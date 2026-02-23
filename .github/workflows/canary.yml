@@ -3,7 +3,8 @@ name: Canary build
 on:
   push:
     branches:
-      - canary
+      - dev
+      - main
     paths-ignore:
       - '**.md'
       - '.github/**'

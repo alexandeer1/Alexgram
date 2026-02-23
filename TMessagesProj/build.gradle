@@ -35,9 +35,10 @@ if (properties != null) {
     pwd = properties.getProperty('ALIAS_PASS')
 }
 
-keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS')
-alias = alias ?: System.getenv('ALIAS_NAME')
-pwd = pwd ?: System.getenv('ALIAS_PASS')
+// Ensure defaults for build if not set
+keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS') ?: "123456"
+alias = alias ?: System.getenv('ALIAS_NAME') ?: "key0"
+pwd = pwd ?: System.getenv('ALIAS_PASS') ?: "123456"
 
 def nativeTarget = System.getenv('NATIVE_TARGET') ?: ''
 

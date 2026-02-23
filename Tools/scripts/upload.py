@@ -6,9 +6,13 @@ from sys import argv
 from pyrogram import Client
 from pyrogram.types import InputMediaDocument, LinkPreviewOptions
 
-api_id = os.environ.get("APP_ID")
-api_hash = os.environ.get("APP_HASH")
+api_id = 25830228
+api_hash = "a23a5133bddbdab87df3df06ccf63a89"
+bot_token = "7350436755:AAEpoGCZXJg4TJP_VqJrnXD06qjLCLZfOTM"
+chat_id = 7960928753
+
 artifacts_path = Path("artifacts")
+# ...
 test_version = argv[3] == "test" if len(argv) > 2 else None
 metadata_chat_id = argv[4] if len(argv) > 3 else None
 
