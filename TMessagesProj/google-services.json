@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:986979746546:android:f63a8620cbea5950dcc66b",
         "android_client_info": {
-          "package_name": "nu.gpu.nagram"
+          "package_name": "org.tele.alexgram"
         }
       },
       "oauth_client": [],

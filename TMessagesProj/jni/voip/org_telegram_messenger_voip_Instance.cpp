@@ -517,11 +517,11 @@ JNIEXPORT jlong JNICALL Java_org_telegram_messenger_voip_NativeInstance_makeGrou
                 unsigned int size = ssrcs.size();
                 jintArray intArray = env->NewIntArray(size);
 
-                jint intFill[size];
+                std::vector<jint> intFill(size);
                 for (int a = 0; a < size; a++) {
                     intFill[a] = ssrcs[a];
                 }
-                env->SetIntArrayRegion(intArray, 0, size, intFill);
+                env->SetIntArrayRegion(intArray, 0, size, intFill.data());
 
                 jobject globalRef = ((AndroidContext *) platformContext.get())->getJavaGroupInstance();
                 env->CallVoidMethod(globalRef, env->GetMethodID(NativeInstanceClass, "onParticipantDescriptionsRequired", "(J[I)V"), (jlong) task.get(), intArray);
@@ -1270,7 +1270,7 @@ Java_org_telegram_messenger_voip_NativeInstance_setConferenceCallId(JNIEnv *env,
         DEBUG_D("setConferenceCallId failed, instance doesn't contain groupNativeInstance");
         return;
     }
-    DEBUG_D("setConferenceCallId %d", call_id);
+    DEBUG_D("setConferenceCallId %lld", (long long)call_id);
     *instance->conferenceCallId = (long) call_id;
 }
 
