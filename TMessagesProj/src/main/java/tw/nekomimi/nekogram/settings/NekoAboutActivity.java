@@ -18,10 +18,7 @@ import tw.nekomimi.nekogram.DatacenterActivity;
 public class NekoAboutActivity extends BaseNekoSettingsActivity {
 
     private int xChannelRow;
-    private int channelRow;
     private int channelTipsRow;
-    private int sourceCodeRow;
-    private int translationRow;
     private int datacenterStatusRow;
 
     @Override
@@ -29,10 +26,7 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
         super.updateRows();
 
         xChannelRow = addRow();
-        channelRow = addRow();
         channelTipsRow = addRow();
-        sourceCodeRow = addRow();
-        translationRow = addRow();
         datacenterStatusRow = addRow();
     }
 
@@ -44,15 +38,9 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
         if (position == xChannelRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("NagramX", NekoAboutActivity.this, 1);
-        } else if (position == channelRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("nagram_channel", NekoAboutActivity.this, 1);
+            MessagesController.getInstance(currentAccount).openByUserName("AlexgramApp", this, 1);
         } else if (position == channelTipsRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("NagramTips", NekoAboutActivity.this, 1);
-        } else if (position == translationRow) {
-            Browser.openUrl(getParentActivity(), "https://crowdin.com/project/NagramX");
-        } else if (position == sourceCodeRow) {
-            Browser.openUrl(getParentActivity(), "https://github.com/risin42/NagramX");
+            MessagesController.getInstance(currentAccount).openByUserName("Alexgramtips", this, 1);
         } else if (position == datacenterStatusRow) {
             presentFragment(new DatacenterActivity(0));
         }
@@ -74,21 +62,14 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
             if (holder.getItemViewType() == TYPE_SETTINGS) {
                 TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                 if (position == xChannelRow) {
-                    textCell.setTextAndValue(getString(R.string.XChannel), "@NagramX", true);
-                } else if (position == channelRow) {
-                    textCell.setTextAndValue(getString(R.string.OfficialChannel), "@nagram_channel", true);
+                    textCell.setTextAndValue("Alexgram Channel", "@AlexgramApp", true);
                 } else if (position == channelTipsRow) {
-                    textCell.setTextAndValue(getString(R.string.TipsChannel), "@" + "NagramTips", true);
-                } else if (position == sourceCodeRow) {
-                    textCell.setTextAndValue(getString(R.string.SourceCode), "Github", true);
-                } else if (position == translationRow) {
-                    textCell.setTextAndValue(getString(R.string.TransSite), "Crowdin", true);
+                    textCell.setTextAndValue("Features Tips Channel", "@Alexgramtips", true);
                 } else if (position == datacenterStatusRow) {
                     textCell.setText(getString(R.string.DatacenterStatus), false);
                 }
             }
         }
-
         @Override
         public int getItemViewType(int position) {
             return TYPE_SETTINGS;
