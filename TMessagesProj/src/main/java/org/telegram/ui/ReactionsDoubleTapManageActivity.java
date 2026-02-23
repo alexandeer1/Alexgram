@@ -113,7 +113,7 @@ public class ReactionsDoubleTapManageActivity extends BaseFragment implements No
                         cell.setText(AndroidUtilities.replaceArrows(
                             AndroidUtilities.replaceSingleTag(
                                 getString(R.string.DoubleTapPreviewRational) + "\n\n" + "**" + getString(R.string.DoubleTapAction) + " >**",
-                                () -> Browser.openUrl(getContext(), "https://t.me/nasettings/chat?r=DoubleTapIncoming")
+                                () -> Browser.openUrl(getContext(), "https://t.me/alexsettings/chat?r=DoubleTapIncoming")
                             ), true
                         ));
                         cell.setBackground(Theme.getThemedDrawableByKey(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));

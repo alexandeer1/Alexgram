@@ -348,10 +348,10 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
                     if (i == 0) {
                         showUnifiedPushStatistics();
                     } else if (i == 1) {
-                        AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/nasettings/%s?r=%s", getMessagesController().linkPrefix, "general", key));
+                        AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/alexsettings/%s?r=%s", getMessagesController().linkPrefix, "general", key));
                         BulletinFactory.of(NekoGeneralSettingsActivity.this).createCopyLinkBulletin().show();
                     } else if (i == 2 && !TextUtils.isEmpty(value)) {
-                        AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/nasettings/%s?r=%s&v=%s", getMessagesController().linkPrefix, "general", key, value));
+                        AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/alexsettings/%s?r=%s&v=%s", getMessagesController().linkPrefix, "general", key, value));
                         BulletinFactory.of(NekoGeneralSettingsActivity.this).createCopyLinkBulletin().show();
                     }
                 }).create());

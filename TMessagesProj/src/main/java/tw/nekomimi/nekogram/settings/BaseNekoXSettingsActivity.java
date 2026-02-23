@@ -274,11 +274,11 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         showDialog(new AlertDialog.Builder(context).setItems(items, (dialogInterface, i) -> {
             switch (i) {
                 case 0:
-                    AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/nasettings/%s?r=%s", getMessagesController().linkPrefix, prefix, key));
+                    AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/alexsettings/%s?r=%s", getMessagesController().linkPrefix, prefix, key));
                     BulletinFactory.of(fragment).createCopyLinkBulletin().show();
                     break;
                 case 1:
-                    AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/nasettings/%s?r=%s&v=%s", getMessagesController().linkPrefix, prefix, key, value));
+                    AndroidUtilities.addToClipboard(String.format(Locale.getDefault(), "https://%s/alexsettings/%s?r=%s&v=%s", getMessagesController().linkPrefix, prefix, key, value));
                     BulletinFactory.of(fragment).createCopyLinkBulletin().show();
                     break;
             }

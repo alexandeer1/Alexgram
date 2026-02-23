@@ -2098,7 +2098,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                                 conferenceSlug = path.replace("call/", "");
                                             } else if (path.startsWith("addemoji/")) {
                                                 emoji = path.replace("addemoji/", "");
-                                            } else if (path.startsWith("nasettings/")) {
+                                            } else if (path.startsWith("alexsettings/") || path.startsWith("nasettings/")) {
+                                                if (path.startsWith("nasettings/")) {
+                                                     Uri.Builder builder = data.buildUpon();
+                                                     builder.path(data.getPath().replace("nasettings/", "alexsettings/"));
+                                                     data = builder.build();
+                                                }
                                                 SettingsHelper.processDeepLink(this, data, fragment -> {
                                                     AndroidUtilities.runOnUIThread(() -> presentFragment(fragment, false, false));
                                                     if (AndroidUtilities.isTablet()) {
@@ -2661,7 +2666,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                         }
                                         checkAppUpdate(true, null, updateAlways);
                                     } else if (url.startsWith("tg:neko") || url.startsWith("tg://neko")) {
-                                        url = url.replace("tg:neko", "tg://t.me/nasettings").replace("tg://neko", "tg://t.me/nasettings");
+                                        url = url.replace("tg:neko", "tg://t.me/alexsettings").replace("tg://neko", "tg://t.me/alexsettings");
                                         data = Uri.parse(url);
                                         SettingsHelper.processDeepLink(this, data, fragment -> {
                                             AndroidUtilities.runOnUIThread(() -> presentFragment(fragment, false, false));
