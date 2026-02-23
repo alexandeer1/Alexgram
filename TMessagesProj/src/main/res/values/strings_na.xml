@@ -9,7 +9,7 @@
     <string name="SendReactions">Send Reactions</string>
     <string name="ShowReactions">Show Reactions</string>
     <string name="CustomTitle">Custom Title</string>
-    <string name="CustomTitleHint">Leave blank to use Nagram X</string>
+    <string name="CustomTitleHint">Leave blank to use Alexgram</string>
     <string name="CreateMono">Create Monospace</string>
     <string name="CreateMonoLanguage">Code Language</string>
     <string name="CopyPhoto">Copy Photo</string>
@@ -23,9 +23,15 @@
     <string name="AppIconGoogle" translatable="false">Google</string>
     <string name="AppIconColorful">Colorful</string>
     <string name="AppIconDarkGreen">Dark Green</string>
-    <string name="AppIconNeon">Neon</string>
+    <string name="AppIconNeon">Alexgram Neon</string>
     <string name="AppIconNiello">Niello</string>
-    <string name="AppIconBlue">Blue</string>
+    <string name="AppIconBlue">Alexgram Blue</string>
+    <string name="AppIconColored">Alexgram Colored</string>
+    <string name="AppIconDark">Alexgram Dark</string>
+    <string name="AppIconGreen">Alexgram Green</string>
+    <string name="AppIconPink">Alexgram Pink</string>
+    <string name="AppIconRoseBlue">Alexgram RoseBlue</string>
+    <string name="AppIconWhite">Alexgram White</string>
     <string name="AppIconDarkBlue">Dark Blue</string>
     <string name="AppIconBlurBlue">Blur Blue</string>
     <string name="InputMessageId">Enter Message ID</string>
@@ -42,7 +48,7 @@
     <string name="CustomEditedMessage">Custom Edited Mark</string>
     <string name="NotificationIcon">Notification Icon</string>
     <string name="Official">Official</string>
-    <string name="Nagram" translatable="false">Nagram</string>
+    <string name="Nagram" translatable="false">Alexgram</string>
     <string name="HalloWeen">HalloWeen</string>
     <string name="ShowOnlineStatus">Show Online Status</string>
     <string name="ShowOnlineStatusNotice">Show the online status of other people next to their profile photo in groups.</string>
