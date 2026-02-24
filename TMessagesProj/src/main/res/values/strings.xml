@@ -7094,8 +7094,8 @@
     <string name="UnconfirmedAuthSingle">We detected a new login to your account from %s. Is it you?</string>
     <string name="UnconfirmedAuthMultiple_one">We detected new %d login to your account. Is it you?</string>
     <string name="UnconfirmedAuthMultiple_other">We detected new %d logins to your account. Is it you?</string>
-    <string name="UnconfirmedAuthMultipleFrom_one">We detected new %d login to your account from %s. Is it you?</string>
-    <string name="UnconfirmedAuthMultipleFrom_other">We detected new %d logins to your account from %s. Is it you?</string>
+    <string name="UnconfirmedAuthMultipleFrom_one">We detected new %1$d login to your account from %2$s. Is it you?</string>
+    <string name="UnconfirmedAuthMultipleFrom_other">We detected new %1$d logins to your account from %2$s. Is it you?</string>
     <string name="UnconfirmedAuthDeniedTitle_one">New Login Prevented</string>
     <string name="UnconfirmedAuthDeniedTitle_other">New Logins Prevented</string>
     <string name="UnconfirmedAuthDeniedMessageSingle">We have terminated the login attempt from %s.</string>
@@ -9634,24 +9634,24 @@
 
     <string name="SuggestionAgreementReached">🤝 **Agreement Reached!**</string>
 
-    <string name="SuggestionAgreementReachedUser1">📆 Your post will be automatically published on **%s** **%s**</string>
+    <string name="SuggestionAgreementReachedUser1">📆 Your post will be automatically published on **%1$s** **%2$s**</string>
     <string name="SuggestionAgreementReachedUser1PresentPerfect">📆 Your post has been published on **%s**</string>
-    <string name="SuggestionAgreementReachedUser1PastSimple">📆 Your post was automatically published on **%s** **%s**</string>
-    <string name="SuggestionAgreementReachedAdmin1">📆 This post will be automatically published **%s** **%s**</string>
+    <string name="SuggestionAgreementReachedUser1PastSimple">📆 Your post was automatically published on **%1$s** **%2$s**</string>
+    <string name="SuggestionAgreementReachedAdmin1">📆 This post will be automatically published **%1$s** **%2$s**</string>
     <string name="SuggestionAgreementReachedAdmin1PresentPerfect">📆 This post has been published on **%s**</string>
-    <string name="SuggestionAgreementReachedAdmin1PastSimple">📆 This post was automatically published on **%s** **%s**</string>
+    <string name="SuggestionAgreementReachedAdmin1PastSimple">📆 This post was automatically published on **%1$s** **%2$s**</string>
 
     <string name="SuggestionAgreementReachedUser2">💰 You have been charged ⭐️ **%s**.</string>
     <string name="SuggestionAgreementReachedAdmin2">💰 **%s** has been charged ⭐️ **%s**.</string>
-    <string name="SuggestionAgreementReachedUser3Stars">⏳ **%s** will receive your **Stars** once the post has been live for **%d** hours.</string>
-    <string name="SuggestionAgreementReachedAdmin3Stars">⏳ **%s** will receive the **Stars** once the post has been live for **%d** hours.</string>
-    <string name="SuggestionAgreementReachedUser4Stars">🔁 If **%s** removes the post before it has been live for **%d** hours, your **Stars** will be refunded.</string>
-    <string name="SuggestionAgreementReachedAdmin4Stars">🔁 If **%s** removes the post before it has been live for **%d** hours, **Stars** will be refunded to user.</string>
+    <string name="SuggestionAgreementReachedUser3Stars">⏳ **%1$s** will receive your **Stars** once the post has been live for **%2$d** hours.</string>
+    <string name="SuggestionAgreementReachedAdmin3Stars">⏳ **%1$s** will receive the **Stars** once the post has been live for **%2$d** hours.</string>
+    <string name="SuggestionAgreementReachedUser4Stars">🔁 If **%1$s** removes the post before it has been live for **%2$d** hours, your **Stars** will be refunded.</string>
+    <string name="SuggestionAgreementReachedAdmin4Stars">🔁 If **%1$s** removes the post before it has been live for **%2$d** hours, **Stars** will be refunded to user.</string>
 
-    <string name="SuggestionAgreementReachedUser3TON">⏳ **%s** will receive your **TON** once the post has been live for **%d** hours.</string>
-    <string name="SuggestionAgreementReachedAdmin3TON">⏳ **%s** will receive the **TON** once the post has been live for **%d** hours.</string>
-    <string name="SuggestionAgreementReachedUser4TON">🔁 If **%s** removes the post before it has been live for **%d** hours, your **TON** will be refunded.</string>
-    <string name="SuggestionAgreementReachedAdmin4TON">🔁 If **%s** removes the post before it has been live for **%d** hours, **TON** will be refunded to user.</string>
+    <string name="SuggestionAgreementReachedUser3TON">⏳ **%1$s** will receive your **TON** once the post has been live for **%2$d** hours.</string>
+    <string name="SuggestionAgreementReachedAdmin3TON">⏳ **%1$s** will receive the **TON** once the post has been live for **%2$d** hours.</string>
+    <string name="SuggestionAgreementReachedUser4TON">🔁 If **%1$s** removes the post before it has been live for **%2$d** hours, your **TON** will be refunded.</string>
+    <string name="SuggestionAgreementReachedAdmin4TON">🔁 If **%1$s** removes the post before it has been live for **%2$d** hours, **TON** will be refunded to user.</string>
 
     <string name="SuggestionAgreementDeclinedYou">❌ **%s** rejected your message.</string>
     <string name="SuggestionAgreementDeclinedThis">❌ **%s** rejected this message.</string>
