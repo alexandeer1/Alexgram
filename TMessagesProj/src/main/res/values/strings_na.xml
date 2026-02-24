@@ -121,4 +121,6 @@
     <string name="VideoPlayerDecoderHardware">HW Only</string>
     <string name="VideoPlayerDecoderPreferHW">Prefer HW</string>
     <string name="StarFallInChat">Star Fall</string>
+    <string name="ExportChat">Export Chat</string>
+    <string name="ImportChat">Import Chat</string>
 </resources>
