@@ -16,7 +16,7 @@ import org.telegram.messenger.MessagesStorage
 import org.telegram.messenger.NotificationCenter
 import org.telegram.messenger.TranslateController
 import org.telegram.tgnet.TLRPC
-import org.telegram.ui.ChatActivity
+// import org.telegram.ui.ChatActivity
 import tw.nekomimi.nekogram.NekoConfig
 import tw.nekomimi.nekogram.helpers.MessageHelper
 import tw.nekomimi.nekogram.translate.Translator
@@ -33,20 +33,20 @@ const val TRANSLATE_MODE_REPLACE = 1
 
 const val TRANSLATION_SEPARATOR = "\n\n--------\n\n"
 
-private val ChatActivity.translateController: TranslateController
+private val org.telegram.ui.ChatActivity.translateController: TranslateController
     get() = messagesController.translateController
 
 
 @JvmName("translateMessages")
-fun ChatActivity.translateMessagesWithProvider(provider: Int) =
+fun org.telegram.ui.ChatActivity.translateMessagesWithProvider(provider: Int) =
     translateMessages(provider = provider)
 
 @JvmName("translateMessages")
-fun ChatActivity.translateMessagesWithMessages(messages: List<MessageObject>) =
+fun org.telegram.ui.ChatActivity.translateMessagesWithMessages(messages: List<MessageObject>) =
     translateMessages(messages = messages)
 
 @JvmOverloads
-fun ChatActivity.translateMessages(
+fun org.telegram.ui.ChatActivity.translateMessages(
     targetLocale: Locale = NekoConfig.translateToLang.String().code2Locale,
     provider: Int = 0,
     messages: List<MessageObject> = messageForTranslate?.let { listOf(it) }
@@ -496,7 +496,7 @@ private fun extractLlmContextText(message: MessageObject): String? {
     return text
 }
 
-private fun buildLlmContext(chatActivity: ChatActivity, message: MessageObject): String? {
+private fun buildLlmContext(chatActivity: org.telegram.ui.ChatActivity, message: MessageObject): String? {
     val maxMessages = LLMTranslator.getContextMessageLimit()
     if (maxMessages <= 0) return null
 
