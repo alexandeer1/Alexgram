@@ -120,4 +120,5 @@
     <string name="VideoPlayerDecoderPreferSW">Prefer SW</string>
     <string name="VideoPlayerDecoderHardware">HW Only</string>
     <string name="VideoPlayerDecoderPreferHW">Prefer HW</string>
+    <string name="StarFallInChat">Star Fall</string>
 </resources>

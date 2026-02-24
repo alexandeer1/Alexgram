@@ -4994,6 +4994,13 @@ public class ChatActivity extends BaseFragment implements
         invalidateBlurredSourcesView = new OnPostDrawView(context, this::invalidateMergedVisibleBlurredPositionsAndSourcesImpl);
         contentView.addView(invalidateBlurredSourcesView);
 
+        if (xyz.nextalone.nagram.NaConfig.INSTANCE.getStarFallInChat().Bool()) {
+            xyz.nextalone.nagram.StarFallView starFallView = new xyz.nextalone.nagram.StarFallView(context);
+            contentView.addView(starFallView, new android.view.ViewGroup.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+            starFallView.setClickable(false);
+            starFallView.setFocusable(false);
+        }
+
         final ViewPositionWatcher viewPositionWatcher = new ViewPositionWatcher(contentView);
 
         glassBackgroundDrawableFactory.setSourceRootView(viewPositionWatcher, contentView);
