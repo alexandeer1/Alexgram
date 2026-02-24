@@ -1678,6 +1678,8 @@ public class ChatActivity extends BaseFragment implements
     private final static int add_shortcut = 24;
     private final static int save_to = 25;
     private final static int auto_delete_timer = 26;
+    private final static int export_chat = 136;
+    private final static int import_chat = 137;
     private final static int change_colors = 27;
     private final static int tag_message = 28;
     private final static int boost_group = 29;
@@ -4035,6 +4037,10 @@ public class ChatActivity extends BaseFragment implements
                         getMessagesController().getTopicsController().toggleViewForumAsMessages(-dialog_id, false);
                         TopicsFragment.prepareToSwitchAnimation(ChatActivity.this);
                     }
+                } else if (id == export_chat) {
+                    xyz.nextalone.nagram.utils.ChatExportImport.exportChat(context, messages, currentChat != null ? currentChat.title : (currentUser != null ? org.telegram.messenger.UserObject.getUserName(currentUser) : "Chat"));
+                } else if (id == import_chat) {
+                    xyz.nextalone.nagram.utils.ChatExportImport.importChat(ChatActivity.this, 137);
                 } else if (id == copy) {
                     SpannableStringBuilder str = new SpannableStringBuilder();
                     long previousUid = 0;
@@ -4871,6 +4877,10 @@ public class ChatActivity extends BaseFragment implements
             if (currentUser != null && currentUser.self && getDialogId() != UserObject.VERIFY) {
                 headerItem.lazilyAddSubItem(add_shortcut, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut));
             }
+
+            headerItem.lazilyAddSubItem(export_chat, R.drawable.msg_share, LocaleController.getString(R.string.ExportChat));
+            headerItem.lazilyAddSubItem(import_chat, R.drawable.msg_folders, LocaleController.getString(R.string.ImportChat));
+
             if (!isTopic && !ChatObject.isMonoForum(currentChat)) {
                 clearHistoryItem = headerItem.lazilyAddSubItem(clear_history, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
             }
@@ -20674,6 +20684,10 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 137 && data != null) {
+                xyz.nextalone.nagram.utils.ChatExportImport.handleImportResult(getParentActivity(), dialog_id, data.getData());
+                return;
+            }
             if (requestCode == 0 || requestCode == 2) {
                 createChatAttachView();
                 if (chatAttachAlert != null) {
