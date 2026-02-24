@@ -47638,70 +47638,93 @@ public class ChatActivity extends BaseFragment implements
     // START AI REPLY GENERATION LOGIC
 
     private void showAiReplyDialog() {
-        if (selectedObject == null) {
-            return;
-        }
-
-        final EditText inputField = new EditText(getParentActivity());
-        inputField.setBackground(Theme.createEditTextDrawable(getParentActivity(), false));
-        inputField.setTextSize(16);
-        inputField.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-        inputField.setHint("Enter your prompt for AI...");
-        inputField.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        inputField.setPadding(AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4));
-
-        LinearLayout container = new LinearLayout(getParentActivity());
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), 0);
-        container.addView(inputField, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-        builder.setTitle("AI Reply");
-        builder.setView(container);
-        builder.setPositiveButton("Generate", null); // Set listener later to prevent auto-close
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String prompt = inputField.getText().toString().trim();
-            if (TextUtils.isEmpty(prompt)) {
+        try {
+            if (selectedObject == null) {
+                return;
+            }
+            if (getParentActivity() == null) {
                 return;
             }
 
-            // Show loading
-            final ProgressBar progressBar = new ProgressBar(getParentActivity());
-            container.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER, 0, 16, 0, 0));
-            inputField.setEnabled(false);
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            final android.widget.EditText inputField = new android.widget.EditText(getParentActivity());
+            inputField.setBackground(Theme.createEditTextDrawable(getParentActivity(), false));
+            inputField.setTextSize(16);
+            inputField.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+            inputField.setHint("Enter your prompt for AI...");
+            inputField.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
+            inputField.setPadding(AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4));
 
-            startAiGeneration(prompt, selectedObject, new AiGenerationCallback() {
-                @Override
-                public void onSuccess(String result) {
-                    AndroidUtilities.runOnUIThread(() -> {
-                        try {
-                            if (dialog.isShowing()) dialog.dismiss();
-                        } catch (Exception e) { /* ignore */ }
+            android.widget.LinearLayout container = new android.widget.LinearLayout(getParentActivity());
+            container.setOrientation(android.widget.LinearLayout.VERTICAL);
+            container.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), 0);
+            container.addView(inputField, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-                        if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
-                            chatActivityEnterView.getEditField().setText(result);
-                            chatActivityEnterView.getEditField().setSelection(result.length());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+            builder.setTitle("AI Reply");
+            builder.setView(container);
+            builder.setPositiveButton("Generate", null); 
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                try {
+                    String prompt = inputField.getText().toString().trim();
+                    if (android.text.TextUtils.isEmpty(prompt)) {
+                        return;
+                    }
+
+                    // Show loading
+                    final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(getParentActivity());
+                    container.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, android.view.Gravity.CENTER, 0, 16, 0, 0));
+                    inputField.setEnabled(false);
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+                    startAiGeneration(prompt, selectedObject, new AiGenerationCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            AndroidUtilities.runOnUIThread(() -> {
+                                try {
+                                    if (dialog.isShowing()) dialog.dismiss();
+                                } catch (Throwable e) { /* ignore */ }
+
+                                if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
+                                    chatActivityEnterView.getEditField().setText(result);
+                                    chatActivityEnterView.getEditField().setSelection(result.length());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            AndroidUtilities.runOnUIThread(() -> {
+                                try {
+                                    container.removeView(progressBar);
+                                    inputField.setEnabled(true);
+                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                                    if (getParentActivity() != null) {
+                                        android.widget.Toast.makeText(getParentActivity(), "Error: " + error, android.widget.Toast.LENGTH_LONG).show();
+                                    }
+                                } catch (Throwable e) {
+                                    e.printStackTrace();
+                                }
+                            });
                         }
                     });
-                }
-
-                @Override
-                public void onError(String error) {
-                    AndroidUtilities.runOnUIThread(() -> {
-                        container.removeView(progressBar);
-                        inputField.setEnabled(true);
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                        Toast.makeText(getParentActivity(), "Error: " + error, Toast.LENGTH_LONG).show();
-                    });
+                } catch (Throwable e) {
+                    if (getParentActivity() != null) {
+                        android.widget.Toast.makeText(getParentActivity(), "Crash in Start: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                    }
+                    e.printStackTrace();
                 }
             });
-        });
+        } catch (Throwable e) {
+            if (getParentActivity() != null) {
+                android.widget.Toast.makeText(getParentActivity(), "Dialog Crash: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+            }
+            e.printStackTrace();
+        }
     }
 
     private interface AiGenerationCallback {
@@ -47710,102 +47733,105 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private void startAiGeneration(String userPrompt, MessageObject originalMessage, AiGenerationCallback callback) {
-        // 1. Get Text Context
-        String messageText = originalMessage.messageText != null ? originalMessage.messageText.toString() : "";
-        if (TextUtils.isEmpty(messageText) && originalMessage.caption != null) {
-            messageText = originalMessage.caption.toString();
-        }
-
-        // 2. Get Image Context (if available)
-        File imageFile = null;
-        if (originalMessage.type == MessageObject.TYPE_PHOTO && originalMessage.messageOwner.media != null && originalMessage.messageOwner.media.photo != null) {
-             try {
-                 // Try to get the largest photo size
-                 TLRPC.PhotoSize photoSize = FileLoader.getClosestPhotoSizeWithSize(originalMessage.messageOwner.media.photo.sizes, 10000);
-                 if (photoSize != null) {
-                     imageFile = FileLoader.getInstance(currentAccount).getPathToAttach(photoSize, true);
-                     if (imageFile == null || !imageFile.exists()) {
-                         // Try without force download check
-                         imageFile = FileLoader.getInstance(currentAccount).getPathToAttach(photoSize, false);
-                     }
-                 }
-             } catch (Exception e) {
-                 e.printStackTrace();
-             }
-        }
-        
-        final String finalMessageText = messageText;
-        final File finalImageFile = (imageFile != null && imageFile.exists()) ? imageFile : null;
-
-        // 3. Try API 1
-        String url1 = NaConfig.INSTANCE.getAiModelUrl().String(); 
-        String key1 = NaConfig.INSTANCE.getAiApiKey().String(); 
-
-        callAiApi(url1, key1, userPrompt, finalMessageText, finalImageFile, new AiGenerationCallback() {
-            @Override
-            public void onSuccess(String result) {
-                callback.onSuccess(result);
+        try {
+            // 1. Get Text Context
+            String messageText = originalMessage.messageText != null ? originalMessage.messageText.toString() : "";
+            if (android.text.TextUtils.isEmpty(messageText) && originalMessage.caption != null) {
+                messageText = originalMessage.caption.toString();
             }
 
-            @Override
-            public void onError(String error) {
-                // 4. Failover to API 2
-                String url2 = NaConfig.INSTANCE.getAiModelUrl2().String();
-                String key2 = NaConfig.INSTANCE.getAiApiKey2().String();
-                
-                if (TextUtils.isEmpty(url2)) {
-                    callback.onError(error + "\n(Failover failed: No API 2 URL configured)");
-                    return;
+            // 2. Get Image Context (if available)
+            File imageFile = null;
+            if (originalMessage.type == MessageObject.TYPE_PHOTO && originalMessage.messageOwner.media != null && originalMessage.messageOwner.media.photo != null) {
+                 try {
+                     TLRPC.PhotoSize photoSize = FileLoader.getClosestPhotoSizeWithSize(originalMessage.messageOwner.media.photo.sizes, 10000);
+                     if (photoSize != null) {
+                         imageFile = FileLoader.getInstance(currentAccount).getPathToAttach(photoSize, true);
+                         if (imageFile == null || !imageFile.exists()) {
+                             imageFile = FileLoader.getInstance(currentAccount).getPathToAttach(photoSize, false);
+                         }
+                     }
+                 } catch (Throwable e) {
+                     e.printStackTrace();
+                 }
+            }
+            
+            final String finalMessageText = messageText;
+            final File finalImageFile = (imageFile != null && imageFile.exists()) ? imageFile : null;
+
+            // 3. Try API 1
+            String url1 = "";
+            String key1 = "";
+            try {
+                 url1 = NaConfig.INSTANCE.getAiModelUrl().String(); 
+                 key1 = NaConfig.INSTANCE.getAiApiKey().String(); 
+            } catch (Throwable e) {
+                 callback.onError("Config loading failed: " + e.getMessage());
+                 return;
+            }
+
+            callAiApi(url1, key1, userPrompt, finalMessageText, finalImageFile, new AiGenerationCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    callback.onSuccess(result);
                 }
 
-                callAiApi(url2, key2, userPrompt, finalMessageText, finalImageFile, callback);
-            }
-        });
+                @Override
+                public void onError(String error) {
+                    try {
+                        // 4. Failover to API 2
+                        String url2 = NaConfig.INSTANCE.getAiModelUrl2().String();
+                        String key2 = NaConfig.INSTANCE.getAiApiKey2().String();
+                        
+                        if (android.text.TextUtils.isEmpty(url2)) {
+                            callback.onError(error + "\n(Failover skipped: No API 2 configured)");
+                            return;
+                        }
+
+                        callAiApi(url2, key2, userPrompt, finalMessageText, finalImageFile, callback);
+                    } catch (Throwable e) {
+                        callback.onError(error + "\n(Failover crash: " + e.getMessage() + ")");
+                    }
+                }
+            });
+        } catch (Throwable e) {
+            callback.onError("Start Gen Crash: " + e.getMessage());
+        }
     }
 
     private void callAiApi(String apiUrl, String apiKey, String userPrompt, String originalMessageText, File imageFile, AiGenerationCallback callback) {
-        if (TextUtils.isEmpty(apiUrl)) {
-            callback.onError("API URL is not configured. Go to N-Settings -> Experimental -> AI Reply to configure.");
+        if (android.text.TextUtils.isEmpty(apiUrl)) {
+            callback.onError("API URL is not configured.");
             return;
         }
 
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .build();
-
         try {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .build();
+
             JSONObject jsonBody = new JSONObject();
-            // Defaulting to gpt-4o logic if user doesn't specify model in URL (can't specify in settings currently, assuming URL is full endpoint like https://api.openai.com/v1/chat/completions)
-            // But wait, user only puts "Model Link" which usually means endpoint.
-            // Model name is usually a separate parameter.
-            // I'll stick to "gpt-4o" as default model or "gpt-3.5-turbo".
-            // Ideally should be configurable. But for now hardcode "gpt-4o" as it's powerful and "god level".
             jsonBody.put("model", "gpt-4o"); 
 
             JSONArray messages = new JSONArray();
 
-            // System message
             JSONObject systemMsg = new JSONObject();
             systemMsg.put("role", "system");
             systemMsg.put("content", "You are a helpful assistant replying to a message in a chat.");
             messages.put(systemMsg);
 
-            // User message
             JSONObject userMsg = new JSONObject();
             userMsg.put("role", "user");
 
             JSONArray contentArray = new JSONArray();
 
-            // Text part
             JSONObject textPart = new JSONObject();
             textPart.put("type", "text");
-            // Combine instruction and original message context
             String content = "Context Message:\n---\n" + originalMessageText + "\n---\n\nUser Instruction: " + userPrompt;
             textPart.put("text", content);
             contentArray.put(textPart);
 
-            // Image part
             if (imageFile != null) {
                 try {
                     byte[] fileBytes = readBytes(imageFile);
@@ -47819,8 +47845,8 @@ public class ChatActivity extends BaseFragment implements
                         imagePart.put("image_url", imageUrl);
                         contentArray.put(imagePart);
                     }
-                } catch (Exception e) {
-                    AndroidUtilities.runOnUIThread(() -> Toast.makeText(getParentActivity(), "Failed to attach image to AI request", Toast.LENGTH_SHORT).show());
+                } catch (Throwable e) {
+                    // ignore image error
                 }
             }
 
@@ -47833,7 +47859,7 @@ public class ChatActivity extends BaseFragment implements
                     .url(apiUrl)
                     .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonBody.toString()));
 
-            if (!TextUtils.isEmpty(apiKey)) {
+            if (!android.text.TextUtils.isEmpty(apiKey)) {
                 requestBuilder.addHeader("Authorization", "Bearer " + apiKey);
             }
 
@@ -47863,34 +47889,35 @@ public class ChatActivity extends BaseFragment implements
                                  callback.onError("No choices in response");
                              }
                         } else {
-                            // Fallback for some other APIs returning just object
                             callback.onError("Unexpected JSON format: " + responseBody);
                         }
-                    } catch (Exception e) {
-                        callback.onError("Parse error: " + e.getMessage());
+                    } catch (Throwable e) {
+                        callback.onError("Parse/Response crash: " + e.getMessage());
                     }
                 }
             });
 
-        } catch (Exception e) {
-            callback.onError("Build request error: " + e.getMessage());
+        } catch (Throwable e) {
+            callback.onError("Build Request crash: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private byte[] readBytes(File file) {
         FileInputStream fis = null;
         try {
+            if (file.length() > 10 * 1024 * 1024) return null; // 10MB limit
             fis = new FileInputStream(file);
             byte[] buffer = new byte[(int) file.length()];
             fis.read(buffer);
             return buffer;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return null;
         } finally {
             try {
                 if (fis != null) fis.close();
-            } catch (Exception e) { /* ignore */ }
+            } catch (Throwable e) { /* ignore */ }
         }
     }
     // END AI REPLY GENERATION LOGIC
