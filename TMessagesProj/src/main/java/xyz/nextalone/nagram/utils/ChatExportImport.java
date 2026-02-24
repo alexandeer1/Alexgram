@@ -43,7 +43,18 @@ public class ChatExportImport {
                 JSONObject obj = new JSONObject();
                 obj.put("id", msg.getId());
                 obj.put("date", sdf.format(new Date(msg.messageOwner.date * 1000L)));
-                obj.put("sender", msg.getSenderName());
+                
+                String senderName = "Unknown";
+                long senderId = msg.getSenderId();
+                if (senderId > 0) {
+                    org.telegram.tgnet.TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(org.telegram.messenger.UserConfig.selectedAccount).getUser(senderId);
+                    if (user != null) senderName = org.telegram.messenger.UserObject.getUserName(user);
+                } else {
+                    org.telegram.tgnet.TLRPC.Chat chat = org.telegram.messenger.MessagesController.getInstance(org.telegram.messenger.UserConfig.selectedAccount).getChat(-senderId);
+                    if (chat != null) senderName = chat.title;
+                }
+                
+                obj.put("sender", senderName);
                 obj.put("message", msg.messageOwner.message);
                 if (msg.isReply()) {
                     obj.put("reply_to_msg_id", msg.getReplyMsgId());
@@ -111,7 +122,7 @@ public class ChatExportImport {
                     // "God level" might imply restoring history, but we can't forge timestamps easily without server API.
                     // Doing a "Quote" style import could work but format is tricky.
                     // For now, let's just send the text content to current chat.
-                    SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(text, dialogId, null, null, null, true, null, null, null, true, 0, null);
+                    SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(text, dialogId, null, null, null, true, null, null, null, true, 0, 0, null, false);
                     count++;
                 }
             }
