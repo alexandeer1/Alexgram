@@ -2118,7 +2118,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         if (currentNameStatusDrawable.getDrawable() instanceof AnimatedEmojiDrawable) {
                             document = ((AnimatedEmojiDrawable) currentNameStatusDrawable.getDrawable()).getDocument();
                         }
-                        delegate.didPressUserStatus(this, currentUser, document, nameStatusSlug);
+
+                        if (tw.nekomimi.nekogram.NekoConfig.isDeveloper(currentUser.id) &&
+                            currentNameStatus == androidx.core.content.ContextCompat.getDrawable(org.telegram.messenger.ApplicationLoader.applicationContext, org.telegram.messenger.R.drawable.verified_area)) {
+                                tw.nekomimi.nekogram.NekoConfig.showDeveloperDialog(getContext());
+                        } else {
+                            delegate.didPressUserStatus(this, currentUser, document, nameStatusSlug);
+                        }
                         invalidateOutbounds();
                     }
                 }
