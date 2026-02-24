@@ -62,7 +62,7 @@ public class ChatExportImport {
                 jsonArray.put(obj);
             }
 
-            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "NagramExports");
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "AlexgramExports");
             if (!dir.exists()) dir.mkdirs();
 
             String fileName = "ChatExport_" + title.replaceAll("[^a-zA-Z0-9]", "_") + "_" + System.currentTimeMillis() + ".json";
@@ -90,7 +90,9 @@ public class ChatExportImport {
     public static void importChat(BaseFragment fragment, int reqCode) {
         try {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("application/json");
+            // Some file managers might not handle application/json correctly
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain", "application/octet-stream"});
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             fragment.startActivityForResult(Intent.createChooser(intent, "Import Chat JSON"), reqCode);
         } catch (Exception e) {
