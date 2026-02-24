@@ -528,10 +528,10 @@ private fun buildLlmContext(chatActivity: ChatActivity, message: MessageObject):
     val contextTexts = ArrayList<String>()
     val currentChat = chatActivity.currentChat
     if (currentChat == null || !ChatObject.isChannelAndNotMegaGroup(currentChat)) {
-        val messages = chatActivity.chatAdapter?.messages
+        val messages = chatActivity.chatAdapter?.messages as? ArrayList<MessageObject>
         if (messages != null) {
             val index = messages.indexOf(message).takeIf { it >= 0 }
-                ?: messages.indexOfFirst { it.dialogId == message.dialogId && it.id == message.id }
+                ?: messages.indexOfFirst { msg -> msg.dialogId == message.dialogId && msg.id == message.id }
                     .takeIf { it >= 0 }
             if (index != null) {
                 val remaining = maxMessages - replyChainTexts.size
@@ -551,7 +551,7 @@ private fun buildLlmContext(chatActivity: ChatActivity, message: MessageObject):
     if (replyChainTexts.isEmpty() && contextTexts.isEmpty()) return null
 
     return buildString {
-        val dialogTitle = DialogObject.getName(chatActivity.currentAccount, message.dialogId).trim()
+        val dialogTitle = DialogObject.getName(chatActivity.getCurrentAccount(), message.dialogId).trim()
         if (dialogTitle.isNotEmpty()) {
             append("Chat: ").append(dialogTitle).append("\n\n")
         }
