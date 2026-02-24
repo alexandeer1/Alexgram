@@ -1378,6 +1378,37 @@ object NaConfig {
             0 // 0: Classic, 1: Spring, 2: Predictive Back
         )
 
+    val enableAIReply =
+        addConfig(
+            "enableAIReply",
+            ConfigItem.configTypeBool,
+            false
+        )
+    val aiModelUrl =
+        addConfig(
+            "aiModelUrl",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val aiApiKey =
+        addConfig(
+            "aiApiKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val aiModelUrl2 =
+        addConfig(
+            "aiModelUrl2",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val aiApiKey2 =
+        addConfig(
+            "aiApiKey2",
+            ConfigItem.configTypeString,
+            ""
+        )
+
     val preferredTranslateTargetLangList = ArrayList<String>()
     fun updatePreferredTranslateTargetLangList() {
         AndroidUtilities.runOnUIThread({

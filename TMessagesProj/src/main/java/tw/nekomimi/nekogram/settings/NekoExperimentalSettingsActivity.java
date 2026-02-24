@@ -59,6 +59,7 @@ import java.util.List;
 import kotlin.Unit;
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.config.CellGroup;
+import tw.nekomimi.nekogram.config.ConfigItem;
 import tw.nekomimi.nekogram.config.cell.AbstractConfigCell;
 import tw.nekomimi.nekogram.config.cell.ConfigCellCustom;
 import tw.nekomimi.nekogram.config.cell.ConfigCellDivider;
@@ -181,6 +182,23 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private final AbstractConfigCell headerPangu = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.Pangu)));
     private final AbstractConfigCell enablePanguOnSendingRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getEnablePanguOnSending(), getString(R.string.PanguInfo)));
     private final AbstractConfigCell dividerPangu = cellGroup.appendCell(new ConfigCellDivider());
+
+    // AI Reply
+    private final AbstractConfigCell headerAIReply = cellGroup.appendCell(new ConfigCellHeader("AI Reply"));
+    private final AbstractConfigCell enableAIReplyRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getEnableAIReply(), "Enable AI Reply in Message Menu"));
+    private final AbstractConfigCell aiModelUrlRow = cellGroup.appendCell(new ConfigCellTextInput("Model URL 1", NaConfig.INSTANCE.getAiModelUrl(), "https://api.openai.com/v1/", null));
+    private final AbstractConfigCell aiApiKeyRow = cellGroup.appendCell(new ConfigCellTextInput("API Key 1", NaConfig.INSTANCE.getAiApiKey(), "sk-...", null));
+    private final AbstractConfigCell aiModelUrl2Row = cellGroup.appendCell(new ConfigCellTextInput("Model URL 2 (Failover)", NaConfig.INSTANCE.getAiModelUrl2(), "https://api.openai.com/v1/", null));
+    private final AbstractConfigCell aiApiKey2Row = cellGroup.appendCell(new ConfigCellTextInput("API Key 2 (Failover)", NaConfig.INSTANCE.getAiApiKey2(), "sk-...", null));
+    private final AbstractConfigCell aiHelpRow = cellGroup.appendCell(new ConfigCellText("How to get API?", "Help", () -> {
+         AndroidUtilities.runOnUIThread(() -> {
+            new AlertDialog.Builder(getParentActivity())
+                .setTitle("How to get API Key")
+                .setMessage("1. Sign up for an AI provider (e.g., OpenAI, DeepSeek).\n2. Go to their API Keys section.\n3. Create a new secret key.\n4. Paste it here.\n\nMake sure your account has credits!")
+                .setPositiveButton("OK", null)
+                .show();
+        });
+    }));
 
     public NekoExperimentalSettingsActivity() {
         if (NaConfig.INSTANCE.getUseDeletedIcon().Bool()) {

@@ -91,7 +91,11 @@ public class CellGroup {
     }
 
     public boolean needSetDivider(AbstractConfigCell cell) {
-        return !(rows.get(rows.indexOf(cell) + 1) instanceof ConfigCellDivider);
+        int index = rows.indexOf(cell);
+        if (index >= 0 && index < rows.size() - 1) {
+            return !(rows.get(index + 1) instanceof ConfigCellDivider);
+        }
+        return false;
     }
 
 }

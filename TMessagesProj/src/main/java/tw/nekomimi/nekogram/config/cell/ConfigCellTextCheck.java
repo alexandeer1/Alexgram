@@ -11,7 +11,7 @@ import tw.nekomimi.nekogram.config.ConfigItem;
 
 public class ConfigCellTextCheck extends AbstractConfigCell {
     private final ConfigItem bindConfig;
-    private final CharSequence title;
+    private final CharSequence customTitle;
     private final String subtitle;
     private boolean enabled = true;
     public TextCheckCell cell;
@@ -26,7 +26,7 @@ public class ConfigCellTextCheck extends AbstractConfigCell {
 
     public ConfigCellTextCheck(ConfigItem bind, String subtitle, CharSequence customTitle) {
         this.bindConfig = bind;
-        this.title = customTitle == null ? getString(bindConfig.getKey()) : customTitle;
+        this.customTitle = customTitle;
         this.subtitle = subtitle;
     }
 
@@ -39,7 +39,20 @@ public class ConfigCellTextCheck extends AbstractConfigCell {
     }
 
     public CharSequence getTitle() {
-        return title;
+        if (customTitle != null) {
+            return customTitle;
+        }
+        if (bindConfig != null) {
+            String key = bindConfig.getKey();
+            if (key != null) {
+                String temp = getString(key);
+                if (temp != null) {
+                    return temp;
+                }
+                return key;
+            }
+        }
+        return "";
     }
 
     public String getKey() {
@@ -61,6 +74,8 @@ public class ConfigCellTextCheck extends AbstractConfigCell {
         this.enabled = enabled;
         if (this.cell != null) {
             this.cell.setEnabled(this.enabled);
+            CharSequence title = getTitle();
+            if (title == null) title = "";
             if (subtitle == null) {
                 cell.setTextAndCheck(title, bindConfig.Bool(), cellGroup.needSetDivider(this), true);
             } else {
@@ -72,10 +87,12 @@ public class ConfigCellTextCheck extends AbstractConfigCell {
     public void onBindViewHolder(RecyclerView.ViewHolder holder) {
         TextCheckCell cell = (TextCheckCell) holder.itemView;
         this.cell = cell;
+        CharSequence safeTitle = getTitle();
+        if (safeTitle == null) safeTitle = "";
         if (subtitle == null) {
-            cell.setTextAndCheck(title, bindConfig.Bool(), cellGroup.needSetDivider(this), true);
+            cell.setTextAndCheck(safeTitle, bindConfig.Bool(), cellGroup.needSetDivider(this), true);
         } else {
-            cell.setTextAndValueAndCheck(title.toString(), subtitle, bindConfig.Bool(), true, cellGroup.needSetDivider(this), true);
+            cell.setTextAndValueAndCheck(safeTitle.toString(), subtitle, bindConfig.Bool(), true, cellGroup.needSetDivider(this), true);
         }
         cell.setEnabled(enabled, null);
     }
