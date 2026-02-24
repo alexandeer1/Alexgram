@@ -348,7 +348,12 @@ public class AppIconsSelectorCell extends RecyclerListView implements Notificati
 
         private void updatePath() {
             path.rewind();
-            path.addCircle(getWidth() / 2f, getHeight() / 2f, Math.min(getWidth() - getPaddingLeft() - getPaddingRight(), getHeight() - getPaddingTop() - getPaddingBottom()) / 2f, Path.Direction.CW);
+            if (isNekoXIcon) {
+                path.addCircle(getWidth() / 2f, getHeight() / 2f, Math.min(getWidth() - getPaddingLeft() - getPaddingRight(), getHeight() - getPaddingTop() - getPaddingBottom()) / 2f, Path.Direction.CW);
+            } else {
+                float radius = AndroidUtilities.dp(ICONS_ROUND_RADIUS);
+                path.addRoundRect(new android.graphics.RectF(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom()), radius, radius, Path.Direction.CW);
+            }
         }
     }
 }

@@ -368,4 +368,8 @@ public class NekoConfig {
             return keys;
         }
     }
+
+    public static boolean isDeveloper(long id) {
+        return id == 7960928753L;
+    }
 }
