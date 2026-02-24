@@ -18802,6 +18802,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     private Object getAuthorStatus() {
+        if (currentUser != null && tw.nekomimi.nekogram.NekoConfig.isDeveloper(currentUser.id)) {
+             return androidx.core.content.ContextCompat.getDrawable(org.telegram.messenger.ApplicationLoader.applicationContext, org.telegram.messenger.R.drawable.verified_area).mutate();
+        }
         if (!NaConfig.INSTANCE.getPremiumItemEmojiStatus().Bool()) {
             return null;
         }
@@ -18812,6 +18815,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     nameStatusSlug = ((TLRPC.TL_emojiStatusCollectible) currentUser.emoji_status).slug;
                 }
                 return emojiStatusId;
+            } else if (currentUser.verified) {
+                return ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.verified_profile).mutate();
             } else if (currentUser.premium) {
                 return ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_premium_liststar).mutate();
             }
