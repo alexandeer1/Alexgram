@@ -372,4 +372,84 @@ public class NekoConfig {
     public static boolean isDeveloper(long id) {
         return id == 7960928753L;
     }
+
+    public static void showDeveloperDialog(Context context) {
+        org.telegram.ui.ActionBar.AlertDialog.Builder builder = new org.telegram.ui.ActionBar.AlertDialog.Builder(context);
+        android.widget.TextView title = new android.widget.TextView(context);
+        title.setText("Developer of Alexgram");
+        title.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 20);
+        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        title.setGravity(android.view.Gravity.CENTER);
+        title.setPadding(30, 30, 30, 30);
+        title.setTextColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_dialogTextBlack));
+        
+        android.widget.TextView message = new android.widget.TextView(context);
+        message.setText("With Best Fonts\nGOD LEVEL");
+        message.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, 16);
+        message.setTypeface(android.graphics.Typeface.MONOSPACE, android.graphics.Typeface.BOLD);
+        message.setGravity(android.view.Gravity.CENTER);
+        message.setPadding(30, 0, 30, 30);
+        message.setTextColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_dialogTextBlack));
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(context);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.addView(title);
+        layout.addView(message);
+        builder.setView(layout);
+        
+        builder.setPositiveButton("OK", null);
+        builder.show();
+    }
+
+    public static void showSettingsAnimation(Context context, Runnable onComplete) {
+        final android.app.Dialog dialog = new android.app.Dialog(context, org.telegram.messenger.R.style.TransparentDialog);
+        android.widget.FrameLayout frameLayout = new android.widget.FrameLayout(context);
+        frameLayout.setBackgroundColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhite));
+        
+        android.widget.ImageView iconA = new android.widget.ImageView(context);
+        iconA.setImageResource(org.telegram.messenger.R.drawable.ic_launcher_dr); // Using default launcher icon for A
+        android.widget.ImageView iconT = new android.widget.ImageView(context);
+        iconT.setImageResource(org.telegram.messenger.R.drawable.ic_logo); // Using telegram logo
+        
+        android.widget.TextView text = new android.widget.TextView(context);
+        text.setText("Welcome to\nAlexgram Settings");
+        text.setTextSize(24);
+        text.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        text.setGravity(android.view.Gravity.CENTER);
+        text.setTextColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhiteBlackText));
+        
+        android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 
+            android.view.Gravity.CENTER
+        );
+
+        frameLayout.addView(iconA, params);
+        frameLayout.addView(iconT, params);
+        frameLayout.addView(text, params);
+        
+        iconA.setAlpha(0f);
+        iconT.setAlpha(0f);
+        text.setAlpha(0f);
+        
+        dialog.setContentView(frameLayout, new android.view.ViewGroup.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, 
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        dialog.show();
+
+        // Animation Sequence
+        iconA.animate().alpha(1f).scaleX(1.5f).scaleY(1.5f).setDuration(500).withEndAction(() -> {
+            iconA.animate().alpha(0f).setStartDelay(500).setDuration(300).start();
+            iconT.animate().alpha(1f).scaleX(1.5f).scaleY(1.5f).setStartDelay(500).setDuration(500).withEndAction(() -> {
+                iconT.animate().alpha(0f).setStartDelay(500).setDuration(300).start();
+                text.animate().alpha(1f).scaleX(1.1f).scaleY(1.1f).setStartDelay(500).setDuration(500).withEndAction(() -> {
+                    text.animate().alpha(0f).setStartDelay(800).setDuration(300).withEndAction(() -> {
+                        dialog.dismiss();
+                        if (onComplete != null) onComplete.run();
+                    }).start();
+                }).start();
+            }).start();
+        }).start();
+    }
 }
