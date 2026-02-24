@@ -189,7 +189,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private final AbstractConfigCell aiApiKeyRow = cellGroup.appendCell(new ConfigCellTextInput("API Key 1", NaConfig.INSTANCE.getAiApiKey(), "sk-...", null));
     private final AbstractConfigCell aiModelUrl2Row = cellGroup.appendCell(new ConfigCellTextInput("Model URL 2 (Failover)", NaConfig.INSTANCE.getAiModelUrl2(), "https://api.openai.com/v1/", null));
     private final AbstractConfigCell aiApiKey2Row = cellGroup.appendCell(new ConfigCellTextInput("API Key 2 (Failover)", NaConfig.INSTANCE.getAiApiKey2(), "sk-...", null));
-    private final AbstractConfigCell aiHelpRow = cellGroup.appendCell(new ConfigCellTextDetail("How to get API?", "You can get API tokens from providers like OpenAI, Anthropic, or others. Usually found in their developer settings.", (v, p) -> {
+    private final AbstractConfigCell aiHelpRow = cellGroup.appendCell(new ConfigCellText("How to get API?", "Help", () -> {
          AndroidUtilities.runOnUIThread(() -> {
             new AlertDialog.Builder(getParentActivity())
                 .setTitle("How to get API Key")
