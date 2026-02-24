@@ -407,9 +407,9 @@ public class NekoConfig {
         frameLayout.setBackgroundColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhite));
         
         android.widget.ImageView iconA = new android.widget.ImageView(context);
-        iconA.setImageResource(org.telegram.messenger.R.drawable.ic_launcher_dr); // Using default launcher icon for A
+        iconA.setImageResource(org.telegram.messenger.R.mipmap.ic_launcher_nagram_blue); // Using default launcher icon for A
         android.widget.ImageView iconT = new android.widget.ImageView(context);
-        iconT.setImageResource(org.telegram.messenger.R.drawable.ic_logo); // Using telegram logo
+        iconT.setImageResource(org.telegram.messenger.R.drawable.telegram_logo); // Using telegram logo
         
         android.widget.TextView text = new android.widget.TextView(context);
         text.setText("Welcome to\nAlexgram Settings");
