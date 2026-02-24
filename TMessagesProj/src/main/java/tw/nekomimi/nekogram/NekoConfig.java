@@ -402,7 +402,8 @@ public class NekoConfig {
     }
 
     public static void showSettingsAnimation(Context context, Runnable onComplete) {
-        final android.app.Dialog dialog = new android.app.Dialog(context, org.telegram.messenger.R.style.TransparentDialog);
+        final android.app.Dialog dialog = new android.app.Dialog(context, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+        dialog.setCancelable(false);
         android.widget.FrameLayout frameLayout = new android.widget.FrameLayout(context);
         frameLayout.setBackgroundColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhite));
         
@@ -412,7 +413,7 @@ public class NekoConfig {
         iconT.setImageResource(org.telegram.messenger.R.drawable.telegram_logo); // Using telegram logo
         
         android.widget.TextView text = new android.widget.TextView(context);
-        text.setText("Welcome to\nAlexgram Settings");
+        text.setText("Welcome to\nNagram Settings");
         text.setTextSize(24);
         text.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         text.setGravity(android.view.Gravity.CENTER);
@@ -445,7 +446,7 @@ public class NekoConfig {
                 iconT.animate().alpha(0f).setStartDelay(500).setDuration(300).start();
                 text.animate().alpha(1f).scaleX(1.1f).scaleY(1.1f).setStartDelay(500).setDuration(500).withEndAction(() -> {
                     text.animate().alpha(0f).setStartDelay(800).setDuration(300).withEndAction(() -> {
-                        dialog.dismiss();
+                        try { dialog.dismiss(); } catch (Exception e) {}
                         if (onComplete != null) onComplete.run();
                     }).start();
                 }).start();
