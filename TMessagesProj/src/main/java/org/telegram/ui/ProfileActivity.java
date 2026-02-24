@@ -4517,7 +4517,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             } else if (position == devicesRow) {
                 presentFragment(new SessionsActivity(0));
             } else if (position == nekoRow) {
-                presentFragment(new NekoSettingsActivity());
+                tw.nekomimi.nekogram.NekoConfig.showSettingsAnimation(getParentActivity(), () -> presentFragment(new NekoSettingsActivity()));
             } else if (position == questionRow) {
                 showDialog(AlertsCreator.createSupportAlert(ProfileActivity.this, resourcesProvider));
             } else if (position == faqRow) {
@@ -11530,6 +11530,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else if (user.verified || tw.nekomimi.nekogram.NekoConfig.isDeveloper(user.id)) {
                         nameTextView[a].setRightDrawable2(getVerifiedCrossfadeDrawable(a));
                         nameTextViewRightDrawable2ContentDescription = LocaleController.getString(R.string.AccDescrVerified);
+                        if (tw.nekomimi.nekogram.NekoConfig.isDeveloper(user.id)) {
+                            nameTextView[a].setRightDrawableOnClick(v -> tw.nekomimi.nekogram.NekoConfig.showDeveloperDialog(getParentActivity()));
+                        }
                     } else if (getMessagesController().isDialogMuted(dialogId != 0 ? dialogId : userId, topicId)) {
                         nameTextView[a].setRightDrawable2(getThemedDrawable(Theme.key_drawable_muteIconDrawable));
                         nameTextViewRightDrawable2ContentDescription = LocaleController.getString(R.string.NotificationsMuted);
@@ -11563,6 +11566,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         nameTextView[a].setRightDrawable2(getScamDrawable(user.scam ? 0 : 1));
                     } else if (user.verified || tw.nekomimi.nekogram.NekoConfig.isDeveloper(user.id)) {
                         nameTextView[a].setRightDrawable2(getVerifiedCrossfadeDrawable(a));
+                        if (tw.nekomimi.nekogram.NekoConfig.isDeveloper(user.id)) {
+                            nameTextView[a].setRightDrawableOnClick(v -> tw.nekomimi.nekogram.NekoConfig.showDeveloperDialog(getParentActivity()));
+                        }
                     } else {
                         nameTextView[a].setRightDrawable2(null);
                     }
