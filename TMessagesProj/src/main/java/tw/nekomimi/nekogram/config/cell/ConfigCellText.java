@@ -14,15 +14,25 @@ public class ConfigCellText extends AbstractConfigCell implements WithKey, WithO
     private final Runnable onClick;
     private boolean enabled = true;
     private TextSettingsCell cell;
+    private boolean isRawText = false;
 
     public ConfigCellText(String key, String customValue, Runnable onClick) {
+        this(key, customValue, onClick, false);
+    }
+
+    public ConfigCellText(String key, String customValue, Runnable onClick, boolean isRawText) {
         this.key = key;
         this.value = (customValue == null) ? "" : customValue;
         this.onClick = onClick;
+        this.isRawText = isRawText;
     }
 
     public ConfigCellText(String key, Runnable onClick) {
         this(key, null, onClick);
+    }
+
+    public ConfigCellText(String key, Runnable onClick, boolean isRawText) {
+        this(key, null, onClick, isRawText);
     }
 
     public int getType() {
@@ -45,14 +55,11 @@ public class ConfigCellText extends AbstractConfigCell implements WithKey, WithO
     public void onBindViewHolder(RecyclerView.ViewHolder holder) {
         TextSettingsCell cell = (TextSettingsCell) holder.itemView;
         this.cell = cell;
-        String title = key;
-        if (key != null) {
-            String temp = getString(key);
-            if (temp != null) {
-                title = temp;
-            }
+        String title;
+        if (isRawText) {
+            title = key;
         } else {
-            title = "";
+            title = (key == null ? "" : getString(key));
         }
         cell.setTextAndValue(title, value, cellGroup.needSetDivider(this));
         cell.setEnabled(enabled);
