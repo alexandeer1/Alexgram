@@ -2098,12 +2098,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                                 conferenceSlug = path.replace("call/", "");
                                             } else if (path.startsWith("addemoji/")) {
                                                 emoji = path.replace("addemoji/", "");
-                                            } else if (path.startsWith("alexsettings/") || path.startsWith("nasettings/")) {
-                                                if (path.startsWith("nasettings/")) {
-                                                     Uri.Builder builder = data.buildUpon();
-                                                     builder.path(data.getPath().replace("nasettings/", "alexsettings/"));
-                                                     data = builder.build();
-                                                }
+                                            } else if (path.startsWith("alexsettings/")) {
                                                 SettingsHelper.processDeepLink(this, data, fragment -> {
                                                     AndroidUtilities.runOnUIThread(() -> presentFragment(fragment, false, false));
                                                     if (AndroidUtilities.isTablet()) {
