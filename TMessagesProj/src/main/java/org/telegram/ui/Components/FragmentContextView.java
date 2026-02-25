@@ -22,6 +22,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.audiofx.Visualizer;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -48,6 +49,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityNodeInfo;
+import xyz.nextalone.nagram.NaConfig;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -143,6 +145,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     private ChatActivityInterface chatActivity;
     private View applyingView;
     private BlurredFrameLayout frameLayout;
+    private MusicVisualizerView visualizerView;
     private FrameLayout groupCallMessagesContainer;
     private View shadow;
     private View selector;
@@ -1170,7 +1173,14 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
     private void updateStyle(@Style int style, boolean force) {
         if (currentStyle == style && !force) {
+            if (style == STYLE_AUDIO_PLAYER && NaConfig.INSTANCE.getMusicGraph().Bool() && visualizerView != null) {
+                 visualizerView.start(MediaController.getInstance().getAudioSessionId());
+            }
             return;
+        }
+        if (visualizerView != null) {
+            visualizerView.setVisibility(GONE);
+            visualizerView.stop();
         }
         checkCreateView();
         if (currentStyle == STYLE_ACTIVE_GROUP_CALL || currentStyle == STYLE_CONNECTING_GROUP_CALL) {
@@ -1289,6 +1299,15 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 playButton.setLayoutParams(LayoutHelper.createFrame(36, 36, Gravity.TOP | Gravity.LEFT, 3, 0, 0, 0));
                 titleTextView.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.LEFT | Gravity.TOP, 37, 0, (isSideMenued ? 64 : 0) + 36, 0));
                 createPlaybackSpeedButton();
+                if (NaConfig.INSTANCE.getMusicGraph().Bool()) {
+                   if (visualizerView == null) {
+                       visualizerView = new MusicVisualizerView(getContext());
+                       frameLayout.addView(visualizerView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+                   }
+                   visualizerView.setVisibility(VISIBLE);
+                   visualizerView.setColor(getThemedColor(Theme.key_inappPlayerTitle));
+                   visualizerView.start(MediaController.getInstance().getAudioSessionId());
+                }
                 if (playbackSpeedButton != null) {
                     playbackSpeedButton.setVisibility(VISIBLE);
                     playbackSpeedButton.setTag(1);
@@ -2937,6 +2956,100 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             if (groupCallMessageCounter == 0) {
                 callMessagesAnimator.replace(null, true);
             }
+        }
+    }
+
+    private class MusicVisualizerView extends View {
+        private Visualizer visualizer;
+        private byte[] mBytes;
+        private float[] mPoints;
+        private Paint mPaint;
+        private int color;
+
+        public MusicVisualizerView(Context context) {
+            super(context);
+            mBytes = null;
+            mPaint = new Paint();
+            mPaint.setStrokeWidth(AndroidUtilities.dp(2));
+            mPaint.setAntiAlias(true);
+            mPaint.setColor(0x40FFFFFF);
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+            mPaint.setColor(ColorUtils.setAlphaComponent(color, 50));
+            invalidate();
+        }
+
+        private int currentAudioSessionId = -1;
+
+        public void start(int audioSessionId) {
+            if (audioSessionId == 0) return;
+            if (visualizer != null && currentAudioSessionId == audioSessionId) {
+                return;
+            }
+            if (visualizer != null) {
+                try {
+                    visualizer.release();
+                } catch (Exception e) {}
+                visualizer = null;
+            }
+            
+            try {
+                // Initialize visualizer with current audio session
+                currentAudioSessionId = audioSessionId;
+                visualizer = new Visualizer(audioSessionId);
+                visualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+                visualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
+                    @Override
+                    public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+                        mBytes = bytes;
+                        invalidate();
+                    }
+
+                    @Override
+                    public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+                    }
+                }, Visualizer.getMaxCaptureRate() / 2, true, false);
+                visualizer.setEnabled(true);
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
+        public void stop() {
+             if (visualizer != null) {
+                try {
+                    visualizer.setEnabled(false);
+                    visualizer.release();
+                } catch (Exception e) {}
+                visualizer = null;
+            }
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            if (mBytes == null) {
+                return;
+            }
+
+            if (mPoints == null || mPoints.length < mBytes.length * 4) {
+                mPoints = new float[mBytes.length * 4];
+            }
+
+            int height = getHeight();
+            int width = getWidth();
+
+            // Simple waveform drawing
+            for (int i = 0; i < mBytes.length - 1; i++) {
+                mPoints[i * 4] = width * i / (float) (mBytes.length - 1);
+                mPoints[i * 4 + 1] = height / 2 + ((byte) (mBytes[i] + 128)) * (height / 2) / 128;
+                mPoints[i * 4 + 2] = width * (i + 1) / (float) (mBytes.length - 1);
+                mPoints[i * 4 + 3] = height / 2 + ((byte) (mBytes[i + 1] + 128)) * (height / 2) / 128;
+            }
+
+            canvas.drawLines(mPoints, mPaint);
         }
     }
 }

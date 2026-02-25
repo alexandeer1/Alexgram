@@ -1552,6 +1552,10 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
         return player != null ? player.getCurrentPosition() : 0;
     }
 
+    public int getAudioSessionId() {
+        return player != null ? player.getAudioSessionId() : 0;
+    }
+
     public boolean isMuted() {
         return player != null && player.getVolume() == 0.0f;
     }
