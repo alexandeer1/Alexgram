@@ -2652,6 +2652,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     presentFragment(new ChannelAdminLogActivity(currentChat));
                 } else if (id == message_filter){
                     presentFragment(new RegexChatFiltersListActivity(chatId != 0 ? -chatId : userId));
+                } else if (id == add_to_folder) {
+                    ArrayList<Long> dialogs = new ArrayList<>();
+                    dialogs.add(getDialogId());
+                    showDialog(new FiltersListBottomSheet(ProfileActivity.this, dialogs));
                 } else if (id == delete_topic) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle(LocaleController.getPluralString("DeleteTopics", 1));
