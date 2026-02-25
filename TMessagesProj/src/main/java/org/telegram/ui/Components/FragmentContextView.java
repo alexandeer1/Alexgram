@@ -2962,23 +2962,41 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     private class MusicVisualizerView extends View {
         private Visualizer visualizer;
         private byte[] mBytes;
-        private float[] mPoints;
         private Paint mPaint;
-        private int color;
-
+        private final int numBars = 50;
+        private float[] amplitudes = new float[numBars];
+        private int[] gradientColors;
+        
         public MusicVisualizerView(Context context) {
             super(context);
             mBytes = null;
             mPaint = new Paint();
-            mPaint.setStrokeWidth(AndroidUtilities.dp(2));
             mPaint.setAntiAlias(true);
-            mPaint.setColor(0x40FFFFFF);
+            mPaint.setStyle(Paint.Style.FILL);
+            // Rainbow / Spectrum colors: Red -> Yellow -> Green -> Blue -> Purple
+            gradientColors = new int[]{
+                0xFFFF0000, // Red
+                0xFFFF7F00, // Orange
+                0xFFFFFF00, // Yellow
+                0xFF00FF00, // Green
+                0xFF0000FF, // Blue
+                0xFF4B0082, // Indigo
+                0xFF9400D3  // Violet
+            };
         }
 
         public void setColor(int color) {
-            this.color = color;
-            mPaint.setColor(ColorUtils.setAlphaComponent(color, 120)); // Increased opacity
-            invalidate();
+           // Ignored in favor of full colorful mode
+           invalidate();
+        }
+        
+        @Override
+        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+            super.onSizeChanged(w, h, oldw, oldh);
+            if (h > 0) {
+               LinearGradient gradient = new LinearGradient(0, h, 0, 0, gradientColors, null, Shader.TileMode.CLAMP);
+               mPaint.setShader(gradient);
+            }
         }
 
         private int currentAudioSessionId = -1;
@@ -2996,24 +3014,22 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             }
             
             try {
-                // Initialize visualizer with current audio session
                 currentAudioSessionId = audioSessionId;
                 visualizer = new Visualizer(audioSessionId);
                 visualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
                 visualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
                     @Override
                     public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
-                        mBytes = bytes;
-                        invalidate();
                     }
 
                     @Override
                     public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+                        mBytes = bytes;
+                        invalidate();
                     }
-                }, Visualizer.getMaxCaptureRate() / 2, true, false);
+                }, Visualizer.getMaxCaptureRate() / 2, false, true);
                 visualizer.setEnabled(true);
             } catch (Exception e) {
-                // Just log to verify if it fails
                 android.util.Log.e("MusicVisualizer", "Error enabling visualizer", e);
             }
         }
@@ -3026,6 +3042,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 } catch (Exception e) {}
                 visualizer = null;
             }
+            currentAudioSessionId = -1;
         }
 
         @Override
@@ -3035,24 +3052,53 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 return;
             }
 
-            if (mPoints == null || mPoints.length < mBytes.length * 4) {
-                mPoints = new float[mBytes.length * 4];
-            }
-
-            int height = getHeight();
             int width = getWidth();
+            int height = getHeight();
+            float barWidth = (float) width / numBars;
+            float space = barWidth * 0.2f; // 20% spacing
+            float drawWidth = barWidth - space;
+            
+            if (drawWidth < 1) drawWidth = 1;
 
-            float centerY = height / 2f;
-            float maxAmplitude = centerY * 0.8f; // Leave some padding
+            // FFT typically gives 1024 values (for capture size 1024). First byte is DC, then pairs of Real/Imag parts.
+            // We want indices primarily from the lower range (bass/mid) as human hearing is logarithmic.
+            
+            // Map numBars to FFT bins. We skip the first few (DC offset) and map logarithmically if possible, 
+            // but linear blocking is easier and often looks fine for small visualizers.
+            
+            for (int i = 0; i < numBars; i++) {
+                int m = mBytes.length / 2;
+                // Use a wider range of the spectrum (up to half the Nyquist frequency)
+                int index = (int) ((i * 1.0f / numBars) * (m / 2)) * 2;
+                
+                if (index < 2) index = 2; // Skip DC/low freq noise
+                if (index + 1 >= mBytes.length) break;
+                
+                byte rfk = mBytes[index];
+                byte ifk = mBytes[index + 1];
+                float magnitude = (float) (rfk * rfk + ifk * ifk);
+                int dbValue = (int) (10 * Math.log10(magnitude));
 
-            for (int i = 0; i < mBytes.length - 1; i++) {
-                mPoints[i * 4] = width * i / (float) (mBytes.length - 1);
-                mPoints[i * 4 + 1] = centerY + ((byte) (mBytes[i] + 128)) * (maxAmplitude / 128f);
-                mPoints[i * 4 + 2] = width * (i + 1) / (float) (mBytes.length - 1);
-                mPoints[i * 4 + 3] = centerY + ((byte) (mBytes[i + 1] + 128)) * (maxAmplitude / 128f);
+                float targetAmplitude = (dbValue > 0 ? dbValue : 0);
+                
+                // Sensitivity adjustment
+                targetAmplitude = (targetAmplitude * 4f); 
+                if (targetAmplitude > height) targetAmplitude = height;
+                
+                // Smooth falloff
+                if (targetAmplitude > amplitudes[i]) {
+                    amplitudes[i] = targetAmplitude;
+                } else {
+                    amplitudes[i] = Math.max(amplitudes[i] - (height / 20.0f), 0);
+                }
+
+                float x = i * barWidth + (space / 2);
+                float y = height - amplitudes[i];
+                
+                canvas.drawRect(x, y, x + drawWidth, height, mPaint);
             }
-
-            canvas.drawLines(mPoints, mPaint);
+            
+            invalidate(); 
         }
     }
 }
