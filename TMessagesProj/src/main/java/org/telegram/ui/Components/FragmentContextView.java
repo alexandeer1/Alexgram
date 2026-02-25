@@ -2996,6 +2996,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             }
             
             try {
+                // Initialize visualizer with current audio session
                 currentAudioSessionId = audioSessionId;
                 visualizer = new Visualizer(audioSessionId);
                 visualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
