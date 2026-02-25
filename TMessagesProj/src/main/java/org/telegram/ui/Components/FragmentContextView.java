@@ -2977,7 +2977,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
         public void setColor(int color) {
             this.color = color;
-            mPaint.setColor(ColorUtils.setAlphaComponent(color, 50));
+            mPaint.setColor(ColorUtils.setAlphaComponent(color, 120)); // Increased opacity
             invalidate();
         }
 
@@ -3013,7 +3013,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 }, Visualizer.getMaxCaptureRate() / 2, true, false);
                 visualizer.setEnabled(true);
             } catch (Exception e) {
-                // Ignore
+                // Just log to verify if it fails
+                android.util.Log.e("MusicVisualizer", "Error enabling visualizer", e);
             }
         }
 
@@ -3041,12 +3042,14 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             int height = getHeight();
             int width = getWidth();
 
-            // Simple waveform drawing
+            float centerY = height / 2f;
+            float maxAmplitude = centerY * 0.8f; // Leave some padding
+
             for (int i = 0; i < mBytes.length - 1; i++) {
                 mPoints[i * 4] = width * i / (float) (mBytes.length - 1);
-                mPoints[i * 4 + 1] = height / 2 + ((byte) (mBytes[i] + 128)) * (height / 2) / 128;
+                mPoints[i * 4 + 1] = centerY + ((byte) (mBytes[i] + 128)) * (maxAmplitude / 128f);
                 mPoints[i * 4 + 2] = width * (i + 1) / (float) (mBytes.length - 1);
-                mPoints[i * 4 + 3] = height / 2 + ((byte) (mBytes[i + 1] + 128)) * (height / 2) / 128;
+                mPoints[i * 4 + 3] = centerY + ((byte) (mBytes[i + 1] + 128)) * (maxAmplitude / 128f);
             }
 
             canvas.drawLines(mPoints, mPaint);
