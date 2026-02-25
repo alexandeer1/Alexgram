@@ -191,18 +191,14 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private final AbstractConfigCell aiModelUrl2Row = cellGroup.appendCell(new ConfigCellTextInput("Model URL 2 (Failover)", NaConfig.INSTANCE.getAiModelUrl2(), "https://api.openai.com/v1/", null));
     private final AbstractConfigCell aiApiKey2Row = cellGroup.appendCell(new ConfigCellTextInput("API Key 2 (Failover)", NaConfig.INSTANCE.getAiApiKey2(), "sk-...", null));
     private final AbstractConfigCell aiHelpRow = cellGroup.appendCell(new ConfigCellText("How to get API?", "Help", () -> {
-        AndroidUtilities.runOnUIThread(() -> {
+         AndroidUtilities.runOnUIThread(() -> {
             new AlertDialog.Builder(getParentActivity())
                 .setTitle("How to get API Key")
-                .setMessage("1. Sign up for an AI provider (e.g., OpenAI, DeepSeek).\n" +
-                        "2. Go to their API Keys section.\n" +
-                        "3. Create a new secret key.\n" +
-                        "4. Paste it here.\n\n" +
-                        "Make sure your account has credits!")
+                .setMessage("1. Sign up for an AI provider (e.g., OpenAI, DeepSeek).\n2. Go to their API Keys section.\n3. Create a new secret key.\n4. Paste it here.\n\nMake sure your account has credits!")
                 .setPositiveButton("OK", null)
                 .show();
         });
-    }, true));
+    }));
 
     public NekoExperimentalSettingsActivity() {
         if (NaConfig.INSTANCE.getUseDeletedIcon().Bool()) {

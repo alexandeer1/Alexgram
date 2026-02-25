@@ -72,10 +72,6 @@ object LlmConfig {
 
     @JvmStatic
     fun setSavedCustomBaseUrl(baseUrl: String?) {
-        val model = LlmUrlNormalizer.extractModelNameFromUrl(baseUrl)
-        if (model != null) {
-            NaConfig.llmModelName.setConfigString(model)
-        }
         val value = LlmUrlNormalizer.normalizeBaseUrl(baseUrl)
         NaConfig.llmApiUrl.setConfigString(value)
     }

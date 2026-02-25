@@ -47642,7 +47642,6 @@ public class ChatActivity extends BaseFragment implements
             if (selectedObject == null) {
                 return;
             }
-            final MessageObject currentSelectedObject = selectedObject; // Capture current selection
             if (getParentActivity() == null) {
                 return;
             }
@@ -47676,51 +47675,54 @@ public class ChatActivity extends BaseFragment implements
                         return;
                     }
 
-                        // Show loading
-                        final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(getParentActivity());
-                        container.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, android.view.Gravity.CENTER, 0, 16, 0, 0));
-                        inputField.setEnabled(false);
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    // Show loading
+                    final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(getParentActivity());
+                    container.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, android.view.Gravity.CENTER, 0, 16, 0, 0));
+                    inputField.setEnabled(false);
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
-                        startAiGeneration(prompt, currentSelectedObject, new AiGenerationCallback() {
-                            @Override
-                            public void onSuccess(String result) {
-                                AndroidUtilities.runOnUIThread(() -> {
-                                    try {
-                                        if (dialog.isShowing()) dialog.dismiss();
-                                    } catch (Throwable e) { /* ignore */ }
+                    startAiGeneration(prompt, selectedObject, new AiGenerationCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            AndroidUtilities.runOnUIThread(() -> {
+                                try {
+                                    if (dialog.isShowing()) dialog.dismiss();
+                                } catch (Throwable e) { /* ignore */ }
 
-                                    if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
-                                        chatActivityEnterView.getEditField().setText(result);
-                                        chatActivityEnterView.getEditField().setSelection(result.length());
+                                if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
+                                    chatActivityEnterView.getEditField().setText(result);
+                                    chatActivityEnterView.getEditField().setSelection(result.length());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            AndroidUtilities.runOnUIThread(() -> {
+                                try {
+                                    container.removeView(progressBar);
+                                    inputField.setEnabled(true);
+                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                                    if (getParentActivity() != null) {
+                                        android.widget.Toast.makeText(getParentActivity(), "Error: " + error, android.widget.Toast.LENGTH_LONG).show();
                                     }
-                                });
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                AndroidUtilities.runOnUIThread(() -> {
-                                    try {
-                                        container.removeView(progressBar);
-                                        inputField.setEnabled(true);
-                                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                                        if (getParentActivity() != null) {
-                                            android.widget.Toast.makeText(getParentActivity(), "Error: " + error, android.widget.Toast.LENGTH_LONG).show();
-                                        }
-                                    } catch (Throwable e) {
-                                        e.printStackTrace();
-                                    }
-                                });
-                            }
-                        });
-                    } catch (Throwable e) {
-                        e.printStackTrace();
+                                } catch (Throwable e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                        }
+                    });
+                } catch (Throwable e) {
+                    if (getParentActivity() != null) {
+                        android.widget.Toast.makeText(getParentActivity(), "Crash in Start: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
                     }
-                });
+                    e.printStackTrace();
+                }
             });
-
-            dialog.show();
         } catch (Throwable e) {
+            if (getParentActivity() != null) {
+                android.widget.Toast.makeText(getParentActivity(), "Dialog Crash: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+            }
             e.printStackTrace();
         }
     }
@@ -47732,11 +47734,6 @@ public class ChatActivity extends BaseFragment implements
 
     private void startAiGeneration(String userPrompt, MessageObject originalMessage, AiGenerationCallback callback) {
         try {
-            if (originalMessage == null) {
-                callback.onError("Original message is null.");
-                return;
-            }
-            
             // 1. Get Text Context
             String messageText = originalMessage.messageText != null ? originalMessage.messageText.toString() : "";
             if (android.text.TextUtils.isEmpty(messageText) && originalMessage.caption != null) {

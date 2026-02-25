@@ -13,14 +13,6 @@ object LlmUrlNormalizer {
             return ""
         }
 
-        if (normalized.contains("generativelanguage.googleapis.com")) {
-            val googleRegex = "(https://generativelanguage\\.googleapis\\.com/v[^/]+)/.*".toRegex()
-            val match = googleRegex.find(normalized)
-            if (match != null) {
-                return match.groupValues[1] + "/openai"
-            }
-        }
-
         while (normalized.endsWith("/")) {
             normalized = normalized.dropLast(1)
         }
@@ -34,17 +26,6 @@ object LlmUrlNormalizer {
         }
 
         return normalized
-    }
-
-    @JvmStatic
-    fun extractModelNameFromUrl(url: String?): String? {
-        if (url == null) return null
-        val normalized = url.trim()
-        if (!normalized.contains("generativelanguage.googleapis.com")) return null
-        
-        val regex = "models/([^/:]+)".toRegex()
-        val matchResult = regex.find(normalized)
-        return matchResult?.groups?.get(1)?.value
     }
 }
 
