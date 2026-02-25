@@ -112,7 +112,6 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     private int lastPage = 0;
     private boolean justCreated = false;
     private boolean startPressed = false;
-    private Drawable logoDrawable;
     private CharSequence[] titles;
     private String[] messages;
     private int currentViewPagerPage;
@@ -969,7 +968,6 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     private void updateColors(boolean fromTheme) {
         startMessagingButtonBackground.setColors(new int[]{getThemedColor(Theme.key_featuredStickers_addButton), getThemedColor(Theme.key_featuredStickers_addButton2)});
-        logoDrawable.setColorFilter(Theme.multAlpha(getThemedColor(Theme.key_actionBarDefaultTitle), 0.9f), PorterDuff.Mode.MULTIPLY);
         fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         switchLanguageTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
         startMessagingButton.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
