@@ -99,6 +99,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             true
         )
+    val musicGraph =
+        addConfig(
+            "MusicGraph",
+            ConfigItem.configTypeBool,
+            true
+        )
     val showTextRegular =
         addConfig(
             "TextRegular",
