@@ -3009,18 +3009,22 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
         public void start(int audioSessionId) {
             if (audioSessionId == 0) return;
-            if (visualizer != null && currentAudioSessionId == audioSessionId) {
-                return;
-            }
+            // Always recreate visualizer to ensure fresh state if session changed or if it was null
             if (visualizer != null) {
+                if (currentAudioSessionId == audioSessionId) {
+                     // Already running on correct session
+                     visualizer.setEnabled(true);
+                     return;
+                }
                 try {
+                    visualizer.setEnabled(false);
                     visualizer.release();
                 } catch (Exception e) {}
                 visualizer = null;
             }
             
+            currentAudioSessionId = audioSessionId;
             try {
-                currentAudioSessionId = audioSessionId;
                 visualizer = new Visualizer(audioSessionId);
                 visualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
                 visualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
@@ -3037,6 +3041,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 visualizer.setEnabled(true);
             } catch (Exception e) {
                 android.util.Log.e("MusicVisualizer", "Error enabling visualizer", e);
+                // Try to restart with a delay if failed?
             }
         }
 
@@ -3048,7 +3053,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 } catch (Exception e) {}
                 visualizer = null;
             }
-            currentAudioSessionId = -1;
+            // Do not reset currentAudioSessionId so we know what we were listening to
+            // currentAudioSessionId = -1; 
         }
 
         @Override
