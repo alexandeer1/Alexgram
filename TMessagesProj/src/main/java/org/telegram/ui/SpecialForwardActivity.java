@@ -173,6 +173,14 @@ public class SpecialForwardActivity extends BaseFragment {
         bottomView = new FrameLayout(context);
         bottomView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         
+        // Attachment/Menu Button (Left)
+        ImageView attachButton = new ImageView(context);
+        attachButton.setImageResource(R.drawable.ic_ab_other); 
+        attachButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon), PorterDuff.Mode.MULTIPLY));
+        attachButton.setScaleType(ImageView.ScaleType.CENTER);
+        attachButton.setOnClickListener(v -> showEditOptions());
+        bottomView.addView(attachButton, LayoutHelper.createFrame(48, 48, Gravity.CENTER_VERTICAL | Gravity.LEFT));
+        
         commentView = new EditTextBoldCursor(context);
         commentView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
         commentView.setHint("Edit Message");
@@ -183,34 +191,16 @@ public class SpecialForwardActivity extends BaseFragment {
         commentView.setMaxLines(4);
         commentView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
         commentView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        bottomView.addView(commentView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.LEFT, 16, 0, 48, 0));
+        // Shift input field to make space for attach button (48dp + 8dp margin = 56dp)
+        bottomView.addView(commentView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.LEFT, 56, 0, 48, 0));
 
-        // Save/Update Button
+        // Save/Update Button (Right)
         ImageView saveButton = new ImageView(context);
         saveButton.setImageResource(R.drawable.baseline_check_24); 
         saveButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText), PorterDuff.Mode.MULTIPLY));
         saveButton.setScaleType(ImageView.ScaleType.CENTER);
         saveButton.setOnClickListener(v -> {
-             if (selectedMessage != null && commentView != null) {
-                 String newText = commentView.getText().toString();
-                 if (selectedMessage.caption != null) {
-                     selectedMessage.caption = newText;
-                 } else {
-                     selectedMessage.messageText = newText;
-                 }
-                 // Also update messageOwner.message/caption legacy field just in case
-                 if (selectedMessage.messageOwner != null) {
-                     selectedMessage.messageOwner.message = newText;
-                 }
-
-                 if (selectedPosition != -1) {
-                     listAdapter.notifyItemChanged(selectedPosition);
-                 }
-                 commentView.setText("");
-                 selectedMessage = null;
-                 selectedPosition = -1;
-                 AndroidUtilities.hideKeyboard(commentView);
-             }
+             saveCurrentEdit();
         });
         bottomView.addView(saveButton, LayoutHelper.createFrame(48, 48, Gravity.CENTER_VERTICAL | Gravity.RIGHT));
 
@@ -224,11 +214,37 @@ public class SpecialForwardActivity extends BaseFragment {
         sendButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chats_actionIcon), PorterDuff.Mode.MULTIPLY));
         sendButton.setScaleType(ImageView.ScaleType.CENTER);
         sendButton.setOnClickListener(v -> {
+             // Auto-save any pending edit before sending
+             if (selectedMessage != null && commentView != null && commentView.getText().length() > 0) {
+                 saveCurrentEdit();
+             }
              forwardMessages();
         });
         frameLayout.addView(sendButton, LayoutHelper.createFrame(56, 56, Gravity.BOTTOM | Gravity.RIGHT, 0, 0, 16, 64)); 
 
         return fragmentView;
+    }
+
+    private void saveCurrentEdit() {
+         if (selectedMessage != null && commentView != null) {
+             String newText = commentView.getText().toString();
+             if (selectedMessage.caption != null) {
+                 selectedMessage.caption = newText;
+             } else {
+                 selectedMessage.messageText = newText;
+             }
+             if (selectedMessage.messageOwner != null) {
+                 selectedMessage.messageOwner.message = newText;
+             }
+
+             if (selectedPosition != -1) {
+                 listAdapter.notifyItemChanged(selectedPosition);
+             }
+             commentView.setText("");
+             selectedMessage = null;
+             selectedPosition = -1;
+             AndroidUtilities.hideKeyboard(commentView);
+         }
     }
 
     private void showEditOptions() {
