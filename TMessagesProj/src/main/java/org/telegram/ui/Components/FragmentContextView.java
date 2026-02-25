@@ -1426,6 +1426,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         super.onDetachedFromWindow();
         if (visualizerView != null) {
             visualizerView.stop();
+            // We should not null the visualizer here, as it may be reused if attached again for same style
+            // But if we navigate away and destroy view, it will be gone anyway
         }
         if (animatorSet != null) {
             animatorSet.cancel();
@@ -1508,16 +1510,17 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 checkCall(true);
                 checkPlayer(true);
                 updatePlaybackButton(false);
-                if (currentStyle == STYLE_AUDIO_PLAYER && NaConfig.INSTANCE.getMusicGraph().Bool()) {
-                     if (visualizerView == null) {
-                         visualizerView = new MusicVisualizerView(getContext());
-                         frameLayout.addView(visualizerView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-                         visualizerView.setVisibility(VISIBLE);
-                         visualizerView.setColor(getThemedColor(Theme.key_inappPlayerTitle));
-                     }
-                     visualizerView.start(MediaController.getInstance().getAudioSessionId());
-                }
             }
+        }
+        
+        if (currentStyle == STYLE_AUDIO_PLAYER && NaConfig.INSTANCE.getMusicGraph().Bool()) {
+             if (visualizerView == null) {
+                 visualizerView = new MusicVisualizerView(getContext());
+                 frameLayout.addView(visualizerView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+                 visualizerView.setVisibility(VISIBLE);
+                 visualizerView.setColor(getThemedColor(Theme.key_inappPlayerTitle));
+             }
+             visualizerView.start(MediaController.getInstance().getAudioSessionId());
         }
 
         if (currentStyle == STYLE_ACTIVE_GROUP_CALL || currentStyle == STYLE_CONNECTING_GROUP_CALL) {
