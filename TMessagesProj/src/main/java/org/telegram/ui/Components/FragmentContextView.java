@@ -3087,6 +3087,30 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         }
 
         @Override
+        protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
+            if (getVisibility() == VISIBLE) {
+                start(MediaController.getInstance().getAudioSessionId());
+            }
+        }
+
+        @Override
+        protected void onDetachedFromWindow() {
+            super.onDetachedFromWindow();
+            stop();
+        }
+
+        @Override
+        public void setVisibility(int visibility) {
+            super.setVisibility(visibility);
+            if (visibility == VISIBLE) {
+                start(MediaController.getInstance().getAudioSessionId());
+            } else {
+                stop();
+            }
+        }
+
+        @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
             if (mBytes == null) {
