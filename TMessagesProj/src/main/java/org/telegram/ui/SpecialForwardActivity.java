@@ -25,10 +25,13 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.telegram.ui.Cells.ChatMessageCell;
+import org.telegram.messenger.MediaDataController;
+import org.telegram.messenger.SendMessagesHelper.SendMessageParams;
+import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
@@ -47,6 +50,7 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.EditTextBoldCursor;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
+
 import org.telegram.ui.Components.ItemOptions;
 
 import java.util.ArrayList;
@@ -346,15 +350,31 @@ public class SpecialForwardActivity extends BaseFragment {
                  
                  long peer = dids.get(0).dialogId; 
                  
-                 // Process messages to strip forward info if we want them as new
-                 for (MessageObject msg : messages) {
-                     msg.messageOwner.fwd_from = null; 
-                     msg.messageOwner.reply_to = null;
-                 }
-
-                 if (messages.size() > 0) {
-                     // We use current user account
-                     SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(messages, peer, false, false, true, 0, 0); 
+                 for (int i = 0; i < messages.size(); i++) {
+                     MessageObject msg = messages.get(i);
+                     
+                     // Create SendMessageParams manually to ensure edited content is sent
+                     SendMessageParams params;
+                     
+                     if (msg.isPhoto()) {
+                         params = SendMessageParams.of(msg.messageOwner.media.photo, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, false);
+                     } else if (msg.isDocument()) {
+                         params = SendMessageParams.of(msg.messageOwner.media.document, null, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, null, false);
+                     } else if (msg.messageText != null && !TextUtils.isEmpty(msg.messageText)) {
+                         // Text message
+                         params = SendMessageParams.of(msg.messageText.toString(), peer, null, null, null, true, null, null, null, notify, scheduleDate, scheduleRepeatPeriod, null, false);
+                     } else {
+                         // Fallback for other types - try to re-use object but update caption in params if possible or just forward
+                         // For now, let's try to reconstruct params from object but force caption
+                         params = SendMessageParams.of(msg);
+                         if (msg.caption != null) params.caption = msg.caption.toString();
+                         else if (msg.messageText != null) params.caption = msg.messageText.toString(); // message field in params used for caption sometimes? No.
+                         // But if it's text, we handled it above.
+                         // If it's a sticker or something else, we might just forward it effectively by sending as copy.
+                         params.peer = peer;
+                     }
+                     
+                     SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(params);
                  }
                  
                  fragment.finishFragment();
