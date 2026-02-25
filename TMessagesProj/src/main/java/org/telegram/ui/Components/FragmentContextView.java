@@ -3053,6 +3053,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 } catch (Exception e) {}
                 visualizer = null;
             }
+            mBytes = null; // Clear data to prevent stuck frame
+            invalidate();
             // Do not reset currentAudioSessionId so we know what we were listening to
             // currentAudioSessionId = -1; 
         }
