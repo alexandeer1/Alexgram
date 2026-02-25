@@ -496,7 +496,7 @@ private fun extractLlmContextText(message: MessageObject): String? {
     return text
 }
 
-private fun buildLlmContext(chatActivity: org.telegram.ui.ChatActivity, message: MessageObject): String? {
+private fun buildLlmContext(chatActivity: ChatActivity, message: MessageObject): String? {
     val maxMessages = LLMTranslator.getContextMessageLimit()
     if (maxMessages <= 0) return null
 
@@ -526,12 +526,12 @@ private fun buildLlmContext(chatActivity: org.telegram.ui.ChatActivity, message:
 
     // Context messages
     val contextTexts = ArrayList<String>()
-    val currentChat = chatActivity.getCurrentChat()
+    val currentChat = chatActivity.currentChat
     if (currentChat == null || !ChatObject.isChannelAndNotMegaGroup(currentChat)) {
-        val messages = chatActivity.chatAdapter?.messages as? ArrayList<MessageObject>
+        val messages = chatActivity.chatAdapter?.messages
         if (messages != null) {
             val index = messages.indexOf(message).takeIf { it >= 0 }
-                ?: messages.indexOfFirst { msg -> msg.dialogId == message.dialogId && msg.id == message.id }
+                ?: messages.indexOfFirst { it.dialogId == message.dialogId && it.id == message.id }
                     .takeIf { it >= 0 }
             if (index != null) {
                 val remaining = maxMessages - replyChainTexts.size
@@ -551,7 +551,7 @@ private fun buildLlmContext(chatActivity: org.telegram.ui.ChatActivity, message:
     if (replyChainTexts.isEmpty() && contextTexts.isEmpty()) return null
 
     return buildString {
-        val dialogTitle = DialogObject.getName(chatActivity.getCurrentAccount(), message.dialogId).trim()
+        val dialogTitle = DialogObject.getName(chatActivity.currentAccount, message.dialogId).trim()
         if (dialogTitle.isNotEmpty()) {
             append("Chat: ").append(dialogTitle).append("\n\n")
         }
