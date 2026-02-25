@@ -1508,6 +1508,15 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 checkCall(true);
                 checkPlayer(true);
                 updatePlaybackButton(false);
+                if (currentStyle == STYLE_AUDIO_PLAYER && NaConfig.INSTANCE.getMusicGraph().Bool()) {
+                     if (visualizerView == null) {
+                         visualizerView = new MusicVisualizerView(getContext());
+                         frameLayout.addView(visualizerView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+                         visualizerView.setVisibility(VISIBLE);
+                         visualizerView.setColor(getThemedColor(Theme.key_inappPlayerTitle));
+                     }
+                     visualizerView.start(MediaController.getInstance().getAudioSessionId());
+                }
             }
         }
 
