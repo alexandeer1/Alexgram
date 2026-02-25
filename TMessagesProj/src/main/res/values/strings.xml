@@ -9021,7 +9021,7 @@
     <string name="BotFileDownloadOpen">Open</string>
     <string name="BotFileDownloadCancel">Cancel</string>
     <string name="StoreCollageRetake">Retake</string>
-    <string name="Percent">%d%</string>
+    <string name="Percent">%d%%</string>
     <string name="AffiliateProgramBot">Affiliate Program</string>
     <string name="AffiliateProgramBotOff">Off</string>
     <string name="BotAffiliateProgramTitle">Affiliate Program</string>
