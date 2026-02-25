@@ -1514,6 +1514,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             }
         }
         
+        // MOVED: Ensure visualizer starts here, covering all cases (returning from back stack, etc)
         if (currentStyle == STYLE_AUDIO_PLAYER && NaConfig.INSTANCE.getMusicGraph().Bool()) {
              if (visualizerView == null) {
                  visualizerView = new MusicVisualizerView(getContext());
