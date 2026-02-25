@@ -3001,7 +3001,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 visualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
                 visualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
                     @Override
-                    public void onWaveformDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+                    public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
                         mBytes = bytes;
                         invalidate();
                     }
