@@ -16,7 +16,7 @@ import org.telegram.messenger.MessagesStorage
 import org.telegram.messenger.NotificationCenter
 import org.telegram.messenger.TranslateController
 import org.telegram.tgnet.TLRPC
-// import org.telegram.ui.ChatActivity
+import org.telegram.ui.ChatActivity
 import tw.nekomimi.nekogram.NekoConfig
 import tw.nekomimi.nekogram.helpers.MessageHelper
 import tw.nekomimi.nekogram.translate.Translator
@@ -526,7 +526,7 @@ private fun buildLlmContext(chatActivity: org.telegram.ui.ChatActivity, message:
 
     // Context messages
     val contextTexts = ArrayList<String>()
-    val currentChat = chatActivity.currentChat
+    val currentChat = chatActivity.getCurrentChat()
     if (currentChat == null || !ChatObject.isChannelAndNotMegaGroup(currentChat)) {
         val messages = chatActivity.chatAdapter?.messages as? ArrayList<MessageObject>
         if (messages != null) {
