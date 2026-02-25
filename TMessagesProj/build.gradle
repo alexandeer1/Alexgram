@@ -172,7 +172,6 @@ android {
     }
 
     sourceSets.main.jniLibs.srcDirs = ['./jni/']
-    sourceSets.main.java.srcDirs += 'src/main/kotlin'
 
     namespace = 'org.telegram.messenger'
 }
