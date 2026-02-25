@@ -262,6 +262,14 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
         listView.setOnItemClickListener((view, position, x, y) -> {
             AbstractConfigCell a = cellGroup.rows.get(position);
             if (a instanceof ConfigCellTextCheck) {
+                if (position == cellGroup.rows.indexOf(musicGraphRow)) {
+                    if (!NaConfig.INSTANCE.getMusicGraph().Bool()) {
+                         if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                             getParentActivity().requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 101);
+                             return;
+                         }
+                    }
+                }
                 if (position == cellGroup.rows.indexOf(regexFiltersEnabledRow) && (LocaleController.isRTL && x > AndroidUtilities.dp(76) || !LocaleController.isRTL && x < (view.getMeasuredWidth() - AndroidUtilities.dp(76)))) {
                     presentFragment(new RegexFiltersSettingActivity());
                     return;
