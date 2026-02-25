@@ -12748,6 +12748,55 @@ public class ChatActivity extends BaseFragment implements
         updateSelectedMessageReactions();
     }
 
+
+    private void openStandardForward() {
+        int hasPoll = 0;
+        boolean hasInvoice = false;
+        ArrayList<MessageObject> messages = new ArrayList<>();
+        for (int a = 0; a < selectedMessagesIds.length; a++) {
+            for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
+                messages.add(messageObject);
+                if (messageObject.isTodo()) {
+                    hasPoll = 3;
+                } else if (messageObject.isPoll()) {
+                    hasPoll = messageObject.isPublicPoll() ? 2 : 1;
+                    if (hasPoll == 2) {
+                        break;
+                    }
+                } else if (messageObject.isInvoice()) {
+                    hasInvoice = true;
+                }
+            }
+            if (hasPoll == 2) {
+                break;
+            }
+        }
+        if (selectionReactionsOverlay != null && selectionReactionsOverlay.isVisible()) {
+            selectionReactionsOverlay.setHiddenByScroll(true);
+        }
+        Bundle args = new Bundle();
+        args.putBoolean("onlySelect", true);
+        args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
+        args.putInt("messagesCount", canForwardMessagesCount);
+        args.putInt("hasPoll", hasPoll);
+        args.putBoolean("hasInvoice", hasInvoice);
+        args.putBoolean("canSelectTopics", true);
+        DialogsActivity fragment = new DialogsActivity(args);
+        fragment.setDelegate(ChatActivity.this);
+        presentFragment(fragment);
+    }
+
+    private void openSpecialForwardActivity() {
+         ArrayList<MessageObject> messages = new ArrayList<>();
+         for (int a = 0; a < selectedMessagesIds.length; a++) {
+             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                 messages.add(selectedMessagesIds[a].valueAt(b));
+             }
+         }
+         presentFragment(new SpecialForwardActivity(messages));
+    }
+
     public void openForward(boolean fromActionBar) {
         boolean hasSelectedAyuDeletedMessage = hasSelectedAyuDeletedMessage();
         if (getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage() || hasSelectedAyuDeletedMessage) {
@@ -12798,40 +12847,14 @@ public class ChatActivity extends BaseFragment implements
             }
             return;
         }
-        int hasPoll = 0;
-        boolean hasInvoice = false;
-        for (int a = 0; a < 2; a++) {
-            for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
-                if (messageObject.isTodo()) {
-                    hasPoll = 3;
-                } else if (messageObject.isPoll()) {
-                    hasPoll = messageObject.isPublicPoll() ? 2 : 1;
-                    if (hasPoll == 2) {
-                        break;
-                    }
-                } else if (messageObject.isInvoice()) {
-                    hasInvoice = true;
-                }
-            }
-            if (hasPoll == 2) {
-                break;
-            }
-        }
-        if (selectionReactionsOverlay != null && selectionReactionsOverlay.isVisible()) {
-            selectionReactionsOverlay.setHiddenByScroll(true);
-        }
-        Bundle args = new Bundle();
-        args.putBoolean("onlySelect", true);
-        args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
-        args.putInt("messagesCount", canForwardMessagesCount);
-        args.putInt("hasPoll", hasPoll);
-        args.putBoolean("hasInvoice", hasInvoice);
-        args.putBoolean("canSelectTopics", true);
-        DialogsActivity fragment = new DialogsActivity(args);
-        fragment.setDelegate(ChatActivity.this);
-        presentFragment(fragment);
+
+        // Show choice menu
+        org.telegram.ui.Components.ItemOptions itemOptions = org.telegram.ui.Components.ItemOptions.makeOptions(this, fromActionBar ? actionBar.getActionMode().getItem(forward) : actionsButtonsLayout.getForwardButton());
+        itemOptions.add(R.drawable.msg_forward, "Forward", this::openStandardForward);
+        itemOptions.add(R.drawable.ic_ab_other, "Special forward", this::openSpecialForwardActivity);
+        itemOptions.show();
     }
+
 
     public void showBottomOverlayProgress(boolean show, boolean animated) {
         if (show && bottomOverlayProgress.getTag() != null || !show && bottomOverlayProgress.getTag() == null) {
