@@ -225,6 +225,34 @@ public class SpecialForwardActivity extends BaseFragment {
         return fragmentView;
     }
 
+    private MessageObject recreateMessageObject(MessageObject source) {
+        if (source == null) return null;
+        try {
+            SerializedData data = new SerializedData(source.messageOwner.getObjectSize());
+            source.messageOwner.serializeToStream(data);
+            
+            byte[] byteArray = data.toByteArray();
+            data.cleanup();
+            
+            SerializedData readData = new SerializedData(byteArray);
+            int constructor = readData.readInt32(false);
+            TLRPC.Message messageClone = TLRPC.Message.TLdeserialize(readData, constructor, false);
+            readData.cleanup();
+            
+            if (messageClone == null) return source;
+
+            messageClone.dialog_id = source.getDialogId();
+            
+            MessageObject newObj = new MessageObject(UserConfig.selectedAccount, messageClone, false, false);
+            newObj.messageText = source.messageText; 
+            newObj.caption = source.caption;
+            return newObj;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return source;
+        }
+    }
+
     private void saveCurrentEdit() {
          if (selectedMessage != null && commentView != null) {
              String newText = commentView.getText().toString();
@@ -235,6 +263,12 @@ public class SpecialForwardActivity extends BaseFragment {
              }
              if (selectedMessage.messageOwner != null) {
                  selectedMessage.messageOwner.message = newText;
+             }
+             
+             MessageObject newObj = recreateMessageObject(selectedMessage);
+             if (newObj != null) {
+                 messages.set(selectedPosition, newObj);
+                 selectedMessage = newObj; 
              }
 
              if (selectedPosition != -1) {
@@ -295,7 +329,8 @@ public class SpecialForwardActivity extends BaseFragment {
         builder.setView(input);
         builder.setPositiveButton("Replace", (dialog, which) -> {
             String newText = input.getText().toString();
-            for (MessageObject msg : messages) {
+            for (int i = 0; i < messages.size(); i++) {
+                MessageObject msg = messages.get(i);
                 if (msg.caption != null) {
                      msg.caption = newText;
                      if (msg.messageOwner != null) msg.messageOwner.message = newText; 
@@ -303,6 +338,7 @@ public class SpecialForwardActivity extends BaseFragment {
                      msg.messageText = newText;
                      if (msg.messageOwner != null) msg.messageOwner.message = newText;
                 }
+                messages.set(i, recreateMessageObject(msg));
             }
             listAdapter.notifyDataSetChanged();
         });
@@ -320,7 +356,8 @@ public class SpecialForwardActivity extends BaseFragment {
         builder.setPositiveButton("Replace", (dialog, which) -> {
             String newLink = input.getText().toString();
             Pattern urlPattern = Pattern.compile("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
-            for (MessageObject msg : messages) {
+            for (int i = 0; i < messages.size(); i++) {
+                MessageObject msg = messages.get(i);
                 CharSequence cs = msg.caption != null ? msg.caption : msg.messageText;
                 String text = cs != null ? cs.toString() : "";
                 if (TextUtils.isEmpty(text)) continue;
@@ -330,6 +367,7 @@ public class SpecialForwardActivity extends BaseFragment {
                 else msg.messageText = result;
                 
                 if (msg.messageOwner != null) msg.messageOwner.message = result;
+                messages.set(i, recreateMessageObject(msg));
             }
             listAdapter.notifyDataSetChanged();
         });
@@ -339,7 +377,8 @@ public class SpecialForwardActivity extends BaseFragment {
 
     private void deleteAllLinks() {
         Pattern urlPattern = Pattern.compile("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)");
-        for (MessageObject msg : messages) {
+        for (int i = 0; i < messages.size(); i++) {
+                MessageObject msg = messages.get(i);
                 CharSequence cs = msg.caption != null ? msg.caption : msg.messageText;
                 String text = cs != null ? cs.toString() : "";
                 if (TextUtils.isEmpty(text)) continue;
@@ -348,18 +387,21 @@ public class SpecialForwardActivity extends BaseFragment {
                 if (msg.caption != null) msg.caption = result;
                 else msg.messageText = result;
                 if (msg.messageOwner != null) msg.messageOwner.message = result;
+                messages.set(i, recreateMessageObject(msg));
         }
         listAdapter.notifyDataSetChanged();
     }
 
     private void deleteAllCaptions() {
-        for (MessageObject msg : messages) {
+        for (int i = 0; i < messages.size(); i++) {
+            MessageObject msg = messages.get(i);
             msg.caption = null;
             // Also might need to clear messageText if it was derived from caption? 
             if (msg.isPhoto() || msg.isVideo() || msg.isDocument()) {
                 msg.messageText = "";
                 if (msg.messageOwner != null) msg.messageOwner.message = "";
             }
+            messages.set(i, recreateMessageObject(msg));
         }
         listAdapter.notifyDataSetChanged();
     }
@@ -367,40 +409,38 @@ public class SpecialForwardActivity extends BaseFragment {
     private void forwardMessages() {
         Bundle args = new Bundle();
         args.putBoolean("onlySelect", true);
-        args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_DEFAULT);
+        args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
         DialogsActivity dialogsActivity = new DialogsActivity(args);
         dialogsActivity.setDelegate(new DialogsActivity.DialogsActivityDelegate() {
             @Override
             public boolean didSelectDialogs(DialogsActivity fragment, ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
                  if (dids == null || dids.isEmpty()) return false;
                  
-                 long peer = dids.get(0).dialogId; 
-                 
-                 for (int i = 0; i < messages.size(); i++) {
-                     MessageObject msg = messages.get(i);
+                 for (int i = 0; i < dids.size(); i++) {
+                     long peer = dids.get(i).dialogId; 
+                     for (int j = 0; j < messages.size(); j++) {
+                         MessageObject msg = messages.get(j);
                      
-                     // Create SendMessageParams manually to ensure edited content is sent
-                     SendMessageParams params;
+                         // Create SendMessageParams manually to ensure edited content is sent
+                         SendMessageParams params;
                      
-                     if (msg.isPhoto()) {
-                         params = SendMessageParams.of((TLRPC.TL_photo) msg.messageOwner.media.photo, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, false);
-                     } else if (msg.isDocument()) {
-                         params = SendMessageParams.of((TLRPC.TL_document) msg.messageOwner.media.document, null, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, null, false);
-                     } else if (msg.messageText != null && !TextUtils.isEmpty(msg.messageText)) {
-                         // Text message
-                         params = SendMessageParams.of(msg.messageText.toString(), peer, null, null, null, true, null, null, null, notify, scheduleDate, scheduleRepeatPeriod, null, false);
-                     } else {
-                         // Fallback for other types - try to re-use object but update caption in params if possible or just forward
-                         // For now, let's try to reconstruct params from object but force caption
-                         params = SendMessageParams.of(msg);
-                         if (msg.caption != null) params.caption = msg.caption.toString();
-                         else if (msg.messageText != null) params.caption = msg.messageText.toString(); // message field in params used for caption sometimes? No.
-                         // But if it's text, we handled it above.
-                         // If it's a sticker or something else, we might just forward it effectively by sending as copy.
-                         params.peer = peer;
+                         if (msg.isPhoto()) {
+                             params = SendMessageParams.of((TLRPC.TL_photo) msg.messageOwner.media.photo, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, false);
+                         } else if (msg.isDocument()) {
+                             params = SendMessageParams.of((TLRPC.TL_document) msg.messageOwner.media.document, null, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, null, false);
+                         } else if (msg.messageText != null && !TextUtils.isEmpty(msg.messageText)) {
+                             // Text message
+                             params = SendMessageParams.of(msg.messageText.toString(), peer, null, null, null, true, null, null, null, notify, scheduleDate, scheduleRepeatPeriod, null, false);
+                         } else {
+                             // Fallback for other types
+                             params = SendMessageParams.of(msg);
+                             if (msg.caption != null) params.caption = msg.caption.toString();
+                             else if (msg.messageText != null) params.caption = msg.messageText.toString(); 
+                             params.peer = peer;
+                         }
+                     
+                         SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(params);
                      }
-                     
-                     SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(params);
                  }
                  
                  fragment.finishFragment();
