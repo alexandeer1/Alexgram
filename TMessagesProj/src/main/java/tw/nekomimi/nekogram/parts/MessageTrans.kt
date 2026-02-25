@@ -33,20 +33,20 @@ const val TRANSLATE_MODE_REPLACE = 1
 
 const val TRANSLATION_SEPARATOR = "\n\n--------\n\n"
 
-private val org.telegram.ui.ChatActivity.translateController: TranslateController
+private val ChatActivity.translateController: TranslateController
     get() = messagesController.translateController
 
 
 @JvmName("translateMessages")
-fun org.telegram.ui.ChatActivity.translateMessagesWithProvider(provider: Int) =
+fun ChatActivity.translateMessagesWithProvider(provider: Int) =
     translateMessages(provider = provider)
 
 @JvmName("translateMessages")
-fun org.telegram.ui.ChatActivity.translateMessagesWithMessages(messages: List<MessageObject>) =
+fun ChatActivity.translateMessagesWithMessages(messages: List<MessageObject>) =
     translateMessages(messages = messages)
 
 @JvmOverloads
-fun org.telegram.ui.ChatActivity.translateMessages(
+fun ChatActivity.translateMessages(
     targetLocale: Locale = NekoConfig.translateToLang.String().code2Locale,
     provider: Int = 0,
     messages: List<MessageObject> = messageForTranslate?.let { listOf(it) }
