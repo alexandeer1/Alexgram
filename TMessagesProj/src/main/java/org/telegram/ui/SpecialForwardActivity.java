@@ -71,6 +71,8 @@ public class SpecialForwardActivity extends BaseFragment {
 
     private final static int edit_item = 1;
 
+    private ChatMessageCell.ChatMessageCellDelegate chatMessageCellDelegate;
+
     public SpecialForwardActivity(ArrayList<MessageObject> sourceMessages) {
         this.messages = new ArrayList<>();
         this.originalMessages = new ArrayList<>();
@@ -115,6 +117,14 @@ public class SpecialForwardActivity extends BaseFragment {
 
     @Override
     public View createView(Context context) {
+        if (chatMessageCellDelegate == null) {
+            chatMessageCellDelegate = new ChatMessageCell.ChatMessageCellDelegate() {
+                 @Override public boolean canPerformActions() { return false; }
+                 @Override public void didPressImage(ChatMessageCell cell, float x, float y) {}
+                 @Override public void didPressShare(ChatMessageCell cell) {}
+                 @Override public boolean isChatAdminCell(int uid) { return false; }
+            };
+        }
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
         actionBar.setTitle("Special forward");
@@ -387,47 +397,36 @@ public class SpecialForwardActivity extends BaseFragment {
 
     private class ListAdapter extends RecyclerListView.SelectionAdapter {
         private Context mContext;
-        public ListAdapter(Context context) { mContext = context; }
+        private ChatMessageCell.ChatMessageCellDelegate delegate;
+
+        public ListAdapter(Context context) { 
+            mContext = context; 
+            delegate = new ChatMessageCell.ChatMessageCellDelegate() {
+                 @Override public boolean canPerformActions() { return false; }
+                 @Override public void didPressImage(ChatMessageCell cell, float x, float y) {}
+                 @Override public void didPressShare(ChatMessageCell cell) {}
+                 @Override public boolean isChatAdminCell(int uid) { return false; }
+            };
+        }
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) { return true; }
         @Override
         public int getItemCount() { return messages.size(); }
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new RecyclerListView.Holder(new TextCell(mContext));
+            ChatMessageCell cell = new ChatMessageCell(mContext, UserConfig.selectedAccount);
+            cell.setDelegate(delegate);
+            return new RecyclerListView.Holder(cell);
         }
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            TextCell cell = (TextCell) holder.itemView;
+            ChatMessageCell cell = (ChatMessageCell) holder.itemView;
             MessageObject message = messages.get(position);
-            
-            String displayText = "";
-            if (message.caption != null) displayText = message.caption.toString();
-            else if (message.messageText != null) displayText = message.messageText.toString();
-            
-            if (TextUtils.isEmpty(displayText)) {
-                displayText = "[Media: " + message.type + "]";
-            }
-            cell.setText(displayText);
+            // Ensure message has a minimal valid setup for display
+            cell.setMessageObject(message, null, false, false, false, false);
             cell.setBackgroundColor(selectedPosition == position ? Theme.getColor(Theme.key_chat_messagePanelBackground) : Color.TRANSPARENT);
         }
         @Override
         public int getItemViewType(int position) { return 0; }
-    }
-
-    private static class TextCell extends FrameLayout {
-        private TextView textView;
-        public TextCell(Context context) {
-            super(context);
-            textView = new TextView(context);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-            textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-            textView.setSingleLine(false);
-            textView.setMaxLines(3);
-            textView.setEllipsize(TextUtils.TruncateAt.END);
-            textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-            addView(textView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 16, 8, 16, 8));
-        }
-        public void setText(String text) { textView.setText(text); }
     }
 }
