@@ -321,7 +321,7 @@ public class SpecialForwardActivity extends BaseFragment {
     private void forwardMessages() {
         Bundle args = new Bundle();
         args.putBoolean("onlySelect", true);
-        args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_EVERYTHING);
+        args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_DEFAULT);
         DialogsActivity dialogsActivity = new DialogsActivity(args);
         dialogsActivity.setDelegate(new DialogsActivity.DialogsActivityDelegate() {
             @Override
@@ -334,12 +334,11 @@ public class SpecialForwardActivity extends BaseFragment {
                  for (MessageObject msg : messages) {
                      msg.messageOwner.fwd_from = null; 
                      msg.messageOwner.reply_to = null;
-                     msg.messageOwner.reply_to_msg_id = 0;
                  }
 
                  if (messages.size() > 0) {
                      // We use current user account
-                     SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(messages, peer, false, false, true, 0); 
+                     SendMessagesHelper.getInstance(UserConfig.selectedAccount).sendMessage(messages, peer, false, false, true, 0, 0); 
                  }
                  
                  fragment.finishFragment();
