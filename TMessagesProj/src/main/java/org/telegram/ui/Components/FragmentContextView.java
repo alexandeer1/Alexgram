@@ -3023,26 +3023,16 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
         public void start(int audioSessionId) {
             if (audioSessionId == 0) return;
-            // Always recreate visualizer to ensure fresh state if session changed or if it was null
+            
+            // Always recreate visualizer to ensure fresh state.
+            // When navigating between fragments, the existing Visualizer hardware instance 
+            // often dies or gets stuck, even if the audioSessionId hasn't changed.
             if (visualizer != null) {
-                if (currentAudioSessionId == audioSessionId) {
-                     // Already running on correct session
-                     try {
-                         visualizer.setEnabled(true);
-                     } catch (Exception e) {
-                         // If enable fails, re-init
-                         android.util.Log.e("MusicVisualizer", "Error restarting visualizer", e);
-                         try { visualizer.release(); } catch (Exception  ignored) {}
-                         visualizer = null;
-                     }
-                     if (visualizer != null) return;
-                } else {
-                    try {
-                        visualizer.setEnabled(false);
-                        visualizer.release();
-                    } catch (Exception e) {}
-                    visualizer = null;
-                }
+                try {
+                    visualizer.setEnabled(false);
+                    visualizer.release();
+                } catch (Exception e) {}
+                visualizer = null;
             }
             
             currentAudioSessionId = audioSessionId;
