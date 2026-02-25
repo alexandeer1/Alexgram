@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
@@ -76,24 +77,34 @@ public class SpecialForwardActivity extends BaseFragment {
                 // Create copy for working list
                 SerializedData data = new SerializedData(msg.messageOwner.getObjectSize());
                 msg.messageOwner.serializeToStream(data);
-                TLRPC.Message messageClone = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+                
+                SerializedData readData = new SerializedData(data.toByteArray());
+                TLRPC.Message messageClone = TLRPC.Message.TLdeserialize(readData, readData.readInt32(false), false);
                 messageClone.dialog_id = msg.getDialogId();
                 MessageObject newObj = new MessageObject(UserConfig.selectedAccount, messageClone, false, false);
                 newObj.messageText = msg.messageText; 
                 newObj.caption = msg.caption;
                 this.messages.add(newObj);
                 
+                data.cleanup();
+                readData.cleanup();
+                
                 // Create SEPARATE copy for restore point
                 SerializedData data2 = new SerializedData(msg.messageOwner.getObjectSize());
                 msg.messageOwner.serializeToStream(data2);
-                TLRPC.Message messageClone2 = TLRPC.Message.TLdeserialize(data2, data2.readInt32(false), false);
+                
+                SerializedData readData2 = new SerializedData(data2.toByteArray());
+                TLRPC.Message messageClone2 = TLRPC.Message.TLdeserialize(readData2, readData2.readInt32(false), false);
                 messageClone2.dialog_id = msg.getDialogId();
                 MessageObject originalObj = new MessageObject(UserConfig.selectedAccount, messageClone2, false, false);
                 originalObj.messageText = msg.messageText; 
                 originalObj.caption = msg.caption;
                 this.originalMessages.add(originalObj);
+                
+                data2.cleanup();
+                readData2.cleanup();
             } catch (Exception e) {
-                e.printStackTrace();
+                FileLog.e(e);
             }
         }
     }
@@ -227,14 +238,19 @@ public class SpecialForwardActivity extends BaseFragment {
              try {
                 SerializedData data = new SerializedData(msg.messageOwner.getObjectSize());
                 msg.messageOwner.serializeToStream(data);
-                TLRPC.Message messageClone = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+                
+                SerializedData readData = new SerializedData(data.toByteArray());
+                TLRPC.Message messageClone = TLRPC.Message.TLdeserialize(readData, readData.readInt32(false), false);
                 messageClone.dialog_id = msg.getDialogId();
                 MessageObject newObj = new MessageObject(UserConfig.selectedAccount, messageClone, false, false);
                 newObj.messageText = msg.messageText; 
                 newObj.caption = msg.caption;
                 this.messages.add(newObj);
+                
+                data.cleanup();
+                readData.cleanup();
             } catch (Exception e) {
-                e.printStackTrace();
+                FileLog.e(e);
             }
         }
         listAdapter.notifyDataSetChanged();
