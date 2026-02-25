@@ -1180,6 +1180,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                     visualizerView.setVisibility(VISIBLE);
                     visualizerView.setColor(getThemedColor(Theme.key_inappPlayerTitle));
                 }
+                // Always try to start/restart visualizer
                 visualizerView.start(MediaController.getInstance().getAudioSessionId());
             }
             return;
@@ -1865,6 +1866,18 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         }
         MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
         View fragmentView = fragment.getFragmentView();
+        
+        // Ensure visualizer is active if player is visible, even if style didn't change (e.g. returning from another fragment)
+        if (visible && currentStyle == STYLE_AUDIO_PLAYER && NaConfig.INSTANCE.getMusicGraph().Bool()) {
+             if (visualizerView == null) {
+                 visualizerView = new MusicVisualizerView(getContext());
+                 frameLayout.addView(visualizerView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+                 visualizerView.setVisibility(VISIBLE);
+                 visualizerView.setColor(getThemedColor(Theme.key_inappPlayerTitle));
+             }
+             visualizerView.start(MediaController.getInstance().getAudioSessionId());
+        }
+        
         if (!create && fragmentView != null) {
             if (fragmentView.getParent() == null || ((View) fragmentView.getParent()).getVisibility() != VISIBLE) {
                 create = true;
@@ -3013,18 +3026,29 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             if (visualizer != null) {
                 if (currentAudioSessionId == audioSessionId) {
                      // Already running on correct session
-                     visualizer.setEnabled(true);
-                     return;
+                     try {
+                         visualizer.setEnabled(true);
+                     } catch (Exception e) {
+                         // If enable fails, re-init
+                         android.util.Log.e("MusicVisualizer", "Error restarting visualizer", e);
+                         try { visualizer.release(); } catch (Exception  ignored) {}
+                         visualizer = null;
+                     }
+                     if (visualizer != null) return;
+                } else {
+                    try {
+                        visualizer.setEnabled(false);
+                        visualizer.release();
+                    } catch (Exception e) {}
+                    visualizer = null;
                 }
-                try {
-                    visualizer.setEnabled(false);
-                    visualizer.release();
-                } catch (Exception e) {}
-                visualizer = null;
             }
             
             currentAudioSessionId = audioSessionId;
             try {
+                // Sometimes creation fails if too many visualizers. Release any potential leaks?
+                // But we don't have access to global list.
+                
                 visualizer = new Visualizer(audioSessionId);
                 visualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
                 visualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
@@ -3041,7 +3065,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 visualizer.setEnabled(true);
             } catch (Exception e) {
                 android.util.Log.e("MusicVisualizer", "Error enabling visualizer", e);
-                // Try to restart with a delay if failed?
+                // Try one more time with delay? Or maybe with session 0 (mix)?
             }
         }
 
@@ -3049,14 +3073,16 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
              if (visualizer != null) {
                 try {
                     visualizer.setEnabled(false);
+                } catch (Exception e) {}
+                try {
                     visualizer.release();
                 } catch (Exception e) {}
                 visualizer = null;
             }
-            mBytes = null; // Clear data to prevent stuck frame
-            invalidate();
             // Do not reset currentAudioSessionId so we know what we were listening to
             // currentAudioSessionId = -1; 
+            mBytes = null; 
+            invalidate();
         }
 
         @Override
