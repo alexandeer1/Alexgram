@@ -2655,7 +2655,23 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 } else if (id == add_to_folder) {
                     ArrayList<Long> dialogs = new ArrayList<>();
                     dialogs.add(getDialogId());
-                    showDialog(new FiltersListBottomSheet(ProfileActivity.this, dialogs));
+                    FiltersListBottomSheet bottomSheet = new FiltersListBottomSheet(ProfileActivity.this, dialogs);
+                    bottomSheet.setDelegate((filter, checked) -> {
+                        if (filter == null) {
+                            presentFragment(new FiltersSetupActivity());
+                        } else {
+                            // Toggle dialog in filter
+                            long did = getDialogId();
+                            if (filter.alwaysShow.contains(did)) {
+                                filter.alwaysShow.remove(did);
+                            } else {
+                                filter.alwaysShow.add(did);
+                                filter.neverShow.remove(did);
+                            }
+                            getMessagesController().updateFilterDialogs(filter);
+                        }
+                    });
+                    showDialog(bottomSheet);
                 } else if (id == delete_topic) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle(LocaleController.getPluralString("DeleteTopics", 1));
