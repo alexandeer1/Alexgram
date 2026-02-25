@@ -120,9 +120,9 @@ public class SpecialForwardActivity extends BaseFragment {
         if (chatMessageCellDelegate == null) {
             chatMessageCellDelegate = new ChatMessageCell.ChatMessageCellDelegate() {
                  @Override public boolean canPerformActions() { return false; }
-                 @Override public void didPressImage(ChatMessageCell cell, float x, float y) {}
-                 @Override public void didPressShare(ChatMessageCell cell) {}
-                 @Override public boolean isChatAdminCell(int uid) { return false; }
+                 @Override public void didPressImage(ChatMessageCell cell, float x, float y, boolean fullPreview) {}
+                 @Override public void didQuickShareStart(ChatMessageCell cell, float x, float y) {}
+                 // @Override public boolean isChatAdminCell(int uid) { return false; } // Not in interface
             };
         }
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
@@ -383,9 +383,9 @@ public class SpecialForwardActivity extends BaseFragment {
                      SendMessageParams params;
                      
                      if (msg.isPhoto()) {
-                         params = SendMessageParams.of(msg.messageOwner.media.photo, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, false);
+                         params = SendMessageParams.of((TLRPC.TL_photo) msg.messageOwner.media.photo, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, false);
                      } else if (msg.isDocument()) {
-                         params = SendMessageParams.of(msg.messageOwner.media.document, null, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, null, false);
+                         params = SendMessageParams.of((TLRPC.TL_document) msg.messageOwner.media.document, null, null, peer, null, null, msg.caption != null ? msg.caption.toString() : "", null, null, null, notify, scheduleDate, scheduleRepeatPeriod, 0, null, null, false);
                      } else if (msg.messageText != null && !TextUtils.isEmpty(msg.messageText)) {
                          // Text message
                          params = SendMessageParams.of(msg.messageText.toString(), peer, null, null, null, true, null, null, null, notify, scheduleDate, scheduleRepeatPeriod, null, false);
@@ -419,9 +419,8 @@ public class SpecialForwardActivity extends BaseFragment {
             mContext = context; 
             delegate = new ChatMessageCell.ChatMessageCellDelegate() {
                  @Override public boolean canPerformActions() { return false; }
-                 @Override public void didPressImage(ChatMessageCell cell, float x, float y) {}
-                 @Override public void didPressShare(ChatMessageCell cell) {}
-                 @Override public boolean isChatAdminCell(int uid) { return false; }
+                 @Override public void didPressImage(ChatMessageCell cell, float x, float y, boolean fullPreview) {}
+                 @Override public void didQuickShareStart(ChatMessageCell cell, float x, float y) {}
             };
         }
         @Override
