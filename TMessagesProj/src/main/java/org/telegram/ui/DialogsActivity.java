@@ -13799,7 +13799,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private int calculateListViewPaddingBottom() {
         int additionalBottom = 0;
-        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == VISIBLE) {
+        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
             additionalBottom = (int) (dp(36 + 14) * filterTabsView.getAlpha());
         }
         return getBottomTabsHeight() + additionalBottom;
