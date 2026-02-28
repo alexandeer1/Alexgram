@@ -6599,10 +6599,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         float fadeViewT = totalOffset;
 
         if (filterTabsView != null) {
-            filterTabsView.setTranslationY(totalOffset - searchOffset);
+            if (NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
+                filterTabsView.setTranslationY(0);
+            } else {
+                filterTabsView.setTranslationY(totalOffset - searchOffset);
+            }
             filtersTabVisibility = filterTabsView.getAlpha();
             filtersTabHeight = dp(36 + 7) * filtersTabVisibility;
-            totalOffset += filtersTabHeight;
+            if (!NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
+                totalOffset += filtersTabHeight;
+            }
         }
 
         if (topPanelLayout != null) {
@@ -8788,7 +8794,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void updateFloatingButtonOffset() {
-        final float top = -navigationBarHeight - additionFloatingButtonOffset - additionalFloatingTranslation;
+        float additionalBottom = 0;
+        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
+            additionalBottom = (dp(36 + 14) * filterTabsView.getAlpha());
+        }
+
+        final float top = -navigationBarHeight - additionFloatingButtonOffset - additionalFloatingTranslation - additionalBottom;
         final float baseTranslationY = top
             - floatingButtonPanOffset;
 
@@ -13799,7 +13810,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private int calculateListViewPaddingBottom() {
         int additionalBottom = 0;
-        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == VISIBLE) {
+        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
             additionalBottom = (int) (dp(36 + 14) * filterTabsView.getAlpha());
         }
         return getBottomTabsHeight() + additionalBottom;
