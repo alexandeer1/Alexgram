@@ -5,19 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Rect;
+import android.graphics.Path;
 import android.graphics.RectF;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Utilities;
-import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
-import org.telegram.ui.Components.SizeNotifierFrameLayout;
 
 public class PrivacyBlurOverlayView extends View {
 
@@ -26,32 +21,36 @@ public class PrivacyBlurOverlayView extends View {
     private float bottomY;
     private final float lineThickness = AndroidUtilities.dp(2);
     private final float TOUCH_SLOP = AndroidUtilities.dp(24);
-    
+
     // Drag state
     private boolean isDraggingTop = false;
     private boolean isDraggingBottom = false;
-    
+
     // Slider state
-    private float blurIntensity = 0.5f; // 0.0 to 1.0
+    private float blurIntensity = 0.5f;
     private boolean isDraggingSlider = false;
     private final float sliderWidth = AndroidUtilities.dp(4);
     private final float sliderHeight = AndroidUtilities.dp(200);
     private final float sliderMargin = AndroidUtilities.dp(16);
-    private final float sliderKnobRadius = AndroidUtilities.dp(8);
-    
-    private final Paint blurPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+    private final float sliderKnobRadius = AndroidUtilities.dp(10);
+
     private final Paint dimPaint = new Paint();
     private final Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint arrowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint sliderBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint sliderProgressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint sliderKnobPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    
+    private final Paint blurBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+    private final Paint handlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     private Bitmap blurredBitmap;
     private Canvas blurCanvas;
     private final float DOWN_SCALE = 8f;
     private View targetViewToBlur;
-    
+
     private ChatActivity chatActivity;
+    private final Path arrowPath = new Path();
+    private final RectF handleRect = new RectF();
 
     public PrivacyBlurOverlayView(Context context, ChatActivity chatActivity, View targetViewToBlur) {
         super(context);
@@ -60,42 +59,46 @@ public class PrivacyBlurOverlayView extends View {
         init();
     }
 
-    public PrivacyBlurOverlayView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
     private void init() {
         topY = AndroidUtilities.dp(150);
         bottomY = AndroidUtilities.dp(400);
 
-        dimPaint.setColor(0x40000000); // Semi-transparent black over blur
-        
-        linePaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-        linePaint.setAlpha(200);
+        dimPaint.setColor(0x55000000);
+
+        linePaint.setColor(Color.WHITE);
+        linePaint.setAlpha(230);
         linePaint.setStrokeWidth(lineThickness);
-        linePaint.setShadowLayer(AndroidUtilities.dp(2), 0, AndroidUtilities.dp(1), 0x40000000);
-        
-        sliderBgPaint.setColor(Theme.getColor(Theme.key_divider));
+        linePaint.setStyle(Paint.Style.STROKE);
+
+        arrowPaint.setColor(0xFF333333);
+        arrowPaint.setAlpha(200);
+        arrowPaint.setStrokeWidth(AndroidUtilities.dp(2));
+        arrowPaint.setStyle(Paint.Style.STROKE);
+        arrowPaint.setStrokeCap(Paint.Cap.ROUND);
+        arrowPaint.setStrokeJoin(Paint.Join.ROUND);
+
+        handlePaint.setColor(Color.WHITE);
+        handlePaint.setAlpha(200);
+
+        sliderBgPaint.setColor(0x44FFFFFF);
         sliderBgPaint.setStrokeWidth(sliderWidth);
         sliderBgPaint.setStrokeCap(Paint.Cap.ROUND);
-        
-        sliderProgressPaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+
+        sliderProgressPaint.setColor(Color.WHITE);
         sliderProgressPaint.setStrokeWidth(sliderWidth);
         sliderProgressPaint.setStrokeCap(Paint.Cap.ROUND);
-        
-        sliderKnobPaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-        sliderKnobPaint.setShadowLayer(AndroidUtilities.dp(2), 0, AndroidUtilities.dp(1), 0x40000000);
-        
+
+        sliderKnobPaint.setColor(Color.WHITE);
+
         setWillNotDraw(false);
         setVisibility(GONE);
     }
-    
+
     public void toggleVisibility() {
         isVisible = !isVisible;
         if (isVisible) {
             setVisibility(VISIBLE);
-            updateBlur();
+            postInvalidateOnAnimation();
         } else {
             setVisibility(GONE);
             if (blurredBitmap != null) {
@@ -105,15 +108,15 @@ public class PrivacyBlurOverlayView extends View {
         }
     }
 
-    private void updateBlur() {
+    private void captureAndBlur() {
         if (targetViewToBlur == null || targetViewToBlur.getWidth() == 0 || targetViewToBlur.getHeight() == 0) return;
-        
+
         int w = targetViewToBlur.getWidth();
         int h = targetViewToBlur.getHeight();
         int bw = (int) (w / DOWN_SCALE);
         int bh = (int) (h / DOWN_SCALE);
-        
-        if (bw == 0 || bh == 0) return;
+
+        if (bw <= 0 || bh <= 0) return;
 
         if (blurredBitmap == null || blurredBitmap.getWidth() != bw || blurredBitmap.getHeight() != bh) {
             if (blurredBitmap != null) {
@@ -126,31 +129,31 @@ public class PrivacyBlurOverlayView extends View {
                 return;
             }
         }
-        
+
         blurredBitmap.eraseColor(Color.TRANSPARENT);
         blurCanvas.save();
         blurCanvas.scale(1f / DOWN_SCALE, 1f / DOWN_SCALE);
-        
+        // Temporarily hide this overlay to avoid capturing it in the blur
+        setAlpha(0f);
         targetViewToBlur.draw(blurCanvas);
-        
+        setAlpha(1f);
         blurCanvas.restore();
-        
+
         int radius = Math.max(2, (int) (maxBlurRadius() * blurIntensity));
         if (radius > 1) {
             Utilities.stackBlurBitmap(blurredBitmap, radius);
         }
-        invalidate();
     }
-    
+
     private int maxBlurRadius() {
-        return Math.max(7, Math.max(targetViewToBlur.getHeight(), targetViewToBlur.getWidth()) / 120);
+        if (targetViewToBlur == null) return 10;
+        return Math.max(10, Math.max(targetViewToBlur.getHeight(), targetViewToBlur.getWidth()) / 80);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (bottomY == AndroidUtilities.dp(400) && getMeasuredHeight() > 0) {
-            // First measure initialization
             topY = getMeasuredHeight() / 3f;
             bottomY = getMeasuredHeight() * 2f / 3f;
         }
@@ -200,80 +203,124 @@ public class PrivacyBlurOverlayView extends View {
             case MotionEvent.ACTION_CANCEL:
                 isDraggingTop = false;
                 isDraggingBottom = false;
-                if (isDraggingSlider) {
-                    isDraggingSlider = false;
-                    updateBlur();
-                }
+                isDraggingSlider = false;
                 break;
         }
 
-        // Intercept touches outside the clear area to prevent interacting with blurred messages
+        // Intercept touches in blurred areas
         return y < topY || y > bottomY;
     }
 
     private void updateSliderFromTouch(float y, float sliderYStart, float sliderHeight) {
         float progress = 1f - Math.max(0, Math.min(1f, (y - sliderYStart) / sliderHeight));
         if (progress != blurIntensity) {
-            blurIntensity = Math.max(0.01f, progress);
-            updateBlur();
+            blurIntensity = Math.max(0.05f, progress);
+            invalidate();
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         if (!isVisible) return;
-        
-        // Ensure blurred bitmap is updated if size changed
-        if (blurredBitmap == null) {
-            updateBlur();
-        }
-        
+
+        // Always re-capture and blur on every frame for real-time sync with scrolling
+        captureAndBlur();
+
+        int width = getMeasuredWidth();
+        int height = getMeasuredHeight();
+
         // Draw top blurred area
         if (topY > 0) {
             canvas.save();
-            canvas.clipRect(0, 0, getMeasuredWidth(), topY);
+            canvas.clipRect(0, 0, width, topY);
             drawBlurredBackground(canvas);
             canvas.restore();
-            canvas.drawLine(0, topY, getMeasuredWidth(), topY, linePaint);
         }
 
         // Draw bottom blurred area
-        if (bottomY < getMeasuredHeight()) {
+        if (bottomY < height) {
             canvas.save();
-            canvas.clipRect(0, bottomY, getMeasuredWidth(), getMeasuredHeight());
+            canvas.clipRect(0, bottomY, width, height);
             drawBlurredBackground(canvas);
             canvas.restore();
-            canvas.drawLine(0, bottomY, getMeasuredWidth(), bottomY, linePaint);
         }
 
+        // Draw top line with handle and arrow
+        drawLineWithHandle(canvas, topY, true, width);
+
+        // Draw bottom line with handle and arrow
+        drawLineWithHandle(canvas, bottomY, false, width);
+
         // Draw intensity slider on right edge
-        float sliderX = getMeasuredWidth() - sliderMargin - sliderWidth / 2f;
-        float sliderTop = (getMeasuredHeight() - sliderHeight) / 2f;
+        drawSlider(canvas, width, height);
+
+        // Keep redrawing while visible for real-time blur
+        if (isVisible) {
+            postInvalidateOnAnimation();
+        }
+    }
+
+    private void drawLineWithHandle(Canvas canvas, float lineY, boolean isTopLine, int viewWidth) {
+        // Draw the horizontal line
+        canvas.drawLine(0, lineY, viewWidth, lineY, linePaint);
+
+        // Draw center handle pill
+        float handleW = AndroidUtilities.dp(40);
+        float handleH = AndroidUtilities.dp(16);
+        float cx = viewWidth / 2f;
+        handleRect.set(cx - handleW / 2f, lineY - handleH / 2f, cx + handleW / 2f, lineY + handleH / 2f);
+        canvas.drawRoundRect(handleRect, AndroidUtilities.dp(8), AndroidUtilities.dp(8), handlePaint);
+
+        // Draw arrow inside the handle
+        float arrowSize = AndroidUtilities.dp(4);
+        arrowPath.reset();
+        if (isTopLine) {
+            // Up arrow (▲) — indicates drag upward to extend blur area
+            float ay = lineY - arrowSize / 2f;
+            arrowPath.moveTo(cx - arrowSize, ay + arrowSize);
+            arrowPath.lineTo(cx, ay);
+            arrowPath.lineTo(cx + arrowSize, ay + arrowSize);
+        } else {
+            // Down arrow (▼) — indicates drag downward to extend blur area
+            float ay = lineY - arrowSize / 2f;
+            arrowPath.moveTo(cx - arrowSize, ay);
+            arrowPath.lineTo(cx, ay + arrowSize);
+            arrowPath.lineTo(cx + arrowSize, ay);
+        }
+        canvas.drawPath(arrowPath, arrowPaint);
+    }
+
+    private void drawSlider(Canvas canvas, int viewWidth, int viewHeight) {
+        float sliderX = viewWidth - sliderMargin - sliderWidth / 2f;
+        float sliderTop = (viewHeight - sliderHeight) / 2f;
         float sliderBottom = sliderTop + sliderHeight;
-        
+
+        // Slider background track
         canvas.drawLine(sliderX, sliderTop, sliderX, sliderBottom, sliderBgPaint);
-        
+
+        // Slider progress
         float progressY = sliderBottom - (sliderHeight * blurIntensity);
         canvas.drawLine(sliderX, progressY, sliderX, sliderBottom, sliderProgressPaint);
-        
+
+        // Slider knob
         canvas.drawCircle(sliderX, progressY, sliderKnobRadius, sliderKnobPaint);
     }
-    
+
     private void drawBlurredBackground(Canvas canvas) {
         if (blurredBitmap != null) {
             canvas.save();
             canvas.scale(DOWN_SCALE, DOWN_SCALE);
-            canvas.drawBitmap(blurredBitmap, 0, 0, blurPaint);
+            canvas.drawBitmap(blurredBitmap, 0, 0, blurBitmapPaint);
             canvas.restore();
             canvas.drawRect(canvas.getClipBounds(), dimPaint);
         } else {
             canvas.drawRect(canvas.getClipBounds(), dimPaint);
         }
     }
-    
+
     public void invalidateBlur() {
-        if (isVisible && !isDraggingTop && !isDraggingBottom && !isDraggingSlider) {
-            updateBlur();
+        if (isVisible) {
+            invalidate();
         }
     }
 }
