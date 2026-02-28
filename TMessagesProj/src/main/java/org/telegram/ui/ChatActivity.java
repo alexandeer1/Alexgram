@@ -581,8 +581,8 @@ public class ChatActivity extends BaseFragment implements
     private QuickRepliesEmptyView quickRepliesEmptyView;
     private BusinessLinksEmptyView businessLinksEmptyView;
     public ChatActivityFragmentView contentView;
-    public tw.nekomimi.nekogram.ui.PrivacyBlurOverlayView privacyBlurOverlayView;
     private static final int chat_privacy_blur = 1845;
+    private static final int send_video_as_round = 1846;
     private ChatBigEmptyView bigEmptyView;
     private ArrayList<View> actionModeViews = new ArrayList<>();
     public ChatAvatarContainer avatarContainer;
@@ -4437,6 +4437,14 @@ public class ChatActivity extends BaseFragment implements
                     if (privacyBlurOverlayView != null) {
                         privacyBlurOverlayView.toggleVisibility();
                     }
+                } else if (id == send_video_as_round) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_PICK);
+                        intent.setType("video/*");
+                        startActivityForResult(intent, 71);
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    }
                 } else if (id == topic_close) {
                     if (forumTopic == null)
                         return;
@@ -4904,6 +4912,7 @@ public class ChatActivity extends BaseFragment implements
             
             // Chat Privacy Blur
             headerItem.lazilyAddSubItem(chat_privacy_blur, R.drawable.magic_stick_solar, "Chat Blur");
+            headerItem.lazilyAddSubItem(send_video_as_round, R.drawable.msg_video, "Send Video as Round");
             
             if (currentUser != null && currentUser.self && getDialogId() != UserObject.VERIFY) {
                 headerItem.lazilyAddSubItem(add_shortcut, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut));
@@ -7247,6 +7256,9 @@ public class ChatActivity extends BaseFragment implements
                 chatListView.invalidate();
                 if (contentView != null) {
                     contentView.updateBlurContent();
+                }
+                if (privacyBlurOverlayView != null) {
+                    privacyBlurOverlayView.invalidateBlur();
                 }
                 if (chatListThanosEffect != null) {
                     chatListThanosEffect.scroll(dx, dy);
@@ -20744,6 +20756,84 @@ public class ChatActivity extends BaseFragment implements
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 137 && data != null) {
                 xyz.nextalone.nagram.utils.ChatExportImport.handleImportResult(getParentActivity(), dialog_id, data.getData());
+                return;
+            }
+            // Handle Send Video as Round (circle) message
+            if (requestCode == 71 && data != null && data.getData() != null) {
+                android.net.Uri videoUri = data.getData();
+                String videoPath = null;
+                try {
+                    videoPath = AndroidUtilities.getPath(videoUri);
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+                if (videoPath == null) {
+                    // Try to copy from content URI
+                    try {
+                        java.io.File tempFile = AndroidUtilities.generateVideoPath();
+                        java.io.InputStream in = ApplicationLoader.applicationContext.getContentResolver().openInputStream(videoUri);
+                        java.io.FileOutputStream fos = new java.io.FileOutputStream(tempFile);
+                        byte[] buffer = new byte[8 * 1024];
+                        int len;
+                        while ((len = in.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                        in.close();
+                        fos.close();
+                        videoPath = tempFile.getAbsolutePath();
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                        showAttachmentError();
+                        return;
+                    }
+                }
+                if (videoPath != null) {
+                    org.telegram.messenger.VideoEditedInfo videoEditedInfo = new org.telegram.messenger.VideoEditedInfo();
+                    videoEditedInfo.roundVideo = true;
+                    videoEditedInfo.startTime = -1;
+                    videoEditedInfo.endTime = -1;
+                    // Get video metadata
+                    try {
+                        android.media.MediaMetadataRetriever retriever = new android.media.MediaMetadataRetriever();
+                        retriever.setDataSource(videoPath);
+                        String width = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+                        String height = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+                        String duration = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        String rotation = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+                        String bitrateStr = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_BITRATE);
+                        int w = width != null ? Integer.parseInt(width) : 360;
+                        int h = height != null ? Integer.parseInt(height) : 360;
+                        int rot = rotation != null ? Integer.parseInt(rotation) : 0;
+                        videoEditedInfo.rotationValue = rot;
+                        if (rot == 90 || rot == 270) {
+                            videoEditedInfo.originalWidth = h;
+                            videoEditedInfo.originalHeight = w;
+                        } else {
+                            videoEditedInfo.originalWidth = w;
+                            videoEditedInfo.originalHeight = h;
+                        }
+                        // Round videos in Telegram are 384x384
+                        videoEditedInfo.resultWidth = 384;
+                        videoEditedInfo.resultHeight = 384;
+                        videoEditedInfo.estimatedDuration = duration != null ? Long.parseLong(duration) * 1000 : 0;
+                        videoEditedInfo.originalDuration = duration != null ? Long.parseLong(duration) * 1000 : 0;
+                        videoEditedInfo.bitrate = bitrateStr != null ? Integer.parseInt(bitrateStr) : -1;
+                        videoEditedInfo.framerate = 30;
+                        videoEditedInfo.originalPath = videoPath;
+                        videoEditedInfo.estimatedSize = new java.io.File(videoPath).length();
+                        retriever.release();
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                        // Set minimal defaults
+                        videoEditedInfo.originalWidth = 384;
+                        videoEditedInfo.originalHeight = 384;
+                        videoEditedInfo.resultWidth = 384;
+                        videoEditedInfo.resultHeight = 384;
+                        videoEditedInfo.originalPath = videoPath;
+                    }
+                    SendMessagesHelper.prepareSendingVideo(getAccountInstance(), videoPath, videoEditedInfo, null, null, dialog_id, replyingMessageObject, getThreadMessage(), null, null, null, 0, null, true, 0, 0, false, false, null, null, 0, 0, 0);
+                    afterMessageSend();
+                }
                 return;
             }
             if (requestCode == 0 || requestCode == 2) {
