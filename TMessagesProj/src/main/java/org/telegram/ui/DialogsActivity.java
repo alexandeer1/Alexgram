@@ -6602,7 +6602,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             filterTabsView.setTranslationY(totalOffset - searchOffset);
             filtersTabVisibility = filterTabsView.getAlpha();
             filtersTabHeight = dp(36 + 7) * filtersTabVisibility;
-            totalOffset += filtersTabHeight;
+            if (!NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
+                totalOffset += filtersTabHeight;
+            }
         }
 
         if (topPanelLayout != null) {
@@ -8788,7 +8790,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void updateFloatingButtonOffset() {
-        final float top = -navigationBarHeight - additionFloatingButtonOffset - additionalFloatingTranslation;
+        float additionalBottom = 0;
+        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
+            additionalBottom = (dp(36 + 14) * filterTabsView.getAlpha());
+        }
+
+        final float top = -navigationBarHeight - additionFloatingButtonOffset - additionalFloatingTranslation - additionalBottom;
         final float baseTranslationY = top
             - floatingButtonPanOffset;
 

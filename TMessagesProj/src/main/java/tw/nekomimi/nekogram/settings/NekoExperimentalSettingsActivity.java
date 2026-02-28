@@ -260,7 +260,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
 
         cellGroup.callBackSettingsChanged = (key, newValue) -> {
             if (key.equals(NaConfig.INSTANCE.getMusicGraph().getKey())) {
-                org.telegram.messenger.NotificationCenter.getGlobalInstance().postNotificationName(org.telegram.messenger.NotificationCenter.messagePlayingPlayStateChanged);
+                tooltip.showWithAction(0, org.telegram.ui.Components.UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NaConfig.INSTANCE.getHideContacts().getKey())) {
                 tooltip.showWithAction(0, org.telegram.ui.Components.UndoView.ACTION_NEED_RESTART, null, null);
             }
