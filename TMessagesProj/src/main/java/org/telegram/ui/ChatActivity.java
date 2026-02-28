@@ -20838,7 +20838,7 @@ public class ChatActivity extends BaseFragment implements
                     videoEditedInfo.resultWidth = 384;
                     videoEditedInfo.resultHeight = 384;
                     videoEditedInfo.rotationValue = rot;
-                    videoEditedInfo.bitrate = bitrate;
+                    videoEditedInfo.bitrate = bitrate == -1 ? 0 : bitrate;
                     videoEditedInfo.framerate = 30;
                     videoEditedInfo.estimatedDuration = durationMs * 1000;
                     videoEditedInfo.originalDuration = durationMs * 1000;
