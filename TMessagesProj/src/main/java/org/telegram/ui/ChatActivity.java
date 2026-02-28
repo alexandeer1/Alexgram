@@ -20863,8 +20863,8 @@ public class ChatActivity extends BaseFragment implements
                     }
                     cropState.cropScale = 1.0f;
                     cropState.cropRotate = 0;
-                    cropState.transformWidth = Math.min(w, h);
-                    cropState.transformHeight = Math.min(w, h);
+                    cropState.transformWidth = 384;
+                    cropState.transformHeight = 384;
                     cropState.transformRotation = 0;
                     videoEditedInfo.cropState = cropState;
 
