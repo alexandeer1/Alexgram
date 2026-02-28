@@ -6599,7 +6599,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         float fadeViewT = totalOffset;
 
         if (filterTabsView != null) {
-            filterTabsView.setTranslationY(totalOffset - searchOffset);
+            if (NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
+                filterTabsView.setTranslationY(0);
+            } else {
+                filterTabsView.setTranslationY(totalOffset - searchOffset);
+            }
             filtersTabVisibility = filterTabsView.getAlpha();
             filtersTabHeight = dp(36 + 7) * filtersTabVisibility;
             if (!NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
