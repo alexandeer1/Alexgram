@@ -111,9 +111,9 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private final AbstractConfigCell enhancedFileLoaderRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enhancedFileLoader));
     private final AbstractConfigCell dividerConnection = cellGroup.appendCell(new ConfigCellDivider());
 
-    // Media
     private final AbstractConfigCell headerMedia = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.MediaSettings)));
     private final AbstractConfigCell musicGraphRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getMusicGraph(), "Show Music Visualizer"));
+    private final AbstractConfigCell hideContactsRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHideContacts(), "Hide Contacts"));
     private final AbstractConfigCell audioEnhanceRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getNoiseSuppressAndVoiceEnhance()));
     private final AbstractConfigCell sendMp4DocumentAsVideoRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSendMp4DocumentAsVideo()));
     private final AbstractConfigCell enhancedVideoBitrateRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getEnhancedVideoBitrate()));
@@ -257,6 +257,14 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
         listAdapter = new ListAdapter(context);
 
         listView.setAdapter(listAdapter);
+
+        cellGroup.callBackSettingsChanged = (key, newValue) -> {
+            if (key.equals(NaConfig.INSTANCE.getMusicGraph().getKey())) {
+                org.telegram.messenger.NotificationCenter.getGlobalInstance().postNotificationName(org.telegram.messenger.NotificationCenter.messagePlayingPlayStateChanged);
+            } else if (key.equals(NaConfig.INSTANCE.getHideContacts().getKey())) {
+                tooltip.showWithAction(0, org.telegram.ui.Components.UndoView.ACTION_NEED_RESTART, null, null);
+            }
+        };
 
         // Fragment: Set OnClick Callbacks
         listView.setOnItemClickListener((view, position, x, y) -> {
