@@ -105,6 +105,18 @@ object NaConfig {
             ConfigItem.configTypeBool,
             true
         )
+    val hideContacts =
+        addConfig(
+            "HideContacts",
+            ConfigItem.configTypeBool,
+            false
+        )
+    val foldersAtBottom =
+        addConfig(
+            "FoldersAtBottom",
+            ConfigItem.configTypeBool,
+            false
+        )
     val showTextRegular =
         addConfig(
             "TextRegular",

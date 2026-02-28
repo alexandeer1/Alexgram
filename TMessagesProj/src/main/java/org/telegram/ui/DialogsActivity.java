@@ -1292,8 +1292,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 } else if (child instanceof ViewPage) {
                     childTop = 0;
                 } else if (child == topPanelLayout || child == topBubblesFadeView || child == filterTabsView) {
-                    childTop += actionBar.getMeasuredHeight();
-                    childTop += dp(SEARCH_FIELD_HEIGHT);
+                    if (child == filterTabsView && NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
+                        childTop = (b - t) - getBottomTabsHeight() - height - dp(7);
+                    } else {
+                        childTop += actionBar.getMeasuredHeight();
+                        childTop += dp(SEARCH_FIELD_HEIGHT);
+                    }
                 } else if (dialogStoriesCell != null && dialogStoriesCell.getPremiumHint() == child) {
                     continue;
                 }
@@ -2021,7 +2025,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             final float filterTabsVisibility = filterTabsView != null && filterTabsView.getVisibility() == VISIBLE ? filterTabsView.getAlpha() : 0f;
             final float topPanelsVisibility = topPanelLayout != null ? topPanelLayout.getMetadata().getTotalVisibility() : 0f;
 
-            t += (int) (dp(36 + 14) * filterTabsVisibility);
+            if (!NaConfig.INSTANCE.getFoldersAtBottom().Bool()) {
+                t += (int) (dp(36 + 14) * filterTabsVisibility);
+            }
 
             if (topPanelLayout != null) {
                 final int h = (int) topPanelLayout.getAnimatedHeightWithPadding(lerp((float) dp(14), dp(7), filterTabsVisibility));
@@ -13783,12 +13789,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
     }
 
-    private int calculateListViewPaddingBottom() {
+    private int getBottomTabsHeight() {
         if (commentView != null) {
             return (int) (windowInsetsStateHolder.getAnimatedMaxBottomInset() + dp(9) + chatInputViewsContainer.getInputBubbleHeight() + dp(7) + dp(2));
         } else {
             return navigationBarHeight + additionNavigationBarHeight;
         }
+    }
+
+    private int calculateListViewPaddingBottom() {
+        int additionalBottom = 0;
+        if (NaConfig.INSTANCE.getFoldersAtBottom().Bool() && filterTabsView != null && filterTabsView.getVisibility() == VISIBLE) {
+            additionalBottom = (int) (dp(36 + 14) * filterTabsView.getAlpha());
+        }
+        return getBottomTabsHeight() + additionalBottom;
     }
 
     @Override

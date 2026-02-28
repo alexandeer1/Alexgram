@@ -92,8 +92,20 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private static final int INDEX_CALLS = 3;
     private static final int INDEX_PROFILE = 4;
 
-    private static int indexToPosition(int index) {
-        return index > 2 ? index - 1 : index;
+    private int indexToPosition(int index) {
+        int pos = index > 2 ? index - 1 : index;
+        if (NaConfig.INSTANCE.getHideContacts().Bool()) {
+            if (pos == POSITION_CONTACTS) return -1;
+            if (pos > POSITION_CONTACTS) return pos - 1;
+        }
+        return pos;
+    }
+
+    private int mapPosition(int position) {
+        if (NaConfig.INSTANCE.getHideContacts().Bool() && position >= POSITION_CONTACTS) {
+            return position + 1;
+        }
+        return position;
     }
 
 
@@ -276,6 +288,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             tabsView.setViewVisible(view, true, false);
         }
         checkUi_callTabVisible(getUserConfig().showCallsTab, false);
+        if (NaConfig.INSTANCE.getHideContacts().Bool()) {
+            tabsView.setViewVisible(tabs[INDEX_CONTACTS], false, false);
+        }
 
         selectTab(viewPager.getCurrentPosition(), false);
 
@@ -484,7 +499,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     protected int getFragmentsCount() {
-        return TABS_COUNT;
+        return NaConfig.INSTANCE.getHideContacts().Bool() ? TABS_COUNT - 1 : TABS_COUNT;
     }
 
     @Override
@@ -523,13 +538,14 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     protected BaseFragment createBaseFragmentAt(int position) {
-        if (position == POSITION_CONTACTS) {
+        int realPosition = mapPosition(position);
+        if (realPosition == POSITION_CONTACTS) {
             Bundle args = new Bundle();
             args.putBoolean("needPhonebook", true);
             args.putBoolean("needFinishFragment", false);
             args.putBoolean("hasMainTabs", true);
             return new ContactsActivity(args);
-        } else if (position == POSITION_CALLS_OR_SETTINGS) {
+        } else if (realPosition == POSITION_CALLS_OR_SETTINGS) {
             if (getUserConfig().showCallsTab) {
                 Bundle args = new Bundle();
                 args.putBoolean("needFinishFragment", false);
@@ -539,13 +555,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             Bundle args = new Bundle();
             args.putBoolean("hasMainTabs", true);
             return new SettingsActivity(args);
-        } else if (position == POSITION_CHATS) {
+        } else if (realPosition == POSITION_CHATS) {
             Bundle args = new Bundle();
             args.putBoolean("hasMainTabs", true);
             dialogsActivity = new DialogsActivity(args);
             dialogsActivity.setMainTabsActivityController(new MainTabsActivityControllerImpl());
             return dialogsActivity;
-        } else if (position == POSITION_PROFILE) {
+        } else if (realPosition == POSITION_PROFILE) {
             Bundle args = new Bundle();
             args.putLong("user_id", UserConfig.getInstance(currentAccount).getClientUserId());
             args.putBoolean("my_profile", true);
