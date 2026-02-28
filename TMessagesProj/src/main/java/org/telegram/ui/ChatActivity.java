@@ -20768,7 +20768,6 @@ public class ChatActivity extends BaseFragment implements
                     FileLog.e(e);
                 }
                 if (videoPath == null) {
-                    // Try to copy from content URI
                     try {
                         java.io.File tempFile = AndroidUtilities.generateVideoPath();
                         java.io.InputStream in = ApplicationLoader.applicationContext.getContentResolver().openInputStream(videoUri);
@@ -20788,49 +20787,87 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
                 if (videoPath != null) {
-                    org.telegram.messenger.VideoEditedInfo videoEditedInfo = new org.telegram.messenger.VideoEditedInfo();
+                    // Extract video metadata
+                    int w = 360, h = 360, rot = 0, bitrate = -1;
+                    long durationMs = 0;
+                    android.media.MediaMetadataRetriever retriever = null;
+                    try {
+                        retriever = new android.media.MediaMetadataRetriever();
+                        retriever.setDataSource(videoPath);
+                        String ws = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+                        String hs = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+                        String ds = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        String rs = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+                        String bs = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_BITRATE);
+                        if (ws != null) w = Integer.parseInt(ws);
+                        if (hs != null) h = Integer.parseInt(hs);
+                        if (ds != null) durationMs = Long.parseLong(ds);
+                        if (rs != null) rot = Integer.parseInt(rs);
+                        if (bs != null) bitrate = Integer.parseInt(bs);
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    } finally {
+                        try {
+                            if (retriever != null) retriever.release();
+                        } catch (Exception ignore) {}
+                    }
+
+                    // Validate duration (max 60 seconds)
+                    if (durationMs > 60_000) {
+                        BulletinFactory.of(this).createErrorBulletin(
+                            "Video duration should not be longer than 60 seconds", themeDelegate
+                        ).show();
+                        return;
+                    }
+
+                    // Swap dimensions if rotated 90 or 270
+                    if (rot == 90 || rot == 270) {
+                        int tmp = w;
+                        w = h;
+                        h = tmp;
+                    }
+
+                    // Build VideoEditedInfo for round video
+                    VideoEditedInfo videoEditedInfo = new VideoEditedInfo();
                     videoEditedInfo.roundVideo = true;
                     videoEditedInfo.startTime = -1;
                     videoEditedInfo.endTime = -1;
-                    // Get video metadata
-                    try {
-                        android.media.MediaMetadataRetriever retriever = new android.media.MediaMetadataRetriever();
-                        retriever.setDataSource(videoPath);
-                        String width = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-                        String height = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-                        String duration = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        String rotation = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
-                        String bitrateStr = retriever.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_BITRATE);
-                        int w = width != null ? Integer.parseInt(width) : 360;
-                        int h = height != null ? Integer.parseInt(height) : 360;
-                        int rot = rotation != null ? Integer.parseInt(rotation) : 0;
-                        videoEditedInfo.rotationValue = rot;
-                        if (rot == 90 || rot == 270) {
-                            videoEditedInfo.originalWidth = h;
-                            videoEditedInfo.originalHeight = w;
-                        } else {
-                            videoEditedInfo.originalWidth = w;
-                            videoEditedInfo.originalHeight = h;
-                        }
-                        // Round videos in Telegram are 384x384
-                        videoEditedInfo.resultWidth = 384;
-                        videoEditedInfo.resultHeight = 384;
-                        videoEditedInfo.estimatedDuration = duration != null ? Long.parseLong(duration) * 1000 : 0;
-                        videoEditedInfo.originalDuration = duration != null ? Long.parseLong(duration) * 1000 : 0;
-                        videoEditedInfo.bitrate = bitrateStr != null ? Integer.parseInt(bitrateStr) : -1;
-                        videoEditedInfo.framerate = 30;
-                        videoEditedInfo.originalPath = videoPath;
-                        videoEditedInfo.estimatedSize = new java.io.File(videoPath).length();
-                        retriever.release();
-                    } catch (Exception e) {
-                        FileLog.e(e);
-                        // Set minimal defaults
-                        videoEditedInfo.originalWidth = 384;
-                        videoEditedInfo.originalHeight = 384;
-                        videoEditedInfo.resultWidth = 384;
-                        videoEditedInfo.resultHeight = 384;
-                        videoEditedInfo.originalPath = videoPath;
+                    videoEditedInfo.originalPath = videoPath;
+                    videoEditedInfo.originalWidth = w;
+                    videoEditedInfo.originalHeight = h;
+                    videoEditedInfo.resultWidth = 384;
+                    videoEditedInfo.resultHeight = 384;
+                    videoEditedInfo.rotationValue = rot;
+                    videoEditedInfo.bitrate = bitrate;
+                    videoEditedInfo.framerate = 30;
+                    videoEditedInfo.estimatedDuration = durationMs * 1000;
+                    videoEditedInfo.originalDuration = durationMs * 1000;
+                    videoEditedInfo.estimatedSize = new java.io.File(videoPath).length();
+
+                    // Create CropState for center-crop to 1:1 ratio.
+                    // This is CRITICAL: without cropState, needConvert() returns false
+                    // and the video is sent raw without transcoding.
+                    MediaController.CropState cropState = new MediaController.CropState();
+                    if (w != h) {
+                        // Center-crop to square: crop proportional width/height and offset
+                        int minSide = Math.min(w, h);
+                        cropState.cropPw = (float) minSide / w;
+                        cropState.cropPh = (float) minSide / h;
+                        cropState.cropPx = (1f - cropState.cropPw) / 2f;
+                        cropState.cropPy = (1f - cropState.cropPh) / 2f;
+                    } else {
+                        cropState.cropPw = 1f;
+                        cropState.cropPh = 1f;
+                        cropState.cropPx = 0f;
+                        cropState.cropPy = 0f;
                     }
+                    cropState.cropScale = 1.0f;
+                    cropState.cropRotate = 0;
+                    cropState.transformWidth = 384;
+                    cropState.transformHeight = 384;
+                    cropState.transformRotation = 0;
+                    videoEditedInfo.cropState = cropState;
+
                     SendMessagesHelper.prepareSendingVideo(getAccountInstance(), videoPath, videoEditedInfo, null, null, dialog_id, replyingMessageObject, getThreadMessage(), null, null, null, 0, null, true, 0, 0, false, false, null, null, 0, 0, 0);
                     afterMessageSend();
                 }
