@@ -9767,9 +9767,11 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                 document.attributes.add(attributeVideo);
 
                                 // na: Fix filename
-                                TLRPC.TL_documentAttributeFilename fileName = new TLRPC.TL_documentAttributeFilename();
-                                fileName.file_name = new File(path).getName();
-                                document.attributes.add(fileName);
+                                if (videoEditedInfo == null || !videoEditedInfo.roundVideo) {
+                                    TLRPC.TL_documentAttributeFilename fileName = new TLRPC.TL_documentAttributeFilename();
+                                    fileName.file_name = new File(path).getName();
+                                    document.attributes.add(fileName);
+                                }
 
                                 if (videoEditedInfo != null && (videoEditedInfo.needConvert() || !info.isVideo)) {
                                     if (info.isVideo && videoEditedInfo.muted) {
@@ -10509,9 +10511,11 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                     document.attributes.add(attributeVideo);
 
                     // na: Fix filename
-                    TLRPC.TL_documentAttributeFilename fileName = new TLRPC.TL_documentAttributeFilename();
-                    fileName.file_name = new File(path).getName();
-                    document.attributes.add(fileName);
+                    if (!isRound) {
+                        TLRPC.TL_documentAttributeFilename fileName = new TLRPC.TL_documentAttributeFilename();
+                        fileName.file_name = new File(path).getName();
+                        document.attributes.add(fileName);
+                    }
 
                     if (videoEditedInfo != null && videoEditedInfo.notReadyYet) {
                         attributeVideo.w = videoEditedInfo.resultWidth;
