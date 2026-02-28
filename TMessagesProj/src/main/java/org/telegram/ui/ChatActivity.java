@@ -581,7 +581,6 @@ public class ChatActivity extends BaseFragment implements
     private QuickRepliesEmptyView quickRepliesEmptyView;
     private BusinessLinksEmptyView businessLinksEmptyView;
     public ChatActivityFragmentView contentView;
-    public tw.nekomimi.nekogram.ui.PrivacyBlurOverlayView privacyBlurOverlayView;
     private static final int chat_privacy_blur = 1845;
     private ChatBigEmptyView bigEmptyView;
     private ArrayList<View> actionModeViews = new ArrayList<>();
