@@ -541,6 +541,7 @@ public class ChatActivity extends BaseFragment implements
     private ActionBarMenu.LazyItem audioCallIconItem;
     private boolean searchItemVisible;
     private RadialProgressView progressBar;
+    private tw.nekomimi.nekogram.ui.PrivacyBlurOverlayView privacyBlurOverlayView;
     private ActionBarMenuItem.Item addContactItem;
     private ActionBarMenuItem.Item clearHistoryItem;
     private ActionBarMenuItem.Item viewAsTopics;
@@ -580,6 +581,8 @@ public class ChatActivity extends BaseFragment implements
     private QuickRepliesEmptyView quickRepliesEmptyView;
     private BusinessLinksEmptyView businessLinksEmptyView;
     public ChatActivityFragmentView contentView;
+    public tw.nekomimi.nekogram.ui.PrivacyBlurOverlayView privacyBlurOverlayView;
+    private static final int chat_privacy_blur = 1845;
     private ChatBigEmptyView bigEmptyView;
     private ArrayList<View> actionModeViews = new ArrayList<>();
     public ChatAvatarContainer avatarContainer;
@@ -4430,6 +4433,10 @@ public class ChatActivity extends BaseFragment implements
                     }
                 } else if (id == change_colors) {
                     showChatThemeBottomSheet();
+                } else if (id == chat_privacy_blur) {
+                    if (privacyBlurOverlayView != null) {
+                        privacyBlurOverlayView.toggleVisibility();
+                    }
                 } else if (id == topic_close) {
                     if (forumTopic == null)
                         return;
@@ -4894,6 +4901,10 @@ public class ChatActivity extends BaseFragment implements
             if (themeDelegate.isThemeChangeAvailable(true)) {
                 headerItem.lazilyAddSubItem(change_colors, R.drawable.msg_background, LocaleController.getString(R.string.SetWallpapers));
             }
+            
+            // Chat Privacy Blur
+            headerItem.lazilyAddSubItem(chat_privacy_blur, R.drawable.magic_stick_solar, "Chat Blur");
+            
             if (currentUser != null && currentUser.self && getDialogId() != UserObject.VERIFY) {
                 headerItem.lazilyAddSubItem(add_shortcut, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut));
             }
@@ -7373,6 +7384,10 @@ public class ChatActivity extends BaseFragment implements
         });
 
         contentView.addView(chatListView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
+        privacyBlurOverlayView = new tw.nekomimi.nekogram.ui.PrivacyBlurOverlayView(context, this, chatListView);
+        contentView.addView(privacyBlurOverlayView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
         contentView.addView(topPanelLayoutFade, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 120, Gravity.LEFT | Gravity.TOP));
 
 

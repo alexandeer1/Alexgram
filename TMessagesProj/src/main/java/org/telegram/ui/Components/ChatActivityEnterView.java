@@ -4841,6 +4841,67 @@ public class ChatActivityEnterView extends FrameLayout implements
                 cell.setMinimumWidth(AndroidUtilities.dp(196));
                 menuPopupLayout.addView(cell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 48 * a++, 0, 0));
             }
+            
+            // Send video as Record
+            cell = new ActionBarMenuSubItem(getContext(), false, true);
+            cell.setTextAndIcon("Send video as Record", R.drawable.input_video);
+            cell.setOnClickListener(v -> {
+                if (menuPopupWindow != null && menuPopupWindow.isShowing()) {
+                    menuPopupWindow.dismiss();
+                }
+
+                if (parentFragment != null) {
+                    TLRPC.Chat chat = parentFragment.getCurrentChat();
+                    if (chat != null && !ChatObject.canSendRoundVideo(chat)) {
+                        delegate.needShowMediaBanHint();
+                        return;
+                    }
+                }
+
+                if (checkMenuPermissions(true)) {
+                    if (parentFragment instanceof ChatActivity) {
+                        try {
+                            org.telegram.ui.PhotoAlbumPickerActivity fragment = new org.telegram.ui.PhotoAlbumPickerActivity(
+                                    org.telegram.ui.PhotoAlbumPickerActivity.SELECT_TYPE_AVATAR_VIDEO, false, false, null);
+                            fragment.setMaxSelectedPhotos(1, false);
+                            fragment.setDelegate(new org.telegram.ui.PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
+                                @Override
+                                public void didSelectPhotos(java.util.ArrayList<org.telegram.messenger.SendMessagesHelper.SendingMediaInfo> photos, boolean notify, int scheduleDate) {
+                                    if (!photos.isEmpty()) {
+                                        org.telegram.messenger.SendMessagesHelper.SendingMediaInfo info = photos.get(0);
+                                        if (info.videoEditedInfo != null) {
+                                            info.videoEditedInfo.roundVideo = true;
+                                        } else {
+                                            info.videoEditedInfo = new org.telegram.messenger.VideoEditedInfo();
+                                            info.videoEditedInfo.roundVideo = true;
+                                        }
+                                        ((ChatActivity) parentFragment).didSelectPhotos(photos, notify, scheduleDate, 0, 0);
+                                    }
+                                }
+
+                                @Override
+                                public void startPhotoSelectActivity() {
+                                    try {
+                                        android.content.Intent videoPickerIntent = new android.content.Intent();
+                                        videoPickerIntent.setType("video/*");
+                                        videoPickerIntent.setAction(android.content.Intent.ACTION_GET_CONTENT);
+                                        videoPickerIntent.putExtra(android.provider.MediaStore.EXTRA_SIZE_LIMIT, org.telegram.messenger.FileLoader.DEFAULT_MAX_FILE_SIZE);
+                                        parentFragment.startActivityForResult(videoPickerIntent, 1);
+                                    } catch (Exception e) {
+                                        org.telegram.messenger.FileLog.e(e);
+                                    }
+                                }
+                            });
+                            parentFragment.presentFragment(fragment);
+                        } catch (Exception e) {
+                            org.telegram.messenger.FileLog.e(e);
+                        }
+                    }
+                }
+            });
+            cell.setMinimumWidth(AndroidUtilities.dp(196));
+            menuPopupLayout.addView(cell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 48 * a++, 0, 0));
+            
         } else {
             long chatId = ChatsHelper.getChatId();
             String languageText = Translator.getInputTranslateLangForChat(chatId).toUpperCase();
