@@ -925,7 +925,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     int height = MeasureSpec.getSize(heightMeasureSpec);
                     setMeasuredDimension(width, height);
 
-                    if (!tabletFullSize && rightActionBarLayout.getView().getVisibility() != View.GONE) {
+                    if (!tabletFullSize) {
                         int leftWidth = width / 100 * 35;
                         if (leftWidth < dp(320)) {
                             leftWidth = dp(320);
@@ -951,7 +951,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     int width = r - l;
                     int height = b - t;
 
-                    if (!tabletFullSize && rightActionBarLayout.getView().getVisibility() != View.GONE) {
+                    if (!tabletFullSize) {
                         int leftWidth = width / 100 * 35;
                         if (leftWidth < dp(320)) {
                             leftWidth = dp(320);
