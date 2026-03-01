@@ -1327,10 +1327,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
         if (!AndroidUtilities.isInMultiwindow && (!AndroidUtilities.isSmallTablet() || getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
             tabletFullSize = false;
-            List<BaseFragment> leftStack = actionBarLayout.getFragmentStack();
-            if (leftStack.size() == 1 && leftStack.get(0) instanceof ChatActivity) {
-                actionBarLayout.addFragmentToStack(new MainTabsActivity(), 0);
-            }
             List<BaseFragment> fragmentStack = actionBarLayout.getFragmentStack();
             if (fragmentStack.size() >= 2) {
                 for (int a = 1; a < fragmentStack.size(); a++) {
@@ -1351,16 +1347,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             }
             rightActionBarLayout.getView().setVisibility(rightActionBarLayout.getFragmentStack().isEmpty() ? View.GONE : View.VISIBLE);
-            backgroundTablet.setVisibility(rightActionBarLayout.getFragmentStack().isEmpty() ? View.VISIBLE : View.GONE);
+            backgroundTablet.setVisibility(View.VISIBLE);
             shadowTabletSide.setVisibility(!actionBarLayout.getFragmentStack().isEmpty() ? View.VISIBLE : View.GONE);
         } else {
             tabletFullSize = true;
-            List<BaseFragment> leftStack = actionBarLayout.getFragmentStack();
-            if (leftStack.isEmpty() || (leftStack.size() == 1 && leftStack.get(0) instanceof ChatActivity)) {
-                if (!(leftStack.size() == 1 && leftStack.get(0) instanceof MainTabsActivity)) {
-                    actionBarLayout.addFragmentToStack(new MainTabsActivity(), 0);
-                }
-            }
             List<BaseFragment> fragmentStack = rightActionBarLayout.getFragmentStack();
             if (!fragmentStack.isEmpty()) {
                 for (int a = 0; a < fragmentStack.size(); a++) {
@@ -1381,7 +1371,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             }
             shadowTabletSide.setVisibility(View.GONE);
             rightActionBarLayout.getView().setVisibility(View.GONE);
-            backgroundTablet.setVisibility(!actionBarLayout.getFragmentStack().isEmpty() ? View.GONE : View.VISIBLE);
+            backgroundTablet.setVisibility(View.VISIBLE);
         }
     }
 
