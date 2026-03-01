@@ -1351,12 +1351,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             List<BaseFragment> fragmentStack = actionBarLayout.getFragmentStack();
             
             if (fragmentStack.isEmpty() || (!(fragmentStack.get(0) instanceof MainTabsActivity) && !(fragmentStack.get(0) instanceof DialogsActivity))) {
-                MainTabsActivity mainTabs = new MainTabsActivity();
-                actionBarLayout.addFragmentToStack(mainTabs, INavigationLayout.FORCE_ATTACH_VIEW_AS_FIRST);
-                mainTabs.onResume();
-                mainTabs.onTransitionAnimationEnd(false, true);
-                mainTabs.onTransitionAnimationEnd(true, true);
-                mainTabs.onBecomeFullyVisible();
+                actionBarLayout.addFragmentToStack(new MainTabsActivity(), INavigationLayout.FORCE_ATTACH_VIEW_AS_FIRST);
             }
             
             if (fragmentStack.size() >= 2) {
@@ -1366,6 +1361,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         ((ChatActivity) chatFragment).setIgnoreAttachOnPause(true);
                     }
                     chatFragment.onPause();
+                    chatFragment.onFragmentDestroy();
                     chatFragment.setParentLayout(null);
                     fragmentStack.remove(chatFragment);
                     rightActionBarLayout.addFragmentToStack(chatFragment);
@@ -1389,6 +1385,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         ((ChatActivity) chatFragment).setIgnoreAttachOnPause(true);
                     }
                     chatFragment.onPause();
+                    chatFragment.onFragmentDestroy();
                     chatFragment.setParentLayout(null);
                     fragmentStack.remove(chatFragment);
                     actionBarLayout.addFragmentToStack(chatFragment);
