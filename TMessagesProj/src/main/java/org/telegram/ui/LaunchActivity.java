@@ -8538,6 +8538,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         layersActionBarLayout.closeLastFragment(true);
                     }
                     return false;
+                } else if (tabletFullSize && layout == actionBarLayout) {
+                    return true;
+                } else if (!tabletFullSize && layout == rightActionBarLayout) {
+                    return true;
                 }
             } else if (layout != layersActionBarLayout) {
                 layersActionBarLayout.getView().setVisibility(View.VISIBLE);
