@@ -1346,7 +1346,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             return;
         }
 
-        if (!AndroidUtilities.isInMultiwindow && (!AndroidUtilities.isSmallTablet() || getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE || (!AndroidUtilities.isInMultiwindow && !AndroidUtilities.isSmallTablet())) {
             tabletFullSize = false;
             List<BaseFragment> fragmentStack = actionBarLayout.getFragmentStack();
             
