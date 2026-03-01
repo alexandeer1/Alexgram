@@ -2980,6 +2980,10 @@ public class AndroidUtilities {
     }
 
     public static boolean isSmallTablet() {
+        if (NekoConfig.tabletMode.Int() == NekoConfig.TABLET_ENABLE) {
+            float minSide = Math.min(displaySize.x, displaySize.y) / density;
+            return minSide <= 520;
+        }
         float minSide = Math.min(displaySize.x, displaySize.y) / density;
         return minSide <= 690;
     }
@@ -2987,11 +2991,12 @@ public class AndroidUtilities {
     public static int getMinTabletSide() {
         if (!isSmallTablet()) {
             int smallSide = Math.min(displaySize.x, displaySize.y);
-            int leftSide = smallSide * 35 / 100;
+            int maxSide = Math.max(displaySize.x, displaySize.y);
+            int leftSide = maxSide * 35 / 100;
             if (leftSide < dp(320)) {
                 leftSide = dp(320);
             }
-            return smallSide - leftSide;
+            return maxSide - leftSide;
         } else {
             int smallSide = Math.min(displaySize.x, displaySize.y);
             int maxSide = Math.max(displaySize.x, displaySize.y);
@@ -2999,7 +3004,7 @@ public class AndroidUtilities {
             if (leftSide < dp(320)) {
                 leftSide = dp(320);
             }
-            return Math.min(smallSide, maxSide - leftSide);
+            return maxSide - leftSide;
         }
     }
 
