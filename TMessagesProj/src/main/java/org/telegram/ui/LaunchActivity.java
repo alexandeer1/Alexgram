@@ -925,8 +925,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     int height = MeasureSpec.getSize(heightMeasureSpec);
                     setMeasuredDimension(width, height);
 
-                    if (!AndroidUtilities.isInMultiwindow && (!AndroidUtilities.isSmallTablet() || getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
-                        tabletFullSize = false;
+                    if (!tabletFullSize) {
                         int leftWidth = width / 100 * 35;
                         if (leftWidth < dp(320)) {
                             leftWidth = dp(320);
@@ -935,7 +934,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         shadowTabletSide.measure(MeasureSpec.makeMeasureSpec(dp(1), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
                         rightActionBarLayout.getView().measure(MeasureSpec.makeMeasureSpec(width - leftWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
                     } else {
-                        tabletFullSize = true;
                         actionBarLayout.getView().measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
                     }
                     backgroundTablet.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
@@ -953,7 +951,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     int width = r - l;
                     int height = b - t;
 
-                    if (!AndroidUtilities.isInMultiwindow && (!AndroidUtilities.isSmallTablet() || getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
+                    if (!tabletFullSize) {
                         int leftWidth = width / 100 * 35;
                         if (leftWidth < dp(320)) {
                             leftWidth = dp(320);
@@ -1325,9 +1323,14 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             return;
         }
 
-        if (!AndroidUtilities.isInMultiwindow && (!AndroidUtilities.isSmallTablet() || getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE || (!AndroidUtilities.isInMultiwindow && !AndroidUtilities.isSmallTablet())) {
             tabletFullSize = false;
             List<BaseFragment> fragmentStack = actionBarLayout.getFragmentStack();
+            
+            if (fragmentStack.isEmpty() || (!(fragmentStack.get(0) instanceof MainTabsActivity) && !(fragmentStack.get(0) instanceof DialogsActivity))) {
+                actionBarLayout.addFragmentToStack(new MainTabsActivity(), INavigationLayout.FORCE_ATTACH_VIEW_AS_FIRST);
+            }
+            
             if (fragmentStack.size() >= 2) {
                 for (int a = 1; a < fragmentStack.size(); a++) {
                     BaseFragment chatFragment = fragmentStack.get(a);
@@ -1338,6 +1341,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     chatFragment.onFragmentDestroy();
                     chatFragment.setParentLayout(null);
                     fragmentStack.remove(chatFragment);
+                    chatFragment.resetFragment();
                     rightActionBarLayout.addFragmentToStack(chatFragment);
                     a--;
                 }
@@ -1347,7 +1351,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             }
             rightActionBarLayout.getView().setVisibility(rightActionBarLayout.getFragmentStack().isEmpty() ? View.GONE : View.VISIBLE);
-            backgroundTablet.setVisibility(rightActionBarLayout.getFragmentStack().isEmpty() ? View.VISIBLE : View.GONE);
+            backgroundTablet.setVisibility(View.VISIBLE);
             shadowTabletSide.setVisibility(!actionBarLayout.getFragmentStack().isEmpty() ? View.VISIBLE : View.GONE);
         } else {
             tabletFullSize = true;
@@ -1362,6 +1366,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     chatFragment.onFragmentDestroy();
                     chatFragment.setParentLayout(null);
                     fragmentStack.remove(chatFragment);
+                    chatFragment.resetFragment();
                     actionBarLayout.addFragmentToStack(chatFragment);
                     a--;
                 }
@@ -1371,7 +1376,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             }
             shadowTabletSide.setVisibility(View.GONE);
             rightActionBarLayout.getView().setVisibility(View.GONE);
-            backgroundTablet.setVisibility(!actionBarLayout.getFragmentStack().isEmpty() ? View.GONE : View.VISIBLE);
+            backgroundTablet.setVisibility(View.VISIBLE);
         }
     }
 
@@ -8538,6 +8543,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         layersActionBarLayout.closeLastFragment(true);
                     }
                     return false;
+                } else if (tabletFullSize && layout == actionBarLayout) {
+                    return true;
+                } else if (!tabletFullSize && layout == rightActionBarLayout) {
+                    return true;
                 }
             } else if (layout != layersActionBarLayout) {
                 layersActionBarLayout.getView().setVisibility(View.VISIBLE);
