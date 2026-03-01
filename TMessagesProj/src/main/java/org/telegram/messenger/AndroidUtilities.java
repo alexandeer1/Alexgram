@@ -2954,7 +2954,7 @@ public class AndroidUtilities {
 
     public static void resetTabletFlag() {
         if (wasTablet == null) {
-            wasTablet = isTabletInternal();
+            wasTablet = isTabletForce();
         }
         isTablet = null;
         SharedConfig.updateTabletConfig();
