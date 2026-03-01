@@ -1361,7 +1361,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         ((ChatActivity) chatFragment).setIgnoreAttachOnPause(true);
                     }
                     chatFragment.onPause();
-                    chatFragment.onFragmentDestroy();
+                    if (chatFragment.getFragmentView() != null) {
+                        ViewGroup parent = (ViewGroup) chatFragment.getFragmentView().getParent();
+                        if (parent != null) {
+                            chatFragment.onRemoveFromParent();
+                            parent.removeView(chatFragment.getFragmentView());
+                        }
+                    }
                     chatFragment.setParentLayout(null);
                     fragmentStack.remove(chatFragment);
                     rightActionBarLayout.addFragmentToStack(chatFragment);
@@ -1385,7 +1391,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         ((ChatActivity) chatFragment).setIgnoreAttachOnPause(true);
                     }
                     chatFragment.onPause();
-                    chatFragment.onFragmentDestroy();
+                    if (chatFragment.getFragmentView() != null) {
+                        ViewGroup parent = (ViewGroup) chatFragment.getFragmentView().getParent();
+                        if (parent != null) {
+                            chatFragment.onRemoveFromParent();
+                            parent.removeView(chatFragment.getFragmentView());
+                        }
+                    }
                     chatFragment.setParentLayout(null);
                     fragmentStack.remove(chatFragment);
                     actionBarLayout.addFragmentToStack(chatFragment);
