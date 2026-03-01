@@ -2980,31 +2980,21 @@ public class AndroidUtilities {
     }
 
     public static boolean isSmallTablet() {
-        if (NekoConfig.tabletMode.Int() == NekoConfig.TABLET_ENABLE) {
-            float minSide = Math.min(displaySize.x, displaySize.y) / density;
-            return minSide <= 520;
-        }
         float minSide = Math.min(displaySize.x, displaySize.y) / density;
         return minSide <= 690;
     }
 
     public static int getMinTabletSide() {
-        if (!isSmallTablet()) {
-            int width = displaySize.x;
-            int leftSide = width * 35 / 100;
-            if (leftSide < dp(320)) {
-                leftSide = dp(320);
-            }
-            return width - leftSide;
-        } else {
-            int smallSide = Math.min(displaySize.x, displaySize.y);
-            int maxSide = Math.max(displaySize.x, displaySize.y);
-            int leftSide = maxSide * 35 / 100;
-            if (leftSide < dp(320)) {
-                leftSide = dp(320);
-            }
-            return maxSide - leftSide;
+        int smallSide = Math.min(displaySize.x, displaySize.y);
+        int maxSide = Math.max(displaySize.x, displaySize.y);
+        if (ApplicationLoader.applicationContext != null && ApplicationLoader.applicationContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            return smallSide;
         }
+        int leftSide = maxSide * 35 / 100;
+        if (leftSide < dp(320)) {
+            leftSide = dp(320);
+        }
+        return maxSide - leftSide;
     }
 
     public static int getPhotoSize() {
