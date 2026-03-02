@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="[https://i.ibb.co/MDkydQLH/Chat-GPT-Image-Feb-23-2026-02-00-54-AM.png" alt="Alexgram Logo" width="120" height="120">
+  <img src="https://i.ibb.co/S1X62SH/Alexgram.jpg" alt="Alexgram Logo" width="120" height="120">
 </p>
 <h1 align="center">Alexgram</h1>
 
