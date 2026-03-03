@@ -1,13 +1,28 @@
 package tw.nekomimi.nekogram.settings;
 
+import static android.view.View.OVER_SCROLL_NEVER;
+import static org.telegram.messenger.AndroidUtilities.dp;
+import static org.telegram.messenger.LocaleController.getString;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Build;
-import android.util.TypedValue;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,20 +32,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.R;
-import org.telegram.ui.ActionBar.ActionBar;
-import org.telegram.ui.ActionBar.BaseFragment;
-import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.LaunchActivity;
-
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.net.Uri;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -40,11 +44,23 @@ import com.radolyn.ayugram.utils.AyuGhostPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.R;
 import org.telegram.messenger.SendMessagesHelper;
+import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.BasePermissionsActivity;
+import org.telegram.ui.Cells.SettingsSearchCell;
+import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.DocumentSelectActivity;
+import org.telegram.ui.LaunchActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,12 +75,13 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import kotlin.text.StringsKt;
-
 import tw.nekomimi.nekogram.DialogConfig;
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.helpers.AppRestartHelper;
+import tw.nekomimi.nekogram.helpers.CloudSettingsHelper;
 import tw.nekomimi.nekogram.helpers.LocalNameHelper;
-import tw.nekomimi.nekogram.ui.AlexgramSplashView;
+import tw.nekomimi.nekogram.helpers.SettingsHelper;
+import tw.nekomimi.nekogram.helpers.SettingsSearchResult;
 import tw.nekomimi.nekogram.utils.AlertUtil;
 import tw.nekomimi.nekogram.utils.FileUtil;
 import tw.nekomimi.nekogram.utils.GsonUtil;
@@ -75,6 +92,9 @@ import xyz.nextalone.nagram.helper.LocalPeerColorHelper;
 import xyz.nextalone.nagram.helper.LocalPremiumStatusHelper;
 
 public class NekoSettingsActivity extends BaseFragment {
+
+    private static final int MENU_SEARCH = 1;
+    private static final int MENU_SYNC = 2;
 
     private LinearLayout contentLayout;
     private final int BG_DARK = 0xFF00050B;
@@ -93,17 +113,23 @@ public class NekoSettingsActivity extends BaseFragment {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
         actionBar.setTitle("A-Settings");
+
+        ActionBarMenu menu = actionBar.createMenu();
+        menu.addItem(MENU_SEARCH, R.drawable.ic_ab_search);
+        menu.addItem(MENU_SYNC, R.drawable.cloud_sync);
+
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
                     finishFragment();
+                } else if (id == MENU_SEARCH) {
+                    showSettingsSearchDialog();
+                } else if (id == MENU_SYNC) {
+                    CloudSettingsHelper.getInstance().showDialog(NekoSettingsActivity.this);
                 }
             }
         });
-
-        // Search icon
-        actionBar.createMenu().addItem(1, R.drawable.ic_ab_search);
 
         // Make actionbar transparent to blend with header
         actionBar.setBackgroundColor(Color.TRANSPARENT);
@@ -126,13 +152,49 @@ public class NekoSettingsActivity extends BaseFragment {
         AlexgramSettingsHeaderView headerView = new AlexgramSettingsHeaderView(context);
         contentLayout.addView(headerView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 260));
 
-        // Let's add padding from sides
+        // Padding for content
         LinearLayout mainContent = new LinearLayout(context);
         mainContent.setOrientation(LinearLayout.VERTICAL);
         mainContent.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(16), AndroidUtilities.dp(16), AndroidUtilities.dp(32));
         contentLayout.addView(mainContent, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-        // 2. CORE SETTINGS Group
+        // 2. QUICK SETTINGS (Moved to top)
+        addSectionTitle(mainContent, context, "QUICK SETTINGS");
+        LinearLayout qsCard = createCard(context);
+
+        qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts list", R.drawable.msg_contact, 0xFF00796B, 
+                NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
+                    NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", null, "Restart", true, () -> {
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
+                }));
+        qsCard.addView(createDivider(context));
+
+        qsCard.addView(createSwitchItem(context, "Ghost Mode", "Read silently", R.drawable.msg_secret, 0xFF455A64, 
+                NekoConfig.isGhostModeActive(), isChecked -> {
+                    NekoConfig.setGhostMode(isChecked);
+                }));
+        qsCard.addView(createDivider(context));
+
+        qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFD32F2F, 
+                NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
+                    NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", null, "Restart", true, () -> {
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
+                }));
+        qsCard.addView(createDivider(context));
+
+        qsCard.addView(createSwitchItem(context, "Save Deleted", "Save deleted messages", R.drawable.msg_delete, 0xFFC2185B, 
+                NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), isChecked -> {
+                    NaConfig.INSTANCE.getEnableSaveDeletedMessages().setConfigBool(isChecked);
+                }));
+
+        mainContent.addView(qsCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 24));
+
+
+        // 3. CORE SETTINGS Group
         addSectionTitle(mainContent, context, "CORE SETTINGS");
 
         LinearLayout coreCard = createCard(context);
@@ -147,13 +209,11 @@ public class NekoSettingsActivity extends BaseFragment {
         }));
         coreCard.addView(createDivider(context));
 
-        // Chat settings
         coreCard.addView(createSettingItem(context, "Chats", "UI, Privacy, Media", R.drawable.msg_discussion, 0xFF388E3C, v -> {
             presentFragment(new NekoChatSettingsActivity());
         }));
         coreCard.addView(createDivider(context));
 
-        // Passcode settings
         coreCard.addView(createSettingItem(context, "Passcode", "Security & Fingerprint", R.drawable.msg_permissions, 0xFFC2185B, v -> {
             presentFragment(new NekoPasscodeSettingsActivity());
         }));
@@ -161,25 +221,12 @@ public class NekoSettingsActivity extends BaseFragment {
         mainContent.addView(coreCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 24));
 
 
-        // 3. ADVANCED Group
+        // 4. ADVANCED Group
         addSectionTitle(mainContent, context, "ADVANCED");
         LinearLayout advCard = createCard(context);
 
-        advCard.addView(createSettingItem(context, "Customization", "Themes, Font, Home UI", R.drawable.msg_edit, 0xFFE64A19, v -> {
-            // NekoGeneralSettings or sub-theme? Just point to General for now or NekoGeneralSettingsActivity.
-            presentFragment(new NekoGeneralSettingsActivity()); 
-        }));
-        advCard.addView(createDivider(context));
-
-        advCard.addView(createSettingItem(context, "Backup & Import", "Save or Restore Settings", R.drawable.msg_photo_settings_solar, 0xFF0288D1, v -> {
-            if (Build.VERSION.SDK_INT >= 33) {
-                openFilePicker();
-            } else {
-                DocumentSelectActivity activity = getDocumentSelectActivity(getParentActivity());
-                if (activity != null) {
-                    presentFragment(activity);
-                }
-            }
+        advCard.addView(createSettingItem(context, "Cloud Settings", "Sync, backup, and restore", R.drawable.cloud_sync, 0xFF0288D1, v -> {
+            tw.nekomimi.nekogram.helpers.CloudSettingsHelper.getInstance().showDialog(NekoSettingsActivity.this);
         }));
         advCard.addView(createDivider(context));
 
@@ -187,6 +234,7 @@ public class NekoSettingsActivity extends BaseFragment {
         View expView = createSettingItem(context, "Experimental", "Beta Tools & Features", R.drawable.msg_fave, 0xFF512DA8, v -> {
             presentFragment(new NekoExperimentalSettingsActivity());
         });
+        
         // Add new badge
         TextView newBadge = new TextView(context);
         newBadge.setText("New");
@@ -199,46 +247,11 @@ public class NekoSettingsActivity extends BaseFragment {
         badgeBg.setCornerRadius(AndroidUtilities.dp(6));
         newBadge.setBackground(badgeBg);
         
-        try {
-            LinearLayout expLayout = (LinearLayout) expView;
-            LinearLayout textsLayout = (LinearLayout) expLayout.getChildAt(1);
-            textsLayout.addView(newBadge, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
-        } catch (Exception e) {
-            // Ignore if layout structure changes
-        }
+        FrameLayout extFrame = (FrameLayout) ((LinearLayout) expView).getChildAt(2); // The third child is the rightContainer
+        extFrame.addView(newBadge, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 40, 0));
         
         advCard.addView(expView);
         mainContent.addView(advCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 24));
-
-
-        // 4. QUICK SETTINGS (New section)
-        addSectionTitle(mainContent, context, "QUICK SETTINGS");
-        LinearLayout qsCard = createCard(context);
-
-        qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts list", R.drawable.msg_contact, 0xFF00796B, 
-                NaConfig.INSTANCE.getHideContacts().Bool(), (buttonView, isChecked) -> {
-                    NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
-                }));
-        qsCard.addView(createDivider(context));
-
-        qsCard.addView(createSwitchItem(context, "Ghost Mode", "Read silently", R.drawable.msg_secret, 0xFF455A64, 
-                NekoConfig.isGhostModeActive(), (buttonView, isChecked) -> {
-                    NekoConfig.setGhostMode(isChecked);
-                }));
-        qsCard.addView(createDivider(context));
-
-        qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFD32F2F, 
-                NaConfig.INSTANCE.getMusicGraph().Bool(), (buttonView, isChecked) -> {
-                    NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
-                }));
-        qsCard.addView(createDivider(context));
-
-        qsCard.addView(createSwitchItem(context, "Save Deleted", "Save deleted messages", R.drawable.msg_delete, 0xFFC2185B, 
-                NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), (buttonView, isChecked) -> {
-                    NaConfig.INSTANCE.getEnableSaveDeletedMessages().setConfigBool(isChecked);
-                }));
-
-        mainContent.addView(qsCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 24));
 
 
         // 5. OTHERS (4 horizontal buttons)
@@ -273,7 +286,12 @@ public class NekoSettingsActivity extends BaseFragment {
 
         // 6. Version Text
         TextView versionText = new TextView(context);
-        versionText.setText("Alexgram v1.7.3");
+        try {
+            android.content.pm.PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
+            versionText.setText("Alexgram v" + pInfo.versionName + " (" + pInfo.versionCode + ")");
+        } catch (Exception e) {
+            versionText.setText("Alexgram");
+        }
         versionText.setTextSize(14);
         versionText.setTextColor(0xFF556677);
         versionText.setGravity(Gravity.CENTER);
@@ -284,6 +302,196 @@ public class NekoSettingsActivity extends BaseFragment {
         
         fragmentView = parentFrame;
         return fragmentView;
+    }
+
+    /**
+     * @noinspection SizeReplaceableByIsEmpty
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private void showSettingsSearchDialog() {
+        try {
+            Activity parent = getParentActivity();
+            if (parent == null) return;
+
+            ArrayList<SettingsSearchResult> results = SettingsHelper.onCreateSearchArray(fragment -> AndroidUtilities.runOnUIThread(() -> {
+                try {
+                    presentFragment(fragment);
+                } catch (Exception ignore) {
+                }
+            }));
+
+            final ArrayList<SettingsSearchResult> filtered = new ArrayList<>(results);
+            final String[] currentQuery = new String[]{""};
+            final int searchHeight = dp(36);
+            final int clearSize = dp(36);
+            final int pad = dp(12);
+
+            LinearLayout containerLayout = new LinearLayout(parent);
+            containerLayout.setOrientation(LinearLayout.VERTICAL);
+            containerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+            FrameLayout searchFrame = new FrameLayout(parent);
+            LinearLayout.LayoutParams searchLP = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, searchHeight + dp(12));
+            searchLP.leftMargin = dp(10);
+            searchLP.rightMargin = dp(10);
+            searchLP.topMargin = dp(6);
+            searchLP.bottomMargin = dp(2);
+            searchFrame.setLayoutParams(searchLP);
+            searchFrame.setClipToPadding(true);
+            searchFrame.setClipChildren(true);
+
+            ImageView searchIcon = new ImageView(parent);
+            searchIcon.setScaleType(ImageView.ScaleType.CENTER);
+            searchIcon.setImageResource(R.drawable.ic_ab_search);
+            searchIcon.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteGrayIcon), PorterDuff.Mode.MULTIPLY));
+            searchFrame.addView(searchIcon, LayoutHelper.createFrame(48, 48, Gravity.LEFT | Gravity.CENTER_VERTICAL));
+
+            EditTextBoldCursor searchField = new EditTextBoldCursor(parent);
+            searchField.setHint(getString(R.string.Search));
+            searchField.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
+            searchField.setHintTextColor(getThemedColor(Theme.key_windowBackgroundWhiteHintText));
+            searchField.setSingleLine(true);
+            searchField.setBackground(null);
+            searchField.setInputType(InputType.TYPE_CLASS_TEXT);
+            searchField.setLineColors(getThemedColor(Theme.key_windowBackgroundWhiteInputField), getThemedColor(Theme.key_windowBackgroundWhiteInputFieldActivated), getThemedColor(Theme.key_text_RedRegular));
+            searchField.setPadding(dp(61), pad / 2, dp(48), pad / 2);
+            searchField.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER_VERTICAL));
+            searchFrame.addView(searchField);
+
+            ImageView clearButton = new ImageView(parent);
+            clearButton.setScaleType(ImageView.ScaleType.CENTER);
+            clearButton.setImageResource(R.drawable.ic_close_white);
+            clearButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_actionBarWhiteSelector), Theme.RIPPLE_MASK_CIRCLE_20DP));
+            clearButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteGrayIcon), PorterDuff.Mode.MULTIPLY));
+            clearButton.setLayoutParams(new FrameLayout.LayoutParams(clearSize, clearSize, Gravity.END | Gravity.CENTER_VERTICAL));
+            searchFrame.addView(clearButton);
+            containerLayout.addView(searchFrame);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(parent, resourceProvider);
+            builder.setView(containerLayout);
+            builder.setNegativeButton(getString(R.string.Close), null);
+            final AlertDialog dialog = builder.create();
+            dialog.setOnShowListener(d -> {
+                try {
+                    searchField.requestFocus();
+                    AndroidUtilities.showKeyboard(searchField);
+                } catch (Exception ignore) {
+                }
+            });
+
+            RecyclerListView searchListView = new RecyclerListView(parent);
+            searchListView.setOverScrollMode(OVER_SCROLL_NEVER);
+            searchListView.setLayoutManager(new LinearLayoutManager(parent, LinearLayoutManager.VERTICAL, false));
+
+            var adapter = new RecyclerListView.SelectionAdapter() {
+                @Override
+                public boolean isEnabled(RecyclerView.ViewHolder holder) {
+                    return true;
+                }
+
+                @NonNull
+                @Override
+                public RecyclerListView.Holder onCreateViewHolder(@NonNull ViewGroup parent1, int viewType) {
+                    View view = new SettingsSearchCell(parent);
+                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+                    return new RecyclerListView.Holder(view);
+                }
+
+                @Override
+                public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+                    SettingsSearchCell cell = (SettingsSearchCell) holder.itemView;
+                    SettingsSearchResult r = filtered.get(position);
+                    String[] path = r.path2 != null ? new String[]{r.path1, r.path2} : new String[]{r.path1};
+                    CharSequence titleToSet = r.searchTitle == null ? "" : r.searchTitle;
+                    String q = currentQuery[0];
+                    if (q != null && !q.isEmpty() && titleToSet.length() > 0) {
+                        SpannableStringBuilder ss = new SpannableStringBuilder(titleToSet);
+                        String lower = titleToSet.toString().toLowerCase();
+                        String[] parts = q.split("\\s+");
+                        int highlightColor = getThemedColor(Theme.key_windowBackgroundWhiteBlueText4);
+                        for (String p : parts) {
+                            if (p.isEmpty()) continue;
+                            int idx = 0;
+                            while (true) {
+                                int found = lower.indexOf(p, idx);
+                                if (found == -1) break;
+                                try {
+                                    ss.setSpan(new ForegroundColorSpan(highlightColor), found, found + p.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                } catch (Exception ignore) {
+                                }
+                                idx = found + p.length();
+                            }
+                        }
+                        titleToSet = ss;
+                    }
+                    cell.setTextAndValueAndIcon(titleToSet, path, r.iconResId, position < filtered.size() - 1);
+                }
+
+                @Override
+                public int getItemCount() {
+                    return filtered.size();
+                }
+            };
+
+            searchListView.setAdapter(adapter);
+            searchListView.setOnItemClickListener((v, position) -> {
+                if (position < 0 || position >= filtered.size()) return;
+                SettingsSearchResult r = filtered.get(position);
+                try {
+                    if (r.openRunnable != null) r.openRunnable.run();
+                } catch (Exception ignore) {
+                }
+                dialog.dismiss();
+            });
+
+            containerLayout.addView(searchListView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+            searchField.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String q = s.toString().toLowerCase().trim();
+                    currentQuery[0] = q;
+                    filtered.clear();
+                    if (q.isEmpty()) {
+                        filtered.addAll(results);
+                    } else {
+                        String[] parts = q.split("\\s+");
+                        for (SettingsSearchResult item : results) {
+                            String title = item.searchTitle == null ? "" : item.searchTitle.toLowerCase();
+                            boolean ok = true;
+                            for (String p : parts) {
+                                if (!title.contains(p)) {
+                                    ok = false;
+                                    break;
+                                }
+                            }
+                            if (ok) filtered.add(item);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    searchIcon.setVisibility(q.length() > 20 ? View.GONE : View.VISIBLE);
+                    clearButton.setVisibility(q.isEmpty() ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            clearButton.setOnClickListener(v -> {
+                searchField.setText("");
+                searchField.requestFocus();
+                AndroidUtilities.showKeyboard(searchField);
+            });
+            clearButton.setVisibility(View.GONE);
+
+            showDialog(dialog);
+        } catch (Exception ignore) {
+        }
     }
 
     private void addSectionTitle(LinearLayout parent, Context context, String title) {
@@ -371,7 +579,11 @@ public class NekoSettingsActivity extends BaseFragment {
         return row;
     }
 
-    private View createSwitchItem(Context context, String title, String subtitle, int iconRes, int iconColor, boolean checked, android.widget.CompoundButton.OnCheckedChangeListener onChange) {
+    interface OnSettingSwitchListener {
+        void onSwitch(boolean isChecked);
+    }
+
+    private View createSwitchItem(Context context, String title, String subtitle, int iconRes, int iconColor, boolean checked, OnSettingSwitchListener onChange) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
@@ -422,7 +634,7 @@ public class NekoSettingsActivity extends BaseFragment {
         row.setOnClickListener(v -> {
             boolean isChecked = !sw.isChecked();
             sw.setChecked(isChecked, true);
-            onChange.onCheckedChanged(null, isChecked);
+            onChange.onSwitch(isChecked);
         });
 
         return row;
