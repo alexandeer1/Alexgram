@@ -8,6 +8,7 @@ import static org.telegram.messenger.LocaleController.getString;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -555,23 +556,23 @@ public class NekoTranslatorSettingsActivity extends BaseNekoXSettingsActivity {
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL:
                     view = new TextSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_CHECK:
                     view = new TextCheckCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
                 case CellGroup.ITEM_TYPE_HEADER:
                     view = new HeaderCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_DETAIL:
                     view = new TextDetailSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
                 case ConfigCellCustom.CUSTOM_ITEM_Temperature:
                     view = new TemperatureSeekBar(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
             }
             // noinspection ConstantConditions

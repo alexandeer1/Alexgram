@@ -9,6 +9,7 @@ import android.text.Spanned;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -249,6 +250,7 @@ public class NekoPasscodeSettingsActivity extends BaseNekoSettingsActivity {
                         textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteRedText3));
                         textCell.setText(getString(R.string.PasscodePanicCodeRemove), false);
                     }
+                    holder.itemView.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
                 }
                 case 3: {
@@ -257,6 +259,7 @@ public class NekoPasscodeSettingsActivity extends BaseNekoSettingsActivity {
                     if (position == showInSettingsRow) {
                         textCell.setTextAndCheck(getString(R.string.PasscodeShowInSettings), !PasscodeHelper.isSettingsHidden(), false);
                     }
+                    holder.itemView.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
                 }
                 case 4: {
@@ -267,6 +270,7 @@ public class NekoPasscodeSettingsActivity extends BaseNekoSettingsActivity {
                     } else if (position == panicCodeRow) {
                         cell.setText(getString(R.string.PasscodePanicCode));
                     }
+                    holder.itemView.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 }
                 case 7: {
@@ -302,6 +306,7 @@ public class NekoPasscodeSettingsActivity extends BaseNekoSettingsActivity {
                     cell.setEnabled(passcodeSet);
                     int account = accounts.get(position - accountsStartRow - 1);
                     cell.setAccount(account, PasscodeHelper.hasPasscodeForAccount(account), position + 1 != accountsEndRow);
+                    holder.itemView.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
                     break;
                 }
             }

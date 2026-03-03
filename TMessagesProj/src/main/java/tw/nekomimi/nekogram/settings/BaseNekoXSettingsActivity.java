@@ -4,6 +4,7 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.LocaleController.getString;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -142,11 +143,18 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         });
 
         fragmentView = new FrameLayout(context);
-        fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        // Use transparent background so our custom Alexgram background can show through!
+        fragmentView.setBackgroundColor(Color.TRANSPARENT);
         FrameLayout frameLayout = (FrameLayout) fragmentView;
+
+        // Add the God-Level animated background
+        AlexgramSettingsHeaderView bgView = new AlexgramSettingsHeaderView(context);
+        frameLayout.addView(bgView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
         listView = createListView(context);
         listView.setVerticalScrollBarEnabled(false);
+        // Ensure ListView itself is transparent so the background shows through
+        listView.setBackgroundColor(Color.TRANSPARENT);
         listView.setLayoutManager(layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
         DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
@@ -163,6 +171,17 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
 
         listView.setSections(true);
         actionBar.setAdaptiveBackground(listView);
+        
+        // Ensure ActionBar doesn't draw a solid block over the background, matching A-Settings
+        actionBar.setAddToContainer(false);
+        actionBar.setBackgroundColor(Color.TRANSPARENT);
+        boolean isDark = Theme.getActiveTheme().isDark();
+        int abColor = isDark ? Color.WHITE : 0xFF1A1A2E;
+        actionBar.setItemsColor(abColor, false);
+        actionBar.setTitleColor(abColor);
+        
+        frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
         return fragmentView;
     }
 
