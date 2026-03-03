@@ -4,13 +4,16 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PathMeasure;
 import android.graphics.RadialGradient;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,121 +21,114 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 
+import org.telegram.messenger.R;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 /**
  * Premium animated splash screen for Alexgram.
+ * Uses the actual app icon bitmap with cinematic animations:
  *
- * Animation sequence:
- * 1. Background gradient fades in
- * 2. The "A" letter draws itself with a stroke animation + scale overshoot
- * 3. A paper plane flies in from the upper-right along a Bézier curve with trailing particles
- * 4. Glow pulse radiates from the completed logo
- * 5. Everything fades out to reveal the app
+ * Phase 1: Deep blue gradient background appears instantly
+ * Phase 2: Rotating light rays radiate from center
+ * Phase 3: Icon drops in with 3D-style spring bounce + rotation
+ * Phase 4: Sparkle particles burst outward from icon
+ * Phase 5: Shimmering light sweep passes across icon
+ * Phase 6: Soft pulsing glow halo behind icon
+ * Phase 7: Everything fades out smoothly
  */
 public class AlexgramSplashView extends View {
 
-    // ── Timing constants (ms) ──
-    private static final long TOTAL_DURATION    = 2200;
-    private static final long BG_FADE_START     = 0;
-    private static final long BG_FADE_END       = 200;
-    private static final long A_DRAW_START      = 150;
-    private static final long A_DRAW_END        = 850;
-    private static final long PLANE_START       = 500;
-    private static final long PLANE_END         = 1200;
-    private static final long GLOW_START        = 1100;
-    private static final long GLOW_END          = 1800;
-    private static final long FADE_OUT_START    = 1700;
-    private static final long FADE_OUT_END      = TOTAL_DURATION;
+    // ── Timing (ms) ──
+    private static final long TOTAL_DURATION   = 2600;
+    private static final long RAYS_START       = 0;
+    private static final long RAYS_END         = 2200;
+    private static final long ICON_START       = 100;
+    private static final long ICON_SETTLE      = 700;
+    private static final long SPARKLE_START    = 500;
+    private static final long SPARKLE_END      = 1600;
+    private static final long SHIMMER_START    = 700;
+    private static final long SHIMMER_END      = 1400;
+    private static final long GLOW_START       = 600;
+    private static final long GLOW_END         = 2000;
+    private static final long FADE_OUT_START   = 2000;
+    private static final long FADE_OUT_END     = TOTAL_DURATION;
 
-    // ── Colors ──
-    private static final int COLOR_BG_TOP      = 0xFF5BC8F5;
-    private static final int COLOR_BG_MID      = 0xFF2AABEE;
-    private static final int COLOR_BG_BOTTOM   = 0xFF1565C0;
-    private static final int COLOR_A_LIGHT     = 0xFF80D8FF;
-    private static final int COLOR_A_MAIN      = 0xFF2196F3;
-    private static final int COLOR_A_DARK      = 0xFF0D47A1;
-    private static final int COLOR_PLANE_LIGHT = 0xFFE0F7FA;
-    private static final int COLOR_PLANE_BODY  = 0xFF29B6F6;
-    private static final int COLOR_PARTICLE    = 0xFFB3E5FC;
+    // ── Color palette ──
+    private static final int BG_COLOR_TOP     = 0xFF0A1628;
+    private static final int BG_COLOR_MID     = 0xFF0F2847;
+    private static final int BG_COLOR_BOTTOM  = 0xFF061224;
+    private static final int RAY_COLOR        = 0xFF1E88E5;
+    private static final int GLOW_COLOR_INNER = 0xFF4FC3F7;
+    private static final int GLOW_COLOR_OUTER = 0xFF0D47A1;
+    private static final int SHIMMER_COLOR    = 0xCCFFFFFF;
 
     // ── Paints ──
     private final Paint bgPaint       = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint aFillPaint    = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint aStrokePaint  = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint planePaint    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint iconPaint     = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+    private final Paint rayPaint      = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint glowPaint     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint shimmerPaint  = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint particlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint shadowPaint   = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint ringPaint     = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    // ── Pre-allocated interpolators (avoid per-frame GC) ──
-    private final OvershootInterpolator overshootInterpolator = new OvershootInterpolator(2.0f);
-    private final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(2.0f);
+    // ── Interpolators (cached) ──
+    private final OvershootInterpolator overshootInterp = new OvershootInterpolator(3.0f);
+    private final DecelerateInterpolator decelInterp    = new DecelerateInterpolator(2.5f);
 
-    // ── Pre-allocated arrays (avoid per-frame GC) ──
-    private final float[] planePos = new float[2];
-    private final float[] planeTan = new float[2];
-
-    // ── Pre-allocated reusable path for stroke animation ──
-    private final Path partialStrokePath = new Path();
-
-    // ── Paths ──
-    private Path aPath;
-    private Path planePath;
-    private Path planeFlightPath;
-    private PathMeasure aPathMeasure;
-    private PathMeasure flightPathMeasure;
-
-    // ── Pre-computed shaders ──
-    private LinearGradient aGradient;
-    private LinearGradient planeGradient;
+    // ── Icon bitmap ──
+    private Bitmap iconBitmap;
+    private int iconDrawSize;
 
     // ── Particles ──
-    private final ArrayList<Particle> particles = new ArrayList<>();
-    private final Random random = new Random();
+    private final ArrayList<SparkleParticle> sparkles = new ArrayList<>();
+    private final Random rng = new Random();
 
-    // ── Animation state ──
+    // ── Light rays ──
+    private static final int NUM_RAYS = 12;
+    private final Path rayPath = new Path();
+
+    // ── Animation ──
     private float animProgress = 0f;
     private ValueAnimator mainAnimator;
-    private boolean isFinished = false;
-    private long lastFrameTimeNanos = 0;
+    private long lastFrameNanos = 0;
 
-    // ── Cached dimensions ──
-    private int viewWidth, viewHeight;
-    private float centerX, centerY;
-    private float logoSize;
-    private boolean pathsInitialized = false;
+    // ── Dimensions ──
+    private int vw, vh;
+    private float cx, cy;
+    private boolean initialized = false;
 
     // ── Callback ──
     private Runnable onFinishedCallback;
 
     public AlexgramSplashView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
-    public void setOnFinishedCallback(Runnable callback) {
-        this.onFinishedCallback = callback;
+    public void setOnFinishedCallback(Runnable cb) {
+        this.onFinishedCallback = cb;
     }
 
-    private void init() {
+    private void init(Context context) {
         setLayerType(LAYER_TYPE_HARDWARE, null);
 
-        aStrokePaint.setStyle(Paint.Style.STROKE);
-        aStrokePaint.setStrokeCap(Paint.Cap.ROUND);
-        aStrokePaint.setStrokeJoin(Paint.Join.ROUND);
-        aStrokePaint.setStrokeWidth(4f);
-        aStrokePaint.setColor(COLOR_A_LIGHT);
+        // Load the actual Alexgram icon at high res
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        iconBitmap = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_launcher_alexgram_blue, opts);
 
-        aFillPaint.setStyle(Paint.Style.FILL);
-
-        planePaint.setStyle(Paint.Style.FILL);
-
+        rayPaint.setStyle(Paint.Style.FILL);
         shadowPaint.setStyle(Paint.Style.FILL);
-        shadowPaint.setColor(0x30000000);
-
+        shadowPaint.setColor(0x40000000);
         particlePaint.setStyle(Paint.Style.FILL);
+        shimmerPaint.setStyle(Paint.Style.FILL);
+
+        ringPaint.setStyle(Paint.Style.STROKE);
+        ringPaint.setStrokeWidth(2f);
     }
 
     @Override
@@ -140,152 +136,63 @@ public class AlexgramSplashView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         if (w == 0 || h == 0) return;
 
-        viewWidth = w;
-        viewHeight = h;
-        centerX = w / 2f;
-        centerY = h / 2f;
-        logoSize = Math.min(w, h) * 0.28f;
+        vw = w;
+        vh = h;
+        cx = w / 2f;
+        cy = h / 2f;
 
-        initPaths();
-        initShaders();
+        iconDrawSize = (int) (Math.min(w, h) * 0.30f);
+
+        // Background gradient
+        bgPaint.setShader(new LinearGradient(0, 0, 0, vh,
+                new int[]{BG_COLOR_TOP, BG_COLOR_MID, BG_COLOR_BOTTOM},
+                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
+
+        // Pre-scale icon bitmap once
+        if (iconBitmap != null && iconDrawSize > 0) {
+            iconBitmap = Bitmap.createScaledBitmap(iconBitmap, iconDrawSize, iconDrawSize, true);
+        }
+
+        // Init sparkle particles
+        sparkles.clear();
+        for (int i = 0; i < 50; i++) {
+            sparkles.add(new SparkleParticle());
+        }
+
+        initRayPath();
+
+        initialized = true;
 
         if (mainAnimator == null) {
             startAnimation();
         }
     }
 
-    private void initShaders() {
-        // Background gradient
-        LinearGradient bgGradient = new LinearGradient(
-                0, 0, 0, viewHeight,
-                new int[]{COLOR_BG_TOP, COLOR_BG_MID, COLOR_BG_BOTTOM},
-                new float[]{0f, 0.45f, 1f},
-                Shader.TileMode.CLAMP
-        );
-        bgPaint.setShader(bgGradient);
+    private void initRayPath() {
+        // A single ray "wedge" shape — will be rotated for each ray
+        float innerR = iconDrawSize * 0.3f;
+        float outerR = Math.max(vw, vh) * 0.8f;
+        float halfAngle = (float) Math.toRadians(6);
 
-        // "A" fill gradient (pre-computed, constant)
-        aGradient = new LinearGradient(
-                centerX - logoSize * 0.5f, centerY - logoSize,
-                centerX + logoSize * 0.5f, centerY + logoSize,
-                new int[]{COLOR_A_LIGHT, COLOR_A_MAIN, COLOR_A_DARK},
-                new float[]{0f, 0.4f, 1f},
-                Shader.TileMode.CLAMP
-        );
-
-        // Plane body gradient (pre-computed, constant — coordinates are relative
-        // to the plane's local space after canvas translate/rotate/scale)
-        planeGradient = new LinearGradient(
-                -logoSize * 0.2f, -logoSize * 0.3f,
-                logoSize * 0.4f, logoSize * 0.2f,
-                new int[]{COLOR_PLANE_LIGHT, COLOR_PLANE_BODY, Color.WHITE},
-                new float[]{0f, 0.5f, 1f},
-                Shader.TileMode.CLAMP
-        );
-    }
-
-    private void initPaths() {
-        // ── Build the stylized "A" letter path ──
-        float s = logoSize;
-        float cx = centerX;
-        float cy = centerY;
-
-        aPath = new Path();
-
-        // Outer shape of the "A" — a stylized geometric A with sharp edges
-        float topX = cx - s * 0.05f;
-        float topY = cy - s * 1.0f;
-        float leftBottomX = cx - s * 0.65f;
-        float leftBottomY = cy + s * 0.75f;
-        float rightBottomX = cx + s * 0.15f;
-        float rightBottomY = cy + s * 0.75f;
-        float rightMidX = cx + s * 0.05f;
-        float rightMidY = cy + s * 0.15f;
-        float leftMidX = cx - s * 0.35f;
-        float leftMidY = cy + s * 0.15f;
-        float innerTopX = cx - s * 0.05f;
-        float innerTopY = cy - s * 0.45f;
-
-        // Build the A shape
-        aPath.moveTo(topX, topY);
-        aPath.lineTo(cx + s * 0.12f, topY + s * 0.12f);
-        aPath.lineTo(rightBottomX + s * 0.1f, rightBottomY);
-        aPath.lineTo(rightMidX + s * 0.08f, rightMidY + s * 0.35f);
-        aPath.lineTo(leftMidX + s * 0.1f, leftMidY + s * 0.35f);
-        aPath.lineTo(leftBottomX, leftBottomY);
-        aPath.close();
-
-        // Cut out the inner triangle of the A
-        Path innerCut = new Path();
-        innerCut.moveTo(innerTopX, innerTopY);
-        innerCut.lineTo(cx - s * 0.22f, cy + s * 0.1f);
-        innerCut.lineTo(cx + s * 0.02f, cy + s * 0.1f);
-        innerCut.close();
-
-        aPath.op(innerCut, Path.Op.DIFFERENCE);
-
-        // ── Build the paper plane path (in local coordinates, centered at origin) ──
-        planePath = new Path();
-        float planeS = s * 0.55f;
-
-        float tipX = planeS * 1.0f;
-        float tipY = -planeS * 0.6f;
-        float lwX = -planeS * 0.3f;
-        float lwY = planeS * 0.15f;
-        float bfX = planeS * 0.1f;
-        float bfY = planeS * 0.4f;
-        float rwbX = planeS * 0.55f;
-        float rwbY = planeS * 0.1f;
-        float bcX = planeS * 0.15f;
-        float bcY = -planeS * 0.05f;
-
-        planePath.moveTo(tipX, tipY);
-        planePath.lineTo(lwX, lwY);
-        planePath.lineTo(bcX, bcY);
-        planePath.lineTo(bfX, bfY);
-        planePath.lineTo(rwbX, rwbY);
-        planePath.close();
-
-        // ── Build the flight path (Bézier curve from off-screen to final position) ──
-        planeFlightPath = new Path();
-        float planeRestX = cx + s * 0.25f;
-        float planeRestY = cy - s * 0.15f;
-        float startX = viewWidth + s;
-        float startY = -s;
-
-        planeFlightPath.moveTo(startX, startY);
-        planeFlightPath.cubicTo(
-                viewWidth * 0.7f, viewHeight * 0.15f,
-                centerX + s * 1.5f, centerY - s * 0.8f,
-                planeRestX, planeRestY
-        );
-
-        flightPathMeasure = new PathMeasure(planeFlightPath, false);
-
-        // For the A stroke animation, use the outline path
-        aPathMeasure = new PathMeasure(aPath, true);
-
-        // ── Pre-allocate particle pool ──
-        particles.clear();
-        for (int i = 0; i < 35; i++) {
-            particles.add(new Particle());
-        }
-
-        pathsInitialized = true;
+        rayPath.reset();
+        rayPath.moveTo(innerR * (float) Math.cos(-halfAngle), innerR * (float) Math.sin(-halfAngle));
+        rayPath.lineTo(outerR * (float) Math.cos(-halfAngle), outerR * (float) Math.sin(-halfAngle));
+        rayPath.lineTo(outerR * (float) Math.cos(halfAngle), outerR * (float) Math.sin(halfAngle));
+        rayPath.lineTo(innerR * (float) Math.cos(halfAngle), innerR * (float) Math.sin(halfAngle));
+        rayPath.close();
     }
 
     private void startAnimation() {
         mainAnimator = ValueAnimator.ofFloat(0f, 1f);
         mainAnimator.setDuration(TOTAL_DURATION);
         mainAnimator.setInterpolator(new LinearInterpolator());
-        mainAnimator.addUpdateListener(animation -> {
-            animProgress = (float) animation.getAnimatedValue();
+        mainAnimator.addUpdateListener(a -> {
+            animProgress = (float) a.getAnimatedValue();
             invalidate();
         });
         mainAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                isFinished = true;
                 if (onFinishedCallback != null) {
                     post(onFinishedCallback);
                 }
@@ -296,256 +203,301 @@ public class AlexgramSplashView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (!pathsInitialized || viewWidth == 0) return;
+        if (!initialized) return;
 
-        long currentMs = (long) (animProgress * TOTAL_DURATION);
+        long ms = (long) (animProgress * TOTAL_DURATION);
 
-        // Compute real delta time for particle physics
+        // Real delta time
         long nowNanos = System.nanoTime();
         float dt;
-        if (lastFrameTimeNanos == 0) {
-            dt = 0.016f; // 16ms default for first frame
+        if (lastFrameNanos == 0) {
+            dt = 0.016f;
         } else {
-            dt = (nowNanos - lastFrameTimeNanos) / 1_000_000_000f;
-            dt = Math.min(dt, 0.05f); // cap at 50ms to avoid physics explosions
+            dt = Math.min((nowNanos - lastFrameNanos) / 1_000_000_000f, 0.05f);
         }
-        lastFrameTimeNanos = nowNanos;
+        lastFrameNanos = nowNanos;
 
-        // ── 1. Background ──
-        drawBackground(canvas, currentMs);
+        float masterAlpha = 1f;
+        if (ms > FADE_OUT_START) {
+            masterAlpha = 1f - clamp01(ms, FADE_OUT_START, FADE_OUT_END);
+        }
 
-        // ── 2. "A" letter ──
-        drawALetter(canvas, currentMs);
+        // 1. Background
+        canvas.saveLayerAlpha(0, 0, vw, vh, (int) (masterAlpha * 255));
+        canvas.drawRect(0, 0, vw, vh, bgPaint);
+        canvas.restore();
 
-        // ── 3. Paper plane ──
-        drawPaperPlane(canvas, currentMs, dt);
+        // 2. Light rays
+        drawRays(canvas, ms, masterAlpha);
 
-        // ── 4. Particles ──
-        drawParticles(canvas, currentMs, dt);
+        // 3. Glow halo behind icon
+        drawGlow(canvas, ms, masterAlpha);
 
-        // ── 5. Glow pulse ──
-        drawGlow(canvas, currentMs);
+        // 4. Expanding rings
+        drawRings(canvas, ms, masterAlpha);
+
+        // 5. Icon
+        drawIcon(canvas, ms, masterAlpha);
+
+        // 6. Shimmer sweep
+        drawShimmer(canvas, ms, masterAlpha);
+
+        // 7. Sparkle particles
+        drawSparkles(canvas, ms, masterAlpha, dt);
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  PHASE 1 — Background gradient
+    //  Light rays rotating behind the icon
     // ═══════════════════════════════════════════════════════════
 
-    private void drawBackground(Canvas canvas, long ms) {
-        float alpha = clampProgress(ms, BG_FADE_START, BG_FADE_END);
-        // Keep background until fade out
-        if (ms > FADE_OUT_START) {
-            float fadeOut = 1f - clampProgress(ms, FADE_OUT_START, FADE_OUT_END);
-            alpha = Math.min(alpha, fadeOut);
-        }
+    private void drawRays(Canvas canvas, long ms, float masterAlpha) {
+        if (ms < RAYS_START) return;
+
+        float progress = clamp01(ms, RAYS_START, RAYS_END);
+        float fadeIn = Math.min(progress * 4f, 1f);
+        float fadeOut = ms > FADE_OUT_START ? (1f - clamp01(ms, FADE_OUT_START, FADE_OUT_END)) : 1f;
+        float alpha = fadeIn * fadeOut * masterAlpha * 0.12f;
 
         if (alpha <= 0.001f) return;
 
-        // Use saveLayerAlpha for correct shader opacity
-        int layerAlpha = (int) (alpha * 255);
-        canvas.saveLayerAlpha(0, 0, viewWidth, viewHeight, layerAlpha);
-        canvas.drawRect(0, 0, viewWidth, viewHeight, bgPaint);
+        // Slow rotation
+        float rotation = progress * 90f;
+
+        canvas.save();
+        canvas.translate(cx, cy);
+        canvas.rotate(rotation);
+
+        rayPaint.setColor(RAY_COLOR);
+        rayPaint.setAlpha((int) (alpha * 255));
+
+        float angleStep = 360f / NUM_RAYS;
+        for (int i = 0; i < NUM_RAYS; i++) {
+            canvas.drawPath(rayPath, rayPaint);
+            canvas.rotate(angleStep);
+        }
+
         canvas.restore();
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  PHASE 2 — "A" letter drawing
+    //  Pulsing glow halo
     // ═══════════════════════════════════════════════════════════
 
-    private void drawALetter(Canvas canvas, long ms) {
-        if (ms < A_DRAW_START) return;
+    private void drawGlow(Canvas canvas, long ms, float masterAlpha) {
+        if (ms < GLOW_START) return;
 
-        float rawProgress = clampProgress(ms, A_DRAW_START, A_DRAW_END);
+        float progress = clamp01(ms, GLOW_START, GLOW_END);
+        float fadeIn = decelInterp.getInterpolation(Math.min(progress * 2f, 1f));
 
-        // Overshoot for scale
-        float scaleProgress = overshootInterpolator.getInterpolation(Math.min(rawProgress * 1.2f, 1f));
-        float scale = 0.3f + 0.7f * scaleProgress;
+        // Gentle pulse
+        float pulse = 1f + 0.08f * (float) Math.sin(progress * Math.PI * 4);
+        float radius = iconDrawSize * 0.9f * fadeIn * pulse;
+        float alpha = fadeIn * masterAlpha * 0.7f;
 
-        // Alpha
-        float alpha = Math.min(rawProgress * 3f, 1f);
+        if (alpha <= 0.001f || radius <= 1f) return;
 
-        // Fade out
-        if (ms > FADE_OUT_START) {
-            float fadeOut = 1f - clampProgress(ms, FADE_OUT_START, FADE_OUT_END);
-            alpha *= fadeOut;
+        RadialGradient glow = new RadialGradient(cx, cy, radius,
+                new int[]{
+                        Color.argb((int) (alpha * 180), 79, 195, 247),
+                        Color.argb((int) (alpha * 80), 30, 136, 229),
+                        Color.argb(0, 13, 71, 161)
+                },
+                new float[]{0f, 0.5f, 1f},
+                Shader.TileMode.CLAMP);
+        glowPaint.setShader(glow);
+        canvas.drawCircle(cx, cy, radius, glowPaint);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Expanding rings
+    // ═══════════════════════════════════════════════════════════
+
+    private void drawRings(Canvas canvas, long ms, float masterAlpha) {
+        // Draw 3 expanding rings at staggered times
+        for (int i = 0; i < 3; i++) {
+            long ringStart = ICON_SETTLE + i * 200L;
+            long ringEnd = ringStart + 800L;
+            if (ms < ringStart || ms > ringEnd) continue;
+
+            float p = clamp01(ms, ringStart, ringEnd);
+            float radius = iconDrawSize * 0.35f + p * iconDrawSize * 1.2f;
+            float al = (1f - p) * masterAlpha * 0.35f;
+
+            if (al <= 0.001f) continue;
+
+            ringPaint.setColor(GLOW_COLOR_INNER);
+            ringPaint.setAlpha((int) (al * 255));
+            ringPaint.setStrokeWidth(3f - p * 2f);
+            canvas.drawCircle(cx, cy, radius, ringPaint);
         }
+    }
 
-        if (alpha <= 0.001f) return;
+    // ═══════════════════════════════════════════════════════════
+    //  Icon with spring-bounce entrance
+    // ═══════════════════════════════════════════════════════════
+
+    private void drawIcon(Canvas canvas, long ms, float masterAlpha) {
+        if (ms < ICON_START || iconBitmap == null) return;
+
+        float progress = clamp01(ms, ICON_START, ICON_SETTLE);
+
+        // Spring bounce scale
+        float scaleP = overshootInterp.getInterpolation(progress);
+        float scale = scaleP;
+
+        // Subtle initial rotation that settles to 0
+        float rotation = (1f - progress) * -15f;
+
+        // Alpha (quick fade in)
+        float alpha = Math.min(progress * 5f, 1f) * masterAlpha;
+
+        if (alpha <= 0.001f || scale <= 0.001f) return;
+
+        float halfSize = iconDrawSize / 2f;
 
         canvas.save();
-        canvas.translate(centerX, centerY);
+        canvas.translate(cx, cy);
+        canvas.rotate(rotation);
         canvas.scale(scale, scale);
-        canvas.translate(-centerX, -centerY);
 
-        // Shadow beneath
-        canvas.save();
-        canvas.translate(logoSize * 0.03f, logoSize * 0.06f);
-        shadowPaint.setAlpha((int) (alpha * 60));
-        canvas.drawPath(aPath, shadowPaint);
-        canvas.restore();
+        // Drop shadow
+        shadowPaint.setAlpha((int) (alpha * 80));
+        canvas.drawRoundRect(
+                -halfSize + 4, -halfSize + 8,
+                halfSize + 4, halfSize + 8,
+                iconDrawSize * 0.18f, iconDrawSize * 0.18f,
+                shadowPaint);
 
-        // Fill with pre-computed gradient
-        aFillPaint.setShader(aGradient);
-        aFillPaint.setAlpha((int) (alpha * 255));
-        canvas.drawPath(aPath, aFillPaint);
-
-        // Stroke outline (edge glow) — draws progressively, fades as fill completes
-        if (rawProgress < 1f) {
-            float strokeAlpha = (1f - rawProgress) * alpha;
-            aStrokePaint.setAlpha((int) (strokeAlpha * 255));
-            aStrokePaint.setStrokeWidth(3f + (1f - rawProgress) * 4f);
-
-            partialStrokePath.reset();
-            float pathLength = aPathMeasure.getLength();
-            aPathMeasure.getSegment(0, pathLength * rawProgress, partialStrokePath, true);
-            canvas.drawPath(partialStrokePath, aStrokePaint);
-        }
+        // Draw icon
+        iconPaint.setAlpha((int) (alpha * 255));
+        canvas.drawBitmap(iconBitmap, -halfSize, -halfSize, iconPaint);
 
         canvas.restore();
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  PHASE 3 — Paper plane flight
+    //  Shimmer light sweep across icon
     // ═══════════════════════════════════════════════════════════
 
-    private void drawPaperPlane(Canvas canvas, long ms, float dt) {
-        if (ms < PLANE_START) return;
+    private void drawShimmer(Canvas canvas, long ms, float masterAlpha) {
+        if (ms < SHIMMER_START || ms > SHIMMER_END) return;
 
-        float rawProgress = clampProgress(ms, PLANE_START, PLANE_END);
+        float progress = clamp01(ms, SHIMMER_START, SHIMMER_END);
 
-        // Use decelerate for natural flight deceleration
-        float flightProgress = decelerateInterpolator.getInterpolation(rawProgress);
+        // Shimmer band sweeps left-to-right across the icon
+        float bandWidth = iconDrawSize * 0.5f;
+        float halfIcon = iconDrawSize / 2f;
+        float leftEdge = cx - halfIcon - bandWidth;
+        float rightEdge = cx + halfIcon + bandWidth;
+        float shimmerX = leftEdge + progress * (rightEdge - leftEdge);
 
-        // Get position along the flight path (reuse pre-allocated arrays)
-        float pathLen = flightPathMeasure.getLength();
-        flightPathMeasure.getPosTan(pathLen * flightProgress, planePos, planeTan);
-
-        float planeX = planePos[0];
-        float planeY = planePos[1];
-
-        // Rotation from tangent
-        float angle = (float) Math.toDegrees(Math.atan2(planeTan[1], planeTan[0]));
-
-        // Scale: plane starts bigger and shrinks to final size
-        float planeScale = 1.0f + (1f - flightProgress) * 0.6f;
-
-        // Alpha
-        float alpha = Math.min(rawProgress * 4f, 1f);
-        if (ms > FADE_OUT_START) {
-            float fadeOut = 1f - clampProgress(ms, FADE_OUT_START, FADE_OUT_END);
-            alpha *= fadeOut;
-        }
+        float alpha = masterAlpha * 0.6f;
+        // Peak in the middle, fade at edges
+        float peakFade = 1f - Math.abs(progress - 0.5f) * 2f;
+        alpha *= peakFade;
 
         if (alpha <= 0.001f) return;
 
-        // Spawn particles at plane position
-        if (rawProgress < 0.9f && rawProgress > 0.05f) {
-            for (int i = 0; i < particles.size(); i++) {
-                Particle p = particles.get(i);
-                if (!p.alive && random.nextFloat() < 0.15f) {
-                    p.spawn(planeX, planeY, angle);
+        // Clip to icon area
+        canvas.save();
+        float iconScale = overshootInterp.getInterpolation(
+                clamp01(ms, ICON_START, ICON_SETTLE));
+        if (iconScale <= 0.01f) {
+            canvas.restore();
+            return;
+        }
+
+        canvas.translate(cx, cy);
+        canvas.scale(iconScale, iconScale);
+
+        // Draw a shimmer gradient band
+        LinearGradient shimmerGrad = new LinearGradient(
+                shimmerX - cx - bandWidth / 2, 0,
+                shimmerX - cx + bandWidth / 2, 0,
+                new int[]{
+                        Color.argb(0, 255, 255, 255),
+                        Color.argb((int) (alpha * 200), 255, 255, 255),
+                        Color.argb((int) (alpha * 255), 255, 255, 255),
+                        Color.argb((int) (alpha * 200), 255, 255, 255),
+                        Color.argb(0, 255, 255, 255)
+                },
+                new float[]{0f, 0.3f, 0.5f, 0.7f, 1f},
+                Shader.TileMode.CLAMP);
+        shimmerPaint.setShader(shimmerGrad);
+
+        RectF iconRect = new RectF(-halfIcon, -halfIcon, halfIcon, halfIcon);
+        float cornerR = iconDrawSize * 0.18f;
+        canvas.drawRoundRect(iconRect, cornerR, cornerR, shimmerPaint);
+
+        canvas.restore();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  Sparkle particles
+    // ═══════════════════════════════════════════════════════════
+
+    private void drawSparkles(Canvas canvas, long ms, float masterAlpha, float dt) {
+        if (ms < SPARKLE_START) return;
+
+        float spawnProgress = clamp01(ms, SPARKLE_START, SPARKLE_END);
+
+        // Spawn particles
+        if (spawnProgress < 1f) {
+            for (int i = 0; i < sparkles.size(); i++) {
+                SparkleParticle sp = sparkles.get(i);
+                if (!sp.alive && rng.nextFloat() < 0.12f) {
+                    sp.spawn(cx, cy, iconDrawSize * 0.4f);
                 }
             }
         }
 
-        canvas.save();
-        canvas.translate(planeX, planeY);
-        canvas.rotate(angle);
-        canvas.scale(planeScale, planeScale);
+        // Draw particles
+        for (int i = 0; i < sparkles.size(); i++) {
+            SparkleParticle sp = sparkles.get(i);
+            if (!sp.alive) continue;
 
-        // Shadow
-        canvas.save();
-        canvas.translate(2, 4);
-        shadowPaint.setAlpha((int) (alpha * 50));
-        canvas.drawPath(planePath, shadowPaint);
-        canvas.restore();
+            sp.update(dt);
+            float a = sp.alpha * masterAlpha;
+            if (a <= 0.001f) continue;
 
-        // Plane body with pre-computed gradient
-        planePaint.setShader(planeGradient);
-        planePaint.setAlpha((int) (alpha * 255));
-        canvas.drawPath(planePath, planePaint);
-
-        canvas.restore();
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    //  Particles trailing behind plane
-    // ═══════════════════════════════════════════════════════════
-
-    private void drawParticles(Canvas canvas, long ms, float dt) {
-        if (ms < PLANE_START) return;
-
-        float globalAlpha = 1f;
-        if (ms > FADE_OUT_START) {
-            globalAlpha = 1f - clampProgress(ms, FADE_OUT_START, FADE_OUT_END);
-        }
-        if (globalAlpha <= 0.001f) return;
-
-        for (int i = 0; i < particles.size(); i++) {
-            Particle p = particles.get(i);
-            if (!p.alive) continue;
-
-            p.update(dt);
-
-            float pAlpha = p.alpha * globalAlpha;
-            if (pAlpha <= 0.001f) continue;
-
-            // Outer particle glow
-            particlePaint.setColor(COLOR_PARTICLE);
-            particlePaint.setAlpha((int) (pAlpha * 200));
-            canvas.drawCircle(p.x, p.y, p.radius, particlePaint);
-
-            // Inner bright core
-            particlePaint.setColor(Color.WHITE);
-            particlePaint.setAlpha((int) (pAlpha * 120));
-            canvas.drawCircle(p.x, p.y, p.radius * 0.4f, particlePaint);
+            // 4-point star shape for premium sparkle
+            drawStarSparkle(canvas, sp.x, sp.y, sp.radius, a, sp.rotation);
         }
     }
 
-    // ═══════════════════════════════════════════════════════════
-    //  PHASE 4 — Glow pulse
-    // ═══════════════════════════════════════════════════════════
+    private void drawStarSparkle(Canvas canvas, float x, float y, float r, float alpha, float rotation) {
+        canvas.save();
+        canvas.translate(x, y);
+        canvas.rotate(rotation);
 
-    private void drawGlow(Canvas canvas, long ms) {
-        if (ms < GLOW_START || ms > GLOW_END) return;
+        // Outer glow
+        particlePaint.setColor(GLOW_COLOR_INNER);
+        particlePaint.setAlpha((int) (alpha * 80));
+        canvas.drawCircle(0, 0, r * 2f, particlePaint);
 
-        float progress = clampProgress(ms, GLOW_START, GLOW_END);
+        // Cross lines (star shape)
+        particlePaint.setColor(Color.WHITE);
+        particlePaint.setAlpha((int) (alpha * 255));
+        // Vertical line
+        canvas.drawRect(-r * 0.15f, -r, r * 0.15f, r, particlePaint);
+        // Horizontal line
+        canvas.drawRect(-r, -r * 0.15f, r, r * 0.15f, particlePaint);
 
-        // Pulse: expand and fade
-        float radius = logoSize * (0.8f + progress * 2.5f);
-        float alpha = (1f - progress) * 0.5f;
+        // Center bright dot
+        particlePaint.setAlpha((int) (alpha * 255));
+        canvas.drawCircle(0, 0, r * 0.3f, particlePaint);
 
-        // Fade out overlap
-        if (ms > FADE_OUT_START) {
-            float fadeOut = 1f - clampProgress(ms, FADE_OUT_START, FADE_OUT_END);
-            alpha *= fadeOut;
-        }
-
-        if (alpha <= 0.001f || radius <= 0) return;
-
-        RadialGradient glowGrad = new RadialGradient(
-                centerX, centerY,
-                radius,
-                new int[]{
-                        Color.argb((int) (alpha * 255), 79, 195, 247),
-                        Color.argb((int) (alpha * 150), 79, 195, 247),
-                        Color.argb(0, 79, 195, 247)
-                },
-                new float[]{0f, 0.4f, 1f},
-                Shader.TileMode.CLAMP
-        );
-        glowPaint.setShader(glowGrad);
-        canvas.drawCircle(centerX, centerY, radius, glowPaint);
+        canvas.restore();
     }
 
     // ═══════════════════════════════════════════════════════════
     //  Utility
     // ═══════════════════════════════════════════════════════════
 
-    private static float clampProgress(long currentMs, long startMs, long endMs) {
-        if (currentMs <= startMs) return 0f;
-        if (currentMs >= endMs) return 1f;
-        return (float) (currentMs - startMs) / (float) (endMs - startMs);
+    private static float clamp01(long ms, long start, long end) {
+        if (ms <= start) return 0f;
+        if (ms >= end) return 1f;
+        return (float) (ms - start) / (float) (end - start);
     }
 
     @Override
@@ -555,75 +507,72 @@ public class AlexgramSplashView extends View {
             mainAnimator.cancel();
             mainAnimator = null;
         }
+        if (iconBitmap != null && !iconBitmap.isRecycled()) {
+            iconBitmap.recycle();
+            iconBitmap = null;
+        }
     }
 
-    /**
-     * Call to immediately finish and remove the splash.
-     */
     public void finishSplash() {
-        if (mainAnimator != null) {
-            mainAnimator.cancel();
-        }
-        isFinished = true;
+        if (mainAnimator != null) mainAnimator.cancel();
         animate().alpha(0f).setDuration(200).withEndAction(() -> {
             ViewGroup parent = (ViewGroup) getParent();
-            if (parent != null) {
-                parent.removeView(AlexgramSplashView.this);
-            }
+            if (parent != null) parent.removeView(AlexgramSplashView.this);
         }).start();
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  Particle class
+    //  Sparkle Particle
     // ═══════════════════════════════════════════════════════════
 
-    private class Particle {
-        float x, y;
-        float vx, vy;
-        float radius;
-        float alpha;
-        float life;
-        float maxLife;
+    private class SparkleParticle {
+        float x, y, vx, vy;
+        float radius, alpha, rotation, rotSpeed;
+        float life, maxLife;
         boolean alive = false;
 
-        void spawn(float px, float py, float angleDeg) {
+        void spawn(float originX, float originY, float spawnRadius) {
             alive = true;
-            x = px;
-            y = py;
 
-            // Emit backwards from the plane direction with some spread
-            float radians = (float) Math.toRadians(angleDeg + 180);
-            float speed = 80f + random.nextFloat() * 120f;
-            float spread = (random.nextFloat() - 0.5f) * 1.2f;
-            vx = (float) (Math.cos(radians + spread) * speed);
-            vy = (float) (Math.sin(radians + spread) * speed);
+            // Spawn in a ring around the icon
+            float angle = rng.nextFloat() * 360f;
+            float rad = (float) Math.toRadians(angle);
+            float dist = spawnRadius + rng.nextFloat() * spawnRadius * 0.8f;
+            x = originX + (float) Math.cos(rad) * dist;
+            y = originY + (float) Math.sin(rad) * dist;
 
-            radius = 2f + random.nextFloat() * 5f;
-            maxLife = 0.5f + random.nextFloat() * 0.8f;
+            // Move outward from center
+            float speed = 40f + rng.nextFloat() * 100f;
+            vx = (float) Math.cos(rad) * speed;
+            vy = (float) Math.sin(rad) * speed;
+
+            radius = 3f + rng.nextFloat() * 8f;
+            maxLife = 0.6f + rng.nextFloat() * 1.0f;
             life = 0f;
-            alpha = 0.6f + random.nextFloat() * 0.4f;
+            alpha = 0.7f + rng.nextFloat() * 0.3f;
+            rotation = rng.nextFloat() * 360f;
+            rotSpeed = (rng.nextFloat() - 0.5f) * 200f;
         }
 
         void update(float dt) {
             if (!alive) return;
-
             life += dt;
-            if (life >= maxLife) {
-                alive = false;
-                return;
-            }
+            if (life >= maxLife) { alive = false; return; }
 
             x += vx * dt;
             y += vy * dt;
+            vx *= 0.97f;
+            vy *= 0.97f;
+            rotation += rotSpeed * dt;
 
-            // Slow down
-            vx *= 0.96f;
-            vy *= 0.96f;
-
-            // Fade out
             float lifeRatio = life / maxLife;
-            alpha = (1f - lifeRatio) * 0.8f;
-            radius *= 0.995f;
+            // Fade in quickly, fade out slowly
+            if (lifeRatio < 0.15f) {
+                alpha = (lifeRatio / 0.15f) * 0.9f;
+            } else {
+                alpha = (1f - (lifeRatio - 0.15f) / 0.85f) * 0.9f;
+            }
+            radius *= 0.998f;
         }
     }
 }
