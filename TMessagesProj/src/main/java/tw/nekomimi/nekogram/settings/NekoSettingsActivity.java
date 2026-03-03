@@ -344,7 +344,6 @@ public class NekoSettingsActivity extends BaseFragment {
         versionText.setGravity(Gravity.CENTER);
         contentLayout.addView(versionText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 8, 0, 16));
 
-        parentFrame.addView(scrollView);
 
         fragmentView = parentFrame;
         return fragmentView;
