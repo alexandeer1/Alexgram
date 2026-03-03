@@ -12,6 +12,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.graphics.Color;
 import android.view.ViewGroup;
