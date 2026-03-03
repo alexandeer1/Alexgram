@@ -79,7 +79,10 @@ import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
+import org.telegram.messenger.SharedConfig;
+import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.PhotoAlbumPickerActivity;
 import tw.nekomimi.nekogram.DialogConfig;
 import tw.nekomimi.nekogram.NekoConfig;
@@ -265,7 +268,7 @@ public class NekoSettingsActivity extends BaseFragment {
                 }));
         qsCard.addView(createGlassDivider(context));
 
-        qsCard.addView(createSettingItem(context, "Custom Video Background", "Select & crop video background", R.drawable.msg_photo, 0xFF00BCD4, v -> {
+        qsCard.addView(createSettingItem(context, "Custom Video Background", "Select & crop video background", R.drawable.msg_gallery_solar, 0xFF00BCD4, v -> {
             PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_AVATAR_VIDEO, false, false, null);
             fragment.setDelegate(new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
                 @Override
