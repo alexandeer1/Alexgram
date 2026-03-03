@@ -183,6 +183,10 @@ public class NekoConfig {
 
     public static ConfigItem minimizedStickerCreator = addConfig("minimizedStickerCreator", configTypeBool, false);
 
+    // Live Video Header
+    public static ConfigItem videoHeaderEnabled = addConfig("videoHeaderEnabled", configTypeBool, false);
+    public static ConfigItem videoHeaderPath = addConfig("videoHeaderPath", configTypeString, "");
+
     // --- Ghost Mode ---
     public static ConfigItem sendReadMessagePackets = addConfig("sendReadMessagePackets", configTypeBool, true);
     public static ConfigItem sendReadStoriesPackets = addConfig("sendReadStoriesPackets", configTypeBool, true);

@@ -101,13 +101,16 @@ public class AlexgramSettingsHeaderView extends View {
     }
 
     private void buildBackground() {
+        boolean hasVideoBg = tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && !tw.nekomimi.nekogram.NekoConfig.videoHeaderPath.String().isEmpty();
+        int aMask = hasVideoBg ? 0x90000000 : 0xFF000000; // 56% opacity if video is enabled
+
         if (isDark) {
             bgPaint.setShader(new LinearGradient(0, 0, vw * 0.3f, vh,
-                    new int[]{0xFF020810, 0xFF0B1528, 0xFF000308},
+                    new int[]{(0xFF020810 & 0x00FFFFFF) | aMask, (0xFF0B1528 & 0x00FFFFFF) | aMask, (0xFF000308 & 0x00FFFFFF) | aMask},
                     new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
         } else {
             bgPaint.setShader(new LinearGradient(0, 0, vw * 0.5f, vh,
-                    new int[]{0xFFE8F0FE, 0xFFC9DDFF, 0xFFE3ECFF},
+                    new int[]{(0xFFE8F0FE & 0x00FFFFFF) | aMask, (0xFFC9DDFF & 0x00FFFFFF) | aMask, (0xFFE3ECFF & 0x00FFFFFF) | aMask},
                     new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
         }
     }

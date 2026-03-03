@@ -248,6 +248,15 @@ public class NekoSettingsActivity extends BaseFragment {
                 }));
         qsCard.addView(createGlassDivider(context));
 
+        qsCard.addView(createSwitchItem(context, "Live Video Header", "Play video background in settings", R.drawable.msg_video, 0xFF9C27B0,
+                NekoConfig.videoHeaderEnabled.Bool(), isChecked -> {
+                    NekoConfig.videoHeaderEnabled.setConfigBool(isChecked);
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
+                }));
+        qsCard.addView(createGlassDivider(context));
+
         qsCard.addView(createSwitchItem(context, "Ghost Mode", "Read silently", R.drawable.msg_secret, 0xFF546E7A,
                 NekoConfig.isGhostModeActive(), isChecked -> {
                     NekoConfig.setGhostMode(isChecked);

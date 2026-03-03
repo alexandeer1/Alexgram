@@ -56,8 +56,15 @@ import org.telegram.ui.Components.UndoView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.io.File;
 
 import kotlin.Unit;
+import org.telegram.messenger.FileLoader;
+import org.telegram.messenger.MediaController;
+import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.SendMessagesHelper;
+import org.telegram.messenger.UserConfig;
+import org.telegram.ui.PhotoAlbumPickerActivity;
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.config.CellGroup;
 import tw.nekomimi.nekogram.config.ConfigItem;
@@ -85,6 +92,9 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private AnimatorSet animatorSet;
     private boolean sensitiveCanChange = false;
     private boolean sensitiveEnabled = false;
+
+    private MessageObject convertingVideo;
+    private NotificationCenter.NotificationCenterDelegate videoConvertDelegate;
 
     private final CellGroup cellGroup = new CellGroup(this);
 
@@ -128,6 +138,94 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
 
     // Ayu
     private final AbstractConfigCell headerAyuMoments = cellGroup.appendCell(new ConfigCellHeader("AyuMoments"));
+    private final AbstractConfigCell liveVideoBgRow = cellGroup.appendCell(new ConfigCellText("Pick Live Video Background", () -> {
+        PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_AVATAR_VIDEO, false, false, null);
+        fragment.setDelegate(new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
+            @Override
+            public void didSelectPhotos(ArrayList<SendMessagesHelper.SendingMediaInfo> photos, boolean notify, int scheduleDate) {
+                if (!photos.isEmpty()) {
+                    SendMessagesHelper.SendingMediaInfo info = photos.get(0);
+                    if (info.isVideo || info.videoEditedInfo != null) {
+                        TLRPC.TL_message message = new TLRPC.TL_message();
+                        message.id = 0;
+                        message.message = "";
+                        message.media = new TLRPC.TL_messageMediaEmpty();
+                        message.action = new TLRPC.TL_messageActionEmpty();
+                        message.dialog_id = 0;
+                        MessageObject avatarObject = new MessageObject(UserConfig.selectedAccount, message, false, false);
+                        avatarObject.messageOwner.attachPath = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), SharedConfig.getLastLocalId() + "_bgvideo.mp4").getAbsolutePath();
+                        avatarObject.videoEditedInfo = info.videoEditedInfo;
+                        avatarObject.emojiMarkup = info.emojiMarkup;
+                        if (avatarObject.videoEditedInfo != null) {
+                            avatarObject.videoEditedInfo.shouldLimitFps = false;
+                        }
+                        convertingVideo = avatarObject;
+
+                        if (videoConvertDelegate == null) {
+                            videoConvertDelegate = (id, account, args) -> {
+                                if (id == NotificationCenter.fileNewChunkAvailable) {
+                                    MessageObject messageObject = (MessageObject) args[0];
+                                    if (convertingVideo != null && messageObject == convertingVideo) {
+                                        String finalPath = (String) args[1];
+                                        long finalSize = (Long) args[3];
+                                        if (finalSize != 0) {
+                                            NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.fileNewChunkAvailable);
+                                            NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.filePreparingFailed);
+                                            NekoConfig.videoHeaderPath.setConfigString(finalPath);
+                                            NekoConfig.videoHeaderEnabled.setConfigBool(true);
+                                            convertingVideo = null;
+                                            AndroidUtilities.runOnUIThread(() -> {
+                                                if (getVisibleDialog() != null) {
+                                                    getVisibleDialog().dismiss();
+                                                }
+                                                BulletinFactory.of(NekoExperimentalSettingsActivity.this).createSimpleBulletin(R.raw.done, "Video background set!").show();
+                                            });
+                                        }
+                                    }
+                                } else if (id == NotificationCenter.filePreparingFailed) {
+                                    MessageObject messageObject = (MessageObject) args[0];
+                                    if (convertingVideo != null && messageObject == convertingVideo) {
+                                        NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.fileNewChunkAvailable);
+                                        NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.filePreparingFailed);
+                                        convertingVideo = null;
+                                        AndroidUtilities.runOnUIThread(() -> {
+                                            if (getVisibleDialog() != null) {
+                                                getVisibleDialog().dismiss();
+                                            }
+                                            BulletinFactory.of(NekoExperimentalSettingsActivity.this).createSimpleBulletin(R.raw.error, "Failed to crop video").show();
+                                        });
+                                    }
+                                }
+                            };
+                        }
+
+                        NotificationCenter.getInstance(currentAccount).addObserver(videoConvertDelegate, NotificationCenter.fileNewChunkAvailable);
+                        NotificationCenter.getInstance(currentAccount).addObserver(videoConvertDelegate, NotificationCenter.filePreparingFailed);
+                        MediaController.getInstance().scheduleVideoConvert(avatarObject, true, true, false);
+
+                        AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                        progressDialog.setCanCancel(false);
+                        showDialog(progressDialog);
+                    } else if (info.path != null) {
+                        NekoConfig.videoHeaderPath.setConfigString(info.path);
+                        NekoConfig.videoHeaderEnabled.setConfigBool(true);
+                        BulletinFactory.of(NekoExperimentalSettingsActivity.this).createSimpleBulletin(R.raw.done, "Video set!").show();
+                    }
+                }
+            }
+            @Override
+            public void startPhotoSelectActivity() {
+                try {
+                    android.content.Intent photoPickerIntent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                    photoPickerIntent.setType("video/*");
+                    startActivityForResult(photoPickerIntent, 14);
+                } catch (Exception e) {
+                    org.telegram.messenger.FileLog.e(e);
+                }
+            }
+        });
+        presentFragment(fragment);
+    }));
     private final AbstractConfigCell GhostModeRow = cellGroup.appendCell(new ConfigCellText("GhostMode", () -> presentFragment(new GhostModeActivity())));
     private final AbstractConfigCell regexFiltersEnabledRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getRegexFiltersEnabled(), getString(R.string.RegexFiltersNotice)));
     private final AbstractConfigCell saveLastSeenRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSaveLocalLastSeen()));
