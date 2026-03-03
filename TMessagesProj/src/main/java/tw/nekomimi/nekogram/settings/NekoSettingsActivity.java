@@ -199,8 +199,13 @@ public class NekoSettingsActivity extends BaseFragment {
         badgeBg.setCornerRadius(AndroidUtilities.dp(6));
         newBadge.setBackground(badgeBg);
         
-        FrameLayout extFrame = (FrameLayout) ((LinearLayout) expView).getChildAt(1);
-        extFrame.addView(newBadge, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 0, 40, 0));
+        try {
+            LinearLayout expLayout = (LinearLayout) expView;
+            LinearLayout textsLayout = (LinearLayout) expLayout.getChildAt(1);
+            textsLayout.addView(newBadge, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
+        } catch (Exception e) {
+            // Ignore if layout structure changes
+        }
         
         advCard.addView(expView);
         mainContent.addView(advCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 24));
