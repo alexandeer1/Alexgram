@@ -3201,12 +3201,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             actionBar.setOccupyStatusBar(false);
         }
 
-        if (tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && !android.text.TextUtils.isEmpty(tw.nekomimi.nekogram.NekoConfig.videoHeaderPath.String())) {
-            tw.nekomimi.nekogram.settings.VideoBackgroundView videoBg = new tw.nekomimi.nekogram.settings.VideoBackgroundView(context);
-            actionBar.addView(videoBg, 0, org.telegram.ui.Components.LayoutHelper.createFrame(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.MATCH_PARENT));
-            actionBar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-        }
-
         return actionBar;
     }
 
@@ -3273,7 +3267,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (initialDialogsType == DIALOGS_TYPE_ADD_USERS_TO || isArchive() && getDialogsArray(currentAccount, initialDialogsType, folderId, false).isEmpty()) {
             searchItem.setVisibility(View.GONE);
         }
-        searchItem.setVisibility(View.GONE);
 
         if (!onlySelect && searchString == null && folderId == 0) {
             doneItem = new ActionBarMenuItem(context, null, getThemedColor(Theme.key_actionBarDefaultSelector), getThemedColor(Theme.key_actionBarDefaultIcon), true);
@@ -4117,6 +4110,35 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         ContentView contentView = new ContentView(context);
         fragmentView = contentView;
+
+        if (tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && !android.text.TextUtils.isEmpty(tw.nekomimi.nekogram.NekoConfig.videoHeaderPath.String())) {
+            android.widget.FrameLayout videoContainer = new android.widget.FrameLayout(context) {
+                @Override
+                protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                    int h = actionBar != null ? actionBar.getMeasuredHeight() : 0;
+                    if (dialogStoriesCell != null && dialogStoriesCell.getVisibility() == View.VISIBLE) {
+                        h += Math.max(0, dialogStoriesCell.getMeasuredHeight() + dialogStoriesCell.getTranslationY());
+                        dialogStoriesCell.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    }
+                    boolean search = actionBar != null && actionBar.isSearchFieldVisible();
+                    if (search) {
+                        actionBar.setBackgroundColor(org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_actionBarDefault));
+                    } else {
+                        actionBar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    }
+                    super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
+                }
+                @Override
+                protected void dispatchDraw(android.graphics.Canvas canvas) {
+                    if (actionBar == null || !actionBar.isSearchFieldVisible()) {
+                        super.dispatchDraw(canvas);
+                    }
+                }
+            };
+            tw.nekomimi.nekogram.settings.VideoBackgroundView videoBg = new tw.nekomimi.nekogram.settings.VideoBackgroundView(context);
+            videoContainer.addView(videoBg, org.telegram.ui.Components.LayoutHelper.createFrame(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.MATCH_PARENT));
+            contentView.addView(videoContainer, 0, org.telegram.ui.Components.LayoutHelper.createFrame(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.WRAP_CONTENT));
+        }
 
         viewPositionWatcher = new ViewPositionWatcher(contentView);
         iBlur3FactoryFrostedLiquidGlass.setSourceRootView(viewPositionWatcher, contentView);
