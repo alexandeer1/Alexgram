@@ -4,8 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -13,70 +11,60 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.RadialGradient;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.OvershootInterpolator;
-
-import org.telegram.messenger.R;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Premium Alexgram splash screen.
+ * Ultra-Premium, Seamless Alexgram Splash Screen.
+ * Fast, fluid, and leaves no square icon edges — the animated parts BECOME the final logo.
  *
- * 1. Deep blue gradient + ambient floating particles
- * 2. "A" letter traces itself with a bright neon beam + glow halo
- * 3. "A" fills in with metallic gradient + shadow
- * 4. Paper plane swoops in from bottom-left curving to upper-right (matching icon)
- *    with a luminous trail and sparkles
- * 5. Merge: plane reaches A → shockwave rings + bright flash
- * 6. Flash reveals actual Alexgram icon with spring-bounce
- * 7. Icon breathes with a pulsing glow + floating sparkles
- * 8. Cinematic fade out
+ * Sequence:
+ * 1. Deep blue gradient + drifting ambient stars
+ * 2. Neon beam traces the "A" very fast
+ * 3. The "A" fills with a metallic gradient
+ * 4. Paper plane swoops in from bottom-left to center-right
+ * 5. Shockwave flash on impact
+ * 6. The A and the Plane just stay on screen, perfectly forming the final logo
+ * 7. Fast fade out
  */
 public class AlexgramSplashView extends View {
 
-    // ═══════════════ TIMING (ms) ═══════════════════
-    private static final long TOTAL = 3400;
+    // ═══════════════ TIMING (ms) — Sped up significantly ═══════════════════
+    private static final long TOTAL = 2200;
 
-    // Background + ambient
-    private static final long BG_END = 150;
     private static final long AMBIENT_START = 0;
-    private static final long AMBIENT_END = 2800;
+    private static final long AMBIENT_END   = 1800;
 
-    // A letter stroke
-    private static final long A_STROKE_S = 80;
-    private static final long A_STROKE_E = 1050;
+    // A letter tracing
+    private static final long A_STROKE_S = 0;
+    private static final long A_STROKE_E = 600;
 
     // A letter fill
-    private static final long A_FILL_S = 750;
-    private static final long A_FILL_E = 1150;
+    private static final long A_FILL_S = 400;
+    private static final long A_FILL_E = 700;
 
     // Plane flight
-    private static final long PLANE_S = 950;
-    private static final long PLANE_E = 1700;
+    private static final long PLANE_S = 300;
+    private static final long PLANE_E = 800;
 
-    // Flash + shockwave
-    private static final long FLASH_S = 1580;
-    private static final long FLASH_PEAK = 1700;
-    private static final long FLASH_E = 1950;
+    // Shockwave flash at merge
+    private static final long FLASH_S = 750;
+    private static final long FLASH_PEAK = 850;
+    private static final long FLASH_E = 1100;
 
-    // Icon reveal
-    private static final long ICON_S = 1650;
-    private static final long ICON_E = 2050;
+    // Post-impact glow & sparks
+    private static final long GLOW_S = 800;
+    private static final long GLOW_E = 1600;
 
-    // Glow + post-sparkles
-    private static final long GLOW_S = 1750;
-    private static final long GLOW_E = 2900;
-
-    // Fade out
-    private static final long FADE_S = 2800;
-    private static final long FADE_E = TOTAL;
+    // Fade entire view out to app
+    private static final long FADE_S = 1800;
+    private static final long FADE_E = 2200;
 
     // ═══════════════ COLORS ═══════════════════
     private static final int BG_TOP = 0xFF061B3D;
@@ -84,46 +72,44 @@ public class AlexgramSplashView extends View {
     private static final int BG_BOT = 0xFF041430;
 
     private static final int NEON_CYAN = 0xFF00E5FF;
-    private static final int NEON_BLUE = 0xFF2979FF;
     private static final int A_FILL_LT = 0xFF4FC3F7;
     private static final int A_FILL_DK = 0xFF0D47A1;
 
-    private static final int PLANE_W = 0xFFE0F7FA;
-    private static final int PLANE_B = 0xFF29B6F6;
+    // The plane has two parts: left wing (darker) and right wing (lighter)
+    private static final int PLANE_LT = 0xFFE0F7FA;
+    private static final int PLANE_MID = 0xFF4FC3F7;
+    private static final int PLANE_DK = 0xFF0288D1;
 
     private static final int GLOW_IN = 0xFF4FC3F7;
-    private static final int SPARK_C = 0xFFB3E5FC;
 
     // ═══════════════ PAINTS ═══════════════════
-    private final Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint aStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint aGlow = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint aFill = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint aShadow = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint planePnt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint flashPnt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint glowPnt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint iconPnt = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final Paint sparkPnt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint ringPnt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint ambPnt = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint trailPnt = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint bgPaint    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint aStroke    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint aGlow      = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint aFill      = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint aShadow    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint planeRt    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint planeLt    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint planeShad  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint flashPnt   = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint glowPnt    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint sparkPnt   = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint ringPnt    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint ambPnt     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint trailPnt   = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // ═══════════════ CACHED ═══════════════════
-    private final OvershootInterpolator overI = new OvershootInterpolator(2.8f);
-    private final DecelerateInterpolator decI = new DecelerateInterpolator(2.5f);
+    private final DecelerateInterpolator decI = new DecelerateInterpolator(2.0f);
     private final Path partP = new Path();
     private final float[] pPos = new float[2];
     private final float[] pTan = new float[2];
     private final float[] beamP = new float[2];
 
     // ═══════════════ PATHS ═══════════════════
-    private Path aOutline, aBody, planeShape, flightPath;
+    private Path aOutline, aBody;
+    private Path planeRightWing, planeLeftWing;
+    private Path flightPath;
     private PathMeasure aOutM, flightM;
-
-    // ═══════════════ BITMAP ═══════════════════
-    private Bitmap icon;
-    private int icoSz;
 
     // ═══════════════ PARTICLES ═══════════════════
     private final ArrayList<Spark> sparks = new ArrayList<>();
@@ -140,14 +126,12 @@ public class AlexgramSplashView extends View {
     private boolean ok = false;
     private Runnable onDone;
 
+    // Coordinates for the final resting place of the plane
+    private float finalPlaneX, finalPlaneY, finalPlaneAngle;
+
     public AlexgramSplashView(Context c) {
         super(c);
         setLayerType(LAYER_TYPE_HARDWARE, null);
-
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        icon = BitmapFactory.decodeResource(c.getResources(),
-                R.drawable.ic_launcher_alexgram_blue, o);
 
         aStroke.setStyle(Paint.Style.STROKE);
         aStroke.setStrokeCap(Paint.Cap.ROUND);
@@ -165,8 +149,13 @@ public class AlexgramSplashView extends View {
 
         aFill.setStyle(Paint.Style.FILL);
         aShadow.setStyle(Paint.Style.FILL);
-        aShadow.setColor(0x50000000);
-        planePnt.setStyle(Paint.Style.FILL);
+        aShadow.setColor(0x60000000); // dark drop shadow
+        
+        planeRt.setStyle(Paint.Style.FILL);
+        planeLt.setStyle(Paint.Style.FILL);
+        planeShad.setStyle(Paint.Style.FILL);
+        planeShad.setColor(0x50000000);
+        
         flashPnt.setStyle(Paint.Style.FILL);
         sparkPnt.setStyle(Paint.Style.FILL);
         ambPnt.setStyle(Paint.Style.FILL);
@@ -184,11 +173,7 @@ public class AlexgramSplashView extends View {
         if (w == 0 || h == 0) return;
         vw = w; vh = h;
         cx = w / 2f; cy = h / 2f;
-        ls = Math.min(w, h) * 0.22f;
-        icoSz = (int) (Math.min(w, h) * 0.32f);
-
-        if (icon != null && icoSz > 0)
-            icon = Bitmap.createScaledBitmap(icon, icoSz, icoSz, true);
+        ls = Math.min(w, h) * 0.28f; // slightly larger logo base scale
 
         build();
 
@@ -196,12 +181,11 @@ public class AlexgramSplashView extends View {
         for (int i = 0; i < 70; i++) sparks.add(new Spark());
 
         ambients.clear();
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 40; i++) {
             AmbientDot d = new AmbientDot();
             d.init(vw, vh, rng);
             ambients.add(d);
         }
-
         trailDots.clear();
 
         ok = true;
@@ -209,87 +193,126 @@ public class AlexgramSplashView extends View {
     }
 
     // ══════════════════════════════════════════
-    //  BUILD PATHS
+    //  BUILD PATHS TO MATCH ACTUAL ICON EXACTLY
     // ══════════════════════════════════════════
     private void build() {
         float s = ls;
 
-        // ── "A" OUTLINE (continuous stroke for beam tracing) ──
+        // ── 1. The "A" BODY (Seamless, matching icon shape) ──
+        // Center of the A
+        float ax = cx;
+        float ay = cy;
+
+        // Let's build the A perfectly centered
+        // It's a sharp A with a thick left leg and a crossbar
         aOutline = new Path();
-        float blX = cx - s * 0.58f, blY = cy + s * 0.82f;
-        float apX = cx, apY = cy - s * 0.98f;
-        float brX = cx + s * 0.52f, brY = cy + s * 0.82f;
-        float clX = cx - s * 0.30f, clY = cy + s * 0.10f;
-        float crX = cx + s * 0.28f, crY = cy + s * 0.10f;
+        float hw = s * 0.14f; // stroke width
 
-        // Left leg up to apex
-        aOutline.moveTo(blX, blY);
-        aOutline.lineTo(apX, apY);
-        // Apex down right leg
-        aOutline.lineTo(brX, brY);
+        // Apex
+        float topX = ax, topY = ay - s * 0.7f;
+        // Bottom left
+        float blX = ax - s * 0.5f, blY = ay + s * 0.7f;
+        // Bottom right
+        float brX = ax + s * 0.45f, brY = ay + s * 0.7f;
         // Crossbar
-        aOutline.moveTo(clX, clY);
-        aOutline.lineTo(crX, crY);
+        float midY = ay + s * 0.2f;
 
+        aOutline.moveTo(blX, blY);
+        aOutline.lineTo(topX, topY);
+        aOutline.lineTo(brX, brY);
+        aOutline.moveTo(ax - s * 0.25f, midY);
+        aOutline.lineTo(ax + s * 0.22f, midY);
         aOutM = new PathMeasure(aOutline, false);
 
-        // ── "A" SOLID BODY (filled shape) ──
+        // Filled A shape (with proper leg thickness)
         aBody = new Path();
-        float hw = s * 0.10f; // half-width of the letter strokes
-        // Outer shape
-        aBody.moveTo(apX, apY - hw * 0.3f);
-        aBody.lineTo(apX + hw * 1.2f, apY + hw * 0.5f);
-        aBody.lineTo(brX + hw, brY + hw * 0.3f);
-        aBody.lineTo(brX - hw * 0.3f, brY + hw * 0.3f);
-        aBody.lineTo(crX + hw * 0.5f, crY + hw * 1.5f);
-        aBody.lineTo(clX - hw * 0.5f, clY + hw * 1.5f);
-        aBody.lineTo(blX + hw * 0.3f, blY + hw * 0.3f);
-        aBody.lineTo(blX - hw, blY + hw * 0.3f);
+        aBody.moveTo(topX, topY - hw); // sharp tip
+        aBody.lineTo(topX + hw, topY + hw * 0.5f); // right side of apex
+        aBody.lineTo(brX + hw, brY); // bottom right outer
+        aBody.lineTo(brX - hw * 1.5f, brY); // bottom right inner
+        
+        // Go up to inner crossbar
+        aBody.lineTo(ax + s * 0.1f, midY + hw);
+        aBody.lineTo(ax - s * 0.15f, midY + hw);
+        
+        // Down to inside left leg
+        aBody.lineTo(blX + hw * 1.2f, blY);
+        aBody.lineTo(blX - hw * 0.8f, blY); // bottom left outer
         aBody.close();
 
-        // Inner cut (A hole)
+        // Cutout the top triangle hole
         Path hole = new Path();
-        hole.moveTo(apX, apY + s * 0.42f);
-        hole.lineTo(cx - s * 0.17f, clY - s * 0.02f);
-        hole.lineTo(cx + s * 0.15f, crY - s * 0.02f);
+        hole.moveTo(topX, topY + hw * 2.5f); // inner apex
+        hole.lineTo(ax - s * 0.22f, midY - hw); // left inner
+        hole.lineTo(ax + s * 0.18f, midY - hw); // right inner
         hole.close();
         aBody.op(hole, Path.Op.DIFFERENCE);
 
-        // ── PLANE SHAPE (pointing upper-right, matching icon) ──
-        planeShape = new Path();
-        float ps = s * 0.38f;
-        // Tip pointing upper-right
-        planeShape.moveTo(ps * 0.9f, -ps * 0.35f);    // tip
-        planeShape.lineTo(-ps * 0.4f, -ps * 0.45f);    // top-left wing
-        planeShape.lineTo(-ps * 0.1f, -ps * 0.05f);    // crease
-        planeShape.lineTo(-ps * 0.4f, ps * 0.25f);     // bottom-left wing
-        planeShape.lineTo(ps * 0.4f, ps * 0.0f);       // tail
-        planeShape.close();
+        // ── 2. PLANE SHAPES (Seamless, matching icon) ──
+        // We split the plane into left wing (dark) and right wing (light)
+        // so it has the natural 3D paper plane look of the Alexgram logo.
+        planeRightWing = new Path();
+        planeLeftWing = new Path();
+        
+        float ps = s * 0.75f; // plane scale
+        
+        // Plane is mostly pointing to the right, slightly angled up
+        // Local coordinates:
+        float pTipX = ps * 0.9f, pTipY = -ps * 0.1f;
+        float pTailX = -ps * 0.6f, pTailY = ps * 0.3f;
+        float pTopWingX = -ps * 0.3f, pTopWingY = -ps * 0.45f;
+        float pBotWingX = 0f, pBotWingY = ps * 0.5f;
+        float pCenterFoldX = -ps * 0.3f, pCenterFoldY = 0f;
 
-        // ── FLIGHT PATH: bottom-left → curving up to upper-right (matching icon direction) ──
+        // Right (upper/main) wing - lighter blue
+        planeRightWing.moveTo(pTipX, pTipY);
+        planeRightWing.lineTo(pTopWingX, pTopWingY);
+        planeRightWing.lineTo(pCenterFoldX, pCenterFoldY);
+        planeRightWing.lineTo(pTailX, pTailY);
+        planeRightWing.close();
+
+        // Left (lower/under) wing - darker blue
+        planeLeftWing.moveTo(pTipX, pTipY);
+        planeLeftWing.lineTo(pCenterFoldX, pCenterFoldY);
+        planeLeftWing.lineTo(pBotWingX, pBotWingY);
+        planeLeftWing.close();
+
+        // Final plane position needs to overlay perfectly onto the "A"
+        finalPlaneX = ax + s * 0.15f;
+        finalPlaneY = ay + s * 0.05f;
+        finalPlaneAngle = -15f; // slight upward tilt for the actual icon look
+
+        // ── FLIGHT PATH ──
         flightPath = new Path();
-        float endX = cx + s * 0.12f;
-        float endY = cy - s * 0.25f;
         float startX = -s * 2.0f;
-        float startY = vh + s * 1.0f;
+        float startY = vh + s;
 
         flightPath.moveTo(startX, startY);
         flightPath.cubicTo(
-                vw * 0.15f, vh * 0.55f,       // CP1: curves up through lower-left
-                cx - s * 0.5f, cy - s * 1.5f,  // CP2: sweeps over the top
-                endX, endY                      // lands at merge point
+                vw * 0.2f, vh * 0.6f,       // CP1: sweep up left
+                cx - s * 1.0f, cy + s * 0.5f, // CP2: approach horizontally
+                finalPlaneX, finalPlaneY      // target
         );
         flightM = new PathMeasure(flightPath, false);
 
-        // Shaders
-        bgPaint.setShader(new LinearGradient(0, 0, vw * 0.3f, vh,
+        // ── SHADERS ──
+        bgPaint.setShader(new LinearGradient(0, 0, vw * 0.5f, vh,
                 new int[]{BG_TOP, BG_MID, BG_BOT},
                 new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
 
         aFill.setShader(new LinearGradient(
-                cx - ls, cy - ls, cx + ls, cy + ls,
-                new int[]{A_FILL_LT, A_FILL_DK, 0xFF0A3566},
-                new float[]{0f, 0.6f, 1f}, Shader.TileMode.CLAMP));
+                ax - s, ay - s, ax + s, ay + s,
+                new int[]{A_FILL_LT, A_FILL_DK},
+                null, Shader.TileMode.CLAMP));
+
+        // The plane wings get exact solid gradients to match the icon
+        planeRt.setShader(new LinearGradient(
+                -ps, -ps, ps, ps,
+                new int[]{PLANE_LT, PLANE_MID}, null, Shader.TileMode.CLAMP));
+                
+        planeLt.setShader(new LinearGradient(
+                -ps*0.5f, 0, ps, ps,
+                new int[]{PLANE_MID, PLANE_DK}, null, Shader.TileMode.CLAMP));
     }
 
     // ══════════════════════════════════════════
@@ -320,72 +343,76 @@ public class AlexgramSplashView extends View {
         lastNs = ns;
 
         float m = ms > FADE_S ? 1f - cl(ms, FADE_S, FADE_E) : 1f;
+        if (m <= 0.001f) return;
 
         // 1. Background
-        c.saveLayerAlpha(0, 0, vw, vh, (int) (Math.min(cl(ms, 0, BG_END), m) * 255));
+        c.saveLayerAlpha(0, 0, vw, vh, (int) (m * 255));
         c.drawRect(0, 0, vw, vh, bgPaint);
-        c.restore();
 
-        // 2. Ambient floating particles
+        // 2. Ambient particles (drift slowly in bg)
         drawAmbient(c, ms, m, dt);
 
-        // Before flash: draw A and plane
-        float hideP = cl(ms, FLASH_PEAK, FLASH_E);
-        if (hideP < 1f) {
-            drawAStroke(c, ms, m * (1f - hideP));
-            drawAFill(c, ms, m * (1f - hideP));
-            drawPlane(c, ms, m * (1f - hideP), dt);
-        }
+        // 3. "A" tracing beam
+        drawAStroke(c, ms, m);
 
-        // Flash + shockwave
-        drawFlash(c, ms, m);
-        drawShockwaves(c, ms, m);
+        // 4. "A" fill (stays on screen once fully drawn)
+        drawAFill(c, ms, m);
 
-        // Icon
-        drawIcon(c, ms, m);
+        // 5. Plane flight (flies into place, then stays there)
+        drawPlane(c, ms, m, dt);
 
-        // Glow
-        drawGlow(c, ms, m);
+        // 6. Flash and shockwave (only at merge impact)
+        drawFlashAndShockwave(c, ms, m);
 
-        // Sparkles
+        // 7. Sparkle burst
         drawSparks(c, ms, m, dt);
+
+        c.restore(); // end global alpha layer
     }
 
     // ══════════════════════════════════════════
-    //  AMBIENT FLOATING DOTS (background life)
+    //  AMBIENT
     // ══════════════════════════════════════════
     private void drawAmbient(Canvas c, long ms, float m, float dt) {
-        if (ms < AMBIENT_START || ms > AMBIENT_END) return;
-        float a = Math.min(cl(ms, AMBIENT_START, AMBIENT_START + 500), 1f) * m;
-        if (ms > AMBIENT_END - 500) a *= cl(AMBIENT_END, ms, AMBIENT_END);
+        if (ms > AMBIENT_END) return;
+        float a = m;
+        if (ms > AMBIENT_END - 400) a *= cl(AMBIENT_END, ms, AMBIENT_END);
 
         for (int i = 0; i < ambients.size(); i++) {
             AmbientDot d = ambients.get(i);
             d.update(dt);
             float da = d.alpha * a;
             if (da < 0.01f) continue;
+            
             ambPnt.setColor(NEON_CYAN);
-            ambPnt.setAlpha((int) (da * 80));
-            c.drawCircle(d.x, d.y, d.r * 2.5f, ambPnt);
+            ambPnt.setAlpha((int) (da * 60));
+            c.drawCircle(d.x, d.y, d.r * 2f, ambPnt);
+            
             ambPnt.setColor(Color.WHITE);
-            ambPnt.setAlpha((int) (da * 160));
+            ambPnt.setAlpha((int) (da * 180));
             c.drawCircle(d.x, d.y, d.r, ambPnt);
         }
     }
 
     // ══════════════════════════════════════════
-    //  "A" STROKE — neon beam traces the letter
+    //  "A" STROKE TRACING
     // ══════════════════════════════════════════
     private void drawAStroke(Canvas c, long ms, float alpha) {
-        if (ms < A_STROKE_S || alpha < 0.001f) return;
+        if (ms < A_STROKE_S || ms > A_STROKE_E + 200) return; // fades out after fill
+        
         float p = cl(ms, A_STROKE_S, A_STROKE_E);
-        float sw = 4f + ls * 0.05f;
+        
+        // fade stroke out as solid body fades in
+        float fadeOut = 1f;
+        if (ms > A_FILL_S) fadeOut = 1f - cl(ms, A_FILL_S, A_FILL_E + 200);
+        alpha *= fadeOut;
+        if (alpha < 0.001f) return;
 
-        // Measure total path length
+        float sw = 3f + ls * 0.03f;
         PathMeasure pm = new PathMeasure(aOutline, false);
         float total = 0;
         do { total += pm.getLength(); } while (pm.nextContour());
-
+        
         pm = new PathMeasure(aOutline, false);
         float drawn = 0, target = total * p;
 
@@ -398,255 +425,216 @@ public class AlexgramSplashView extends View {
             partP.reset();
             pm.getSegment(0, seg, partP, true);
 
-            // Wide outer glow
-            aGlow.setStrokeWidth(sw * 5f);
-            aGlow.setAlpha((int) (alpha * 35));
+            // Outer wide glow
+            aGlow.setStrokeWidth(sw * 6f);
+            aGlow.setAlpha((int) (alpha * 40));
             c.drawPath(partP, aGlow);
 
-            // Mid glow
-            aGlow.setStrokeWidth(sw * 2.5f);
-            aGlow.setAlpha((int) (alpha * 70));
-            c.drawPath(partP, aGlow);
-
-            // Core neon stroke
+            // Core beam
             aStroke.setStrokeWidth(sw);
             aStroke.setAlpha((int) (alpha * 255));
             c.drawPath(partP, aStroke);
 
-            // Inner white core for extra brightness
-            aStroke.setColor(Color.WHITE);
-            aStroke.setStrokeWidth(sw * 0.4f);
-            aStroke.setAlpha((int) (alpha * 180));
-            c.drawPath(partP, aStroke);
-            aStroke.setColor(NEON_CYAN);
-
-            // Bright beam tip
-            if (seg < cLen && p < 0.98f) {
+            // Leading bright tip
+            if (seg < cLen && p < 1f) {
                 pm.getPosTan(seg, beamP, null);
-                // Outer glow
                 sparkPnt.setColor(NEON_CYAN);
-                sparkPnt.setAlpha((int) (alpha * 100));
-                c.drawCircle(beamP[0], beamP[1], sw * 6f, sparkPnt);
-                // Inner bright
+                sparkPnt.setAlpha((int) (alpha * 150));
+                c.drawCircle(beamP[0], beamP[1], sw * 4f, sparkPnt);
                 sparkPnt.setColor(Color.WHITE);
                 sparkPnt.setAlpha((int) (alpha * 255));
-                c.drawCircle(beamP[0], beamP[1], sw * 2f, sparkPnt);
-
-                // Spawn tiny particles at beam tip
-                for (int i = 0; i < sparks.size(); i++) {
-                    Spark sp = sparks.get(i);
-                    if (!sp.alive && rng.nextFloat() < 0.08f) {
-                        sp.spawnTiny(beamP[0], beamP[1]);
-                    }
-                }
+                c.drawCircle(beamP[0], beamP[1], sw * 1.5f, sparkPnt);
             }
-
             drawn += cLen;
         } while (pm.nextContour());
         c.restore();
     }
 
     // ══════════════════════════════════════════
-    //  "A" FILL — metallic gradient fill
+    //  "A" SOLID FILL (persists)
     // ══════════════════════════════════════════
-    private void drawAFill(Canvas c, long ms, float alpha) {
-        if (ms < A_FILL_S || alpha < 0.001f) return;
+    private void drawAFill(Canvas c, long ms, float m) {
+        if (ms < A_FILL_S) return;
         float p = cl(ms, A_FILL_S, A_FILL_E);
-        float a = p * alpha;
+        float a = p * m;
+        
+        // Slight pop-in scale
+        float scale = 0.9f + 0.1f * decI.getInterpolation(p);
 
-        // Drop shadow
         c.save();
-        c.translate(ls * 0.02f, ls * 0.05f);
-        aShadow.setAlpha((int) (a * 100));
+        c.translate(cx, cy);
+        c.scale(scale, scale);
+        c.translate(-cx, -cy);
+
+        // Dark back shadow for depth against plane
+        c.save();
+        c.translate(0, ls * 0.06f);
+        aShadow.setAlpha((int) (a * 150));
         c.drawPath(aBody, aShadow);
         c.restore();
 
-        // Filled A
         aFill.setAlpha((int) (a * 255));
         c.drawPath(aBody, aFill);
+        
+        c.restore();
     }
 
     // ══════════════════════════════════════════
-    //  PLANE — flies from bottom-left to upper-right
+    //  PLANE (flies in and parks in final logo spot)
     // ══════════════════════════════════════════
-    private void drawPlane(Canvas c, long ms, float alpha, float dt) {
-        if (ms < PLANE_S || alpha < 0.001f) return;
-        float p = cl(ms, PLANE_S, PLANE_E);
-        float flight = decI.getInterpolation(p);
+    private void drawPlane(Canvas c, long ms, float m, float dt) {
+        if (ms < PLANE_S) return;
+        
+        float flightProg = cl(ms, PLANE_S, PLANE_E);
+        float flight = decI.getInterpolation(flightProg);
 
-        float pathLen = flightM.getLength();
-        flightM.getPosTan(pathLen * flight, pPos, pTan);
-        float px = pPos[0], py = pPos[1];
-        float angle = (float) Math.toDegrees(Math.atan2(pTan[1], pTan[0]));
-        float scale = 1.0f + (1f - flight) * 1.0f;
-        float a = Math.min(p * 5f, 1f) * alpha;
-
-        // ── Trail dots (glowing path behind plane) ──
-        if (p > 0.02f && p < 0.95f) {
-            trailDots.add(new float[]{px, py, 1f}); // x, y, alpha
+        float px, py, angle, scale;
+        
+        if (flightProg < 1f) {
+            // In flight
+            float pathLen = flightM.getLength();
+            flightM.getPosTan(pathLen * flight, pPos, pTan);
+            px = pPos[0]; 
+            py = pPos[1];
+            
+            // Raw tangent angle
+            float pathAngle = (float) Math.toDegrees(Math.atan2(pTan[1], pTan[0]));
+            
+            // Smoothly lerp angle into final parking angle
+            angle = pathAngle + (finalPlaneAngle - pathAngle) * flight;
+            
+            // Starts big, shrinks down perfectly into logo size
+            scale = 1.6f - 0.6f * flight;
+        } else {
+            // Parked (is exactly the logo)
+            px = finalPlaneX;
+            py = finalPlaneY;
+            angle = finalPlaneAngle;
+            scale = 1.0f;
         }
-        // Draw trail
-        for (int i = trailDots.size() - 1; i >= 0; i--) {
-            float[] td = trailDots.get(i);
-            td[2] *= 0.94f; // fade
-            if (td[2] < 0.02f) { trailDots.remove(i); continue; }
-            float ta = td[2] * alpha;
-            trailPnt.setColor(NEON_CYAN);
-            trailPnt.setAlpha((int) (ta * 50));
-            c.drawCircle(td[0], td[1], ls * 0.12f, trailPnt);
-            trailPnt.setColor(Color.WHITE);
-            trailPnt.setAlpha((int) (ta * 120));
-            c.drawCircle(td[0], td[1], ls * 0.03f, trailPnt);
-        }
 
-        // ── Spawn sparkle particles along trail ──
-        if (p > 0.05f && p < 0.90f) {
+        // Draw trail behind plane during flight only
+        if (flightProg > 0.05f && flightProg < 0.98f) {
+            trailDots.add(new float[]{px, py, 1f});
             for (int i = 0; i < sparks.size(); i++) {
                 Spark sp = sparks.get(i);
-                if (!sp.alive && rng.nextFloat() < 0.20f)
+                if (!sp.alive && rng.nextFloat() < 0.25f)
                     sp.spawnTrail(px, py, angle);
             }
         }
+        
+        for (int i = trailDots.size() - 1; i >= 0; i--) {
+            float[] td = trailDots.get(i);
+            td[2] *= 0.92f;
+            if (td[2] < 0.02f) { trailDots.remove(i); continue; }
+            float ta = td[2] * m;
+            trailPnt.setColor(NEON_CYAN);
+            trailPnt.setAlpha((int) (ta * 70));
+            c.drawCircle(td[0], td[1], ls * 0.15f, trailPnt);
+            trailPnt.setColor(Color.WHITE);
+            trailPnt.setAlpha((int) (ta * 150));
+            c.drawCircle(td[0], td[1], ls * 0.04f, trailPnt);
+        }
 
+        float a = Math.min(flightProg * 5f, 1f) * m;
+
+        // Draw plane at correct position
         c.save();
         c.translate(px, py);
         c.rotate(angle);
         c.scale(scale, scale);
 
-        // Outer glow
-        planePnt.setShader(null);
-        planePnt.setColor(NEON_CYAN);
-        planePnt.setAlpha((int) (a * 30));
+        // Big drop shadow under the plane makes it pop over the A
         c.save();
-        c.scale(2.2f, 2.2f);
-        c.drawPath(planeShape, planePnt);
+        c.translate(0, ls * 0.1f);
+        planeShad.setAlpha((int) (a * 150));
+        c.drawPath(planeRightWing, planeShad);
+        c.drawPath(planeLeftWing, planeShad);
         c.restore();
 
-        // Mid glow
-        planePnt.setAlpha((int) (a * 60));
-        c.save();
-        c.scale(1.5f, 1.5f);
-        c.drawPath(planeShape, planePnt);
-        c.restore();
+        // Left wing (dark mode)
+        planeLt.setAlpha((int) (a * 255));
+        c.drawPath(planeLeftWing, planeLt);
 
-        // Plane body
-        planePnt.setShader(new LinearGradient(-ls * 0.2f, -ls * 0.15f,
-                ls * 0.3f, ls * 0.1f,
-                new int[]{PLANE_W, PLANE_B, Color.WHITE},
-                null, Shader.TileMode.CLAMP));
-        planePnt.setAlpha((int) (a * 255));
-        c.drawPath(planeShape, planePnt);
+        // Right wing (light mode)
+        planeRt.setAlpha((int) (a * 255));
+        c.drawPath(planeRightWing, planeRt);
+
+        // Extra white glare on the tip while flying
+        opacityIf(c, planeRt, Color.WHITE, (int) ( (1f - flightProg) * a * 150 ));
+        c.drawPath(planeRightWing, planeRt);
 
         c.restore();
     }
 
+    private void opacityIf(Canvas c, Paint p, int color, int alpha) {
+        if (alpha <= 0) return;
+        int oldC = p.getColor();
+        Shader oldS = p.getShader();
+        p.setShader(null);
+        p.setColor(color);
+        p.setAlpha(alpha);
+        p.setStyle(Paint.Style.FILL);
+    }
+
     // ══════════════════════════════════════════
-    //  FLASH — cinematic white burst
+    //  FLASH + SHOCKWAVE (Impact!)
     // ══════════════════════════════════════════
-    private void drawFlash(Canvas c, long ms, float m) {
-        if (ms < FLASH_S || ms > FLASH_E) return;
-        float a;
-        float expand;
-        if (ms < FLASH_PEAK) {
-            float p = cl(ms, FLASH_S, FLASH_PEAK);
-            a = p * p; // ease-in
-            expand = p;
-        } else {
-            float p = cl(ms, FLASH_PEAK, FLASH_E);
-            a = (1f - p) * (1f - p); // ease-out
-            expand = 1f + p * 0.5f;
+    private void drawFlashAndShockwave(Canvas c, long ms, float m) {
+        if (ms < FLASH_S || ms > GLOW_E) return;
+
+        float hitP = cl(ms, FLASH_S, FLASH_E);
+        if (hitP > 0 && hitP < 1f) {
+            float expand = decI.getInterpolation(hitP);
+            float a = ms < FLASH_PEAK ? cl(ms, FLASH_S, FLASH_PEAK) : 1f - cl(ms, FLASH_PEAK, FLASH_E);
+            
+            // Center ring shockwave
+            ringPnt.setColor(Color.WHITE);
+            ringPnt.setAlpha((int) (a * m * 200));
+            ringPnt.setStrokeWidth(5f * (1f - expand));
+            c.drawCircle(finalPlaneX, finalPlaneY, ls * 0.5f + expand * ls * 3f, ringPnt);
+
+            // Bright center blast
+            float r = ls * (0.8f + expand * 2.5f);
+            RadialGradient fg = new RadialGradient(finalPlaneX, finalPlaneY, Math.max(r, 1f),
+                    new int[]{
+                            Color.argb((int) (a * m * 255), 255, 255, 255),
+                            Color.argb((int) (a * m * 150), 0, 229, 255),
+                            Color.argb(0, 13, 71, 161)
+                    },
+                    new float[]{0f, 0.4f, 1f}, Shader.TileMode.CLAMP);
+            flashPnt.setShader(fg);
+            c.drawCircle(finalPlaneX, finalPlaneY, r, flashPnt);
         }
-        a *= m;
-        float r = ls * (0.5f + expand * 4f);
 
-        RadialGradient fg = new RadialGradient(cx, cy, Math.max(r, 1f),
-                new int[]{
-                        Color.argb((int) (a * 255), 255, 255, 255),
-                        Color.argb((int) (a * 200), 0, 229, 255),
-                        Color.argb((int) (a * 100), 41, 121, 255),
-                        Color.argb(0, 13, 71, 161)
-                },
-                new float[]{0f, 0.2f, 0.5f, 1f}, Shader.TileMode.CLAMP);
-        flashPnt.setShader(fg);
-        c.drawCircle(cx, cy, r, flashPnt);
-    }
-
-    // ══════════════════════════════════════════
-    //  SHOCKWAVE RINGS
-    // ══════════════════════════════════════════
-    private void drawShockwaves(Canvas c, long ms, float m) {
-        for (int i = 0; i < 3; i++) {
-            long rs = FLASH_S + i * 120L;
-            long re = rs + 600L;
-            if (ms < rs || ms > re) continue;
-            float p = cl(ms, rs, re);
-            float r = ls * 0.3f + p * ls * 3f;
-            float a = (1f - p) * (1f - p) * m * 0.6f;
-            if (a < 0.005f) continue;
-            ringPnt.setAlpha((int) (a * 255));
-            ringPnt.setStrokeWidth(4f - p * 3f);
-            c.drawCircle(cx, cy, r, ringPnt);
+        // Ambient sustained glow post-impact
+        if (ms > GLOW_S) {
+            float gP = cl(ms, GLOW_S, GLOW_E);
+            float a = (1f - gP) * m * 0.4f; // fades out slowly
+            if (a > 0.01f) {
+                float pulse = 1f + 0.05f * (float) Math.sin(gP * Math.PI * 6);
+                float r = ls * 2.0f * pulse;
+                RadialGradient g = new RadialGradient(cx, cy, r,
+                        new int[]{
+                                Color.argb((int) (a * 255), 79, 195, 247),
+                                Color.argb(0, 13, 71, 161)
+                        },
+                        null, Shader.TileMode.CLAMP);
+                glowPnt.setShader(g);
+                c.drawCircle(cx, cy, r, glowPnt);
+            }
         }
-    }
-
-    // ══════════════════════════════════════════
-    //  ICON REVEAL
-    // ══════════════════════════════════════════
-    private void drawIcon(Canvas c, long ms, float m) {
-        if (ms < ICON_S || icon == null) return;
-        float p = cl(ms, ICON_S, ICON_E);
-        float a = decI.getInterpolation(p) * m;
-        float sc = overI.getInterpolation(Math.min(p * 1.05f, 1f));
-        if (a < 0.001f || sc < 0.001f) return;
-
-        float half = icoSz / 2f;
-        c.save();
-        c.translate(cx, cy);
-        c.scale(sc, sc);
-
-        // Icon shadow
-        aShadow.setAlpha((int) (a * 60));
-        c.drawRoundRect(-half + 3, -half + 6, half + 3, half + 6,
-                icoSz * 0.15f, icoSz * 0.15f, aShadow);
-
-        iconPnt.setAlpha((int) (a * 255));
-        c.drawBitmap(icon, -half, -half, iconPnt);
-        c.restore();
-    }
-
-    // ══════════════════════════════════════════
-    //  GLOW HALO — breaths behind icon
-    // ══════════════════════════════════════════
-    private void drawGlow(Canvas c, long ms, float m) {
-        if (ms < GLOW_S) return;
-        float p = cl(ms, GLOW_S, GLOW_E);
-        float fi = Math.min(p * 3f, 1f);
-        float pulse = 1f + 0.07f * (float) Math.sin(p * Math.PI * 6);
-        float r = icoSz * 0.75f * fi * pulse;
-        float a = fi * m * 0.55f;
-        if (a < 0.001f || r < 1f) return;
-
-        RadialGradient g = new RadialGradient(cx, cy, r,
-                new int[]{
-                        Color.argb((int) (a * 140), 79, 195, 247),
-                        Color.argb((int) (a * 50), 41, 121, 255),
-                        Color.argb(0, 13, 71, 161)
-                },
-                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
-        glowPnt.setShader(g);
-        c.drawCircle(cx, cy, r, glowPnt);
     }
 
     // ══════════════════════════════════════════
     //  SPARKLES
     // ══════════════════════════════════════════
     private void drawSparks(Canvas c, long ms, float m, float dt) {
-        // Burst at flash
-        if (ms >= FLASH_S && ms < FLASH_E + 300) {
+        if (ms >= FLASH_S && ms < FLASH_S + 200) {
             for (int i = 0; i < sparks.size(); i++) {
                 Spark sp = sparks.get(i);
-                if (!sp.alive && rng.nextFloat() < 0.30f)
-                    sp.spawnBurst(cx, cy, icoSz * 0.3f);
+                if (!sp.alive && rng.nextFloat() < 0.4f)
+                    sp.spawnBurst(finalPlaneX, finalPlaneY, ls * 0.5f);
             }
         }
 
@@ -662,24 +650,19 @@ public class AlexgramSplashView extends View {
             c.rotate(sp.rot);
             float r = sp.rad;
 
-            // 4-point star cross
             sparkPnt.setColor(Color.WHITE);
             sparkPnt.setAlpha((int) (a * 255));
-            c.drawRect(-r * 0.1f, -r, r * 0.1f, r, sparkPnt);
-            c.drawRect(-r, -r * 0.1f, r, r * 0.1f, sparkPnt);
+            c.drawRect(-r * 0.15f, -r, r * 0.15f, r, sparkPnt);
+            c.drawRect(-r, -r * 0.15f, r, r * 0.15f, sparkPnt);
 
-            // Outer glow
             sparkPnt.setColor(GLOW_IN);
-            sparkPnt.setAlpha((int) (a * 70));
-            c.drawCircle(0, 0, r * 2f, sparkPnt);
+            sparkPnt.setAlpha((int) (a * 100));
+            c.drawCircle(0, 0, r * 1.8f, sparkPnt);
 
             c.restore();
         }
     }
 
-    // ══════════════════════════════════════════
-    //  UTILITY
-    // ══════════════════════════════════════════
     private static float cl(long ms, long s, long e) {
         if (ms <= s) return 0f;
         if (ms >= e) return 1f;
@@ -689,20 +672,16 @@ public class AlexgramSplashView extends View {
     @Override protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ani != null) { ani.cancel(); ani = null; }
-        if (icon != null && !icon.isRecycled()) { icon.recycle(); icon = null; }
     }
 
     public void finishSplash() {
         if (ani != null) ani.cancel();
-        animate().alpha(0f).setDuration(200).withEndAction(() -> {
+        animate().alpha(0f).setDuration(150).withEndAction(() -> {
             ViewGroup par = (ViewGroup) getParent();
             if (par != null) par.removeView(AlexgramSplashView.this);
         }).start();
     }
 
-    // ══════════════════════════════════════════
-    //  SPARK PARTICLE
-    // ══════════════════════════════════════════
     private class Spark {
         float x, y, vx, vy, rad, alpha, rot, rs;
         float life, ml;
@@ -711,13 +690,13 @@ public class AlexgramSplashView extends View {
         void spawnTrail(float px, float py, float ang) {
             alive = true; x = px; y = py;
             float rd = (float) Math.toRadians(ang + 180);
-            float sp = 50f + rng.nextFloat() * 90f;
-            float sd = (rng.nextFloat() - 0.5f) * 1.2f;
+            float sp = 60f + rng.nextFloat() * 80f;
+            float sd = (rng.nextFloat() - 0.5f) * 1.5f;
             vx = (float) (Math.cos(rd + sd) * sp);
             vy = (float) (Math.sin(rd + sd) * sp);
-            rad = 2f + rng.nextFloat() * 5f;
-            ml = 0.3f + rng.nextFloat() * 0.5f;
-            life = 0f; alpha = 0.9f;
+            rad = 2.5f + rng.nextFloat() * 4.5f;
+            ml = 0.25f + rng.nextFloat() * 0.35f;
+            life = 0f; alpha = 1f;
             rot = rng.nextFloat() * 360f;
             rs = (rng.nextFloat() - 0.5f) * 300f;
         }
@@ -729,28 +708,14 @@ public class AlexgramSplashView extends View {
             float d = dist + rng.nextFloat() * dist * 1.5f;
             x = ox + (float) Math.cos(rd) * d;
             y = oy + (float) Math.sin(rd) * d;
-            float sp = 80f + rng.nextFloat() * 160f;
+            float sp = 120f + rng.nextFloat() * 200f;
             vx = (float) Math.cos(rd) * sp;
             vy = (float) Math.sin(rd) * sp;
-            rad = 3f + rng.nextFloat() * 8f;
-            ml = 0.5f + rng.nextFloat() * 0.9f;
+            rad = 3.5f + rng.nextFloat() * 10f;
+            ml = 0.4f + rng.nextFloat() * 0.6f;
             life = 0f; alpha = 1f;
             rot = rng.nextFloat() * 360f;
-            rs = (rng.nextFloat() - 0.5f) * 250f;
-        }
-
-        void spawnTiny(float px, float py) {
-            alive = true; x = px; y = py;
-            float a = rng.nextFloat() * 360f;
-            float rd = (float) Math.toRadians(a);
-            float sp = 30f + rng.nextFloat() * 60f;
-            vx = (float) Math.cos(rd) * sp;
-            vy = (float) Math.sin(rd) * sp;
-            rad = 1f + rng.nextFloat() * 3f;
-            ml = 0.2f + rng.nextFloat() * 0.3f;
-            life = 0f; alpha = 0.7f;
-            rot = rng.nextFloat() * 360f;
-            rs = (rng.nextFloat() - 0.5f) * 400f;
+            rs = (rng.nextFloat() - 0.5f) * 200f;
         }
 
         void update(float dt) {
@@ -758,37 +723,28 @@ public class AlexgramSplashView extends View {
             life += dt;
             if (life >= ml) { alive = false; return; }
             x += vx * dt; y += vy * dt;
-            vx *= 0.96f; vy *= 0.96f;
+            vx *= 0.95f; vy *= 0.95f;
             rot += rs * dt;
             float r = life / ml;
-            alpha = r < 0.1f ? (r / 0.1f) : (1f - (r - 0.1f) / 0.9f);
-            rad *= 0.997f;
+            alpha = 1f - r;
+            rad *= 0.99f;
         }
     }
 
-    // ══════════════════════════════════════════
-    //  AMBIENT DOT (floating background particle)
-    // ══════════════════════════════════════════
     private static class AmbientDot {
         float x, y, r, alpha, speed, angle;
-
         void init(int vw, int vh, Random rng) {
             x = rng.nextFloat() * vw;
             y = rng.nextFloat() * vh;
-            r = 1f + rng.nextFloat() * 2.5f;
-            alpha = 0.2f + rng.nextFloat() * 0.5f;
-            speed = 8f + rng.nextFloat() * 20f;
+            r = 1.5f + rng.nextFloat() * 3.0f;
+            alpha = 0.2f + rng.nextFloat() * 0.8f;
+            speed = 15f + rng.nextFloat() * 30f;
             angle = rng.nextFloat() * 360f;
         }
-
         void update(float dt) {
-            float rad = (float) Math.toRadians(angle);
-            x += Math.cos(rad) * speed * dt;
-            y += Math.sin(rad) * speed * dt;
-            angle += (Math.random() - 0.5) * 30 * dt;
-            // Gentle pulse
-            alpha += (float) (Math.sin(System.nanoTime() / 500_000_000.0) * 0.01);
-            alpha = Math.max(0.1f, Math.min(0.7f, alpha));
+            x += Math.cos(Math.toRadians(angle)) * speed * dt;
+            y += Math.sin(Math.toRadians(angle)) * speed * dt;
+            angle += (Math.random() - 0.5) * 50 * dt;
         }
     }
 }
