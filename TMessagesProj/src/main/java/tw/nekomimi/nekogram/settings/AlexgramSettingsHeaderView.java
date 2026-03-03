@@ -124,7 +124,7 @@ public class AlexgramSettingsHeaderView extends View {
                 new float[]{0f, 0.6f, 1f}, Shader.TileMode.CLAMP));
 
         // Dark Mode: Moon
-        moonX = vw * 0.87f; moonY = vh * 0.08f; moonR = vw * 0.035f;
+        moonX = vw * 0.85f; moonY = vh * 0.20f; moonR = vw * 0.05f; // Medium size, shifted down
         moonGlowShader = new RadialGradient(moonX, moonY, moonR * 6f,
                 new int[]{0x38FFFDE0, 0x18FFFFC8, 0x00FFFFB0},
                 new float[]{0f, 0.4f, 1f}, Shader.TileMode.CLAMP);
@@ -191,6 +191,41 @@ public class AlexgramSettingsHeaderView extends View {
             drawDarkTheme(c, dt, time);
         } else {
             drawLightTheme(c, dt, time);
+        }
+        
+        drawBeautifulFlowers(c, dt);
+    }
+
+    private final ArrayList<Petal> petals = new ArrayList<>();
+    private float petalTimer = 0f;
+    
+    // Draw magic floating cherry blossom petals at bottom (in both modes)
+    private void drawBeautifulFlowers(Canvas c, float dt) {
+        petalTimer += dt;
+        if (petalTimer > 0.15f && petals.size() < 40) {
+            petalTimer = 0f;
+            Petal p = new Petal();
+            p.init(vw, vh, rng, isDark);
+            petals.add(p);
+        }
+        
+        dotPaint.setShader(null);
+        for (int i = petals.size() - 1; i >= 0; i--) {
+            Petal p = petals.get(i);
+            p.update(dt);
+            if (p.dead) {
+                petals.remove(i);
+                continue;
+            }
+            
+            dotPaint.setColor(p.color);
+            c.save();
+            c.translate(p.x, p.y);
+            c.rotate(p.rotation);
+            c.scale(p.scaleX, p.scaleY);
+            c.drawCircle(0, 0, p.size, dotPaint);
+            c.drawCircle(p.size * 0.5f, p.size * 0.5f, p.size * 0.8f, dotPaint);
+            c.restore();
         }
     }
 
@@ -382,6 +417,53 @@ public class AlexgramSettingsHeaderView extends View {
             y += vy * dt;
             wingPhase += wingSpeed * dt;
             if (x < -100f) dead = true;
+        }
+    }
+    
+    // Floating Cherry Blossoms / Flowers for both day and night
+    private static class Petal {
+        float x, y, vx, vy, size, rotation, rotSpeed, scaleX, scaleY, swayPhase;
+        int color;
+        boolean dead = false;
+        
+        void init(int vw, int vh, Random rng, boolean isDark) {
+            x = rng.nextFloat() * vw;
+            y = vh * 0.6f + rng.nextFloat() * vh * 0.4f;
+            vx = 20f + rng.nextFloat() * 40f; // drift right
+            vy = 10f + rng.nextFloat() * 30f; // drift down slightly
+            size = 6f + rng.nextFloat() * 8f;
+            rotation = rng.nextFloat() * 360f;
+            rotSpeed = -40f + rng.nextFloat() * 80f; // spin speed
+            scaleX = 0.5f + rng.nextFloat() * 0.5f;
+            scaleY = 0.5f + rng.nextFloat() * 0.5f;
+            swayPhase = rng.nextFloat() * (float)Math.PI * 2f;
+            
+            // Soft pink cherry blossom colors
+            float cChoice = rng.nextFloat();
+            if (isDark) {
+                // Dimmer, glowing petals
+                if (cChoice < 0.33f) color = 0xAAFFB6C1; // Light pink
+                else if (cChoice < 0.66f) color = 0x80FFC0CB; // Pink
+                else color = 0x60FF69B4; // Hot pink deeper
+            } else {
+                // Brighter daylight petals
+                if (cChoice < 0.33f) color = 0xDDFFAAD4; // Vivid light pink
+                else if (cChoice < 0.66f) color = 0xBBFFC0CB; // Pink
+                else color = 0x90FF69B4; // Hot pink
+            }
+        }
+        
+        void update(float dt) {
+            swayPhase += dt * 2f;
+            x += vx * dt + (float)Math.sin(swayPhase) * 20f * dt;
+            y += vy * dt;
+            rotation += rotSpeed * dt;
+            
+            // 3D spinning leaf effect
+            scaleX = 0.7f + 0.3f * (float)Math.cos(swayPhase * 1.5f);
+            
+            // Die when off screen
+            if (x > 2000f || y > 3000f) dead = true;
         }
     }
 }

@@ -177,7 +177,8 @@ public class NekoSettingsActivity extends BaseFragment {
 
         LinearLayout contentLayout = new LinearLayout(context);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(88) + AndroidUtilities.statusBarHeight, AndroidUtilities.dp(16), AndroidUtilities.dp(32));
+        // Reduced top padding slightly to move the icon upwards
+        contentLayout.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(48) + AndroidUtilities.statusBarHeight, AndroidUtilities.dp(16), AndroidUtilities.dp(32));
         scrollView.addView(contentLayout, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // 4. Logo badge (smaller)
@@ -193,11 +194,17 @@ public class NekoSettingsActivity extends BaseFragment {
         circBg.setColor(isDark ? 0x30FFFFFF : 0x40FFFFFF);
         circBg.setStroke(AndroidUtilities.dp(1), isDark ? 0x40FFFFFF : 0x2A000000);
         iconCircle.setBackground(circBg);
+        
+        // Force children inside the circle to be clipped, solving the square icon bug
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            iconCircle.setClipToOutline(true);
+        }
 
         ImageView appIcon = new ImageView(context);
         appIcon.setImageResource(isDark ? R.drawable.ic_launcher_alexgram_neon : R.drawable.ic_launcher_alexgram_colored);
-        appIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        iconCircle.addView(appIcon, LayoutHelper.createFrame(40, 40, Gravity.CENTER));
+        // Use CENTER_CROP so the image goes to edges and is smoothly cut off by clipToOutline
+        appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        iconCircle.addView(appIcon, LayoutHelper.createFrame(56, 56, Gravity.CENTER)); // Enlarge the icon slightly within the mask
 
         logoBadge.addView(iconCircle, LayoutHelper.createLinear(56, 56, Gravity.CENTER));
 
