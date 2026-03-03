@@ -27,14 +27,52 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.LaunchActivity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.radolyn.ayugram.messages.AyuSavePreferences;
 import com.radolyn.ayugram.utils.AyuGhostPreferences;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import org.telegram.messenger.SendMessagesHelper;
+import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.BasePermissionsActivity;
+import org.telegram.ui.DocumentSelectActivity;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+
+import kotlin.text.StringsKt;
+
+import tw.nekomimi.nekogram.DialogConfig;
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.helpers.AppRestartHelper;
+import tw.nekomimi.nekogram.helpers.LocalNameHelper;
 import tw.nekomimi.nekogram.ui.AlexgramSplashView;
 import tw.nekomimi.nekogram.utils.AlertUtil;
+import tw.nekomimi.nekogram.utils.FileUtil;
+import tw.nekomimi.nekogram.utils.GsonUtil;
+import tw.nekomimi.nekogram.utils.ShareUtil;
 import xyz.nextalone.nagram.NaConfig;
+import xyz.nextalone.nagram.helper.BookmarksHelper;
+import xyz.nextalone.nagram.helper.LocalPeerColorHelper;
+import xyz.nextalone.nagram.helper.LocalPremiumStatusHelper;
 
 public class NekoSettingsActivity extends BaseFragment {
 
@@ -133,8 +171,15 @@ public class NekoSettingsActivity extends BaseFragment {
         }));
         advCard.addView(createDivider(context));
 
-        advCard.addView(createSettingItem(context, "Backup & Import", "Save or Restore Settings", R.drawable.msg_cloud, 0xFF0288D1, v -> {
-            // Handle backup action
+        advCard.addView(createSettingItem(context, "Backup & Import", "Save or Restore Settings", R.drawable.msg_photo_settings_solar, 0xFF0288D1, v -> {
+            if (Build.VERSION.SDK_INT >= 33) {
+                openFilePicker();
+            } else {
+                DocumentSelectActivity activity = getDocumentSelectActivity(getParentActivity());
+                if (activity != null) {
+                    presentFragment(activity);
+                }
+            }
         }));
         advCard.addView(createDivider(context));
 
@@ -166,25 +211,25 @@ public class NekoSettingsActivity extends BaseFragment {
         LinearLayout qsCard = createCard(context);
 
         qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts list", R.drawable.msg_contact, 0xFF00796B, 
-                NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
+                NaConfig.INSTANCE.getHideContacts().Bool(), (buttonView, isChecked) -> {
                     NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
                 }));
         qsCard.addView(createDivider(context));
 
         qsCard.addView(createSwitchItem(context, "Ghost Mode", "Read silently", R.drawable.msg_secret, 0xFF455A64, 
-                NekoConfig.isGhostModeActive(), isChecked -> {
+                NekoConfig.isGhostModeActive(), (buttonView, isChecked) -> {
                     NekoConfig.setGhostMode(isChecked);
                 }));
         qsCard.addView(createDivider(context));
 
-        qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_music, 0xFFD32F2F, 
-                NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
+        qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFD32F2F, 
+                NaConfig.INSTANCE.getMusicGraph().Bool(), (buttonView, isChecked) -> {
                     NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
                 }));
         qsCard.addView(createDivider(context));
 
         qsCard.addView(createSwitchItem(context, "Save Deleted", "Save deleted messages", R.drawable.msg_delete, 0xFFC2185B, 
-                NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), isChecked -> {
+                NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), (buttonView, isChecked) -> {
                     NaConfig.INSTANCE.getEnableSaveDeletedMessages().setConfigBool(isChecked);
                 }));
 
@@ -197,10 +242,20 @@ public class NekoSettingsActivity extends BaseFragment {
         othersRow.setOrientation(LinearLayout.HORIZONTAL);
 
         othersRow.addView(createBigButton(context, "Export", R.drawable.msg_shareout, v -> {
-            
+            backupSettings();
         }), LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1f));
         othersRow.addView(createBigButton(context, "Reset", R.drawable.msg_reset, v -> {
-            
+            AlertUtil.showConfirm(getParentActivity(),
+                    LocaleController.getString(R.string.ResetSettingsAlert),
+                    R.drawable.msg_reset,
+                    LocaleController.getString(R.string.Reset),
+                    true,
+                    () -> {
+                        ApplicationLoader.applicationContext.getSharedPreferences("nekocloud", Activity.MODE_PRIVATE).edit().clear().commit();
+                        ApplicationLoader.applicationContext.getSharedPreferences("nekox_config", Activity.MODE_PRIVATE).edit().clear().commit();
+                        NekoConfig.getPreferences().edit().clear().commit();
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
         }), LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1f));
         othersRow.addView(createBigButton(context, "Restart", R.drawable.msg_retry, v -> {
             AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
@@ -302,7 +357,7 @@ public class NekoSettingsActivity extends BaseFragment {
         // Right arrow
         FrameLayout rightContainer = new FrameLayout(context);
         ImageView arrow = new ImageView(context);
-        arrow.setImageResource(R.drawable.arrow_right);
+        arrow.setImageResource(R.drawable.arrow_more_solar);
         arrow.setColorFilter(TEXT_SUB);
         rightContainer.addView(arrow, LayoutHelper.createFrame(24, 24, Gravity.CENTER_VERTICAL | Gravity.RIGHT));
 
@@ -409,4 +464,313 @@ public class NekoSettingsActivity extends BaseFragment {
         return box;
     }
 
+    private void backupSettings() {
+        Context context = getParentActivity();
+        if (context == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(LocaleController.getString(R.string.BackupSettings));
+
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+        org.telegram.ui.Cells.CheckBoxCell checkBoxCell = new org.telegram.ui.Cells.CheckBoxCell(context, org.telegram.ui.Cells.CheckBoxCell.TYPE_CHECK_BOX_DEFAULT, resourceProvider);
+        checkBoxCell.setBackground(Theme.getSelectorDrawable(false));
+        checkBoxCell.setText(LocaleController.getString(R.string.ExportSettingsIncludeApiKeys), "", true, false);
+        checkBoxCell.setPadding(LocaleController.isRTL ? AndroidUtilities.dp(16) : AndroidUtilities.dp(8), 0, LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(16), 0);
+        checkBoxCell.setChecked(true, false);
+        checkBoxCell.setOnClickListener(v -> {
+            org.telegram.ui.Cells.CheckBoxCell cell = (org.telegram.ui.Cells.CheckBoxCell) v;
+            cell.setChecked(!cell.isChecked(), true);
+        });
+        linearLayout.addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+
+        builder.setView(linearLayout);
+        builder.setPositiveButton(LocaleController.getString(R.string.ExportTheme), (dialog, which) -> {
+            boolean includeApiKeys = checkBoxCell.isChecked();
+            try {
+                File cacheFile = new File(AndroidUtilities.getCacheDir(), new Date().toLocaleString() + ".nekox-settings.json");
+                FileUtil.writeUtf8String(backupSettingsJson(false, 4, includeApiKeys), cacheFile);
+                ShareUtil.shareFile(getParentActivity(), cacheFile);
+            } catch (JSONException e) {
+                AlertUtil.showSimpleAlert(getParentActivity(), e);
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    public static String backupSettingsJson(boolean isCloud, int indentSpaces) throws JSONException {
+        return backupSettingsJson(isCloud, indentSpaces, true);
+    }
+
+    public static String backupSettingsJson(boolean isCloud, int indentSpaces, boolean includeApiKeys) throws JSONException {
+        JSONObject configJson = new JSONObject();
+
+        ArrayList<String> userconfig = new ArrayList<>();
+        userconfig.add("saveIncomingPhotos");
+        userconfig.add("passcodeHash");
+        userconfig.add("passcodeType");
+        userconfig.add("passcodeHash");
+        userconfig.add("autoLockIn");
+        userconfig.add("useFingerprint");
+        spToJSON("userconfing", configJson, userconfig::contains, isCloud);
+
+        ArrayList<String> mainconfig = new ArrayList<>();
+        mainconfig.add("saveToGallery");
+        mainconfig.add("autoplayGifs");
+        mainconfig.add("autoplayVideo");
+        mainconfig.add("mapPreviewType");
+        mainconfig.add("raiseToSpeak");
+        mainconfig.add("customTabs");
+        mainconfig.add("directShare");
+        mainconfig.add("shuffleMusic");
+        mainconfig.add("playOrderReversed");
+        mainconfig.add("inappCamera");
+        mainconfig.add("repeatMode");
+        mainconfig.add("fontSize");
+        mainconfig.add("bubbleRadius");
+        mainconfig.add("ivFontSize");
+        mainconfig.add("allowBigEmoji");
+        mainconfig.add("streamMedia");
+        mainconfig.add("saveStreamMedia");
+        mainconfig.add("smoothKeyboard");
+        mainconfig.add("pauseMusicOnRecord");
+        mainconfig.add("streamAllVideo");
+        mainconfig.add("streamMkv");
+        mainconfig.add("suggestStickers");
+        mainconfig.add("sortContactsByName");
+        mainconfig.add("sortFilesByName");
+        mainconfig.add("noSoundHintShowed");
+        mainconfig.add("directShareHash");
+        mainconfig.add("useThreeLinesLayout");
+        mainconfig.add("archiveHidden");
+        mainconfig.add("distanceSystemType");
+        mainconfig.add("loopStickers");
+        mainconfig.add("keepMedia");
+        mainconfig.add("noStatusBar");
+        mainconfig.add("lastKeepMediaCheckTime");
+        mainconfig.add("searchMessagesAsListHintShows");
+        mainconfig.add("searchMessagesAsListUsed");
+        mainconfig.add("stickersReorderingHintUsed");
+        mainconfig.add("textSelectionHintShows");
+        mainconfig.add("scheduledOrNoSoundHintShows");
+        mainconfig.add("lockRecordAudioVideoHint");
+        mainconfig.add("disableVoiceAudioEffects");
+        mainconfig.add("chatSwipeAction");
+
+        if (!isCloud) mainconfig.add("theme");
+        mainconfig.add("selectedAutoNightType");
+        mainconfig.add("autoNightScheduleByLocation");
+        mainconfig.add("autoNightBrighnessThreshold");
+        mainconfig.add("autoNightDayStartTime");
+        mainconfig.add("autoNightDayEndTime");
+        mainconfig.add("autoNightSunriseTime");
+        mainconfig.add("autoNightCityName");
+        mainconfig.add("autoNightSunsetTime");
+        mainconfig.add("autoNightLocationLatitude3");
+        mainconfig.add("autoNightLocationLongitude3");
+        mainconfig.add("autoNightLastSunCheckDay");
+        mainconfig.add("lang_code");
+        mainconfig.add("web_restricted_domains2");
+
+        spToJSON("mainconfig", configJson, mainconfig::contains);
+        if (!isCloud) spToJSON("themeconfig", configJson, null);
+        spToJSON("nkmrcfg", configJson, null, includeApiKeys);
+
+        return configJson.toString(indentSpaces);
+    }
+
+    private static void spToJSON(String sp, JSONObject object, Function<String, Boolean> filter) throws JSONException {
+        spToJSON(sp, object, filter, true);
+    }
+
+    private static void spToJSON(String sp, JSONObject object, Function<String, Boolean> filter, boolean includeApiKeys) throws JSONException {
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences(sp, Activity.MODE_PRIVATE);
+        JSONObject jsonConfig = new JSONObject();
+        for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            String key = entry.getKey();
+            if (!includeApiKeys && (key.endsWith("Key") || key.contains("Token") || key.contains("AccountID"))) {
+                continue;
+            }
+            if (filter != null && !filter.apply(key)) {
+                continue;
+            }
+            if (entry.getValue() instanceof Long) {
+                key = key + "_long";
+            } else if (entry.getValue() instanceof Float) {
+                key = key + "_float";
+            }
+            jsonConfig.put(key, entry.getValue());
+        }
+        object.put(sp, jsonConfig);
+    }
+
+    private DocumentSelectActivity getDocumentSelectActivity(Activity parent) {
+        try {
+            if (parent.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                parent.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, BasePermissionsActivity.REQUEST_CODE_EXTERNAL_STORAGE);
+                return null;
+            }
+        } catch (Throwable ignore) {
+        }
+        DocumentSelectActivity fragment = new DocumentSelectActivity(false);
+        fragment.setMaxSelectedFiles(1);
+        fragment.setAllowPhoto(false);
+        fragment.setDelegate(new DocumentSelectActivity.DocumentSelectActivityDelegate() {
+            @Override
+            public void didSelectFiles(DocumentSelectActivity activity, ArrayList<String> files, String caption, boolean notify, int scheduleDate) {
+                activity.finishFragment();
+                importSettings(parent, new File(files.get(0)));
+            }
+
+            @Override
+            public void didSelectPhotos(ArrayList<SendMessagesHelper.SendingMediaInfo> photos, boolean notify, int scheduleDate) {
+            }
+
+            @Override
+            public void startDocumentSelectActivity() {
+            }
+        });
+        return fragment;
+    }
+
+    public static void importSettings(Context context, File settingsFile) {
+        AlertUtil.showConfirm(context,
+                LocaleController.getString(R.string.ImportSettingsAlert),
+                R.drawable.msg_photo_settings_solar,
+                LocaleController.getString(R.string.Import),
+                true,
+                () -> importSettingsConfirmed(context, settingsFile));
+    }
+
+    public static void importSettingsConfirmed(Context context, File settingsFile) {
+        try {
+            JsonObject configJson = GsonUtil.toJsonObject(FileUtil.readUtf8String(settingsFile));
+            importSettings(configJson);
+
+            AlertDialog restart = new AlertDialog(context, 0);
+            restart.setTitle(LocaleController.getString(R.string.NagramX));
+            restart.setMessage(LocaleController.getString(R.string.RestartAppToTakeEffect));
+            restart.setPositiveButton(LocaleController.getString(R.string.OK), (__, ___) -> AppRestartHelper.triggerRebirth(context, new Intent(context, LaunchActivity.class)));
+            restart.show();
+        } catch (Exception e) {
+            AlertUtil.showSimpleAlert(context, e);
+        }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void importSettings(JsonObject configJson) throws JSONException {
+        Set<String> allowedKeys = new HashSet<>();
+        try {
+            allowedKeys.addAll(NekoConfig.getAllKeys());
+            allowedKeys.addAll(NaConfig.INSTANCE.getAllKeys());
+        } catch (Throwable ignore) {
+        }
+        String[] preservePrefixes = {
+                AyuGhostPreferences.ghostReadExclusionPrefix,
+                AyuGhostPreferences.ghostTypingExclusionPrefix,
+                AyuSavePreferences.saveExclusionPrefix,
+                LocalNameHelper.chatNameOverridePrefix,
+                LocalNameHelper.userNameOverridePrefix,
+                DialogConfig.customForumTabPrefix,
+                LocalPeerColorHelper.KEY_PREFIX,
+                LocalPremiumStatusHelper.KEY_PREFIX,
+                BookmarksHelper.KEY_PREFIX
+        };
+
+        for (Map.Entry<String, JsonElement> element : configJson.entrySet()) {
+            String spName = element.getKey();
+            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences(spName, Activity.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            for (Map.Entry<String, JsonElement> config : ((JsonObject) element.getValue()).entrySet()) {
+                String key = config.getKey();
+                JsonPrimitive value = (JsonPrimitive) config.getValue();
+                if ("nkmrcfg".equals(spName)) {
+                    boolean shouldSkip = true;
+                    for (String prefix : preservePrefixes) {
+                        if (key.startsWith(prefix)) {
+                            shouldSkip = false;
+                            break;
+                        }
+                    }
+                    if (shouldSkip) {
+                        String actualKey = key;
+                        if (key.endsWith("_long")) {
+                            actualKey = StringsKt.substringBeforeLast(key, "_long", key);
+                        } else if (key.endsWith("_float")) {
+                            actualKey = StringsKt.substringBeforeLast(key, "_float", key);
+                        }
+                        shouldSkip = !allowedKeys.contains(actualKey);
+                    }
+                    if (shouldSkip) {
+                        continue;
+                    }
+                }
+                if (value.isBoolean()) {
+                    editor.putBoolean(key, value.getAsBoolean());
+                } else if (value.isNumber()) {
+                    boolean isLong = false;
+                    boolean isFloat = false;
+                    if (key.endsWith("_long")) {
+                        key = StringsKt.substringBeforeLast(key, "_long", key);
+                        isLong = true;
+                    } else if (key.endsWith("_float")) {
+                        key = StringsKt.substringBeforeLast(key, "_float", key);
+                        isFloat = true;
+                    }
+                    if (isLong) {
+                        editor.putLong(key, value.getAsLong());
+                    } else if (isFloat) {
+                        editor.putFloat(key, value.getAsFloat());
+                    } else {
+                        editor.putInt(key, value.getAsInt());
+                    }
+                } else {
+                    editor.putString(key, value.getAsString());
+                }
+            }
+            editor.commit();
+        }
+    }
+
+    private void openFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/json");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        try {
+            startActivityForResult(intent, 21);
+        } catch (android.content.ActivityNotFoundException ex) {
+            AlertUtil.showSimpleAlert(getParentActivity(), ex);
+        }
+    }
+
+    @Override
+    public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 21 && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                File cacheDir = AndroidUtilities.getCacheDir();
+                String tempFile = UUID.randomUUID().toString().replace("-", "") + ".nekox-settings.json";
+                File file = new File(cacheDir.getPath(), tempFile);
+                try {
+                    final InputStream inputStream = ApplicationLoader.applicationContext.getContentResolver().openInputStream(uri);
+                    if (inputStream != null) {
+                        OutputStream outputStream = new FileOutputStream(file);
+                        final byte[] buffer = new byte[4 * 1024];
+                        int read;
+                        while ((read = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, read);
+                        }
+                        inputStream.close();
+                        outputStream.flush();
+                        outputStream.close();
+                        importSettings(getParentActivity(), file);
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+            super.onActivityResultFragment(requestCode, resultCode, data);
+        }
+    }
 }
