@@ -169,7 +169,9 @@ public class NekoSettingsActivity extends BaseFragment {
         ScrollView scrollView = new ScrollView(context);
         scrollView.setVerticalScrollBarEnabled(false);
         scrollView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        scrollView.setClipToPadding(false);
+        // Clip to padding so scrolling content cleanly disappears behind the transparent ActionBar!
+        scrollView.setClipToPadding(true);
+        scrollView.setPadding(0, AndroidUtilities.dp(56) + AndroidUtilities.statusBarHeight, 0, 0);
         parentFrame.addView(scrollView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
         // 3. Add ActionBar ON TOP of everything
@@ -177,8 +179,7 @@ public class NekoSettingsActivity extends BaseFragment {
 
         LinearLayout contentLayout = new LinearLayout(context);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        // Reduced top padding slightly to move the icon upwards
-        contentLayout.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(48) + AndroidUtilities.statusBarHeight, AndroidUtilities.dp(16), AndroidUtilities.dp(32));
+        contentLayout.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), AndroidUtilities.dp(32));
         scrollView.addView(contentLayout, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // 4. Logo badge (smaller)
@@ -201,7 +202,7 @@ public class NekoSettingsActivity extends BaseFragment {
         }
 
         ImageView appIcon = new ImageView(context);
-        appIcon.setImageResource(R.drawable.ic_launcher_dr);
+        appIcon.setImageResource(isDark ? R.drawable.ic_launcher_alexgram_neon : R.drawable.ic_launcher_alexgram_blue);
         // Use CENTER_CROP so the image goes to edges and is smoothly cut off by clipToOutline
         appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
         iconCircle.addView(appIcon, LayoutHelper.createFrame(56, 56, Gravity.CENTER)); // Enlarge the icon slightly within the mask

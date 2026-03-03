@@ -345,6 +345,14 @@ public class AlexgramSettingsHeaderView extends View {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (ok && ani == null) {
+            go();
+        }
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ani != null) { ani.cancel(); ani = null; }
