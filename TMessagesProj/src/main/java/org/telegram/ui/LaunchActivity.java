@@ -260,6 +260,7 @@ import tw.nekomimi.nekogram.utils.AndroidUtil;
 import tw.nekomimi.nekogram.utils.ProxyUtil;
 import xyz.nextalone.nagram.NaConfig;
 import tw.nekomimi.nekogram.ui.icons.IconsResources;
+import tw.nekomimi.nekogram.ui.AlexgramSplashView;
 
 public class LaunchActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, IPipActivity {
     public final static String EXTRA_FORCE_NOT_INTERNAL_APPS = "force_not_internal_apps";
@@ -847,6 +848,27 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         //    refreshRateController = new RefreshRateController(this);
         //}
         checkFrameMetrics();
+
+        // ── Alexgram premium splash animation ──
+        if (savedInstanceState == null) {
+            AlexgramSplashView splashView = new AlexgramSplashView(this);
+            frameLayout.addView(splashView, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+            ));
+            splashView.bringToFront();
+            splashView.setOnFinishedCallback(() -> {
+                splashView.animate()
+                        .alpha(0f)
+                        .setDuration(250)
+                        .withEndAction(() -> {
+                            if (splashView.getParent() != null) {
+                                frameLayout.removeView(splashView);
+                            }
+                        })
+                        .start();
+            });
+        }
     }
 
     public void checkFrameMetrics() {
