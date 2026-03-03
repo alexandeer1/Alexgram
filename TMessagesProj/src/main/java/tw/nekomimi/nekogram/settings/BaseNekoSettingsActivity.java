@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
@@ -294,7 +295,8 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, 0, 0, bottom);
+        int topPadding = ActionBar.getCurrentActionBarHeight() + top;
+        listView.setPadding(0, topPadding, 0, bottom);
         listView.setClipToPadding(false);
     }
 
@@ -372,11 +374,11 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     break;
                 case TYPE_SETTINGS:
                     view = new TextSettingsCell(mContext, resourcesProvider);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_CHECK:
                     view = new TextCheckCell(mContext, resourcesProvider);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_HEADER:
                     view = new HeaderCell(mContext, resourcesProvider);
@@ -384,11 +386,11 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     break;
                 case TYPE_NOTIFICATION_CHECK:
                     view = new NotificationsCheckCell(mContext, resourcesProvider);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_DETAIL_SETTINGS:
                     view = new TextDetailSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_INFO_PRIVACY:
                     view = new TextInfoPrivacyCell(mContext, resourcesProvider);
@@ -396,38 +398,38 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     break;
                 case TYPE_TEXT:
                     view = new TextCell(mContext, resourcesProvider);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_CHECKBOX:
                     view = new TextCheckbox2Cell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_RADIO:
                     view = new TextRadioCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_ACCOUNT:
                     view = new AccountCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_EMOJI:
                 case TYPE_EMOJI_SELECTION:
                     view = new EmojiSetCell(mContext, viewType == TYPE_EMOJI_SELECTION);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_CREATION:
                     CreationTextCell creationTextCell = new CreationTextCell(mContext, 70, resourcesProvider);
                     creationTextCell.startPadding = 61;
                     view = creationTextCell;
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_FLICKER:
                     view = new FlickerLoadingView(mContext, resourcesProvider);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_CHECK2:
                     view = new TextCheckCell2(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case TYPE_CHECKBOX2:
                     CheckBoxCell checkBoxCell = new CheckBoxCell(mContext, CheckBoxCell.TYPE_CHECK_BOX_ROUND, 21, getResourceProvider());
@@ -435,12 +437,25 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     checkBoxCell.getCheckBoxRound().setColor(Theme.key_switch2TrackChecked, Theme.key_radioBackground, Theme.key_checkboxCheck);
                     checkBoxCell.setEnabled(true);
                     view = checkBoxCell;
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
             }
             // noinspection ConstantConditions
-            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+            if (viewType != TYPE_SHADOW && viewType != TYPE_INFO_PRIVACY) {
+                lp.setMargins(dp(12), dp(2), dp(12), dp(2));
+            }
+            view.setLayoutParams(lp);
             return new RecyclerListView.Holder(view);
+        }
+
+        private GradientDrawable createGlassDrawable() {
+            boolean isDark = Theme.getActiveTheme().isDark();
+            GradientDrawable gd = new GradientDrawable();
+            gd.setCornerRadius(dp(12));
+            gd.setColor(isDark ? 0x30FFFFFF : 0x55FFFFFF);
+            gd.setStroke(dp(1), isDark ? 0x15FFFFFF : 0x25FFFFFF);
+            return gd;
         }
     }
 

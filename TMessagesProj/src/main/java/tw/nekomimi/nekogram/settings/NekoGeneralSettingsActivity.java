@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.text.TextPaint;
@@ -617,11 +618,11 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL:
                     view = new TextSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_CHECK:
                     view = new TextCheckCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case CellGroup.ITEM_TYPE_HEADER:
                     view = new HeaderCell(mContext);
@@ -629,7 +630,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_DETAIL:
                     view = new TextDetailSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case CellGroup.ITEM_TYPE_TEXT:
                     view = new TextInfoPrivacyCell(mContext);
@@ -638,16 +639,29 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
                 case ConfigCellCustom.CUSTOM_ITEM_CharBlurAlpha:
                     view = chatBlurAlphaSeekbar = new ChatBlurAlphaSeekBar(mContext);
                     chatBlurAlphaSeekbar.setEnabled(NekoConfig.forceBlurInChat.Bool());
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON:
                     view = new TextCell(mContext);
-                    view.setBackgroundColor(Theme.getActiveTheme().isDark() ? 0x60000000 : 0x40FFFFFF);
+                    view.setBackground(createGlassDrawable());
                     break;
             }
             // noinspection ConstantConditions
-            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+            if (viewType != CellGroup.ITEM_TYPE_DIVIDER && viewType != CellGroup.ITEM_TYPE_TEXT) {
+                lp.setMargins(dp(12), dp(2), dp(12), dp(2));
+            }
+            view.setLayoutParams(lp);
             return new RecyclerListView.Holder(view);
+        }
+
+        private GradientDrawable createGlassDrawable() {
+            boolean isDark = Theme.getActiveTheme().isDark();
+            GradientDrawable gd = new GradientDrawable();
+            gd.setCornerRadius(dp(12));
+            gd.setColor(isDark ? 0x30FFFFFF : 0x55FFFFFF);
+            gd.setStroke(dp(1), isDark ? 0x15FFFFFF : 0x25FFFFFF);
+            return gd;
         }
     }
 
