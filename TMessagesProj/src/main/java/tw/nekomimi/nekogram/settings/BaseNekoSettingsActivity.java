@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
@@ -151,6 +150,9 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         });
 
         listView.setSections(true);
+        listView.addItemDecoration(new GlassGroupDecoration(
+            viewType -> viewType == TYPE_SHADOW || viewType == TYPE_INFO_PRIVACY
+        ));
         actionBar.setAdaptiveBackground(listView);
 
         actionBar.setAddToContainer(false);
@@ -374,11 +376,11 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     break;
                 case TYPE_SETTINGS:
                     view = new TextSettingsCell(mContext, resourcesProvider);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_CHECK:
                     view = new TextCheckCell(mContext, resourcesProvider);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_HEADER:
                     view = new HeaderCell(mContext, resourcesProvider);
@@ -386,50 +388,50 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     break;
                 case TYPE_NOTIFICATION_CHECK:
                     view = new NotificationsCheckCell(mContext, resourcesProvider);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_DETAIL_SETTINGS:
                     view = new TextDetailSettingsCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_INFO_PRIVACY:
                     view = new TextInfoPrivacyCell(mContext, resourcesProvider);
-                    view.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, getThemedColor(Theme.key_windowBackgroundGrayShadow)));
+                    view.setBackground(null);
                     break;
                 case TYPE_TEXT:
                     view = new TextCell(mContext, resourcesProvider);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_CHECKBOX:
                     view = new TextCheckbox2Cell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_RADIO:
                     view = new TextRadioCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_ACCOUNT:
                     view = new AccountCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_EMOJI:
                 case TYPE_EMOJI_SELECTION:
                     view = new EmojiSetCell(mContext, viewType == TYPE_EMOJI_SELECTION);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_CREATION:
                     CreationTextCell creationTextCell = new CreationTextCell(mContext, 70, resourcesProvider);
                     creationTextCell.startPadding = 61;
                     view = creationTextCell;
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_FLICKER:
                     view = new FlickerLoadingView(mContext, resourcesProvider);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_CHECK2:
                     view = new TextCheckCell2(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case TYPE_CHECKBOX2:
                     CheckBoxCell checkBoxCell = new CheckBoxCell(mContext, CheckBoxCell.TYPE_CHECK_BOX_ROUND, 21, getResourceProvider());
@@ -437,25 +439,12 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     checkBoxCell.getCheckBoxRound().setColor(Theme.key_switch2TrackChecked, Theme.key_radioBackground, Theme.key_checkboxCheck);
                     checkBoxCell.setEnabled(true);
                     view = checkBoxCell;
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
             }
             // noinspection ConstantConditions
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
-            if (viewType != TYPE_SHADOW && viewType != TYPE_INFO_PRIVACY) {
-                lp.setMargins(dp(12), dp(2), dp(12), dp(2));
-            }
-            view.setLayoutParams(lp);
+            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
             return new RecyclerListView.Holder(view);
-        }
-
-        private GradientDrawable createGlassDrawable() {
-            boolean isDark = Theme.getActiveTheme().isDark();
-            GradientDrawable gd = new GradientDrawable();
-            gd.setCornerRadius(dp(12));
-            gd.setColor(isDark ? 0x30FFFFFF : 0x55FFFFFF);
-            gd.setStroke(dp(1), isDark ? 0x15FFFFFF : 0x25FFFFFF);
-            return gd;
         }
     }
 

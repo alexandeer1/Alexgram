@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -608,11 +607,11 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL:
                     view = new TextSettingsCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_CHECK:
                     view = new TextCheckCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case CellGroup.ITEM_TYPE_HEADER:
                     view = new HeaderCell(mContext);
@@ -620,32 +619,19 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_DETAIL:
                     view = new TextDetailSettingsCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case CellGroup.ITEM_TYPE_TEXT:
                     view = new TextInfoPrivacyCell(mContext);
                     break;
                 case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON:
                     view = new TextCell(mContext);
-                    view.setBackground(createGlassDrawable());
+                    view.setBackgroundColor(Color.TRANSPARENT);
                     break;
             }
             //noinspection ConstantConditions
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
-            if (viewType != CellGroup.ITEM_TYPE_DIVIDER && viewType != CellGroup.ITEM_TYPE_TEXT) {
-                lp.setMargins(AndroidUtilities.dp(12), AndroidUtilities.dp(2), AndroidUtilities.dp(12), AndroidUtilities.dp(2));
-            }
-            view.setLayoutParams(lp);
+            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
             return new RecyclerListView.Holder(view);
-        }
-
-        private GradientDrawable createGlassDrawable() {
-            boolean isDark = Theme.getActiveTheme().isDark();
-            GradientDrawable gd = new GradientDrawable();
-            gd.setCornerRadius(AndroidUtilities.dp(12));
-            gd.setColor(isDark ? 0x30FFFFFF : 0x55FFFFFF);
-            gd.setStroke(AndroidUtilities.dp(1), isDark ? 0x15FFFFFF : 0x25FFFFFF);
-            return gd;
         }
     }
 

@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import tw.nekomimi.nekogram.ui.cells.CellGroup;
+
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -170,6 +172,9 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         frameLayout.addView(tooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
 
         listView.setSections(true);
+        listView.addItemDecoration(new GlassGroupDecoration(
+            viewType -> viewType == CellGroup.ITEM_TYPE_DIVIDER || viewType == CellGroup.ITEM_TYPE_TEXT
+        ));
         actionBar.setAdaptiveBackground(listView);
         
         // Ensure ActionBar doesn't draw a solid block over the background, matching A-Settings
