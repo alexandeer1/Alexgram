@@ -153,6 +153,7 @@ public class NekoSettingsActivity extends BaseFragment {
         });
 
         // Transparent action bar
+        actionBar.setAddToContainer(false); // Fix: Prevent adding to default container (which causes the black bar)
         actionBar.setBackgroundColor(Color.TRANSPARENT);
         int abColor = isDark ? Color.WHITE : 0xFF1A1A2E;
         actionBar.setItemsColor(abColor, false);
@@ -171,12 +172,15 @@ public class NekoSettingsActivity extends BaseFragment {
         scrollView.setClipToPadding(false);
         parentFrame.addView(scrollView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
+        // 3. Add ActionBar ON TOP of everything
+        parentFrame.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
         LinearLayout contentLayout = new LinearLayout(context);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(88), AndroidUtilities.dp(16), AndroidUtilities.dp(32));
+        contentLayout.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(88) + AndroidUtilities.statusBarHeight, AndroidUtilities.dp(16), AndroidUtilities.dp(32));
         scrollView.addView(contentLayout, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        // 3. Logo badge (smaller)
+        // 4. Logo badge (smaller)
         LinearLayout logoBadge = new LinearLayout(context);
         logoBadge.setOrientation(LinearLayout.VERTICAL);
         logoBadge.setGravity(Gravity.CENTER);
@@ -191,7 +195,7 @@ public class NekoSettingsActivity extends BaseFragment {
         iconCircle.setBackground(circBg);
 
         ImageView appIcon = new ImageView(context);
-        appIcon.setImageResource(R.drawable.ic_launcher_dr);
+        appIcon.setImageResource(isDark ? R.drawable.ic_launcher_alexgram_neon : R.drawable.ic_launcher_alexgram_colored);
         appIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         iconCircle.addView(appIcon, LayoutHelper.createFrame(40, 40, Gravity.CENTER));
 

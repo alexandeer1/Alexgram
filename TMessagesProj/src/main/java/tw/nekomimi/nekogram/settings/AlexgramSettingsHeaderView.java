@@ -5,7 +5,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.view.View;
@@ -18,8 +20,7 @@ import java.util.Random;
 
 /**
  * Full-screen animated universe/sky background for A-Settings.
- * Dark mode: deep space with stars, nebulae, moon, shooting stars.
- * Light mode: soft gradient sky with drifting clouds and sun glow.
+ * Heavily optimized: no object allocation or shader creation in onDraw.
  */
 public class AlexgramSettingsHeaderView extends View {
 
@@ -27,26 +28,47 @@ public class AlexgramSettingsHeaderView extends View {
     private final Paint dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint glowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint shootPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint sunRayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private int vw, vh;
     private boolean isDark;
 
     private final ArrayList<Star> stars = new ArrayList<>();
     private final ArrayList<ShootingStar> shootingStars = new ArrayList<>();
+    private final ArrayList<Bird> birds = new ArrayList<>();
     private final Random rng = new Random();
 
     private ValueAnimator ani;
     private long lastNs = 0;
     private boolean ok = false;
     private float shootTimer = 0f;
+    private float birdTimer = 0f;
+
+    // Precomputed Shaders for Performance
+    private Shader sunGlowShader;
+    private Shader moonGlowShader;
+    private Shader moonBodyShader;
+    private Shader nebula1Shader, nebula2Shader, nebula3Shader;
+
+    // Cache locations
+    private float sunX, sunY, sunR;
+    private float moonX, moonY, moonR;
+    private float n1X, n1Y, n1R;
+    private float n2X, n2Y, n2R;
+    private float n3X, n3Y, n3R;
+
+    // Paths
+    private final Path sunRaysPath = new Path();
 
     public AlexgramSettingsHeaderView(Context context) {
         super(context);
+        // Using hardware layer speeds up rendering significantly
         setLayerType(LAYER_TYPE_HARDWARE, null);
         dotPaint.setStyle(Paint.Style.FILL);
         glowPaint.setStyle(Paint.Style.FILL);
         shootPaint.setStyle(Paint.Style.STROKE);
         shootPaint.setStrokeCap(Paint.Cap.ROUND);
+        sunRayPaint.setStyle(Paint.Style.FILL);
         isDark = Theme.getActiveTheme().isDark();
     }
 
@@ -56,14 +78,21 @@ public class AlexgramSettingsHeaderView extends View {
         if (w == 0 || h == 0) return;
         vw = w; vh = h;
         isDark = Theme.getActiveTheme().isDark();
+        
         buildBackground();
+        precomputeShaders();
+        buildSunRays();
 
         stars.clear();
-        int count = isDark ? 140 : 0;
-        for (int i = 0; i < count; i++) {
-            Star s = new Star();
-            s.init(vw, vh, rng);
-            stars.add(s);
+        shootingStars.clear();
+        birds.clear();
+        
+        if (isDark) {
+            for (int i = 0; i < 140; i++) {
+                Star s = new Star();
+                s.init(vw, vh, rng);
+                stars.add(s);
+            }
         }
 
         ok = true;
@@ -82,9 +111,63 @@ public class AlexgramSettingsHeaderView extends View {
         }
     }
 
+    private void precomputeShaders() {
+        // Light Mode: Sun
+        sunX = vw * 0.15f; sunY = vh * 0.05f; sunR = vw * 0.25f;
+        sunGlowShader = new RadialGradient(sunX, sunY, sunR,
+                new int[]{0x40FFD54F, 0x1AFFECB3, 0x00FFF8E1},
+                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
+        
+        sunRayPaint.setShader(new RadialGradient(sunX, sunY, sunR * 1.5f,
+                new int[]{0x25FFD54F, 0x05FFECB3, 0x00FFFFFF},
+                new float[]{0f, 0.6f, 1f}, Shader.TileMode.CLAMP));
+
+        // Dark Mode: Moon
+        moonX = vw * 0.87f; moonY = vh * 0.08f; moonR = vw * 0.035f;
+        moonGlowShader = new RadialGradient(moonX, moonY, moonR * 6f,
+                new int[]{0x38FFFDE0, 0x18FFFFC8, 0x00FFFFB0},
+                new float[]{0f, 0.4f, 1f}, Shader.TileMode.CLAMP);
+                
+        moonBodyShader = new RadialGradient(moonX - moonR*0.3f, moonY - moonR*0.3f, moonR,
+                new int[]{0xFFFFFDE8, 0xFFE8E0C8}, null, Shader.TileMode.CLAMP);
+
+        // Dark Mode: Nebulae
+        n1X = vw * 0.12f; n1Y = vh * 0.15f; n1R = vw * 0.45f;
+        nebula1Shader = createNebulaShader(n1X, n1Y, n1R, 0x18, 0x50, 0x30, 0xD0);
+        
+        n2X = vw * 0.78f; n2Y = vh * 0.08f; n2R = vw * 0.30f;
+        nebula2Shader = createNebulaShader(n2X, n2Y, n2R, 0x30, 0x18, 0x80, 0xB0);
+        
+        n3X = vw * 0.45f; n3Y = vh * 0.75f; n3R = vw * 0.50f;
+        nebula3Shader = createNebulaShader(n3X, n3Y, n3R, 0x10, 0x35, 0x55, 0x90);
+    }
+    
+    private Shader createNebulaShader(float nx, float ny, float nr, int r, int g, int b, int a) {
+        int ao = Math.max(0, Math.min(255, (int) (a * 0.12f)));
+        return new RadialGradient(nx, ny, nr,
+                new int[]{Color.argb(ao, r, g, b), Color.argb(ao / 3, r, g, b), Color.argb(0, r, g, b)},
+                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
+    }
+
+    private void buildSunRays() {
+        sunRaysPath.reset();
+        int rayCount = 12;
+        float innerRadius = sunR * 0.2f;
+        float outerRadius = sunR * 1.5f;
+        for (int i = 0; i < rayCount; i++) {
+            float angle1 = (float) (i * Math.PI * 2 / rayCount);
+            float angle2 = (float) ((i + 0.3f) * Math.PI * 2 / rayCount);
+            sunRaysPath.moveTo(sunX + (float)Math.cos(angle1) * innerRadius, sunY + (float)Math.sin(angle1) * innerRadius);
+            sunRaysPath.lineTo(sunX + (float)Math.cos(angle1) * outerRadius, sunY + (float)Math.sin(angle1) * outerRadius);
+            sunRaysPath.lineTo(sunX + (float)Math.cos(angle2) * outerRadius, sunY + (float)Math.sin(angle2) * outerRadius);
+            sunRaysPath.lineTo(sunX + (float)Math.cos(angle2) * innerRadius, sunY + (float)Math.sin(angle2) * innerRadius);
+            sunRaysPath.close();
+        }
+    }
+
     private void go() {
         ani = ValueAnimator.ofFloat(0f, 1f);
-        ani.setDuration(3000);
+        ani.setDuration(10000); // 10 sec cycle
         ani.setRepeatCount(ValueAnimator.INFINITE);
         ani.setInterpolator(new LinearInterpolator());
         ani.addUpdateListener(a -> invalidate());
@@ -98,10 +181,10 @@ public class AlexgramSettingsHeaderView extends View {
         float dt = lastNs == 0 ? 0.016f : Math.min((ns - lastNs) / 1e9f, 0.05f);
         lastNs = ns;
 
-        // Background gradient
+        // Background gradient O(1)
         c.drawRect(0, 0, vw, vh, bgPaint);
 
-        float time = (System.currentTimeMillis() % 12000) / 12000f;
+        float time = (System.currentTimeMillis() % 60000) / 60000f; // 60s global loop
 
         if (isDark) {
             drawDarkTheme(c, dt, time);
@@ -111,30 +194,24 @@ public class AlexgramSettingsHeaderView extends View {
     }
 
     private void drawDarkTheme(Canvas c, float dt, float time) {
-        // Nebula clouds
-        drawNebula(c, vw * 0.12f, vh * 0.15f, vw * 0.45f, 0x18, 0x50, 0x30, 0xD0, time);
-        drawNebula(c, vw * 0.78f, vh * 0.08f, vw * 0.30f, 0x30, 0x18, 0x80, 0xB0, time + 0.33f);
-        drawNebula(c, vw * 0.45f, vh * 0.75f, vw * 0.50f, 0x10, 0x35, 0x55, 0x90, time + 0.66f);
+        // 1. Nebulae (Rendered mostly once with hardware transformations)
+        drawOptimizedGlow(c, nebula1Shader, n1X, n1Y, n1R, 1f + 0.08f * (float) Math.sin(time * 10f * Math.PI * 2));
+        drawOptimizedGlow(c, nebula2Shader, n2X, n2Y, n2R, 1f + 0.08f * (float) Math.sin((time * 10f + 0.33f) * Math.PI * 2));
+        drawOptimizedGlow(c, nebula3Shader, n3X, n3Y, n3R, 1f + 0.08f * (float) Math.sin((time * 10f + 0.66f) * Math.PI * 2));
 
-        // Moon (top-right)
-        float moonX = vw * 0.87f, moonY = vh * 0.06f;
-        float moonR = vw * 0.035f;
-        float mp = 1f + 0.06f * (float) Math.sin(time * Math.PI * 2);
+        // 2. Moon Glow (Pulsing)
+        float mp = 1f + 0.06f * (float) Math.sin(time * 15f * Math.PI * 2);
+        drawOptimizedGlow(c, moonGlowShader, moonX, moonY, moonR * 6f, mp);
 
-        glowPaint.setShader(new RadialGradient(moonX, moonY, moonR * 6f * mp,
-                new int[]{0x38FFFDE0, 0x18FFFFC8, 0x00FFFFB0},
-                new float[]{0f, 0.4f, 1f}, Shader.TileMode.CLAMP));
-        c.drawCircle(moonX, moonY, moonR * 6f * mp, glowPaint);
-
-        dotPaint.setShader(new RadialGradient(moonX - moonR * 0.3f, moonY - moonR * 0.3f, moonR,
-                new int[]{0xFFFFFDE8, 0xFFE8E0C8}, null, Shader.TileMode.CLAMP));
+        // 3. Moon body
+        dotPaint.setShader(moonBodyShader);
         c.drawCircle(moonX, moonY, moonR, dotPaint);
         dotPaint.setShader(null);
         dotPaint.setColor(0x18000000);
         c.drawCircle(moonX + moonR * 0.2f, moonY - moonR * 0.15f, moonR * 0.12f, dotPaint);
         c.drawCircle(moonX - moonR * 0.25f, moonY + moonR * 0.3f, moonR * 0.08f, dotPaint);
 
-        // Twinkling stars
+        // 4. Twinkling stars (Hardware batched)
         for (int i = 0; i < stars.size(); i++) {
             Star s = stars.get(i);
             s.update(dt);
@@ -148,7 +225,7 @@ public class AlexgramSettingsHeaderView extends View {
             }
         }
 
-        // Shooting stars
+        // 5. Shooting stars
         shootTimer += dt;
         if (shootTimer > 2f + rng.nextFloat() * 3f) {
             shootTimer = 0f;
@@ -168,20 +245,59 @@ public class AlexgramSettingsHeaderView extends View {
     }
 
     private void drawLightTheme(Canvas c, float dt, float time) {
-        // Soft sun glow (top-left)
-        float sunX = vw * 0.15f, sunY = vh * 0.05f;
-        float sp = 1f + 0.04f * (float) Math.sin(time * Math.PI * 2);
-        float sunR = vw * 0.25f * sp;
-        glowPaint.setShader(new RadialGradient(sunX, sunY, sunR,
-                new int[]{0x30FFD54F, 0x15FFECB3, 0x00FFF8E1},
-                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
-        c.drawCircle(sunX, sunY, sunR, glowPaint);
+        // 1. Sun Glow
+        float sp = 1f + 0.04f * (float) Math.sin(time * 20f * Math.PI * 2);
+        drawOptimizedGlow(c, sunGlowShader, sunX, sunY, sunR, sp);
 
-        // Drifting faint cloud shapes
+        // 2. Rotating God-Rays
+        c.save();
+        c.rotate(time * 360f, sunX, sunY); // Full rotation every 60s
+        c.drawPath(sunRaysPath, sunRayPaint);
+        c.restore();
+
+        // 3. Floating Clouds (Parallax moving left to right)
         float cloudPhase = time * (float) Math.PI * 2;
-        drawCloud(c, vw * 0.3f + (float) Math.sin(cloudPhase) * vw * 0.02f, vh * 0.12f, vw * 0.18f, 0x12B0BEC5);
-        drawCloud(c, vw * 0.7f + (float) Math.cos(cloudPhase * 0.7f) * vw * 0.015f, vh * 0.25f, vw * 0.14f, 0x0EB0BEC5);
-        drawCloud(c, vw * 0.5f + (float) Math.sin(cloudPhase * 1.3f) * vw * 0.025f, vh * 0.55f, vw * 0.22f, 0x10B0BEC5);
+        float cx1 = (time * 1.5f * vw) % (vw * 1.5f) - vw * 0.2f;
+        float cx2 = ((time + 0.3f) * 1.2f * vw) % (vw * 1.5f) - vw * 0.2f;
+        float cx3 = ((time + 0.6f) * 0.8f * vw) % (vw * 1.5f) - vw * 0.2f;
+
+        drawCloud(c, cx1, vh * 0.12f, vw * 0.18f, 0x12B0BEC5);
+        drawCloud(c, cx2, vh * 0.25f, vw * 0.14f, 0x0EB0BEC5);
+        drawCloud(c, cx3, vh * 0.55f, vw * 0.22f, 0x10B0BEC5);
+
+        // 4. Flying Birds
+        birdTimer += dt;
+        if (birdTimer > 1.5f && rng.nextFloat() < 0.02f) { // Random chance every frame after 1.5s
+            birdTimer = 0f;
+            Bird b = new Bird();
+            b.init(vw, vh, rng);
+            birds.add(b);
+        }
+        
+        dotPaint.setColor(0x405C6B7F); // Dark slate for birds
+        dotPaint.setShader(null);
+        shootPaint.setColor(0x405C6B7F);
+        shootPaint.setStrokeWidth(AndroidUtilities.dp(1.5f));
+        
+        for (int i = birds.size() - 1; i >= 0; i--) {
+            Bird b = birds.get(i);
+            b.update(dt);
+            if (b.dead) { birds.remove(i); continue; }
+            
+            // Draw V shape bird
+            float wingOffset = (float) Math.sin(b.wingPhase) * b.size * 0.8f;
+            c.drawLine(b.x, b.y, b.x - b.size, b.y - wingOffset, shootPaint);
+            c.drawLine(b.x, b.y, b.x - b.size, b.y + wingOffset, shootPaint);
+        }
+    }
+
+    private void drawOptimizedGlow(Canvas c, Shader shader, float cx, float cy, float maxR, float scale) {
+        c.save();
+        c.translate(cx, cy);
+        c.scale(scale, scale);
+        glowPaint.setShader(shader);
+        c.drawCircle(0, 0, maxR, glowPaint);
+        c.restore();
     }
 
     private void drawCloud(Canvas c, float cx, float cy, float r, int color) {
@@ -190,17 +306,6 @@ public class AlexgramSettingsHeaderView extends View {
         c.drawCircle(cx, cy, r, dotPaint);
         c.drawCircle(cx - r * 0.6f, cy + r * 0.15f, r * 0.7f, dotPaint);
         c.drawCircle(cx + r * 0.65f, cy + r * 0.1f, r * 0.65f, dotPaint);
-    }
-
-    private void drawNebula(Canvas c, float nx, float ny, float nr, int r, int g, int b, int a, float phase) {
-        float breathe = 1f + 0.08f * (float) Math.sin(phase * Math.PI * 2);
-        float fr = nr * breathe;
-        if (fr <= 0) return;
-        int ao = Math.max(0, Math.min(255, (int) (a * 0.12f)));
-        glowPaint.setShader(new RadialGradient(nx, ny, fr,
-                new int[]{Color.argb(ao, r, g, b), Color.argb(ao / 3, r, g, b), Color.argb(0, r, g, b)},
-                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
-        c.drawCircle(nx, ny, fr, glowPaint);
     }
 
     @Override
@@ -252,6 +357,30 @@ public class AlexgramSettingsHeaderView extends View {
             float p = life / maxLife;
             alpha = p < 0.15f ? p / 0.15f : 1f - ((p - 0.15f) / 0.85f);
             alpha = Math.max(0, Math.min(1, alpha));
+        }
+    }
+    
+    // New Day Mode feature: Birds
+    private static class Bird {
+        float x, y, vx, vy, size, wingPhase, wingSpeed;
+        boolean dead = false;
+        
+        void init(int vw, int vh, Random rng) {
+            // Start from right, fly left slowly
+            x = vw + 50f;
+            y = vh * 0.1f + rng.nextFloat() * vh * 0.3f; // Upper sky
+            vx = -(80f + rng.nextFloat() * 60f); // Move left
+            vy = -10f + rng.nextFloat() * 20f; // Slight up/down
+            size = 8f + rng.nextFloat() * 6f;
+            wingPhase = rng.nextFloat() * (float)Math.PI;
+            wingSpeed = 8f + rng.nextFloat() * 6f; // Flap frequency
+        }
+        
+        void update(float dt) {
+            x += vx * dt;
+            y += vy * dt;
+            wingPhase += wingSpeed * dt;
+            if (x < -100f) dead = true;
         }
     }
 }
