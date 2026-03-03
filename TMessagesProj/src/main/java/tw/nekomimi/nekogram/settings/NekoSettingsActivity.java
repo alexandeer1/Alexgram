@@ -165,7 +165,7 @@ public class NekoSettingsActivity extends BaseFragment {
         qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts list", R.drawable.msg_contact, 0xFF00796B, 
                 NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
                     NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
-                    AlertUtil.showConfirm(getParentActivity(), "Restart required", null, "Restart", true, () -> {
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
                         AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
                     });
                 }));
@@ -180,7 +180,7 @@ public class NekoSettingsActivity extends BaseFragment {
         qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFD32F2F, 
                 NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
                     NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
-                    AlertUtil.showConfirm(getParentActivity(), "Restart required", null, "Restart", true, () -> {
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
                         AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
                     });
                 }));
