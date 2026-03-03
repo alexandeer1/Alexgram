@@ -201,7 +201,7 @@ public class NekoSettingsActivity extends BaseFragment {
         }
 
         ImageView appIcon = new ImageView(context);
-        appIcon.setImageResource(isDark ? R.drawable.ic_launcher_alexgram_neon : R.drawable.ic_launcher_alexgram_colored);
+        appIcon.setImageResource(R.drawable.ic_launcher_dr);
         // Use CENTER_CROP so the image goes to edges and is smoothly cut off by clipToOutline
         appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
         iconCircle.addView(appIcon, LayoutHelper.createFrame(56, 56, Gravity.CENTER)); // Enlarge the icon slightly within the mask
