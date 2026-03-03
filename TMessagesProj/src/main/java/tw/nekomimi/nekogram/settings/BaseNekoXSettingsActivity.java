@@ -149,12 +149,6 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         fragmentView.setBackgroundColor(Color.TRANSPARENT);
         FrameLayout frameLayout = (FrameLayout) fragmentView;
 
-        // Add the live video background if enabled
-        if (tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && !tw.nekomimi.nekogram.NekoConfig.videoHeaderPath.String().isEmpty()) {
-            VideoBackgroundView videoBgView = new VideoBackgroundView(context);
-            frameLayout.addView(videoBgView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        }
-
         // Add the God-Level animated background
         AlexgramSettingsHeaderView bgView = new AlexgramSettingsHeaderView(context);
         frameLayout.addView(bgView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));

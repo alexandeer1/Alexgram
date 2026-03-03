@@ -3200,6 +3200,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (inPreviewMode || AndroidUtilities.isTablet() && folderId != 0 && !isArchive()) {
             actionBar.setOccupyStatusBar(false);
         }
+
+        if (tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && !android.text.TextUtils.isEmpty(tw.nekomimi.nekogram.NekoConfig.videoHeaderPath.String())) {
+            tw.nekomimi.nekogram.settings.VideoBackgroundView videoBg = new tw.nekomimi.nekogram.settings.VideoBackgroundView(context);
+            actionBar.addView(videoBg, 0, org.telegram.ui.Components.LayoutHelper.createFrame(org.telegram.ui.Components.LayoutHelper.MATCH_PARENT, org.telegram.ui.Components.LayoutHelper.MATCH_PARENT));
+            actionBar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        }
+
         return actionBar;
     }
 
