@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import tw.nekomimi.nekogram.ui.cells.CellGroup;
+import tw.nekomimi.nekogram.config.CellGroup;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
