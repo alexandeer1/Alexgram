@@ -9,6 +9,7 @@ import android.text.Spanned;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -249,6 +250,7 @@ public class NekoPasscodeSettingsActivity extends BaseNekoSettingsActivity {
                         textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteRedText3));
                         textCell.setText(getString(R.string.PasscodePanicCodeRemove), false);
                     }
+                    holder.itemView.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 }
                 case 3: {
@@ -267,6 +269,7 @@ public class NekoPasscodeSettingsActivity extends BaseNekoSettingsActivity {
                     } else if (position == panicCodeRow) {
                         cell.setText(getString(R.string.PasscodePanicCode));
                     }
+                    holder.itemView.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 }
                 case 7: {

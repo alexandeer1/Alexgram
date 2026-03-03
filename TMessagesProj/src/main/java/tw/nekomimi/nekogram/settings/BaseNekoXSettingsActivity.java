@@ -4,10 +4,13 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.LocaleController.getString;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+
+import tw.nekomimi.nekogram.config.CellGroup;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -142,11 +145,18 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         });
 
         fragmentView = new FrameLayout(context);
-        fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
+        // Use transparent background so our custom Alexgram background can show through!
+        fragmentView.setBackgroundColor(Color.TRANSPARENT);
         FrameLayout frameLayout = (FrameLayout) fragmentView;
+
+        // Add the God-Level animated background
+        AlexgramSettingsHeaderView bgView = new AlexgramSettingsHeaderView(context);
+        frameLayout.addView(bgView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
         listView = createListView(context);
         listView.setVerticalScrollBarEnabled(false);
+        // Ensure ListView itself is transparent so the background shows through
+        listView.setBackgroundColor(Color.TRANSPARENT);
         listView.setLayoutManager(layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
         DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
@@ -162,7 +172,21 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         frameLayout.addView(tooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
 
         listView.setSections(true);
+        listView.addItemDecoration(new GlassGroupDecoration(
+            viewType -> viewType == CellGroup.ITEM_TYPE_DIVIDER || viewType == CellGroup.ITEM_TYPE_TEXT
+        ));
         actionBar.setAdaptiveBackground(listView);
+        
+        // Ensure ActionBar doesn't draw a solid block over the background, matching A-Settings
+        actionBar.setAddToContainer(false);
+        actionBar.setBackgroundColor(Color.TRANSPARENT);
+        boolean isDark = Theme.getActiveTheme().isDark();
+        int abColor = isDark ? Color.WHITE : 0xFF1A1A2E;
+        actionBar.setItemsColor(abColor, false);
+        actionBar.setTitleColor(abColor);
+        
+        frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
         return fragmentView;
     }
 
@@ -173,7 +197,8 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, 0, 0, bottom);
+        int topPadding = ActionBar.getCurrentActionBarHeight() + top;
+        listView.setPadding(0, topPadding, 0, bottom);
         listView.setClipToPadding(false);
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) tooltip.getLayoutParams();
         layoutParams.setMargins(dp(8), 0, dp(8), dp(8) + bottom);

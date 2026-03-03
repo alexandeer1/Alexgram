@@ -11,10 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.text.Editable;
@@ -29,8 +27,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,10 +48,11 @@ import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.AlertDialog;
-import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.BasePermissionsActivity;
+import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.SettingsSearchCell;
+import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Components.EditTextBoldCursor;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
@@ -80,6 +77,7 @@ import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.helpers.AppRestartHelper;
 import tw.nekomimi.nekogram.helpers.CloudSettingsHelper;
 import tw.nekomimi.nekogram.helpers.LocalNameHelper;
+import tw.nekomimi.nekogram.helpers.PasscodeHelper;
 import tw.nekomimi.nekogram.helpers.SettingsHelper;
 import tw.nekomimi.nekogram.helpers.SettingsSearchResult;
 import tw.nekomimi.nekogram.utils.AlertUtil;
@@ -91,49 +89,54 @@ import xyz.nextalone.nagram.helper.BookmarksHelper;
 import xyz.nextalone.nagram.helper.LocalPeerColorHelper;
 import xyz.nextalone.nagram.helper.LocalPremiumStatusHelper;
 
-public class NekoSettingsActivity extends BaseFragment {
+public class NekoSettingsActivity extends BaseNekoSettingsActivity {
 
     private static final int MENU_SEARCH = 1;
     private static final int MENU_SYNC = 2;
 
-    // Adaptive colors (set in createView based on theme)
-    private int cardBg, cardBorder, textTitle, textSub, sectionLabel, accentColor, dividerColor;
-    private boolean isDark;
+    private int generalRow;
+    private int translatorRow;
+    private int chatRow;
+    private int passcodeRow;
+    private int experimentRow;
+    private int categoriesEndRow;
+
+    private int importSettingsRow;
+    private int exportSettingsRow;
+    private int resetSettingsRow;
+    private int appRestartRow;
+    private int nSettingsEndRow;
+
+
+    private int aboutRow;
 
     @Override
-    public boolean onFragmentCreate() {
-        super.onFragmentCreate();
-        return true;
-    }
+    protected void updateRows() {
+        super.updateRows();
 
-    private void setupColors() {
-        isDark = Theme.getActiveTheme().isDark();
-        if (isDark) {
-            cardBg = 0x30FFFFFF;       // frosted glass dark
-            cardBorder = 0x22FFFFFF;
-            textTitle = 0xFFFFFFFF;
-            textSub = 0xFF8899AA;
-            sectionLabel = 0xCC8899AA;
-            accentColor = 0xFF4FC3F7;
-            dividerColor = 0x15FFFFFF;
+        generalRow = addRow();
+        translatorRow = addRow();
+        chatRow = addRow();
+        if (!PasscodeHelper.isSettingsHidden()) {
+            passcodeRow = addRow();
         } else {
-            cardBg = 0x60FFFFFF;       // frosted glass light
-            cardBorder = 0x30000000;
-            textTitle = 0xFF1A1A2E;
-            textSub = 0xFF5C6B7F;
-            sectionLabel = 0xCC5C6B7F;
-            accentColor = 0xFF1976D2;
-            dividerColor = 0x18000000;
+            passcodeRow = -1;
         }
+        experimentRow = addRow();
+        categoriesEndRow = addRow();
+
+        importSettingsRow = addRow();
+        exportSettingsRow = addRow();
+        resetSettingsRow = addRow();
+        appRestartRow = addRow();
+        nSettingsEndRow = addRow();
+
+        aboutRow = addRow();
     }
 
     @Override
     public View createView(Context context) {
-        setupColors();
-
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setAllowOverlayTitle(true);
-        actionBar.setTitle("A-Settings");
+        View view = super.createView(context);
 
         ActionBarMenu menu = actionBar.createMenu();
         menu.addItem(MENU_SEARCH, R.drawable.ic_ab_search);
@@ -152,384 +155,12 @@ public class NekoSettingsActivity extends BaseFragment {
             }
         });
 
-        // Transparent action bar
-        actionBar.setAddToContainer(false); // Fix: Prevent adding to default container (which causes the black bar)
-        actionBar.setBackgroundColor(Color.TRANSPARENT);
-        int abColor = isDark ? Color.WHITE : 0xFF1A1A2E;
-        actionBar.setItemsColor(abColor, false);
-        actionBar.setTitleColor(abColor);
-
-        FrameLayout parentFrame = new FrameLayout(context);
-
-        // 1. Full-screen animated background
-        AlexgramSettingsHeaderView bgView = new AlexgramSettingsHeaderView(context);
-        parentFrame.addView(bgView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-
-        // 2. ScrollView on top
-        ScrollView scrollView = new ScrollView(context);
-        scrollView.setVerticalScrollBarEnabled(false);
-        scrollView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        // Clip to padding so scrolling content cleanly disappears behind the transparent ActionBar!
-        scrollView.setClipToPadding(true);
-        scrollView.setPadding(0, AndroidUtilities.dp(56) + AndroidUtilities.statusBarHeight, 0, 0);
-        parentFrame.addView(scrollView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-
-        // 3. Add ActionBar ON TOP of everything
-        parentFrame.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        LinearLayout contentLayout = new LinearLayout(context);
-        contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), AndroidUtilities.dp(32));
-        scrollView.addView(contentLayout, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        // 4. Logo badge (smaller)
-        LinearLayout logoBadge = new LinearLayout(context);
-        logoBadge.setOrientation(LinearLayout.VERTICAL);
-        logoBadge.setGravity(Gravity.CENTER);
-        logoBadge.setPadding(0, AndroidUtilities.dp(12), 0, AndroidUtilities.dp(20));
-
-        // App icon circle
-        FrameLayout iconCircle = new FrameLayout(context);
-        GradientDrawable circBg = new GradientDrawable();
-        circBg.setShape(GradientDrawable.OVAL);
-        circBg.setColor(isDark ? 0x30FFFFFF : 0x40FFFFFF);
-        circBg.setStroke(AndroidUtilities.dp(1), isDark ? 0x40FFFFFF : 0x2A000000);
-        iconCircle.setBackground(circBg);
-        
-        // Force children inside the circle to be clipped, solving the square icon bug
-        if (android.os.Build.VERSION.SDK_INT >= 21) {
-            iconCircle.setClipToOutline(true);
-        }
-
-        ImageView appIcon = new ImageView(context);
-        appIcon.setImageResource(isDark ? R.drawable.ic_launcher_alexgram_neon : R.drawable.ic_launcher_alexgram_blue);
-        // Use CENTER_CROP so the image goes to edges and is smoothly cut off by clipToOutline
-        appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        iconCircle.addView(appIcon, LayoutHelper.createFrame(56, 56, Gravity.CENTER)); // Enlarge the icon slightly within the mask
-
-        logoBadge.addView(iconCircle, LayoutHelper.createLinear(56, 56, Gravity.CENTER));
-
-        // App name
-        TextView appName = new TextView(context);
-        appName.setText("Alexgram");
-        appName.setTextColor(textTitle);
-        appName.setTextSize(20);
-        appName.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        appName.setGravity(Gravity.CENTER);
-        appName.setPadding(0, AndroidUtilities.dp(8), 0, 0);
-        logoBadge.addView(appName, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
-
-        // Version under name
-        TextView verSmall = new TextView(context);
-        try {
-            android.content.pm.PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            verSmall.setText("v" + pInfo.versionName);
-        } catch (Exception e) {
-            verSmall.setText("");
-        }
-        verSmall.setTextColor(textSub);
-        verSmall.setTextSize(12);
-        verSmall.setGravity(Gravity.CENTER);
-        verSmall.setPadding(0, AndroidUtilities.dp(2), 0, 0);
-        logoBadge.addView(verSmall, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
-
-        contentLayout.addView(logoBadge, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
-
-        // ===== QUICK SETTINGS =====
-        addGlassSection(contentLayout, context, "QUICK SETTINGS");
-        LinearLayout qsCard = createGlassCard(context);
-
-        qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts list", R.drawable.msg_contact, 0xFF00897B,
-                NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
-                    NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
-                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
-                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
-                    });
-                }));
-        qsCard.addView(createGlassDivider(context));
-
-        qsCard.addView(createSwitchItem(context, "Ghost Mode", "Read silently", R.drawable.msg_secret, 0xFF546E7A,
-                NekoConfig.isGhostModeActive(), isChecked -> {
-                    NekoConfig.setGhostMode(isChecked);
-                }));
-        qsCard.addView(createGlassDivider(context));
-
-        qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFE53935,
-                NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
-                    NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
-                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
-                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
-                    });
-                }));
-        qsCard.addView(createGlassDivider(context));
-
-        qsCard.addView(createSwitchItem(context, "Save Deleted", "Save deleted messages", R.drawable.msg_delete, 0xFFAD1457,
-                NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), isChecked -> {
-                    NaConfig.INSTANCE.getEnableSaveDeletedMessages().setConfigBool(isChecked);
-                }));
-
-        contentLayout.addView(qsCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 20));
-
-        // ===== CORE SETTINGS =====
-        addGlassSection(contentLayout, context, "CORE SETTINGS");
-        LinearLayout coreCard = createGlassCard(context);
-
-        coreCard.addView(createSettingItem(context, "General", "Appearance, Language, Behavior", R.drawable.msg_theme, 0xFF1E88E5, v -> {
-            presentFragment(new NekoGeneralSettingsActivity());
-        }));
-        coreCard.addView(createGlassDivider(context));
-
-        coreCard.addView(createSettingItem(context, "Translator", "Messages, Languages, Engine", R.drawable.ic_translate, 0xFF7B1FA2, v -> {
-            presentFragment(new NekoTranslatorSettingsActivity());
-        }));
-        coreCard.addView(createGlassDivider(context));
-
-        coreCard.addView(createSettingItem(context, "Chats", "UI, Privacy, Media", R.drawable.msg_discussion, 0xFF43A047, v -> {
-            presentFragment(new NekoChatSettingsActivity());
-        }));
-        coreCard.addView(createGlassDivider(context));
-
-        coreCard.addView(createSettingItem(context, "Passcode", "Security & Fingerprint", R.drawable.msg_permissions, 0xFFE53935, v -> {
-            presentFragment(new NekoPasscodeSettingsActivity());
-        }));
-
-        contentLayout.addView(coreCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 20));
-
-        // ===== ADVANCED =====
-        addGlassSection(contentLayout, context, "ADVANCED");
-        LinearLayout advCard = createGlassCard(context);
-
-        advCard.addView(createSettingItem(context, "Cloud Settings", "Sync, backup, and restore", R.drawable.cloud_sync, 0xFF0288D1, v -> {
-            CloudSettingsHelper.getInstance().showDialog(NekoSettingsActivity.this);
-        }));
-        advCard.addView(createGlassDivider(context));
-
-        advCard.addView(createSettingItem(context, "Experimental", "Beta Tools & Features", R.drawable.msg_fave, 0xFF7B1FA2, v -> {
-            presentFragment(new NekoExperimentalSettingsActivity());
-        }));
-
-        contentLayout.addView(advCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 20));
-
-        // ===== ACTIONS =====
-        addGlassSection(contentLayout, context, "ACTIONS");
-        LinearLayout actRow = new LinearLayout(context);
-        actRow.setOrientation(LinearLayout.HORIZONTAL);
-
-        actRow.addView(createGlassButton(context, "Export", R.drawable.msg_shareout, textSub, v -> {
-            backupSettings();
-        }), LayoutHelper.createLinear(0, 72, 1f, 0, 0, 6, 0));
-
-        actRow.addView(createGlassButton(context, "Reset", R.drawable.msg_reset, 0xFFEF5350, v -> {
-            AlertUtil.showConfirm(getParentActivity(),
-                    LocaleController.getString(R.string.ResetSettingsAlert),
-                    R.drawable.msg_reset,
-                    LocaleController.getString(R.string.Reset),
-                    true,
-                    () -> {
-                        ApplicationLoader.applicationContext.getSharedPreferences("nekocloud", Activity.MODE_PRIVATE).edit().clear().commit();
-                        ApplicationLoader.applicationContext.getSharedPreferences("nekox_config", Activity.MODE_PRIVATE).edit().clear().commit();
-                        NekoConfig.getPreferences().edit().clear().commit();
-                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
-                    });
-        }), LayoutHelper.createLinear(0, 72, 1f, 6, 0, 6, 0));
-
-        actRow.addView(createGlassButton(context, "Restart", R.drawable.msg_retry, 0xFF42A5F5, v -> {
-            AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
-        }), LayoutHelper.createLinear(0, 72, 1f, 6, 0, 6, 0));
-
-        actRow.addView(createGlassButton(context, "About", R.drawable.msg_info, textSub, v -> {
-            presentFragment(new NekoAboutActivity());
-        }), LayoutHelper.createLinear(0, 72, 1f, 6, 0, 0, 0));
-
-        contentLayout.addView(actRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 28));
-
-        // Version footer
-        TextView versionText = new TextView(context);
-        try {
-            android.content.pm.PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            versionText.setText("Alexgram v" + pInfo.versionName + " (" + pInfo.versionCode + ")");
-        } catch (Exception e) {
-            versionText.setText("Alexgram");
-        }
-        versionText.setTextSize(12);
-        versionText.setTextColor(isDark ? 0x80FFFFFF : 0x80000000);
-        versionText.setGravity(Gravity.CENTER);
-        contentLayout.addView(versionText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 8, 0, 16));
-
-
-        fragmentView = parentFrame;
-        return fragmentView;
-    }
-
-    // ========== Glass UI Helpers ==========
-
-    private void addGlassSection(LinearLayout parent, Context ctx, String title) {
-        TextView tv = new TextView(ctx);
-        tv.setText(title);
-        tv.setTextSize(11);
-        tv.setTextColor(sectionLabel);
-        tv.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        tv.setLetterSpacing(0.1f);
-        parent.addView(tv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 4, 0, 0, 8));
-    }
-
-    private LinearLayout createGlassCard(Context ctx) {
-        LinearLayout card = new LinearLayout(ctx);
-        card.setOrientation(LinearLayout.VERTICAL);
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(cardBg);
-        bg.setCornerRadius(AndroidUtilities.dp(16));
-        bg.setStroke(AndroidUtilities.dp(1), cardBorder);
-        card.setBackground(bg);
-        card.setClipChildren(true);
-        return card;
-    }
-
-    private View createGlassDivider(Context ctx) {
-        View v = new View(ctx);
-        v.setBackgroundColor(dividerColor);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1);
-        lp.leftMargin = AndroidUtilities.dp(56);
-        v.setLayoutParams(lp);
-        return v;
-    }
-
-    private View createSettingItem(Context ctx, String title, String subtitle, int iconRes, int iconColor, View.OnClickListener onClick) {
-        LinearLayout row = new LinearLayout(ctx);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(14), AndroidUtilities.dp(13), AndroidUtilities.dp(14), AndroidUtilities.dp(13));
-        row.setClickable(true);
-        row.setBackground(Theme.getSelectorDrawable(false));
-        row.setOnClickListener(onClick);
-
-        // Icon
-        ImageView iconView = new ImageView(ctx);
-        iconView.setImageResource(iconRes);
-        iconView.setColorFilter(Color.WHITE);
-        iconView.setScaleType(ImageView.ScaleType.CENTER);
-        GradientDrawable iconBg = new GradientDrawable();
-        iconBg.setShape(GradientDrawable.RECTANGLE);
-        iconBg.setCornerRadius(AndroidUtilities.dp(10));
-        iconBg.setColor(iconColor);
-        iconView.setBackground(iconBg);
-        row.addView(iconView, LayoutHelper.createLinear(32, 32));
-
-        // Texts
-        LinearLayout texts = new LinearLayout(ctx);
-        texts.setOrientation(LinearLayout.VERTICAL);
-
-        TextView titleView = new TextView(ctx);
-        titleView.setText(title);
-        titleView.setTextColor(textTitle);
-        titleView.setTextSize(15);
-        titleView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        texts.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView subView = new TextView(ctx);
-        subView.setText(subtitle);
-        subView.setTextColor(textSub);
-        subView.setTextSize(12);
-        texts.addView(subView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 1, 0, 0));
-
-        row.addView(texts, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 0, 0));
-
-        // Arrow
-        ImageView arrow = new ImageView(ctx);
-        arrow.setImageResource(R.drawable.arrow_more_solar);
-        arrow.setColorFilter(isDark ? 0x60FFFFFF : 0x40000000);
-        row.addView(arrow, LayoutHelper.createLinear(18, 18));
-
-        return row;
-    }
-
-    interface OnSettingSwitchListener {
-        void onSwitch(boolean isChecked);
-    }
-
-    private View createSwitchItem(Context ctx, String title, String subtitle, int iconRes, int iconColor, boolean checked, OnSettingSwitchListener onChange) {
-        LinearLayout row = new LinearLayout(ctx);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(AndroidUtilities.dp(14), AndroidUtilities.dp(13), AndroidUtilities.dp(14), AndroidUtilities.dp(13));
-        row.setBackground(Theme.getSelectorDrawable(false));
-
-        ImageView iconView = new ImageView(ctx);
-        iconView.setImageResource(iconRes);
-        iconView.setColorFilter(Color.WHITE);
-        iconView.setScaleType(ImageView.ScaleType.CENTER);
-        GradientDrawable iconBg = new GradientDrawable();
-        iconBg.setShape(GradientDrawable.RECTANGLE);
-        iconBg.setCornerRadius(AndroidUtilities.dp(10));
-        iconBg.setColor(iconColor);
-        iconView.setBackground(iconBg);
-        row.addView(iconView, LayoutHelper.createLinear(32, 32));
-
-        LinearLayout texts = new LinearLayout(ctx);
-        texts.setOrientation(LinearLayout.VERTICAL);
-
-        TextView titleView = new TextView(ctx);
-        titleView.setText(title);
-        titleView.setTextColor(textTitle);
-        titleView.setTextSize(15);
-        titleView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        texts.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        TextView subView = new TextView(ctx);
-        subView.setText(subtitle);
-        subView.setTextColor(textSub);
-        subView.setTextSize(12);
-        texts.addView(subView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 1, 0, 0));
-
-        row.addView(texts, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 0, 0));
-
-        org.telegram.ui.Components.Switch sw = new org.telegram.ui.Components.Switch(ctx);
-        sw.setChecked(checked, false);
-        sw.setColors(Theme.key_switchTrack, Theme.key_switchTrackChecked, Theme.key_windowBackgroundWhite, Theme.key_windowBackgroundWhite);
-        row.addView(sw, LayoutHelper.createLinear(44, 24));
-
-        row.setOnClickListener(v -> {
-            boolean isChecked = !sw.isChecked();
-            sw.setChecked(isChecked, true);
-            onChange.onSwitch(isChecked);
-        });
-
-        return row;
-    }
-
-    private View createGlassButton(Context ctx, String text, int iconRes, int tint, View.OnClickListener onClick) {
-        LinearLayout box = new LinearLayout(ctx);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setGravity(Gravity.CENTER);
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(cardBg);
-        bg.setCornerRadius(AndroidUtilities.dp(14));
-        bg.setStroke(AndroidUtilities.dp(1), cardBorder);
-        box.setBackground(bg);
-        box.setClickable(true);
-        box.setOnClickListener(onClick);
-
-        ImageView icon = new ImageView(ctx);
-        icon.setImageResource(iconRes);
-        icon.setColorFilter(tint);
-        box.addView(icon, LayoutHelper.createLinear(20, 20));
-
-        TextView tv = new TextView(ctx);
-        tv.setText(text);
-        tv.setTextColor(textSub);
-        tv.setTextSize(11);
-        tv.setGravity(Gravity.CENTER);
-        tv.setPadding(0, AndroidUtilities.dp(5), 0, 0);
-        box.addView(tv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-        return box;
+        return view;
     }
 
     /**
      * @noinspection SizeReplaceableByIsEmpty
      */
-    @SuppressLint("NotifyDataSetChanged")
     private void showSettingsSearchDialog() {
         try {
             Activity parent = getParentActivity();
@@ -553,12 +184,12 @@ public class NekoSettingsActivity extends BaseFragment {
             containerLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
             FrameLayout searchFrame = new FrameLayout(parent);
-            LinearLayout.LayoutParams searchLP = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, searchHeight + dp(12));
-            searchLP.leftMargin = dp(10);
-            searchLP.rightMargin = dp(10);
-            searchLP.topMargin = dp(6);
-            searchLP.bottomMargin = dp(2);
-            searchFrame.setLayoutParams(searchLP);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, searchHeight + dp(12));
+            layoutParams.leftMargin = dp(10);
+            layoutParams.rightMargin = dp(10);
+            layoutParams.topMargin = dp(6);
+            layoutParams.bottomMargin = dp(2);
+            searchFrame.setLayoutParams(layoutParams);
             searchFrame.setClipToPadding(true);
             searchFrame.setClipChildren(true);
 
@@ -677,6 +308,7 @@ public class NekoSettingsActivity extends BaseFragment {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                 }
 
+                @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void afterTextChanged(Editable s) {
                     String q = s.toString().toLowerCase().trim();
@@ -716,30 +348,138 @@ public class NekoSettingsActivity extends BaseFragment {
         }
     }
 
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.NekoSettings);
+    }
+
+    @SuppressLint("ApplySharedPref")
+    @Override
+    protected void onItemClick(View view, int position, float x, float y) {
+        if (position == chatRow) {
+            presentFragment(new NekoChatSettingsActivity());
+        } else if (position == generalRow) {
+            presentFragment(new NekoGeneralSettingsActivity());
+        } else if (position == passcodeRow) {
+            presentFragment(new NekoPasscodeSettingsActivity());
+        } else if (position == experimentRow) {
+            presentFragment(new NekoExperimentalSettingsActivity());
+        } else if (position == translatorRow) {
+            presentFragment(new NekoTranslatorSettingsActivity());
+        } else if (position == aboutRow) {
+            presentFragment(new NekoAboutActivity());
+        } else if (position == importSettingsRow) {
+            if (Build.VERSION.SDK_INT >= 33) {
+                openFilePicker();
+            } else {
+                DocumentSelectActivity activity = getDocumentSelectActivity(getParentActivity());
+                if (activity != null) {
+                    presentFragment(activity);
+                }
+            }
+        } else if (position == resetSettingsRow) {
+            AlertUtil.showConfirm(getParentActivity(),
+                    getString(R.string.ResetSettingsAlert),
+                    R.drawable.msg_reset,
+                    getString(R.string.Reset),
+                    true,
+                    () -> {
+                        ApplicationLoader.applicationContext.getSharedPreferences("nekocloud", Activity.MODE_PRIVATE).edit().clear().commit();
+                        ApplicationLoader.applicationContext.getSharedPreferences("nekox_config", Activity.MODE_PRIVATE).edit().clear().commit();
+                        NekoConfig.getPreferences().edit().clear().commit();
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
+        } else if (position == exportSettingsRow) {
+            backupSettings();
+        } else if (position == appRestartRow) {
+            AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+        }
+    }
+
+    @Override
+    protected BaseListAdapter createAdapter(Context context) {
+        return new ListAdapter(context);
+    }
+
+    private class ListAdapter extends BaseListAdapter {
+
+        public ListAdapter(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
+            int viewType = holder.getItemViewType();
+            switch (viewType) {
+                case TYPE_SHADOW: {
+                    holder.itemView.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
+                    break;
+                }
+                case TYPE_TEXT: {
+                    TextCell textCell = (TextCell) holder.itemView;
+                    if (position == chatRow) {
+                        textCell.setTextAndIcon(getString(R.string.Chat), R.drawable.msg_discussion, true);
+                    } else if (position == generalRow) {
+                        textCell.setTextAndIcon(getString(R.string.General), R.drawable.msg_theme, true);
+                    } else if (position == translatorRow) {
+                        textCell.setTextAndIcon(getString(R.string.TranslatorSettings), R.drawable.ic_translate, true);
+                    } else if (position == passcodeRow) {
+                        textCell.setTextAndIcon(getString(R.string.PasscodeNeko), R.drawable.msg_permissions, true);
+                    } else if (position == experimentRow) {
+                        textCell.setTextAndIcon(getString(R.string.Experimental), R.drawable.msg_fave, true);
+                    } else if (position == importSettingsRow) {
+                        textCell.setTextAndIcon(getString(R.string.ImportSettings), R.drawable.msg_photo_settings_solar, true);
+                    } else if (position == exportSettingsRow) {
+                        textCell.setTextAndIcon(getString(R.string.BackupSettings), R.drawable.msg_instant_link_solar, true);
+                    } else if (position == resetSettingsRow) {
+                        textCell.setTextAndIcon(getString(R.string.ResetSettings), R.drawable.msg_reset_solar, true);
+                    } else if (position == appRestartRow) {
+                        textCell.setTextAndIcon(getString(R.string.RestartApp), R.drawable.msg_retry_solar, true);
+                    } else if (position == aboutRow) {
+                        textCell.setTextAndIcon(getString(R.string.About), R.drawable.msg_info, true);
+                    }
+                    break;
+                }
+
+            }
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == categoriesEndRow || position == nSettingsEndRow) {
+                return TYPE_SHADOW;
+            } else if (position == chatRow || position == generalRow || position == passcodeRow || position == experimentRow || position == translatorRow ||
+                    position == importSettingsRow || position == exportSettingsRow || position == resetSettingsRow || position == appRestartRow ||
+                    position == aboutRow) {
+                return TYPE_TEXT;
+            }
+            return TYPE_SHADOW;
+        }
+    }
 
     private void backupSettings() {
         Context context = getParentActivity();
         if (context == null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(LocaleController.getString(R.string.BackupSettings));
+        builder.setTitle(getString(R.string.BackupSettings));
 
         LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        org.telegram.ui.Cells.CheckBoxCell checkBoxCell = new org.telegram.ui.Cells.CheckBoxCell(context, org.telegram.ui.Cells.CheckBoxCell.TYPE_CHECK_BOX_DEFAULT, resourceProvider);
+        CheckBoxCell checkBoxCell = new CheckBoxCell(context, CheckBoxCell.TYPE_CHECK_BOX_DEFAULT, resourceProvider);
         checkBoxCell.setBackground(Theme.getSelectorDrawable(false));
-        checkBoxCell.setText(LocaleController.getString(R.string.ExportSettingsIncludeApiKeys), "", true, false);
+        checkBoxCell.setText(getString(R.string.ExportSettingsIncludeApiKeys), "", true, false);
         checkBoxCell.setPadding(LocaleController.isRTL ? AndroidUtilities.dp(16) : AndroidUtilities.dp(8), 0, LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(16), 0);
         checkBoxCell.setChecked(true, false);
         checkBoxCell.setOnClickListener(v -> {
-            org.telegram.ui.Cells.CheckBoxCell cell = (org.telegram.ui.Cells.CheckBoxCell) v;
+            CheckBoxCell cell = (CheckBoxCell) v;
             cell.setChecked(!cell.isChecked(), true);
         });
         linearLayout.addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
 
         builder.setView(linearLayout);
-        builder.setPositiveButton(LocaleController.getString(R.string.ExportTheme), (dialog, which) -> {
+        builder.setPositiveButton(getString(R.string.ExportTheme), (dialog, which) -> {
             boolean includeApiKeys = checkBoxCell.isChecked();
             try {
                 File cacheFile = new File(AndroidUtilities.getCacheDir(), new Date().toLocaleString() + ".nekox-settings.json");
@@ -749,7 +489,7 @@ public class NekoSettingsActivity extends BaseFragment {
                 AlertUtil.showSimpleAlert(getParentActivity(), e);
             }
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        builder.setNegativeButton(getString(R.string.Cancel), null);
         builder.show();
     }
 
@@ -758,6 +498,7 @@ public class NekoSettingsActivity extends BaseFragment {
     }
 
     public static String backupSettingsJson(boolean isCloud, int indentSpaces, boolean includeApiKeys) throws JSONException {
+
         JSONObject configJson = new JSONObject();
 
         ArrayList<String> userconfig = new ArrayList<>();
@@ -824,7 +565,9 @@ public class NekoSettingsActivity extends BaseFragment {
         mainconfig.add("autoNightLocationLatitude3");
         mainconfig.add("autoNightLocationLongitude3");
         mainconfig.add("autoNightLastSunCheckDay");
+
         mainconfig.add("lang_code");
+
         mainconfig.add("web_restricted_domains2");
 
         spToJSON("mainconfig", configJson, mainconfig::contains);
@@ -889,27 +632,31 @@ public class NekoSettingsActivity extends BaseFragment {
     }
 
     public static void importSettings(Context context, File settingsFile) {
+
         AlertUtil.showConfirm(context,
-                LocaleController.getString(R.string.ImportSettingsAlert),
+                getString(R.string.ImportSettingsAlert),
                 R.drawable.msg_photo_settings_solar,
-                LocaleController.getString(R.string.Import),
+                getString(R.string.Import),
                 true,
                 () -> importSettingsConfirmed(context, settingsFile));
+
     }
 
     public static void importSettingsConfirmed(Context context, File settingsFile) {
+
         try {
             JsonObject configJson = GsonUtil.toJsonObject(FileUtil.readUtf8String(settingsFile));
             importSettings(configJson);
 
             AlertDialog restart = new AlertDialog(context, 0);
-            restart.setTitle(LocaleController.getString(R.string.NagramX));
-            restart.setMessage(LocaleController.getString(R.string.RestartAppToTakeEffect));
-            restart.setPositiveButton(LocaleController.getString(R.string.OK), (__, ___) -> AppRestartHelper.triggerRebirth(context, new Intent(context, LaunchActivity.class)));
+            restart.setTitle(getString(R.string.NagramX));
+            restart.setMessage(getString(R.string.RestartAppToTakeEffect));
+            restart.setPositiveButton(getString(R.string.OK), (__, ___) -> AppRestartHelper.triggerRebirth(context, new Intent(context, LaunchActivity.class)));
             restart.show();
         } catch (Exception e) {
             AlertUtil.showSimpleAlert(context, e);
         }
+
     }
 
     @SuppressLint("ApplySharedPref")
