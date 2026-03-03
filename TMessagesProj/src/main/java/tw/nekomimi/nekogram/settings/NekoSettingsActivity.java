@@ -75,6 +75,15 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import kotlin.text.StringsKt;
+import org.telegram.messenger.FileLoader;
+import org.telegram.messenger.MediaController;
+import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.NotificationCenter;
+import org.telegram.messenger.SharedConfig;
+import org.telegram.messenger.UserConfig;
+import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.BulletinFactory;
+import org.telegram.ui.PhotoAlbumPickerActivity;
 import tw.nekomimi.nekogram.DialogConfig;
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.helpers.AppRestartHelper;
@@ -92,6 +101,8 @@ import xyz.nextalone.nagram.helper.LocalPeerColorHelper;
 import xyz.nextalone.nagram.helper.LocalPremiumStatusHelper;
 
 public class NekoSettingsActivity extends BaseFragment {
+    private MessageObject convertingVideo;
+    private NotificationCenter.NotificationCenterDelegate videoConvertDelegate;
 
     private static final int MENU_SEARCH = 1;
     private static final int MENU_SYNC = 2;
@@ -246,6 +257,104 @@ public class NekoSettingsActivity extends BaseFragment {
                         AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
                     });
                 }));
+        qsCard.addView(createGlassDivider(context));
+
+        qsCard.addView(createSwitchItem(context, "Live Video Header", "Enable video background in main header", R.drawable.msg_video, 0xFF9C27B0,
+                NekoConfig.videoHeaderEnabled.Bool(), isChecked -> {
+                    NekoConfig.videoHeaderEnabled.setConfigBool(isChecked);
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
+                }));
+        qsCard.addView(createGlassDivider(context));
+
+        qsCard.addView(createSettingItem(context, "Custom Video Background", "Select & crop video background", R.drawable.msg_gallery_solar, 0xFF00BCD4, v -> {
+            PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER, false, false, null);
+            fragment.setDelegate(new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
+                @Override
+                public void didSelectPhotos(ArrayList<SendMessagesHelper.SendingMediaInfo> photos, boolean notify, int scheduleDate) {
+                    if (!photos.isEmpty()) {
+                        SendMessagesHelper.SendingMediaInfo info = photos.get(0);
+                        if (info.isVideo || info.videoEditedInfo != null) {
+                            TLRPC.TL_message message = new TLRPC.TL_message();
+                            message.id = 0;
+                            message.message = "";
+                            message.media = new TLRPC.TL_messageMediaEmpty();
+                            message.action = new TLRPC.TL_messageActionEmpty();
+                            message.dialog_id = 0;
+                            MessageObject avatarObject = new MessageObject(UserConfig.selectedAccount, message, false, false);
+                            avatarObject.messageOwner.attachPath = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), SharedConfig.getLastLocalId() + "_bgvideo.mp4").getAbsolutePath();
+                            avatarObject.videoEditedInfo = info.videoEditedInfo;
+                            avatarObject.emojiMarkup = info.emojiMarkup;
+                            if (avatarObject.videoEditedInfo != null) {
+                                avatarObject.videoEditedInfo.shouldLimitFps = false;
+                            }
+                            convertingVideo = avatarObject;
+                            if (videoConvertDelegate == null) {
+                                videoConvertDelegate = (id, account, args) -> {
+                                    if (id == NotificationCenter.fileNewChunkAvailable) {
+                                        MessageObject messageObject = (MessageObject) args[0];
+                                        if (convertingVideo != null && messageObject == convertingVideo) {
+                                            String finalPath = (String) args[1];
+                                            long finalSize = (Long) args[3];
+                                            if (finalSize != 0) {
+                                                NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.fileNewChunkAvailable);
+                                                NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.filePreparingFailed);
+                                                NekoConfig.videoHeaderPath.setConfigString(finalPath);
+                                                NekoConfig.videoHeaderEnabled.setConfigBool(true);
+                                                convertingVideo = null;
+                                                AndroidUtilities.runOnUIThread(() -> {
+                                                    if (getVisibleDialog() != null) {
+                                                        getVisibleDialog().dismiss();
+                                                    }
+                                                    BulletinFactory.of(NekoSettingsActivity.this).createSimpleBulletin(R.raw.done, "Video header set!").show();
+                                                    AndroidUtilities.runOnUIThread(() -> AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class)), 1500);
+                                                });
+                                            }
+                                        }
+                                    } else if (id == NotificationCenter.filePreparingFailed) {
+                                        MessageObject messageObject = (MessageObject) args[0];
+                                        if (convertingVideo != null && messageObject == convertingVideo) {
+                                            NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.fileNewChunkAvailable);
+                                            NotificationCenter.getInstance(currentAccount).removeObserver(videoConvertDelegate, NotificationCenter.filePreparingFailed);
+                                            convertingVideo = null;
+                                            AndroidUtilities.runOnUIThread(() -> {
+                                                if (getVisibleDialog() != null) {
+                                                    getVisibleDialog().dismiss();
+                                                }
+                                                BulletinFactory.of(NekoSettingsActivity.this).createSimpleBulletin(R.raw.error, "Failed to prepare video").show();
+                                            });
+                                        }
+                                    }
+                                };
+                            }
+                            NotificationCenter.getInstance(currentAccount).addObserver(videoConvertDelegate, NotificationCenter.fileNewChunkAvailable);
+                            NotificationCenter.getInstance(currentAccount).addObserver(videoConvertDelegate, NotificationCenter.filePreparingFailed);
+                            MediaController.getInstance().scheduleVideoConvert(avatarObject, true, true, false);
+                            AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                            progressDialog.setCanCancel(false);
+                            showDialog(progressDialog);
+                        } else if (info.path != null) {
+                            NekoConfig.videoHeaderPath.setConfigString(info.path);
+                            NekoConfig.videoHeaderEnabled.setConfigBool(true);
+                            BulletinFactory.of(NekoSettingsActivity.this).createSimpleBulletin(R.raw.done, "Video header set!").show();
+                            AndroidUtilities.runOnUIThread(() -> AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class)), 1500);
+                        }
+                    }
+                }
+                @Override
+                public void startPhotoSelectActivity() {
+                    try {
+                        android.content.Intent photoPickerIntent = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                        photoPickerIntent.setType("video/*");
+                        startActivityForResult(photoPickerIntent, 14);
+                    } catch (Exception e) {
+                        org.telegram.messenger.FileLog.e(e);
+                    }
+                }
+            });
+            presentFragment(fragment);
+        }));
         qsCard.addView(createGlassDivider(context));
 
         qsCard.addView(createSwitchItem(context, "Ghost Mode", "Read silently", R.drawable.msg_secret, 0xFF546E7A,

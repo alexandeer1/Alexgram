@@ -56,8 +56,15 @@ import org.telegram.ui.Components.UndoView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.io.File;
 
 import kotlin.Unit;
+import org.telegram.messenger.FileLoader;
+import org.telegram.messenger.MediaController;
+import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.SendMessagesHelper;
+import org.telegram.messenger.UserConfig;
+import org.telegram.ui.PhotoAlbumPickerActivity;
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.config.CellGroup;
 import tw.nekomimi.nekogram.config.ConfigItem;
@@ -85,6 +92,9 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private AnimatorSet animatorSet;
     private boolean sensitiveCanChange = false;
     private boolean sensitiveEnabled = false;
+
+    private MessageObject convertingVideo;
+    private NotificationCenter.NotificationCenterDelegate videoConvertDelegate;
 
     private final CellGroup cellGroup = new CellGroup(this);
 
