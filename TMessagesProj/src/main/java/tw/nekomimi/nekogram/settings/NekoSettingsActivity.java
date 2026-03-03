@@ -191,7 +191,7 @@ public class NekoSettingsActivity extends BaseFragment {
         iconCircle.setBackground(circBg);
 
         ImageView appIcon = new ImageView(context);
-        appIcon.setImageResource(R.mipmap.ic_launcher);
+        appIcon.setImageResource(R.drawable.ic_launcher_dr);
         appIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         iconCircle.addView(appIcon, LayoutHelper.createFrame(40, 40, Gravity.CENTER));
 
