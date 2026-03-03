@@ -1,6 +1,7 @@
 package tw.nekomimi.nekogram.settings;
 
 import android.animation.ValueAnimator;
+import org.telegram.messenger.AndroidUtilities;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
