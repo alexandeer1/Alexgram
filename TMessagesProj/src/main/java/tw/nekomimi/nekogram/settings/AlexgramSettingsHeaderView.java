@@ -144,22 +144,24 @@ public class AlexgramSettingsHeaderView extends View {
         finalPlaneY = ay + s * 0.05f;
         finalPlaneAngle = -15f;
 
-        bgPaint.setShader(new LinearGradient(0, 0, vw * 0.5f, vh,
-                new int[]{BG_TOP, BG_MID, BG_BOT},
-                new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
+        if (vw > 0 && vh > 0) {
+            bgPaint.setShader(new LinearGradient(0, 0, vw * 0.5f, vh,
+                    new int[]{BG_TOP, BG_MID, BG_BOT},
+                    new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP));
 
-        aFill.setShader(new LinearGradient(
-                ax - s, ay - s, ax + s, ay + s,
-                new int[]{A_FILL_LT, A_FILL_DK},
-                null, Shader.TileMode.CLAMP));
+            aFill.setShader(new LinearGradient(
+                    ax - s, ay - s, ax + s, ay + s,
+                    new int[]{A_FILL_LT, A_FILL_DK},
+                    null, Shader.TileMode.CLAMP));
 
-        planeRt.setShader(new LinearGradient(
-                -ps, -ps, ps, ps,
-                new int[]{PLANE_LT, PLANE_MID}, null, Shader.TileMode.CLAMP));
-                
-        planeLt.setShader(new LinearGradient(
-                -ps*0.5f, 0, ps, ps,
-                new int[]{PLANE_MID, PLANE_DK}, null, Shader.TileMode.CLAMP));
+            planeRt.setShader(new LinearGradient(
+                    -ps, -ps, ps, ps,
+                    new int[]{PLANE_LT, PLANE_MID}, null, Shader.TileMode.CLAMP));
+                    
+            planeLt.setShader(new LinearGradient(
+                    -ps*0.5f, 0, ps, ps,
+                    new int[]{PLANE_MID, PLANE_DK}, null, Shader.TileMode.CLAMP));
+        }
     }
 
     private void go() {
@@ -199,14 +201,16 @@ public class AlexgramSettingsHeaderView extends View {
         // Glowing backdrop behind logo
         float pulse = 1f + 0.05f * (float) Math.sin((System.currentTimeMillis() % 2000) / 2000f * Math.PI * 2);
         float r = ls * 2.2f * pulse;
-        RadialGradient g = new RadialGradient(cx, cy, r,
-                new int[]{
-                        Color.argb(120, 79, 195, 247),
-                        Color.argb(0, 13, 71, 161)
-                },
-                null, Shader.TileMode.CLAMP);
-        glowPnt.setShader(g);
-        c.drawCircle(cx, cy, r, glowPnt);
+        if (r > 0) {
+            RadialGradient g = new RadialGradient(cx, cy, r,
+                    new int[]{
+                            Color.argb(120, 79, 195, 247),
+                            Color.argb(0, 13, 71, 161)
+                    },
+                    null, Shader.TileMode.CLAMP);
+            glowPnt.setShader(g);
+            c.drawCircle(cx, cy, r, glowPnt);
+        }
 
         // Ring around logo
         ringPnt.setColor(NEON_CYAN);
