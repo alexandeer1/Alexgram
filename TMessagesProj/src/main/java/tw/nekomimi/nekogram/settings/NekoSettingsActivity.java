@@ -78,6 +78,7 @@ import kotlin.text.StringsKt;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.PhotoAlbumPickerActivity;
 import tw.nekomimi.nekogram.DialogConfig;
