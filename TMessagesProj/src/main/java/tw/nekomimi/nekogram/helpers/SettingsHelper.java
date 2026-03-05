@@ -128,7 +128,10 @@ public class SettingsHelper {
                     continue;
                 }
                 int guid = uid + i;
-                String title = getString(key);
+                String title = fragment.getRowTitle(i);
+                if (title == null || title.isEmpty()) {
+                    title = getString(key);
+                }
                 if (title == null || title.isEmpty()) {
                     continue;
                 }
