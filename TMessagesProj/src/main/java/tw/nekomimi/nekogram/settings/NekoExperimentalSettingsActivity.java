@@ -205,10 +205,11 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
         @Override
         public void setConfigBool(boolean v) {
             NaConfig.INSTANCE.getHideStoriesFromHeader().setConfigBool(v);
-            // If Hide Stories from Header turned ON -> Turn OFF Video Header
-            if (v && NekoConfig.videoHeaderEnabled.Bool()) {
+            // REQUIREMENT: Video Header works ONLY when Hide Stories is ON.
+            // If user turns Hide Stories OFF (v == false) -> Stories become visible -> Video Header must turn OFF.
+            if (!v && NekoConfig.videoHeaderEnabled.Bool()) {
                  NekoConfig.videoHeaderEnabled.setConfigBool(false);
-                 BulletinFactory.of(NekoExperimentalSettingsActivity.this).createSimpleBulletin(R.raw.ic_delete, "Live Video Header disabled due to hidden stories").show();
+                 BulletinFactory.of(NekoExperimentalSettingsActivity.this).createSimpleBulletin(R.raw.ic_delete, "Live Video Header disabled because stories are now visible").show();
             }
         }
     };
