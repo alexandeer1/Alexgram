@@ -269,7 +269,7 @@ public class NekoSettingsActivity extends BaseFragment {
         qsCard.addView(createGlassDivider(context));
 
         qsCard.addView(createSettingItem(context, "Custom Video Background", "Select & crop video background", R.drawable.msg_gallery_solar, 0xFF00BCD4, v -> {
-            PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER, false, false, null);
+            PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_HEADER_BACKGROUND, false, false, null);
             fragment.setDelegate(new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
                 @Override
                 public void didSelectPhotos(ArrayList<SendMessagesHelper.SendingMediaInfo> photos, boolean notify, int scheduleDate) {

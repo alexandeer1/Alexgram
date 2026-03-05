@@ -142,6 +142,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment implements Notificati
     public static int SELECT_TYPE_AVATAR = 1;
     public static int SELECT_TYPE_WALLPAPER = 2;
     public static int SELECT_TYPE_AVATAR_VIDEO = 3;
+    public static int SELECT_TYPE_HEADER_BACKGROUND = 4;
     public static int SELECT_TYPE_QR = 10;
 
     public PhotoAlbumPickerActivity(int selectPhotoType, boolean allowGifs, boolean allowCaption, ChatActivity chatActivity) {

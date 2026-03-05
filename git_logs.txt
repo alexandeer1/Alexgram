@@ -1,0 +1,60 @@
+commit 54a7b5073f3a22b70db22eb25c4177c2ba760d55
+Author: AI Config <test@example.com>
+Date:   Wed Mar 4 21:47:49 2026 +0530
+
+    Allow unlimited scroll for locked stories header to prevent shrinking and overlap
+
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+index 7f86d5b85..46d139f00 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+@@ -1618,6 +1618,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
+                 containersAlpha = 1f - progressToDialogStoriesCell;
+             } else {
+                 float limit = -getMaxScrollYOffsetWithoutSearch();
++                if (locked) {
++                    limit = Integer.MIN_VALUE;
++                }
+                 dialogStoriesCell.setTranslationY(Math.max(scrollYOffset, limit) + storiesYOffset + storiesOverscroll / 2f - dp(8));
+                 dialogStoriesCell.setProgressToCollapse(p, !rightSlidingDialogContainer.hasFragment());
+                 if (!animateToHasStories) {
+@@ -1644,6 +1647,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
+                  float ty;
+                  if (hasStories) {
+                      float limit = -getMaxScrollYOffsetWithoutSearch();
++                     if (locked) {
++                        limit = Integer.MIN_VALUE;
++                     }
+                      ty = Math.max(scrollYOffset, limit) + storiesYOffset + storiesOverscroll / 2f - dp(8);
+                  } else if (hasOnlySlefStories) {
+                      ty = -dp(DialogStoriesCell.HEIGHT_IN_DP) + Math.max(scrollYOffset, -getMaxScrollYOffsetWithoutSearch()) - dp(8);
+
+commit 50f44ac1c2c2ed818259c751b06262930a122c58
+Author: AI Config <test@example.com>
+Date:   Wed Mar 4 21:24:06 2026 +0530
+
+    Fix usage of undefined variable 'contentView' by referencing 'fragmentView'
+
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+index c148cacbe..7f86d5b85 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+@@ -1638,8 +1638,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
+             actionBar.setTranslationY(0);
+         }
+ 
+-        if (tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && contentView.getChildCount() > 0) {
+-            View child = contentView.getChildAt(0);
++        if (tw.nekomimi.nekogram.NekoConfig.videoHeaderEnabled.Bool() && fragmentView instanceof ViewGroup && ((ViewGroup) fragmentView).getChildCount() > 0) {
++            View child = ((ViewGroup) fragmentView).getChildAt(0);
+             if (child instanceof android.widget.FrameLayout && !(child instanceof ViewPage) && !(child instanceof org.telegram.ui.Components.RecyclerListView)) {
+                  float ty;
+                  if (hasStories) {
+@@ -1654,6 +1654,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
+             }
+         }
+ 
++
+         containersAlpha *= (1f - factorSearch);
+         if (containersAlpha != 1f) {
+             actionBar.getTitlesContainer().setPivotY(AndroidUtilities.statusBarHeight);
