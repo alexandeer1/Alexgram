@@ -1607,9 +1607,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             int count = MessagesController.getInstance(currentAccount).hintDialogs.size();
             itemInternals.add(new ItemInternal(VIEW_TYPE_RECENTLY_VIEWED));
             for (int k = 0; k < count; k++) {
-                TLRPC.User user = MessagesController.getInstance(currentAccount).hintDialogs.get(k);
-                if (!HiddenChatsController.getInstance().isHidden(currentAccount, user.id)) {
-                    itemInternals.add(new ItemInternal(VIEW_TYPE_ME_URL, user));
+                TLRPC.RecentMeUrl url = MessagesController.getInstance(currentAccount).hintDialogs.get(k);
+                long id = url.user_id != 0 ? url.user_id : -url.chat_id;
+                if (!HiddenChatsController.getInstance().isHidden(currentAccount, id)) {
+                    itemInternals.add(new ItemInternal(VIEW_TYPE_ME_URL, url));
                 }
             }
             itemInternals.add(new ItemInternal(VIEW_TYPE_DIVIDER));
