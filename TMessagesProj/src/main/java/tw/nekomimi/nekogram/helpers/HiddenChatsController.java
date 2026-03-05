@@ -127,8 +127,6 @@ public class HiddenChatsController {
         }
         saveIds(currentAccount);
         NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload);
-        NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.updateInterfaces, 
-                org.telegram.messenger.MessagesController.UPDATE_MASK_DIALOGS);
     }
 
     public boolean isHidden(int currentAccount, long dialogId) {
