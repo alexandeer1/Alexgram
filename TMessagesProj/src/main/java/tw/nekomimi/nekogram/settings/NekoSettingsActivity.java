@@ -106,6 +106,8 @@ public class NekoSettingsActivity extends BaseFragment {
 
     private static final int MENU_SEARCH = 1;
     private static final int MENU_SYNC = 2;
+    private static final int PERMISSION_REQ_MUSIC_GRAPH = 120;
+    private org.telegram.ui.Components.Switch musicGraphSwitch;
 
     // Adaptive colors (set in createView based on theme)
     private int cardBg, cardBorder, textTitle, textSub, sectionLabel, accentColor, dividerColor;
@@ -250,7 +252,7 @@ public class NekoSettingsActivity extends BaseFragment {
         addGlassSection(contentLayout, context, "QUICK SETTINGS");
         LinearLayout qsCard = createGlassCard(context);
 
-        qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts list", R.drawable.msg_contact, 0xFF00897B,
+        qsCard.addView(createSwitchItem(context, "Hide Contacts", "Hide contacts tab", R.drawable.msg_contact, 0xFF00897B,
                 NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
                     NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
                     AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
@@ -385,13 +387,33 @@ public class NekoSettingsActivity extends BaseFragment {
                 }));
         qsCard.addView(createGlassDivider(context));
 
-        qsCard.addView(createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFE53935,
-                NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
+        View musicGraphRow = createSwitchItem(context, "Music Graph", "Visualizer in player", R.drawable.msg_filled_data_music_solar, 0xFFE53935,
+                NaConfig.INSTANCE.getMusicGraph().Bool() && (Build.VERSION.SDK_INT < 23 || context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED), isChecked -> {
+                    if (isChecked) {
+                        if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                            getParentActivity().requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_REQ_MUSIC_GRAPH);
+                            if (musicGraphSwitch != null) {
+                                musicGraphSwitch.setChecked(false, true);
+                            }
+                            return;
+                        }
+                    }
                     NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
                     AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
                         AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
                     });
-                }));
+                });
+        if (musicGraphRow instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) musicGraphRow;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View child = vg.getChildAt(i);
+                if (child instanceof org.telegram.ui.Components.Switch) {
+                    musicGraphSwitch = (org.telegram.ui.Components.Switch) child;
+                    break;
+                }
+            }
+        }
+        qsCard.addView(musicGraphRow);
         qsCard.addView(createGlassDivider(context));
 
         qsCard.addView(createSwitchItem(context, "Save Deleted", "Save deleted messages", R.drawable.msg_delete, 0xFFAD1457,
@@ -1155,6 +1177,40 @@ public class NekoSettingsActivity extends BaseFragment {
                 }
             }
             super.onActivityResultFragment(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSION_REQ_MUSIC_GRAPH) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (musicGraphSwitch != null) {
+                    musicGraphSwitch.setChecked(true, true);
+                    NaConfig.INSTANCE.getMusicGraph().setConfigBool(true);
+                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                    });
+                }
+            } else {
+                if (getParentActivity() != null && !getParentActivity().shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                    new AlertDialog.Builder(getParentActivity())
+                            .setTitle("Permission Required")
+                            .setMessage("Go to settings-Apps-Alexgram give permission to allow microphone")
+                            .setPositiveButton("Settings", (dialog, which) -> {
+                                try {
+                                    Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
+                                    getParentActivity().startActivity(intent);
+                                } catch (Exception ignore) {
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }
+                if (musicGraphSwitch != null) {
+                    musicGraphSwitch.setChecked(false, true);
+                }
+            }
         }
     }
 }

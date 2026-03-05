@@ -872,4 +872,36 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
         addRowsToMap(cellGroup);
     }
 
+    @Override
+    public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 101) {
+            if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                 NaConfig.INSTANCE.getMusicGraph().setConfigBool(true);
+                 if (listAdapter != null) {
+                     listAdapter.notifyItemChanged(cellGroup.rows.indexOf(musicGraphRow));
+                 }
+                 try {
+                     // Since tooltip might not be accessible or initialized as a field, we skip it or use a safer way if available.
+                     // The config changed callback handles the tooltip usually, but since we are modifying directly, we might miss it.
+                     // However, the main requirement is enabling it.
+                 } catch (Exception e) {}
+            } else {
+                if (getParentActivity() != null && !getParentActivity().shouldShowRequestPermissionRationale(android.Manifest.permission.RECORD_AUDIO)) {
+                    new AlertDialog.Builder(getParentActivity())
+                            .setTitle("Permission Required")
+                            .setMessage("Go to settings-Apps-Alexgram give permission to allow microphone")
+                            .setPositiveButton("Settings", (dialog, which) -> {
+                                try {
+                                    android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    intent.setData(android.net.Uri.parse("package:" + org.telegram.messenger.ApplicationLoader.applicationContext.getPackageName()));
+                                    getParentActivity().startActivity(intent);
+                                } catch (Exception ignore) {
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }
+            }
+        }
+    }
 }

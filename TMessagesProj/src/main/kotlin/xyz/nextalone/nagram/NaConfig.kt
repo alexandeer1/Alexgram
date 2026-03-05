@@ -103,7 +103,7 @@ object NaConfig {
         addConfig(
             "MusicGraph",
             ConfigItem.configTypeBool,
-            true
+            false
         )
     val hideContacts =
         addConfig(

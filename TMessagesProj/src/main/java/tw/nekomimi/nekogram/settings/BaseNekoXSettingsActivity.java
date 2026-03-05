@@ -53,6 +53,7 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
     protected UndoView tooltip;
     protected HashMap<String, Integer> rowMap = new HashMap<>(20);
     protected HashMap<Integer, String> rowMapReverse = new HashMap<>(20);
+    protected HashMap<Integer, String> rowTitleMapReverse = new HashMap<>(20);
     protected HashMap<Integer, ConfigItem> rowConfigMapReverse = new HashMap<>(20);
 
     public static AlertDialog showConfigMenuAlert(Context context, String titleKey, ArrayList<ConfigCellTextCheck> configItems) {
@@ -224,16 +225,33 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         rowMap.clear();
         rowMapReverse.clear();
         rowConfigMapReverse.clear();
+        rowTitleMapReverse.clear();
         String key;
         ConfigItem config;
         for (int i = 0; i < cellGroup.rows.size(); i++) {
-            config = getBindConfig(cellGroup.rows.get(i));
-            key = getRowKey(cellGroup.rows.get(i));
+            AbstractConfigCell cell = cellGroup.rows.get(i);
+            config = getBindConfig(cell);
+            key = getRowKey(cell);
             if (key == null) key = String.valueOf(i);
             rowMap.put(key, i);
             rowMapReverse.put(i, key);
             rowConfigMapReverse.put(i, config);
+
+            String title = null;
+            if (cell instanceof ConfigCellTextCheck) {
+                CharSequence cs = ((ConfigCellTextCheck) cell).getTitle();
+                if (cs != null) title = cs.toString();
+            } else if (cell instanceof ConfigCellTextCheckIcon) {
+                title = ((ConfigCellTextCheckIcon) cell).getTitle();
+            }
+            if (title != null) {
+                rowTitleMapReverse.put(i, title);
+            }
         }
+    }
+
+    public String getRowTitle(int position) {
+        return rowTitleMapReverse.get(position);
     }
 
     protected String getRowKey(int position) {
