@@ -114,7 +114,6 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private final AbstractConfigCell localPremiumRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.localPremium));
     private final AbstractConfigCell unlimitedPinnedDialogsRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.unlimitedPinnedDialogs, getString(R.string.UnlimitedPinnedDialogsAbout)));
     private final AbstractConfigCell unlimitedFavedStickersRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.unlimitedFavedStickers, getString(R.string.UnlimitedFavoredStickersAbout)));
-    private final AbstractConfigCell foldersAtBottomRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getFoldersAtBottom(), "Folders At Bottom"));
     private final AbstractConfigCell dividerGeneral = cellGroup.appendCell(new ConfigCellDivider());
 
     // Connections
@@ -135,7 +134,6 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
             getString(R.string.VideoPlayerDecoderPreferHW),
             getString(R.string.VideoPlayerDecoderPreferSW),
     }, null));
-    private final AbstractConfigCell starFallRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getStarFallInChat(), "Star Fall Animation"));
     private final AbstractConfigCell dividerMedia = cellGroup.appendCell(new ConfigCellDivider());
 
     // Ayu
