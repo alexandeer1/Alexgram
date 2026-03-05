@@ -97,6 +97,15 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.radolyn.ayugram.utils.LastSeenHelper;
 
+import tw.nekomimi.nekogram.ui.HiddenChatsActivity;
+import android.text.InputType;
+import org.telegram.ui.Components.EditTextBoldCursor;
+import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.Components.BulletinFactory;
+import org.telegram.ui.Components.LayoutHelper;
+import android.view.Gravity;
+import android.widget.LinearLayout; // Ensure LinearLayout is imported
+import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -687,6 +696,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int pin2 = 108;
     private final static int add_to_folder = 109;
     private final static int remove_from_folder = 110;
+    private final static int hide_chat = 111;
 
     private final static int select_all = 1000;
 
@@ -3545,6 +3555,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable.center = true;
                 actionBar.setTitle(actionBarTitleNax = TypefaceHelper.getTitleText(currentAccount), statusDrawable);
                 actionBar.setOnLongClickListener(v -> {
+                    if (HiddenChatsController.getInstance().hasPasscode()) {
+                        showHiddenChatsPasscode();
+                        return true;
+                    }
                     if (NekoConfig.hideAllTab.Bool() && filterTabsView != null && filterTabsView.getCurrentTabId() != Integer.MAX_VALUE) {
                         filterTabsView.toggleAllTabs(true);
                         filterTabsView.selectDefaultTab();
@@ -4078,7 +4092,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         undoView.showWithAction(did, UndoView.ACTION_REMOVED_FROM_FOLDER, neverShow.size(), filter, null, null);
                     }
                     hideActionMode(false);
-                } else if (id == pin || id == read || id == delete || id == clear || id == mute || id == archive || id == block || id == archive2 || id == pin2) {
+                } else if (id == pin || id == read || id == delete || id == clear || id == mute || id == archive || id == block || id == archive2 || id == pin2 || id == hide_chat) {
                     performSelectedDialogsAction(selectedDialogs, id, true, false);
                 } else if (id == select_all) {
                     final int initialSelectedCount = selectedDialogs.size();
@@ -6787,6 +6801,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         pin2Item = otherItem.addSubItem(pin2, R.drawable.msg_pin, LocaleController.getString(R.string.DialogPin));
         addToFolderItem = otherItem.addSubItem(add_to_folder, R.drawable.msg_addfolder, LocaleController.getString(R.string.FilterAddTo));
         removeFromFolderItem = otherItem.addSubItem(remove_from_folder, R.drawable.msg_removefolder, LocaleController.getString(R.string.FilterRemoveFrom));
+        if (this instanceof HiddenChatsActivity) {
+             otherItem.addSubItem(hide_chat, R.drawable.msg_unlock, "Remove from Hidden Chats");
+        } else {
+             otherItem.addSubItem(hide_chat, R.drawable.msg_lock, "Add to Hidden Chats");
+        }
         readItem = otherItem.addSubItem(read, R.drawable.msg_markread, LocaleController.getString(R.string.MarkAsRead));
         clearItem = otherItem.addSubItem(clear, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
         blockItem = otherItem.addSubItem(block, R.drawable.msg_block, LocaleController.getString(R.string.BlockUser));
@@ -9116,6 +9135,34 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         performSelectedDialogsAction(selectedDialogs, action, alert, longPress, null);
     }
 
+    private void showHiddenChatsPasscode() {
+         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+         builder.setTitle("Enter Passcode");
+         final EditTextBoldCursor field = new EditTextBoldCursor(getParentActivity());
+         field.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+         field.setGravity(Gravity.CENTER);
+         field.setTextSize(18);
+         field.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
+         field.setHint("Enter Passcode");
+         
+         LinearLayout container = new LinearLayout(getParentActivity());
+         container.setOrientation(LinearLayout.VERTICAL);
+         container.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(12), AndroidUtilities.dp(24), 0);
+         container.addView(field, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+         builder.setView(container);
+
+         builder.setPositiveButton("Unlock", (d, w) -> {
+             if (HiddenChatsController.getInstance().checkPasscode(field.getText().toString())) {
+                 HiddenChatsController.getInstance().unlock();
+                 presentFragment(new HiddenChatsActivity(new Bundle()));
+             } else {
+                 BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.error, "Incorrect Passcode").show();
+             }
+         });
+         builder.setNegativeButton("Cancel", null);
+         builder.show();
+    }
+
     private void performSelectedDialogsAction(ArrayList<Long> selectedDialogs, int action, boolean alert, boolean longPress, HashSet<Long> dialogsIdsToRevoke) {
         if (getParentActivity() == null) {
             return;
@@ -9129,6 +9176,39 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         int count = selectedDialogs.size();
         int pinnedActionCount = 0;
+        if (action == hide_chat) {
+            HiddenChatsController controller = HiddenChatsController.getInstance();
+            if (!controller.hasPasscode()) {
+                BulletinFactory.of(DialogsActivity.this).createSimpleBulletin(R.raw.error, "Please set up passcode in Settings first").show();
+                hideActionMode(true);
+                return;
+            }
+            int hideCount = 0;
+            boolean isVault = this instanceof HiddenChatsActivity;
+            for (int i = 0; i < selectedDialogs.size(); i++) {
+                long dialogId = selectedDialogs.get(i);
+                if (isVault) {
+                   if (controller.isHidden(dialogId)) {
+                        controller.toggleHidden(dialogId);
+                        hideCount++;
+                   }
+                } else {
+                   if (!controller.isHidden(dialogId)) {
+                        controller.toggleHidden(dialogId);
+                        hideCount++;
+                   }
+                }
+            }
+            if (hideCount > 0 && viewPages != null) {
+                for (ViewPage viewPage : viewPages) {
+                     if (viewPage.dialogsAdapter != null) {
+                        viewPage.dialogsAdapter.notifyDataSetChanged();
+                     }
+                }
+            }
+            hideActionMode(true);
+            return;
+        }
         if (action == archive || action == archive2) {
             ArrayList<Long> copy = new ArrayList<>(selectedDialogs);
             getMessagesController().addDialogToFolder(copy, canUnarchiveCount == 0 ? 1 : 0, -1, null, 0);

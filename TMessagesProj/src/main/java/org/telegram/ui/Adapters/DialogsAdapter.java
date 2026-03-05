@@ -76,7 +76,9 @@ import org.telegram.ui.DialogsActivity;
 import org.telegram.ui.Stories.DialogStoriesCell;
 import org.telegram.ui.Stories.StoriesController;
 import org.telegram.ui.Stories.StoriesListPlaceProvider;
+import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 
+import tw.nekomimi.nekogram.ui.HiddenChatsActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1465,6 +1467,18 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         ArrayList<TLRPC.Dialog> array = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen);
         if (array == null) {
             array = new ArrayList<>();
+        } else if (dialogsType == 0) {
+            boolean isHiddenScreen = parentFragment instanceof HiddenChatsActivity; 
+            ArrayList<TLRPC.Dialog> filtered = new ArrayList<>();
+            for (TLRPC.Dialog dialog : array) {
+                boolean isHidden = HiddenChatsController.getInstance().isHidden(dialog.id);
+                if (isHiddenScreen) {
+                    if (isHidden) filtered.add(dialog);
+                } else {
+                    if (!isHidden) filtered.add(dialog);
+                }
+            }
+            array = filtered;
         }
         dialogsCount = array.size();
         isEmpty = false;

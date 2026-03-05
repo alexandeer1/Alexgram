@@ -46,8 +46,10 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.R;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.UserConfig;
+import tw.nekomimi.nekogram.ui.HiddenChatsActivity;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
+import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -285,6 +287,23 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
     }
 
     private boolean filter(Object obj) {
+        long dialogId = 0;
+        if (obj instanceof TLRPC.User) {
+            dialogId = ((TLRPC.User) obj).id;
+        } else if (obj instanceof TLRPC.Chat) {
+            dialogId = -((TLRPC.Chat) obj).id;
+        } else if (obj instanceof TLRPC.EncryptedChat) {
+            dialogId = DialogObject.makeEncryptedDialogId(((TLRPC.EncryptedChat) obj).id);
+        }
+
+        boolean isHidden = HiddenChatsController.getInstance().isHidden(dialogId);
+        boolean isHiddenScreen = dialogsActivity instanceof HiddenChatsActivity;
+
+        if (dialogId != 0) {
+            if (isHidden && !isHiddenScreen) return false;
+            if (!isHidden && isHiddenScreen) return false;
+        }
+
         if (dialogsType != DialogsActivity.DIALOGS_TYPE_START_ATTACH_BOT) {
             return true;
         }
