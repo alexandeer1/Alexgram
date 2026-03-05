@@ -47,6 +47,15 @@ public class HiddenChatsController {
         biometricEnabled = preferences.getBoolean("biometric", false);
     }
 
+    public void reset() {
+        hiddenChatIds.clear();
+        passcode = null;
+        isUnlocked = false;
+        biometricEnabled = false;
+        preferences.edit().clear().apply();
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.dialogsNeedReload);
+    }
+
     private void saveIds() {
         preferences.edit().putStringSet("hidden_ids", hiddenChatIds).apply();
     }

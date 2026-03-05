@@ -3764,6 +3764,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     shareEmpty[0] = true;
 
                     ArrayList<TLRPC.Dialog> dialogs = new ArrayList<>(defaultTab ? getMessagesController().getDialogs(folderId) : getMessagesController().getAllDialogs());
+                    // Filter hidden chats
+                    for (int i = 0; i < dialogs.size(); i++) {
+                        if (HiddenChatsController.getInstance().isHidden(dialogs.get(i).id)) {
+                             dialogs.remove(i);
+                             i--;
+                        }
+                    }
+
                     MessagesController.DialogFilter filter = null;
                     if (dialogFilter != null) {
                         filter = getMessagesController().getDialogFilters().get(tabView.getId());
@@ -10983,7 +10991,19 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         MessagesController messagesController = AccountInstance.getInstance(currentAccount).getMessagesController();
         if (dialogsType == DIALOGS_TYPE_DEFAULT) {
-            return messagesController.getDialogs(folderId);
+            ArrayList<TLRPC.Dialog> original = messagesController.getDialogs(folderId);
+            ArrayList<TLRPC.Dialog> filtered = new ArrayList<>();
+            boolean isHiddenChatsActivity = this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity;
+            for (int i = 0; i < original.size(); i++) {
+                TLRPC.Dialog dialog = original.get(i);
+                 boolean isHidden = HiddenChatsController.getInstance().isHidden(dialog.id);
+                 if (isHiddenChatsActivity) {
+                      if (isHidden) filtered.add(dialog);
+                 } else {
+                      if (!isHidden) filtered.add(dialog);
+                 }
+            }
+            return filtered;
         } else if (dialogsType == DIALOGS_TYPE_WIDGET || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY) {
             return messagesController.dialogsServerOnly;
         } else if (dialogsType == DIALOGS_TYPE_ADD_USERS_TO) {

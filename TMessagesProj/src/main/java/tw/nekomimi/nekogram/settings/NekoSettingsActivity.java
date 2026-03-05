@@ -1285,9 +1285,8 @@ public class NekoSettingsActivity extends BaseFragment {
             String code = editText.getText().toString();
             if (HiddenChatsController.getInstance().checkPasscode(code)) {
                 HiddenChatsController.getInstance().unlock();
-                 AndroidUtilities.runOnUIThread(() -> {
-                     BulletinFactory.of(NekoSettingsActivity.this).createSimpleBulletin(R.raw.done, "Unlocked").show();
-                });
+                dialog.dismiss();
+                presentFragment(new HiddenChatsSettingsActivity());
             } else {
                  AndroidUtilities.runOnUIThread(() -> {
                      BulletinFactory.of(NekoSettingsActivity.this).createSimpleBulletin(R.raw.error, "Incorrect Passcode").show();
