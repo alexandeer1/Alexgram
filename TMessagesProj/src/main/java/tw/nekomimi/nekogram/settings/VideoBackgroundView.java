@@ -98,27 +98,39 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
             return;
         }
 
+        float videoAspect = (float) videoWidth / videoHeight;
+        float viewAspect = (float) viewWidth / viewHeight;
+
         Matrix matrix = new Matrix();
 
-        float scaleX = (float) viewWidth / videoWidth;
-        float scaleY = (float) viewHeight / videoHeight;
-        float maxScale = Math.max(scaleX, scaleY);
+        float scaleX = 1f;
+        float scaleY = 1f;
 
-        // Center crop
-        float scaledVideoWidth = videoWidth * maxScale;
-        float scaledVideoHeight = videoHeight * maxScale;
+        if (videoAspect > viewAspect) {
+            // Video is wider than the view.
+            // To maintain aspect ratio and fill height, we scale X (width) up? No.
+            // If we stretch to View (W, H), the video is squished horizontally (or rather, the stored aspect is too small).
+            // Actually, wait. TextureView stretches the content (videoWidth, videoHeight) into (viewWidth, viewHeight).
+            
+            // If videoAspect > viewAspect (e.g. 16:9 video in 1:1 view).
+            // Width is relatively larger in video.
+            // Stretched into 1:1, it looks tall and thin? No, wide video into square looks tall?
+            // Wide video (say 100x50, aspect 2) -> Square view (50x50, aspect 1).
+            // Horizontal pixels get squashed by factor 2.
+            // We need to Expand X by factor 2 to restore aspect.
+            // But if we expand X, we crop sides. That's CENTER_CROP.
+            // ScaleX = videoAspect / viewAspect.
+            scaleX = videoAspect / viewAspect;
+        } else {
+            // Video is taller than view (e.g. 9:16 video in 1:1 view).
+            // Tall video (say 50x100, aspect 0.5) -> Square view (50x50, aspect 1).
+            // Vertical pixels get squashed by factor 2.
+            // We need to Expand Y by factor 2.
+            // ScaleY = viewAspect / videoAspect.
+            scaleY = viewAspect / videoAspect;
+        }
 
-        float translateX = (viewWidth - scaledVideoWidth) / 2f;
-        float translateY = (viewHeight - scaledVideoHeight) / 2f;
-
-        matrix.setScale(maxScale, maxScale);
-        matrix.postTranslate(translateX, translateY);
-
-        // Required because TextureView scaling uses the view's dimensions 
-        // as 1.0f scale by default
-        matrix.postScale(1f / viewWidth, 1f / viewHeight, 0, 0);
-        matrix.preScale(viewWidth, viewHeight);
-
+        matrix.setScale(scaleX, scaleY, viewWidth / 2f, viewHeight / 2f);
         textureView.setTransform(matrix);
     }
 
