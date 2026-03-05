@@ -4116,6 +4116,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 @Override
                 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                     int h = actionBar != null ? actionBar.getMeasuredHeight() : 0;
+                    if (h == 0) {
+                        h = org.telegram.ui.ActionBar.ActionBar.getCurrentActionBarHeight();
+                        if (actionBar != null && actionBar.getOccupyStatusBar()) {
+                            h += AndroidUtilities.statusBarHeight;
+                        }
+                    }
                     if (dialogStoriesCell != null && dialogStoriesCell.getVisibility() == View.VISIBLE) {
                         h += Math.max(0, dialogStoriesCell.getMeasuredHeight() + dialogStoriesCell.getTranslationY());
                         dialogStoriesCell.setBackgroundColor(android.graphics.Color.TRANSPARENT);

@@ -8,6 +8,8 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.widget.FrameLayout;
 
+import android.widget.ImageView;
+
 import org.telegram.messenger.FileLog;
 import org.telegram.ui.Components.LayoutHelper;
 
@@ -18,22 +20,45 @@ import tw.nekomimi.nekogram.NekoConfig;
 public class VideoBackgroundView extends FrameLayout implements TextureView.SurfaceTextureListener {
 
     private TextureView textureView;
+    private ImageView imageView;
     private MediaPlayer mediaPlayer;
     private Surface surface;
     private String currentVideoPath;
+    private boolean isImage;
 
     public VideoBackgroundView(Context context) {
         super(context);
         
         currentVideoPath = NekoConfig.videoHeaderPath.String();
         
-        textureView = new TextureView(context);
-        textureView.setSurfaceTextureListener(this);
-        addView(textureView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        isImage = isImageFile(currentVideoPath);
+
+        if (isImage) {
+            imageView = new ImageView(context);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            try {
+                if (currentVideoPath != null) {
+                    imageView.setImageURI(android.net.Uri.fromFile(new File(currentVideoPath)));
+                }
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+            addView(imageView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        } else {
+            textureView = new TextureView(context);
+            textureView.setSurfaceTextureListener(this);
+            addView(textureView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        }
+    }
+
+    private boolean isImageFile(String path) {
+        if (path == null) return false;
+        String lower = path.toLowerCase();
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp") || lower.endsWith(".bmp") || lower.endsWith(".gif");
     }
 
     private void initMediaPlayer(Surface surface) {
-        if (currentVideoPath == null || currentVideoPath.isEmpty()) {
+        if (isImage || currentVideoPath == null || currentVideoPath.isEmpty()) {
             return;
         }
 
@@ -65,6 +90,7 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
     }
 
     private void updateTextureViewSize(int videoWidth, int videoHeight) {
+        if (isImage) return;
         int viewWidth = getWidth();
         int viewHeight = getHeight();
 
@@ -72,27 +98,39 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
             return;
         }
 
+        float videoAspect = (float) videoWidth / videoHeight;
+        float viewAspect = (float) viewWidth / viewHeight;
+
         Matrix matrix = new Matrix();
 
-        float scaleX = (float) viewWidth / videoWidth;
-        float scaleY = (float) viewHeight / videoHeight;
-        float maxScale = Math.max(scaleX, scaleY);
+        float scaleX = 1f;
+        float scaleY = 1f;
 
-        // Center crop
-        float scaledVideoWidth = videoWidth * maxScale;
-        float scaledVideoHeight = videoHeight * maxScale;
+        if (videoAspect > viewAspect) {
+            // Video is wider than the view.
+            // To maintain aspect ratio and fill height, we scale X (width) up? No.
+            // If we stretch to View (W, H), the video is squished horizontally (or rather, the stored aspect is too small).
+            // Actually, wait. TextureView stretches the content (videoWidth, videoHeight) into (viewWidth, viewHeight).
+            
+            // If videoAspect > viewAspect (e.g. 16:9 video in 1:1 view).
+            // Width is relatively larger in video.
+            // Stretched into 1:1, it looks tall and thin? No, wide video into square looks tall?
+            // Wide video (say 100x50, aspect 2) -> Square view (50x50, aspect 1).
+            // Horizontal pixels get squashed by factor 2.
+            // We need to Expand X by factor 2 to restore aspect.
+            // But if we expand X, we crop sides. That's CENTER_CROP.
+            // ScaleX = videoAspect / viewAspect.
+            scaleX = videoAspect / viewAspect;
+        } else {
+            // Video is taller than view (e.g. 9:16 video in 1:1 view).
+            // Tall video (say 50x100, aspect 0.5) -> Square view (50x50, aspect 1).
+            // Vertical pixels get squashed by factor 2.
+            // We need to Expand Y by factor 2.
+            // ScaleY = viewAspect / videoAspect.
+            scaleY = viewAspect / videoAspect;
+        }
 
-        float translateX = (viewWidth - scaledVideoWidth) / 2f;
-        float translateY = (viewHeight - scaledVideoHeight) / 2f;
-
-        matrix.setScale(maxScale, maxScale);
-        matrix.postTranslate(translateX, translateY);
-
-        // Required because TextureView scaling uses the view's dimensions 
-        // as 1.0f scale by default
-        matrix.postScale(1f / viewWidth, 1f / viewHeight, 0, 0);
-        matrix.preScale(viewWidth, viewHeight);
-
+        matrix.setScale(scaleX, scaleY, viewWidth / 2f, viewHeight / 2f);
         textureView.setTransform(matrix);
     }
 
@@ -110,12 +148,14 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+        if (isImage) return;
         surface = new Surface(surfaceTexture);
         initMediaPlayer(surface);
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
+        if (isImage) return;
         if (mediaPlayer != null) {
             updateTextureViewSize(mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight());
         }
@@ -137,12 +177,14 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
     }
 
     public void play() {
+        if (isImage) return;
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
             mediaPlayer.start();
         }
     }
 
     public void pause() {
+        if (isImage) return;
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
         }
@@ -151,7 +193,8 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (textureView.isAvailable() && mediaPlayer == null) {
+        if (isImage) return;
+        if (textureView != null && textureView.isAvailable() && mediaPlayer == null) {
             surface = new Surface(textureView.getSurfaceTexture());
             initMediaPlayer(surface);
         } else {
@@ -162,6 +205,7 @@ public class VideoBackgroundView extends FrameLayout implements TextureView.Surf
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if (isImage) return;
         pause();
     }
 }

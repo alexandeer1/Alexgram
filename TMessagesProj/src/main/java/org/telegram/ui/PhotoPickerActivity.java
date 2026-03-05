@@ -860,7 +860,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 int type;
                 if (selectPhotoType == PhotoAlbumPickerActivity.SELECT_TYPE_AVATAR || selectPhotoType == PhotoAlbumPickerActivity.SELECT_TYPE_AVATAR_VIDEO) {
                     type = PhotoViewer.SELECT_TYPE_AVATAR;
-                } else if (selectPhotoType == PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER) {
+                } else if (selectPhotoType == PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER || selectPhotoType == PhotoAlbumPickerActivity.SELECT_TYPE_HEADER_BACKGROUND) {
                     type = PhotoViewer.SELECT_TYPE_WALLPAPER;
                 } else if (selectPhotoType == PhotoAlbumPickerActivity.SELECT_TYPE_QR) {
                     type = PhotoViewer.SELECT_TYPE_QR;
@@ -1849,7 +1849,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         applyCaption();
         sendPressed = true;
         delegate.actionButtonPressed(false, notify, scheduleDate, scheduleRepeatPeriod);
-        if (selectPhotoType != PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER && (delegate == null || delegate.canFinishFragment())) {
+        if (selectPhotoType != PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER && selectPhotoType != PhotoAlbumPickerActivity.SELECT_TYPE_HEADER_BACKGROUND && (delegate == null || delegate.canFinishFragment())) {
             finishFragment();
         }
     }

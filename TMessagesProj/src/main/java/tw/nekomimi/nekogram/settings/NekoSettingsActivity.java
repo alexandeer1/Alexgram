@@ -261,15 +261,37 @@ public class NekoSettingsActivity extends BaseFragment {
 
         qsCard.addView(createSwitchItem(context, "Live Video Header", "Enable video background in main header", R.drawable.msg_video, 0xFF9C27B0,
                 NekoConfig.videoHeaderEnabled.Bool(), isChecked -> {
-                    NekoConfig.videoHeaderEnabled.setConfigBool(isChecked);
-                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
-                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
-                    });
+                    // REQUIREMENT: Live Video Header works ONLY when Hide Stories is ON.
+                    if (isChecked && !NaConfig.INSTANCE.getHideStoriesFromHeader().Bool()) {
+                         // User wants to ENABLE video header, but Stories are VISIBLE (HideFromHeader is False).
+                         // We must show confirmation to HIDE stories.
+                         new AlertDialog.Builder(getParentActivity())
+                            .setTitle("Requires Hidden Stories")
+                            .setMessage("Live Video Header requires Stories to be hidden from the header.\n\nDo you want to enable 'Hide from Header' now?")
+                            .setPositiveButton("Enable & Hide Stories", (d, w) -> {
+                                NaConfig.INSTANCE.getHideStoriesFromHeader().setConfigBool(true); // Hide stories
+                                NekoConfig.videoHeaderEnabled.setConfigBool(true); // Enable video header
+                                
+                                AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                                    AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                                });
+                            })
+                            .setNegativeButton("Cancel", (d, w) -> {
+                                d.dismiss();
+                                getParentActivity().recreate(); // Reset switch state
+                            })
+                            .show();
+                    } else {
+                        NekoConfig.videoHeaderEnabled.setConfigBool(isChecked);
+                        AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                            AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                        });
+                    }
                 }));
         qsCard.addView(createGlassDivider(context));
 
         qsCard.addView(createSettingItem(context, "Custom Video Background", "Select & crop video background", R.drawable.msg_gallery_solar, 0xFF00BCD4, v -> {
-            PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_WALLPAPER, false, false, null);
+            PhotoAlbumPickerActivity fragment = new PhotoAlbumPickerActivity(PhotoAlbumPickerActivity.SELECT_TYPE_HEADER_BACKGROUND, false, false, null);
             fragment.setDelegate(new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
                 @Override
                 public void didSelectPhotos(ArrayList<SendMessagesHelper.SendingMediaInfo> photos, boolean notify, int scheduleDate) {

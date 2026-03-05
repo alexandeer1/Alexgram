@@ -187,7 +187,33 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     // Story
     private final AbstractConfigCell headerStory = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.Story)));
     private final AbstractConfigCell disableStoriesRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDisableStories()));
-    private final AbstractConfigCell hideFromHeaderRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHideStoriesFromHeader()));
+    
+    // Custom wrapper for Hide from Header to handle side-effects
+    private final ConfigItem hideFromHeaderConfigWrapper = new ConfigItem(NaConfig.INSTANCE.getHideStoriesFromHeader().getKey(), ConfigItem.configTypeBool, false) {
+        @Override
+        public boolean Bool() {
+            return NaConfig.INSTANCE.getHideStoriesFromHeader().Bool();
+        }
+
+        @Override
+        public boolean toggleConfigBool() {
+            boolean newValue = !Bool();
+            setConfigBool(newValue);
+            return newValue;
+        }
+
+        @Override
+        public void setConfigBool(boolean v) {
+            NaConfig.INSTANCE.getHideStoriesFromHeader().setConfigBool(v);
+            // REQUIREMENT: Video Header works ONLY when Hide Stories is ON.
+            // If user turns Hide Stories OFF (v == false) -> Stories become visible -> Video Header must turn OFF.
+            if (!v && NekoConfig.videoHeaderEnabled.Bool()) {
+                 NekoConfig.videoHeaderEnabled.setConfigBool(false);
+                 BulletinFactory.of(NekoExperimentalSettingsActivity.this).createSimpleBulletin(R.raw.ic_delete, "Live Video Header disabled because stories are now visible").show();
+            }
+        }
+    };
+    private final AbstractConfigCell hideFromHeaderRow = cellGroup.appendCell(new ConfigCellTextCheck(hideFromHeaderConfigWrapper));
     private final AbstractConfigCell dividerStory = cellGroup.appendCell(new ConfigCellDivider());
 
     // Pangu
