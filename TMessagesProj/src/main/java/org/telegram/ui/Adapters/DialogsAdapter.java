@@ -76,7 +76,9 @@ import org.telegram.ui.DialogsActivity;
 import org.telegram.ui.Stories.DialogStoriesCell;
 import org.telegram.ui.Stories.StoriesController;
 import org.telegram.ui.Stories.StoriesListPlaceProvider;
+import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 
+import tw.nekomimi.nekogram.ui.HiddenChatsActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1465,6 +1467,18 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         ArrayList<TLRPC.Dialog> array = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen);
         if (array == null) {
             array = new ArrayList<>();
+        } else if (dialogsType == 0) {
+            boolean isHiddenScreen = parentFragment instanceof HiddenChatsActivity; 
+            ArrayList<TLRPC.Dialog> filtered = new ArrayList<>();
+            for (TLRPC.Dialog dialog : array) {
+                boolean isHidden = HiddenChatsController.getInstance().isHidden(currentAccount, dialog.id);
+                if (isHiddenScreen) {
+                    if (isHidden) filtered.add(dialog);
+                } else {
+                    if (!isHidden) filtered.add(dialog);
+                }
+            }
+            array = filtered;
         }
         dialogsCount = array.size();
         isEmpty = false;
@@ -1479,7 +1493,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                 long selfId = UserConfig.getInstance(currentAccount).clientUserId;
                 for (int a = 0, N = onlineContacts.size(); a < N; a++) {
                     long userId = onlineContacts.get(a).user_id;
-                    if (userId == selfId || messagesController.dialogs_dict.get(userId) != null) {
+                    if (userId == selfId || messagesController.dialogs_dict.get(userId) != null || HiddenChatsController.getInstance().isHidden(currentAccount, userId)) {
                         onlineContacts.remove(a);
                         a--;
                         N--;
@@ -1496,7 +1510,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         }
 
         final MessagesController.DialogFilter filter = getCurrentFilter();
-        if ((filter == null || filter.isDefault()) && parentFragment != null && parentFragment.isReplyTo && parentFragment.replyMessageAuthor != 0) {
+        if ((filter == null || filter.isDefault()) && parentFragment != null && parentFragment.isReplyTo && parentFragment.replyMessageAuthor != 0 && !HiddenChatsController.getInstance().isHidden(currentAccount, parentFragment.replyMessageAuthor)) {
             itemInternals.add(new ItemInternal(VIEW_TYPE_GRAY_SECTION));
             TLRPC.Dialog foundDialog = null;
             for (int i = 0; i < array.size(); ++i) {
@@ -1511,7 +1525,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             }
             itemInternals.add(new ItemInternal(VIEW_TYPE_DIALOG, foundDialog));
             itemInternals.add(new ItemInternal(VIEW_TYPE_GRAY_SECTION));
-        } else if ((filter == null || filter.isDefault()) && parentFragment != null && dialogsType == DialogsActivity.DIALOGS_TYPE_FORWARD && parentFragment.forwardOriginalChannel != 0) {
+        } else if ((filter == null || filter.isDefault()) && parentFragment != null && dialogsType == DialogsActivity.DIALOGS_TYPE_FORWARD && parentFragment.forwardOriginalChannel != 0 && !HiddenChatsController.getInstance().isHidden(currentAccount, parentFragment.forwardOriginalChannel)) {
             itemInternals.add(new ItemInternal(VIEW_TYPE_GRAY_SECTION));
             TLRPC.Dialog foundDialog = null;
             for (int i = 0; i < array.size(); ++i) {
@@ -1593,7 +1607,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             int count = MessagesController.getInstance(currentAccount).hintDialogs.size();
             itemInternals.add(new ItemInternal(VIEW_TYPE_RECENTLY_VIEWED));
             for (int k = 0; k < count; k++) {
-                itemInternals.add(new ItemInternal(VIEW_TYPE_ME_URL, MessagesController.getInstance(currentAccount).hintDialogs.get(k)));
+                TLRPC.User user = MessagesController.getInstance(currentAccount).hintDialogs.get(k);
+                if (!HiddenChatsController.getInstance().isHidden(currentAccount, user.id)) {
+                    itemInternals.add(new ItemInternal(VIEW_TYPE_ME_URL, user));
+                }
             }
             itemInternals.add(new ItemInternal(VIEW_TYPE_DIVIDER));
         } else if (dialogsType == DialogsActivity.DIALOGS_TYPE_IMPORT_HISTORY_GROUPS || dialogsType == DialogsActivity.DIALOGS_TYPE_IMPORT_HISTORY) {
