@@ -48,6 +48,8 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+
+import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -427,7 +429,7 @@ public class NekoSettingsActivity extends BaseFragment {
         addGlassSection(contentLayout, context, "PRIVACY");
         LinearLayout privacyCard = createGlassCard(context);
 
-        privacyCard.addView(createSettingItem(context, "Hidden Chats", "Secure vault for private chats", R.drawable.msg_lock, 0xFFE91E63, v -> {
+        privacyCard.addView(createSettingItem(context, "Hidden Chats", "Secure vault for private chats", R.drawable.msg_folders_private_solar, 0xFFE91E63, v -> {
             if (HiddenChatsController.getInstance().hasPasscode()) {
                 showHiddenChatsPasscodeDialog(context);
             } else {

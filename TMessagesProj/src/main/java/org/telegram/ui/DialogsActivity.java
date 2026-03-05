@@ -6801,10 +6801,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         pin2Item = otherItem.addSubItem(pin2, R.drawable.msg_pin, LocaleController.getString(R.string.DialogPin));
         addToFolderItem = otherItem.addSubItem(add_to_folder, R.drawable.msg_addfolder, LocaleController.getString(R.string.FilterAddTo));
         removeFromFolderItem = otherItem.addSubItem(remove_from_folder, R.drawable.msg_removefolder, LocaleController.getString(R.string.FilterRemoveFrom));
-        if (this instanceof HiddenChatsActivity) {
-             otherItem.addSubItem(hide_chat, R.drawable.msg_unlock, "Remove from Hidden Chats");
+        if (this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity) {
+             otherItem.addSubItem(hide_chat, R.drawable.msg_unarchive_solar, "Remove from Hidden Chats");
         } else {
-             otherItem.addSubItem(hide_chat, R.drawable.msg_lock, "Add to Hidden Chats");
+             otherItem.addSubItem(hide_chat, R.drawable.msg_folders_private_solar, "Add to Hidden Chats");
         }
         readItem = otherItem.addSubItem(read, R.drawable.msg_markread, LocaleController.getString(R.string.MarkAsRead));
         clearItem = otherItem.addSubItem(clear, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
