@@ -261,10 +261,37 @@ public class NekoSettingsActivity extends BaseFragment {
 
         qsCard.addView(createSwitchItem(context, "Live Video Header", "Enable video background in main header", R.drawable.msg_video, 0xFF9C27B0,
                 NekoConfig.videoHeaderEnabled.Bool(), isChecked -> {
-                    NekoConfig.videoHeaderEnabled.setConfigBool(isChecked);
-                    AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
-                        AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
-                    });
+                    if (isChecked && NaConfig.INSTANCE.getHideStoriesFromHeader().Bool()) {
+                         // User wants to ENABLE video header, but Stories are HIDDEN.
+                         // We must show confirmation.
+                         new AlertDialog.Builder(getParentActivity())
+                            .setTitle("Conflict with 'Hide from Header'")
+                            .setMessage("Live Video Header cannot be enabled while 'Hide from Header' (Stories) is ON.\n\nDo you want to turn OFF 'Hide from Header' and Enable Video Header?")
+                            .setPositiveButton("Turn OFF & Enable", (d, w) -> {
+                                NaConfig.INSTANCE.getHideStoriesFromHeader().setConfigBool(false);
+                                NekoConfig.videoHeaderEnabled.setConfigBool(true);
+                                
+                                AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                                    AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                                });
+                            })
+                            .setNegativeButton("Cancel", (d, w) -> {
+                                // Revert switch visually if possible, or just do nothing (state remains false)
+                                // Since this callback is often on checked change, the switch might already be visually toggled?
+                                // Usually these simple callbacks don't support rejecting the toggle easily without rebuilding the cell.
+                                // However, re-binding happens on resume often.
+                                // For now, we assume the switch stays in previous state or user toggles back.
+                                d.dismiss();
+                                // Force restart the activity to reset the switch visual state if it toggled
+                                getParentActivity().recreate();
+                            })
+                            .show();
+                    } else {
+                        NekoConfig.videoHeaderEnabled.setConfigBool(isChecked);
+                        AlertUtil.showConfirm(getParentActivity(), "Restart required", R.drawable.msg_retry, "Restart", true, () -> {
+                            AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
+                        });
+                    }
                 }));
         qsCard.addView(createGlassDivider(context));
 
