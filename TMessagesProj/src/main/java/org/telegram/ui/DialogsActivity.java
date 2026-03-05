@@ -3766,7 +3766,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     ArrayList<TLRPC.Dialog> dialogs = new ArrayList<>(defaultTab ? getMessagesController().getDialogs(folderId) : getMessagesController().getAllDialogs());
                     // Filter hidden chats
                     for (int i = 0; i < dialogs.size(); i++) {
-                        if (HiddenChatsController.getInstance().isHidden(dialogs.get(i).id)) {
+                        if (HiddenChatsController.getInstance().isHidden(currentAccount, dialogs.get(i).id)) {
                              dialogs.remove(i);
                              i--;
                         }
@@ -9196,13 +9196,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             for (int i = 0; i < selectedDialogs.size(); i++) {
                 long dialogId = selectedDialogs.get(i);
                 if (isVault) {
-                   if (controller.isHidden(dialogId)) {
-                        controller.toggleHidden(dialogId);
+                   if (controller.isHidden(currentAccount, dialogId)) {
+                        controller.toggleHidden(currentAccount, dialogId);
                         hideCount++;
                    }
                 } else {
-                   if (!controller.isHidden(dialogId)) {
-                        controller.toggleHidden(dialogId);
+                   if (!controller.isHidden(currentAccount, dialogId)) {
+                        controller.toggleHidden(currentAccount, dialogId);
                         hideCount++;
                    }
                 }
@@ -10996,7 +10996,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             boolean isHiddenChatsActivity = this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity;
             for (int i = 0; i < original.size(); i++) {
                 TLRPC.Dialog dialog = original.get(i);
-                 boolean isHidden = HiddenChatsController.getInstance().isHidden(dialog.id);
+                 boolean isHidden = HiddenChatsController.getInstance().isHidden(currentAccount, dialog.id);
                  if (isHiddenChatsActivity) {
                       if (isHidden) filtered.add(dialog);
                  } else {

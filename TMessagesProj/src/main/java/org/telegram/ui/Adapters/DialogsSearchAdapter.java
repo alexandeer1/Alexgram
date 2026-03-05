@@ -296,7 +296,7 @@ public class DialogsSearchAdapter extends RecyclerListView.SelectionAdapter {
             dialogId = DialogObject.makeEncryptedDialogId(((TLRPC.EncryptedChat) obj).id);
         }
 
-        boolean isHidden = HiddenChatsController.getInstance().isHidden(dialogId);
+        boolean isHidden = HiddenChatsController.getInstance().isHidden(currentAccount, dialogId);
         boolean isHiddenScreen = dialogsActivity instanceof HiddenChatsActivity;
 
         if (dialogId != 0) {

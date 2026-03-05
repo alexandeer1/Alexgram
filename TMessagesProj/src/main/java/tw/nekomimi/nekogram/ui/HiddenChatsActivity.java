@@ -29,7 +29,7 @@ public class HiddenChatsActivity extends DialogsActivity {
         tw.nekomimi.nekogram.helpers.HiddenChatsController controller = tw.nekomimi.nekogram.helpers.HiddenChatsController.getInstance();
         for (int i = 0; i < all.size(); i++) {
              org.telegram.tgnet.TLRPC.Dialog d = all.get(i);
-             if (controller.isHidden(d.id)) {
+             if (controller.isHidden(currentAccount, d.id)) {
                  hidden.add(d);
              }
         }
