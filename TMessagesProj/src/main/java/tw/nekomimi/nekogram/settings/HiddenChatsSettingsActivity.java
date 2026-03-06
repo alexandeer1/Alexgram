@@ -74,6 +74,15 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
              builder.show();
         }));
 
+        // How to Use
+        contentLayout.addView(createSettingItem(context, "How to Use", "Learn how to manage hidden chats", R.drawable.msg_info, 0xFFE91E63, v -> {
+             AlertDialog.Builder builder = new AlertDialog.Builder(context);
+             builder.setTitle("How to Use Hidden Chats");
+             builder.setMessage("• Hide Chats:\nLong-press any chat in the list and select 'Hide', or use the Plus icon in the Hidden Chats screen to add multiple chats at once.\n\n• Access Hidden Chats:\nLong-press the 'Search' or 'New Message' button on the main screen, or open them directly from these settings.\n\n• Privacy:\nChats added to Hidden Chats are automatically muted. You can manually unmute them if you prefer.\n\n• Passcode:\nYour hidden chats are protected by a 4-digit passcode.");
+             builder.setPositiveButton("Got It", null);
+             builder.show();
+        }));
+
         return fragmentView;
     }
 
@@ -128,12 +137,6 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
     private void showChangePasscodeDialog(Context context) {
         // Reuse setup logic logic, potentially duplicate code due to time constraints (user waiting)
         // Ideally should be shared.
-        // For simplicity: Clear existing passcode and show standard setup defined in NekoSettingsActivity
-        // But NekoSettingsActivity methods are private.
-        // So I'll just rely on HiddenChatsController to manage state
-        HiddenChatsController.getInstance().setPasscode(null); 
-        // Then show setup dialog? No, setup dialog is in NekoSettingsActivity.
-        // Let's implement a simple setup dialog here too.
         
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Set New Passcode");
@@ -141,6 +144,7 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
         final org.telegram.ui.Components.EditTextBoldCursor editText = new org.telegram.ui.Components.EditTextBoldCursor(context);
         editText.setTextSize(18);
         editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        editText.setFilters(new android.text.InputFilter[] { new android.text.InputFilter.LengthFilter(4) });
         editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         editText.setGravity(Gravity.CENTER);
         
@@ -150,16 +154,25 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
         container.addView(editText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         builder.setView(container);
 
-        builder.setPositiveButton("Set", (dialog, which) -> {
-            String code = editText.getText().toString();
-            if (code.length() == 4) {
-                HiddenChatsController.getInstance().setPasscode(code);
-                AndroidUtilities.runOnUIThread(() -> {
-                     org.telegram.ui.Components.BulletinFactory.of(HiddenChatsSettingsActivity.this).createSimpleBulletin(R.raw.done, "Passcode Updated").show();
-                });
-            }
-        });
+        builder.setPositiveButton("Set", null);
         builder.setNegativeButton("Cancel", null);
-        builder.show();
+        
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(di -> {
+            View b = dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE);
+            b.setOnClickListener(view -> {
+                String code = editText.getText().toString();
+                if (code.length() == 4) {
+                    HiddenChatsController.getInstance().setPasscode(code);
+                    AndroidUtilities.runOnUIThread(() -> {
+                         org.telegram.ui.Components.BulletinFactory.of(HiddenChatsSettingsActivity.this).createSimpleBulletin(R.raw.done, "Passcode Updated").show();
+                    });
+                    dialog.dismiss();
+                } else {
+                    AndroidUtilities.shakeView(editText);
+                }
+            });
+        });
+        dialog.show();
     }
 }

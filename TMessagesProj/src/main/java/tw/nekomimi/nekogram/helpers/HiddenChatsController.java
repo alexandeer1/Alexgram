@@ -124,6 +124,12 @@ public class HiddenChatsController {
             ids.remove(idInfo);
         } else {
             ids.add(idInfo);
+            // Default mute chat indefinitely if enabled by User.
+            android.content.SharedPreferences preferences = org.telegram.messenger.MessagesController.getNotificationsSettings(currentAccount);
+            if (!preferences.contains("notify2_" + dialogId)) {
+                 preferences.edit().putInt("notify2_" + dialogId, 2).apply();
+                 org.telegram.messenger.NotificationsController.getInstance(currentAccount).updateServerNotificationsSettings(dialogId, 0, true);
+            }
         }
         saveIds(currentAccount);
         NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogsNeedReload);

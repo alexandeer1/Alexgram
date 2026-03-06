@@ -3555,7 +3555,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable.center = true;
                 actionBar.setTitle(actionBarTitleNax = TypefaceHelper.getTitleText(currentAccount), statusDrawable);
                 actionBar.setOnLongClickListener(v -> {
-                    if (HiddenChatsController.getInstance().hasPasscode()) {
+                    if (!(this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity) && HiddenChatsController.getInstance().hasPasscode()) {
                         showHiddenChatsPasscode();
                         return true;
                     }
@@ -3589,7 +3589,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         if (
             (initialDialogsType == DIALOGS_TYPE_DEFAULT && !onlySelect || initialDialogsType == DIALOGS_TYPE_FORWARD) &&
-            folderId == 0 && TextUtils.isEmpty(searchString)
+            folderId == 0 && TextUtils.isEmpty(searchString) && !(this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity)
         ) {
             filterTabsView = new FilterTabsView(context, resourceProvider) {
                 @Override
@@ -3713,6 +3713,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public int getTabCounter(int tabId) {
+                    if (DialogsActivity.this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity) {
+                        return 0;
+                    }
                     if (NaConfig.INSTANCE.getIgnoreUnreadCount().Int() == NekoConfig.DIALOG_FILTER_EXCLUDE_ALL) {
                         return 0;
                     }
@@ -4890,6 +4893,30 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         floatingButton3 = new FragmentFloatingButton(context, resourceProvider);
         contentView.addView(floatingButton3, FragmentFloatingButton.createDefaultLayoutParams());
         floatingButton3.setOnClickListener(v -> {
+            if (this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity) {
+                Bundle args = new Bundle();
+                args.putBoolean("onlySelect", true);
+                args.putBoolean("checkCanWrite", false);
+                args.putInt("dialogsType", DIALOGS_TYPE_DEFAULT);
+                DialogsActivity fragment = new DialogsActivity(args);
+                fragment.setDelegate(new DialogsActivityDelegate() {
+                    @Override
+                    public boolean didSelectDialogs(DialogsActivity fragment, java.util.ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
+                        long currentAccount = fragment.getCurrentAccount();
+                        tw.nekomimi.nekogram.helpers.HiddenChatsController controller = tw.nekomimi.nekogram.helpers.HiddenChatsController.getInstance();
+                        for (int i = 0; i < dids.size(); i++) {
+                            long dialogId = dids.get(i).dialogId;
+                            if (!controller.isHidden(currentAccount, dialogId)) {
+                                controller.toggleHidden(currentAccount, dialogId);
+                            }
+                        }
+                        fragment.finishFragment();
+                        return true;
+                    }
+                });
+                presentFragment(fragment);
+                return;
+            }
             if (parentLayout != null && parentLayout.isInPreviewMode()) {
                 finishPreviewFragment();
                 return;
@@ -8851,7 +8878,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             floatingButton3.setButtonVisible(isVisible, animated);
         }
         if (floatingButtonStories != null) {
-            floatingButtonStories.setButtonVisible(isVisible && !NaConfig.INSTANCE.getDisableStories().Bool(), animated);
+            floatingButtonStories.setButtonVisible(isVisible && !NaConfig.INSTANCE.getDisableStories().Bool() && !(this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity), animated);
         }
     }
 
@@ -10984,6 +11011,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private ArrayList<TLRPC.Dialog> botShareDialogs;
 
+    private ArrayList<TLRPC.Dialog> filterHiddenDialogs(ArrayList<TLRPC.Dialog> original, int currentAccount) {
+        ArrayList<TLRPC.Dialog> filtered = new ArrayList<>(original.size());
+        boolean isHiddenChatsActivity = this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity;
+        tw.nekomimi.nekogram.helpers.HiddenChatsController controller = tw.nekomimi.nekogram.helpers.HiddenChatsController.getInstance();
+        for (int i = 0; i < original.size(); i++) {
+            TLRPC.Dialog dialog = original.get(i);
+            boolean isHidden = controller.isHidden(currentAccount, dialog.id);
+            if (isHiddenChatsActivity) {
+                if (isHidden) filtered.add(dialog);
+            } else {
+                if (!isHidden) filtered.add(dialog);
+            }
+        }
+        return filtered;
+    }
+
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         if (frozen && frozenDialogsList != null) {
@@ -10991,19 +11034,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         MessagesController messagesController = AccountInstance.getInstance(currentAccount).getMessagesController();
         if (dialogsType == DIALOGS_TYPE_DEFAULT) {
-            ArrayList<TLRPC.Dialog> original = messagesController.getDialogs(folderId);
-            ArrayList<TLRPC.Dialog> filtered = new ArrayList<>();
-            boolean isHiddenChatsActivity = this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity;
-            for (int i = 0; i < original.size(); i++) {
-                TLRPC.Dialog dialog = original.get(i);
-                 boolean isHidden = HiddenChatsController.getInstance().isHidden(currentAccount, dialog.id);
-                 if (isHiddenChatsActivity) {
-                      if (isHidden) filtered.add(dialog);
-                 } else {
-                      if (!isHidden) filtered.add(dialog);
-                 }
-            }
-            return filtered;
+            return filterHiddenDialogs(messagesController.getDialogs(folderId), currentAccount);
         } else if (dialogsType == DIALOGS_TYPE_WIDGET || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY) {
             return messagesController.dialogsServerOnly;
         } else if (dialogsType == DIALOGS_TYPE_ADD_USERS_TO) {
@@ -11035,20 +11066,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (dialogsType == DIALOGS_TYPE_FORWARD) {
             return messagesController.dialogsForward;
         } else if (dialogsType == DIALOGS_TYPE_USERS_ONLY || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY_USERS) {
-            return messagesController.dialogsUsersOnly;
+            return filterHiddenDialogs(messagesController.dialogsUsersOnly, currentAccount);
         } else if (dialogsType == DIALOGS_TYPE_CHANNELS_ONLY) {
-            return messagesController.dialogsChannelsOnly;
+            return filterHiddenDialogs(messagesController.dialogsChannelsOnly, currentAccount);
         } else if (dialogsType == DIALOGS_TYPE_GROUPS_ONLY || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY_GROUPS) {
-            return messagesController.dialogsGroupsOnly;
+            return filterHiddenDialogs(messagesController.dialogsGroupsOnly, currentAccount);
         } else if (dialogsType == 7 || dialogsType == 8) {
             MessagesController.DialogFilter dialogFilter = messagesController.selectedDialogFilter[dialogsType == 7 ? 0 : 1];
             if (dialogFilter == null) {
-                return messagesController.getDialogs(folderId);
+                return filterHiddenDialogs(messagesController.getDialogs(folderId), currentAccount);
             } else {
                 if (initialDialogsType == DIALOGS_TYPE_FORWARD) {
                     return dialogFilter.dialogsForward;
                 }
-                return dialogFilter.dialogs;
+                return filterHiddenDialogs(dialogFilter.dialogs, currentAccount);
             }
         } else if (dialogsType == DIALOGS_TYPE_BLOCK) {
             return messagesController.dialogsForBlock;
