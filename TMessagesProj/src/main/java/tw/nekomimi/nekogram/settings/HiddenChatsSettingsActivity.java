@@ -145,16 +145,25 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
         container.addView(editText, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         builder.setView(container);
 
-        builder.setPositiveButton("Set", (dialog, which) -> {
-            String code = editText.getText().toString();
-            if (code.length() == 4) {
-                HiddenChatsController.getInstance().setPasscode(code);
-                AndroidUtilities.runOnUIThread(() -> {
-                     org.telegram.ui.Components.BulletinFactory.of(HiddenChatsSettingsActivity.this).createSimpleBulletin(R.raw.done, "Passcode Updated").show();
-                });
-            }
-        });
+        builder.setPositiveButton("Set", null);
         builder.setNegativeButton("Cancel", null);
-        builder.show();
+        
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(di -> {
+            android.widget.Button b = dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE);
+            b.setOnClickListener(view -> {
+                String code = editText.getText().toString();
+                if (code.length() == 4) {
+                    HiddenChatsController.getInstance().setPasscode(code);
+                    AndroidUtilities.runOnUIThread(() -> {
+                         org.telegram.ui.Components.BulletinFactory.of(HiddenChatsSettingsActivity.this).createSimpleBulletin(R.raw.done, "Passcode Updated").show();
+                    });
+                    dialog.dismiss();
+                } else {
+                    AndroidUtilities.shakeView(editText);
+                }
+            });
+        });
+        dialog.show();
     }
 }
