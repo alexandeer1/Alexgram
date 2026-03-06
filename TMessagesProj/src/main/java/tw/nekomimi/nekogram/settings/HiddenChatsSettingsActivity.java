@@ -78,7 +78,7 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
         contentLayout.addView(createSettingItem(context, "How to Use", "Learn how to manage hidden chats", R.drawable.msg_info, 0xFFE91E63, v -> {
              AlertDialog.Builder builder = new AlertDialog.Builder(context);
              builder.setTitle("How to Use Hidden Chats");
-             builder.setMessage("• Hide Chats:\nLong-press any chat in the list and select 'Hide', or use the Plus icon in the Hidden Chats screen to add multiple chats at once.\n\n• Access Hidden Chats:\nLong-press the 'Search' or 'New Message' button on the main screen, or open them directly from these settings.\n\n• Privacy:\nChats added to Hidden Chats are automatically muted. You can manually unmute them if you prefer.\n\n• Passcode:\nYour hidden chats are protected by a 4-digit passcode.");
+             builder.setMessage("Hide Chats:\nLong-press any chat in the chat list, you will see 3-dot menu then click option: Add to Hidden Chats or use the Plus icon in the Hidden Chats screen to add multiple chats at once.\n\nAccess Hidden Chats:\nLong-press on the Alexgram header/title bar on the main screen, or open them directly from Hidden Chats Settings.\n\nPrivacy:\nChats added to Hidden Chats are automatically muted. You can manually unmute them if you prefer.\n\nPasscode:\nYour hidden chats are protected by a 4-digit passcode.");
              builder.setPositiveButton("Got It", null);
              builder.show();
         }));
