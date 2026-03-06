@@ -4902,7 +4902,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 fragment.setDelegate(new DialogsActivityDelegate() {
                     @Override
                     public boolean didSelectDialogs(DialogsActivity fragment, java.util.ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
-                        long currentAccount = fragment.getCurrentAccount();
+                        int currentAccount = fragment.getCurrentAccount();
                         tw.nekomimi.nekogram.helpers.HiddenChatsController controller = tw.nekomimi.nekogram.helpers.HiddenChatsController.getInstance();
                         for (int i = 0; i < dids.size(); i++) {
                             long dialogId = dids.get(i).dialogId;
