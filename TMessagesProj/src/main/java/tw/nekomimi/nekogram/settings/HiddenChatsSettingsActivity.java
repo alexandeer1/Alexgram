@@ -128,12 +128,6 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
     private void showChangePasscodeDialog(Context context) {
         // Reuse setup logic logic, potentially duplicate code due to time constraints (user waiting)
         // Ideally should be shared.
-        // For simplicity: Clear existing passcode and show standard setup defined in NekoSettingsActivity
-        // But NekoSettingsActivity methods are private.
-        // So I'll just rely on HiddenChatsController to manage state
-        HiddenChatsController.getInstance().setPasscode(null); 
-        // Then show setup dialog? No, setup dialog is in NekoSettingsActivity.
-        // Let's implement a simple setup dialog here too.
         
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Set New Passcode");
@@ -141,6 +135,7 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
         final org.telegram.ui.Components.EditTextBoldCursor editText = new org.telegram.ui.Components.EditTextBoldCursor(context);
         editText.setTextSize(18);
         editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        editText.setFilters(new android.text.InputFilter[] { new android.text.InputFilter.LengthFilter(4) });
         editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         editText.setGravity(Gravity.CENTER);
         
