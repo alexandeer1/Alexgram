@@ -4893,6 +4893,30 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         floatingButton3 = new FragmentFloatingButton(context, resourceProvider);
         contentView.addView(floatingButton3, FragmentFloatingButton.createDefaultLayoutParams());
         floatingButton3.setOnClickListener(v -> {
+            if (this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity) {
+                Bundle args = new Bundle();
+                args.putBoolean("onlySelect", true);
+                args.putBoolean("checkCanWrite", false);
+                args.putInt("dialogsType", DIALOGS_TYPE_DEFAULT);
+                DialogsActivity fragment = new DialogsActivity(args);
+                fragment.setDelegate(new DialogsActivityDelegate() {
+                    @Override
+                    public boolean didSelectDialogs(DialogsActivity fragment, java.util.ArrayList<MessagesStorage.TopicKey> dids, CharSequence message, boolean param, boolean notify, int scheduleDate, int scheduleRepeatPeriod, TopicsFragment topicsFragment) {
+                        long currentAccount = fragment.getCurrentAccount();
+                        tw.nekomimi.nekogram.helpers.HiddenChatsController controller = tw.nekomimi.nekogram.helpers.HiddenChatsController.getInstance();
+                        for (int i = 0; i < dids.size(); i++) {
+                            long dialogId = dids.get(i).dialogId;
+                            if (!controller.isHidden(currentAccount, dialogId)) {
+                                controller.toggleHidden(currentAccount, dialogId);
+                            }
+                        }
+                        fragment.finishFragment();
+                        return true;
+                    }
+                });
+                presentFragment(fragment);
+                return;
+            }
             if (parentLayout != null && parentLayout.isInPreviewMode()) {
                 finishPreviewFragment();
                 return;
@@ -8854,7 +8878,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             floatingButton3.setButtonVisible(isVisible, animated);
         }
         if (floatingButtonStories != null) {
-            floatingButtonStories.setButtonVisible(isVisible && !NaConfig.INSTANCE.getDisableStories().Bool(), animated);
+            floatingButtonStories.setButtonVisible(isVisible && !NaConfig.INSTANCE.getDisableStories().Bool() && !(this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity), animated);
         }
     }
 
