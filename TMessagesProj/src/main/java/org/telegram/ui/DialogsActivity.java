@@ -3555,7 +3555,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable.center = true;
                 actionBar.setTitle(actionBarTitleNax = TypefaceHelper.getTitleText(currentAccount), statusDrawable);
                 actionBar.setOnLongClickListener(v -> {
-                    if (HiddenChatsController.getInstance().hasPasscode()) {
+                    if (!(this instanceof tw.nekomimi.nekogram.ui.HiddenChatsActivity) && HiddenChatsController.getInstance().hasPasscode()) {
                         showHiddenChatsPasscode();
                         return true;
                     }
