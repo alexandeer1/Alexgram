@@ -150,7 +150,7 @@ public class HiddenChatsSettingsActivity extends BaseFragment {
         
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(di -> {
-            android.widget.Button b = dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE);
+            View b = dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE);
             b.setOnClickListener(view -> {
                 String code = editText.getText().toString();
                 if (code.length() == 4) {
