@@ -421,6 +421,10 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
             if (Build.VERSION.SDK_INT >= 31 && blurChanged) {
                 if (newBlur > 0) {
                    float r = Math.max(1f, newBlur / 4.0f);
+                   videoTextureView.setRenderEffect(RenderEffect.createBlurEffect(r, r, Shader.TileMode.CLAMP));
+                } else {
+                   videoTextureView.setRenderEffect(null);
+                }
             }
             return true;
         } else {

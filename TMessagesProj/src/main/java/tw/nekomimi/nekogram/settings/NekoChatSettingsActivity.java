@@ -870,8 +870,6 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     }
 
     //impl ListAdapter
-        addRowsToMap(cellGroup);
-    }
 
     private void checkLiveVideoWarning(TextCheckCell view) {
         if (!NaConfig.INSTANCE.getLiveVideoShowWarning().Bool()) {
