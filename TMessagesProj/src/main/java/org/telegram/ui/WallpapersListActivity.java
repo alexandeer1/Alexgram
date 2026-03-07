@@ -46,6 +46,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import xyz.nextalone.nagram.NaConfig;
 import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.Components.BulletinFactory;
+import org.telegram.messenger.browser.Browser;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -61,6 +62,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -745,10 +747,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
             if (position == uploadImageRow) {
                 updater.openGallery();
             } else if (position == setVideoWallpaperRow) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("video/*");
-                startActivityForResult(intent, 520);
+                Browser.openUrl(getParentActivity(), "https://t.me/alexsettings/chat?r=EnableLiveVideoWallpaper");
             } else if (position == setColorRow) {
                 WallpapersListActivity activity = new WallpapersListActivity(TYPE_COLOR);
                 activity.patterns = patterns;
@@ -819,6 +818,9 @@ public class WallpapersListActivity extends BaseFragment implements Notification
     @Override
     public void onResume() {
         super.onResume();
+        if (listAdapter != null) {
+            listAdapter.notifyDataSetChanged();
+        }
         SharedPreferences preferences = MessagesController.getGlobalMainSettings();
         Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
         if (dialogId != 0) {
