@@ -41,6 +41,9 @@ import android.widget.TextView;
 import androidx.annotation.Keep;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import xyz.nextalone.nagram.NaConfig;
+import org.telegram.ui.Components.Bulletin;
+import org.telegram.ui.Components.BulletinFactory;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -99,6 +102,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
     private int resetRow;
     private int resetInfoRow;
     private int galleryRow;
+    private int setVideoWallpaperRow;
     private int galleryHintRow;
 
     private int currentType;
@@ -738,6 +742,11 @@ public class WallpapersListActivity extends BaseFragment implements Notification
             }
             if (position == uploadImageRow) {
                 updater.openGallery();
+            } else if (position == setVideoWallpaperRow) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("video/*");
+                startActivityForResult(intent, 520);
             } else if (position == setColorRow) {
                 WallpapersListActivity activity = new WallpapersListActivity(TYPE_COLOR);
                 activity.patterns = patterns;
@@ -868,6 +877,27 @@ public class WallpapersListActivity extends BaseFragment implements Notification
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         updater.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 520 && resultCode == Activity.RESULT_OK && data != null) {
+            android.net.Uri uri = data.getData();
+            if (uri != null) {
+                try {
+                final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getParentActivity().getContentResolver().takePersistableUriPermission(uri, takeFlags);
+                } catch (Exception e) {
+                   // ignore
+                }
+
+                String path = uri.toString();
+                // Save path
+                NaConfig.INSTANCE.getLiveVideoWallpaperPath().setConfigString(path);
+                // Enable if disabled
+                if (!NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool()) {
+                    NaConfig.INSTANCE.getEnableLiveVideoWallpaper().setConfigBool(true);
+                }
+                
+                BulletinFactory.of(this).createSimpleBulletin(R.drawable.msg_video, "Video Wallpaper Set").show();
+            }
+        }
     }
 
     @Override
@@ -1359,6 +1389,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
         if (currentType == TYPE_ALL) {
             uploadImageRow = rowCount++;
             setColorRow = rowCount++;
+            setVideoWallpaperRow = rowCount++;
             sectionRow = rowCount++;
             galleryRow = -1;
             galleryHintRow = -1;
@@ -1371,6 +1402,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
         } else {
             uploadImageRow = -1;
             setColorRow = -1;
+            setVideoWallpaperRow = -1;
             sectionRow = -1;
             galleryRow = -1;
             galleryHintRow = -1;
@@ -1861,6 +1893,8 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                         textCell.setTextAndIcon(LocaleController.getString(R.string.SelectFromGallery), R.drawable.msg_photos, true);
                     } else if (position == setColorRow) {
                         textCell.setTextAndIcon(LocaleController.getString(R.string.SetColor), R.drawable.msg_palette, true);
+                    } else if (position == setVideoWallpaperRow) {
+                        textCell.setTextAndIcon("Set Video Wallpaper", R.drawable.msg_video, true);
                     } else if (position == resetRow) {
                         textCell.setText(LocaleController.getString(R.string.ResetChatBackgrounds), false);
                     } else if (position == galleryRow) {
