@@ -408,7 +408,7 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
         boolean blurChanged = (newBlur != currentBlur);
         currentBlur = newBlur;
 
-        if (enabled && !android.text.TextUtils.isEmpty(path)) {
+         if (enabled && !android.text.TextUtils.isEmpty(currentVideoPath)) {
             if (videoTextureView == null) {
                 videoTextureView = new TextureView(getContext());
                 videoTextureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
@@ -430,9 +430,9 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
                 addView(videoTextureView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
             } else {
                 if (pathChanged && videoTextureView.isAvailable()) {
-                     playVideo(videoTextureView.getSurfaceTexture(), path);
+                     playVideo(videoTextureView.getSurfaceTexture(), currentVideoPath);
                 } else if (!videoWallpaperPlaying && videoTextureView.isAvailable()) {
-                     playVideo(videoTextureView.getSurfaceTexture(), path);
+                     playVideo(videoTextureView.getSurfaceTexture(), currentVideoPath);
                 }
             }
             if (Build.VERSION.SDK_INT >= 31 && blurChanged) {
@@ -461,7 +461,11 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
             } else {
                 videoMediaPlayer.reset();
             }
-            videoMediaPlayer.setDataSource(path);
+            if (path.startsWith("content://")) {
+                videoMediaPlayer.setDataSource(getContext(), android.net.Uri.parse(path));
+            } else {
+                videoMediaPlayer.setDataSource(path);
+            }
             videoMediaPlayer.setSurface(new Surface(surface));
             videoMediaPlayer.setLooping(true);
             videoMediaPlayer.setVolume(0, 0);

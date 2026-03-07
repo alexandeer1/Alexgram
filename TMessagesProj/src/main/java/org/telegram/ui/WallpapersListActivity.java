@@ -20,6 +20,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -896,6 +898,11 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                 }
                 
                 BulletinFactory.of(this).createSimpleBulletin(R.drawable.msg_video, "Video Wallpaper Set").show();
+                
+                // Force UI update to show active state
+                if (listAdapter != null) {
+                    listAdapter.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -1894,7 +1901,16 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                     } else if (position == setColorRow) {
                         textCell.setTextAndIcon(LocaleController.getString(R.string.SetColor), R.drawable.msg_palette, true);
                     } else if (position == setVideoWallpaperRow) {
-                        textCell.setTextAndIcon("Set Video Wallpaper", R.drawable.msg_video, true);
+                        if (NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool()) {
+                            textCell.setTextAndIcon("Set Video Wallpaper", R.drawable.msg_video, true);
+                            textCell.imageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_featuredStickers_addButton), PorterDuff.Mode.SRC_IN));
+                            textCell.textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
+                            textCell.textView.setText("Video Wallpaper (Active)");
+                        } else {
+                            textCell.setTextAndIcon("Set Video Wallpaper", R.drawable.msg_video, true);
+                            textCell.imageView.setColorFilter(null);
+                            textCell.textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+                        }
                     } else if (position == resetRow) {
                         textCell.setText(LocaleController.getString(R.string.ResetChatBackgrounds), false);
                     } else if (position == galleryRow) {
@@ -1921,7 +1937,16 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                         Object object = p < wallPapers.size() ? wallPapers.get(p) : null;
                         Object selectedWallpaper;
                         long id;
-                        if (object instanceof TLRPC.TL_wallPaper) {
+                        if (NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool()) {
+                            selectedWallpaper = null;
+                            if (object instanceof TLRPC.TL_wallPaper) {
+                                id = ((TLRPC.TL_wallPaper) object).id;
+                            } else if (object instanceof ColorWallpaper && ((ColorWallpaper) object).parentWallpaper != null) {
+                                id = ((ColorWallpaper) object).parentWallpaper.id;
+                            } else {
+                                id = 0;
+                            }
+                        } else if (object instanceof TLRPC.TL_wallPaper) {
                             TLRPC.TL_wallPaper wallPaper = (TLRPC.TL_wallPaper) object;
                             Theme.OverrideWallpaperInfo info = Theme.getActiveTheme().overrideWallpaper;
                             if (!selectedBackgroundSlug.equals(wallPaper.slug) ||
@@ -1973,7 +1998,11 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                         if (actionBar.isActionModeShowed()) {
                             wallpaperCell.setChecked(a, selectedWallPapers.indexOfKey(id) >= 0, !scrolling);
                         } else {
-                            wallpaperCell.setChecked(a, false, !scrolling);
+                            if (NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool()) {
+                                wallpaperCell.setChecked(a, false, !scrolling);
+                            } else {
+                                wallpaperCell.setChecked(a, selectedWallpaper != null, !scrolling);
+                            }
                         }
                     }
                     break;
