@@ -699,6 +699,30 @@ object NaConfig {
             ConfigItem.configTypeString,
             ""
         )
+    val liveVideoWallpaperPath =
+        addConfig(
+            "LiveVideoWallpaperPath",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val enableLiveVideoWallpaper =
+        addConfig(
+            "EnableLiveVideoWallpaper",
+            ConfigItem.configTypeBool,
+            false
+        )
+    val liveVideoBlurIntensity =
+        addConfig(
+            "LiveVideoBlurIntensity",
+            ConfigItem.configTypeInt,
+            0
+        )
+    val liveVideoShowWarning =
+        addConfig(
+            "LiveVideoShowWarning",
+            ConfigItem.configTypeBool,
+            true
+        )
     val llmProviderGeminiModel =
         addConfig(
             "LlmProviderGeminiModel",
