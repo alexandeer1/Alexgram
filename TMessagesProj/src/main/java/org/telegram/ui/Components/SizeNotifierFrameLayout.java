@@ -46,6 +46,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LiteMode;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -57,6 +58,11 @@ import org.telegram.ui.ChatBackgroundDrawable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import android.media.MediaPlayer;
+import android.view.TextureView;
+import android.graphics.SurfaceTexture;
+import android.view.Surface;
 
 import tw.nekomimi.nekogram.NekoConfig;
 import xyz.nextalone.nagram.NaConfig;
@@ -93,6 +99,19 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     private boolean skipBackgroundDrawing;
     SnowflakesEffect snowflakesEffect;
     public View backgroundView;
+    private TextureView videoTextureView;
+    private MediaPlayer videoMediaPlayer;
+    private boolean videoWallpaperPlaying;
+    private String currentVideoPath;
+    private int currentBlur = -1;
+    private boolean canPlayVideo = false;
+
+    public void setCanPlayVideo(boolean canPlay) {
+        this.canPlayVideo = canPlay;
+        if (attached) {
+             checkVideoWallpaper();
+        }
+    }
     boolean attached;
 
 
@@ -368,14 +387,129 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     }
 
 
+    private boolean checkVideoWallpaper() {
+        if (!canPlayVideo) {
+             if (videoTextureView != null) {
+                removeView(videoTextureView);
+                videoTextureView = null;
+                releaseVideo();
+            }
+            return false;
+        }
+
+        boolean enabled = NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool();
+        String path = NaConfig.INSTANCE.getLiveVideoWallpaperPath().String();
+
+        // Check if path or config actually changed
+        boolean pathChanged = !android.text.TextUtils.equals(path, currentVideoPath);
+        currentVideoPath = path; // Update current path
+
+        int newBlur = NaConfig.INSTANCE.getLiveVideoBlurIntensity().Int();
+        boolean blurChanged = (newBlur != currentBlur);
+        currentBlur = newBlur;
+
+         if (enabled && !android.text.TextUtils.isEmpty(currentVideoPath)) {
+            if (videoTextureView == null) {
+                videoTextureView = new TextureView(getContext());
+                videoTextureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                    @Override
+                    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                        // Use currentVideoPath (member variable), not the potentially stale local variable 'path'
+                        playVideo(surface, currentVideoPath);
+                    }
+                    @Override
+                    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {}
+                    @Override
+                    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                        releaseVideo();
+                        return true;
+                    }
+                    @Override
+                    public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
+                });
+                addView(videoTextureView, 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+            } else {
+                if (pathChanged && videoTextureView.isAvailable()) {
+                     playVideo(videoTextureView.getSurfaceTexture(), currentVideoPath);
+                } else if (!videoWallpaperPlaying && videoTextureView.isAvailable()) {
+                     playVideo(videoTextureView.getSurfaceTexture(), currentVideoPath);
+                }
+            }
+            if (Build.VERSION.SDK_INT >= 31 && blurChanged) {
+                if (newBlur > 0) {
+                   float r = Math.max(1f, newBlur / 4.0f);
+                   videoTextureView.setRenderEffect(RenderEffect.createBlurEffect(r, r, Shader.TileMode.CLAMP));
+                } else {
+                   videoTextureView.setRenderEffect(null);
+                }
+            }
+            return true;
+        } else {
+            if (videoTextureView != null) {
+                removeView(videoTextureView);
+                videoTextureView = null;
+                releaseVideo();
+            }
+            return false;
+        }
+    }
+
+    private void playVideo(SurfaceTexture surface, String path) {
+        try {
+            if (videoMediaPlayer == null) {
+                videoMediaPlayer = new MediaPlayer();
+            } else {
+                videoMediaPlayer.reset();
+            }
+            if (path.startsWith("content://")) {
+                videoMediaPlayer.setDataSource(getContext(), android.net.Uri.parse(path));
+            } else {
+                videoMediaPlayer.setDataSource(path);
+            }
+            videoMediaPlayer.setSurface(new Surface(surface));
+            videoMediaPlayer.setLooping(true);
+            videoMediaPlayer.setVolume(0, 0);
+            videoMediaPlayer.prepareAsync();
+            videoMediaPlayer.setOnPreparedListener(MediaPlayer::start);
+            videoWallpaperPlaying = true;
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+    }
+
+    private void releaseVideo() {
+        if (videoMediaPlayer != null) {
+            videoMediaPlayer.release();
+            videoMediaPlayer = null;
+        }
+        videoWallpaperPlaying = false;
+    }
+
     public void setBackgroundImage(Drawable bitmap, boolean motion) {
+        boolean video = checkVideoWallpaper();
         if (backgroundDrawable == bitmap) {
+            if (video) {
+               if (backgroundView != null) backgroundView.setVisibility(View.GONE);
+               if (videoTextureView != null) videoTextureView.setVisibility(View.VISIBLE);
+            } else {
+               if (backgroundView != null) backgroundView.setVisibility(View.VISIBLE);
+               if (videoTextureView != null) videoTextureView.setVisibility(View.GONE);
+            }
             return;
         }
         if (backgroundView == null) {
             addView(backgroundView = new BackgroundView(getContext()), 0, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
             checkLayerType();
         }
+
+        if (video) {
+           if (backgroundView != null) backgroundView.setVisibility(View.GONE);
+           if (videoTextureView != null) videoTextureView.setVisibility(View.VISIBLE);
+        } else {
+           if (backgroundView != null) backgroundView.setVisibility(View.VISIBLE);
+           if (videoTextureView != null) videoTextureView.setVisibility(View.GONE);
+        }
+
         if (bitmap instanceof MotionBackgroundDrawable) {
             MotionBackgroundDrawable motionBackgroundDrawable = (MotionBackgroundDrawable) bitmap;
             motionBackgroundDrawable.setParentView(backgroundView);
@@ -870,6 +1004,7 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        checkVideoWallpaper();
         attached = true;
         if (needBlur && !blurIsRunning) {
             blurIsRunning = true;
@@ -892,6 +1027,7 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        releaseVideo();
         attached = false;
         blurPaintTop.setShader(null);
         blurPaintTop2.setShader(null);

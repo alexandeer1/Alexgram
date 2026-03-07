@@ -9,6 +9,7 @@ public class ConfigCellCustom extends AbstractConfigCell {
     public static final int CUSTOM_ITEM_CharBlurAlpha = 997;
     public static final int CUSTOM_ITEM_EmojiSet = 996;
     public static final int CUSTOM_ITEM_Temperature = 995;
+    public static final int CUSTOM_ITEM_BlurIntensity = 994;
 
     public final int type;
     public boolean enabled;

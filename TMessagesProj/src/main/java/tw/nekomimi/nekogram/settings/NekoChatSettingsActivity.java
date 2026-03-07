@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.NotificationCenter;
@@ -135,6 +136,13 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
             "Nekogram",
     }, null));
     private final AbstractConfigCell dividerChats = cellGroup.appendCell(new ConfigCellDivider());
+
+    // Live Video Wallpaper
+    private final AbstractConfigCell headerLiveVideoWallpaper = cellGroup.appendCell(new ConfigCellHeader("Live Video Wallpaper"));
+    private final AbstractConfigCell liveVideoWallpaperToggleRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getEnableLiveVideoWallpaper(), "Enable Live Video Wallpaper"));
+    private final AbstractConfigCell liveVideoWallpaperPathRow = cellGroup.appendCell(new ConfigCellCustom("LiveVideoWallpaperPath", CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL, true));
+    private final AbstractConfigCell liveVideoBlurIntensityRow = cellGroup.appendCell(new ConfigCellCustom("LiveVideoBlurIntensity", ConfigCellCustom.CUSTOM_ITEM_BlurIntensity, true));
+    private final AbstractConfigCell dividerLiveVideoWallpaper = cellGroup.appendCell(new ConfigCellDivider());
 
     // Double Tap
     private final AbstractConfigCell headerDoubleTap = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.DoubleTapAction)));
@@ -531,7 +539,16 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
         listView.setOnItemClickListener((view, position, x, y) -> {
             AbstractConfigCell a = cellGroup.rows.get(position);
             if (a instanceof ConfigCellTextCheck) {
-                ((ConfigCellTextCheck) a).onClick((TextCheckCell) view);
+                if (a == liveVideoWallpaperToggleRow) {
+                    boolean isEnabling = !NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool();
+                    if (isEnabling) {
+                        checkLiveVideoWarning((TextCheckCell) view);
+                    } else {
+                        ((ConfigCellTextCheck) a).onClick((TextCheckCell) view);
+                    }
+                } else {
+                    ((ConfigCellTextCheck) a).onClick((TextCheckCell) view);
+                }
             } else if (a instanceof ConfigCellSelectBox) {
                 ((ConfigCellSelectBox) a).onClick(view);
             } else if (a instanceof ConfigCellTextInput) {
@@ -544,7 +561,20 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
                     } catch (Exception ignored) {}
                 }
             } else if (a instanceof ConfigCellCustom) { // Custom onclick
-                if (position == cellGroup.rows.indexOf(maxRecentStickerCountRow)) {
+                if (position == cellGroup.rows.indexOf(liveVideoWallpaperPathRow)) {
+                    if (!NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool()) {
+                        AndroidUtilities.shakeView(view);
+                        return;
+                    }
+                    try {
+                        android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(android.content.Intent.CATEGORY_OPENABLE);
+                        intent.setType("video/*");
+                        startActivityForResult(intent, 1024);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (position == cellGroup.rows.indexOf(maxRecentStickerCountRow)) {
                     final int[] counts = {20, 30, 40, 50, 80, 100, 120, 150, 180, 200};
                     List<String> types = Arrays.stream(counts)
                             .filter(i -> i <= getMessagesController().maxRecentStickersCount)
@@ -841,6 +871,121 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     }
 
     //impl ListAdapter
+
+    private void checkLiveVideoWarning(TextCheckCell view) {
+        if (!NaConfig.INSTANCE.getLiveVideoShowWarning().Bool()) {
+            NaConfig.INSTANCE.getEnableLiveVideoWallpaper().toggleConfigBool();
+            view.setChecked(NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool());
+            return;
+        }
+
+        android.app.ActivityManager activityManager = (android.app.ActivityManager) ApplicationLoader.applicationContext.getSystemService(Context.ACTIVITY_SERVICE);
+        android.app.ActivityManager.MemoryInfo memoryInfo = new android.app.ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        long totalRam = memoryInfo.totalMem;
+        long fourGB = 4L * 1024 * 1024 * 1024;
+        long eightGB = 8L * 1024 * 1024 * 1024;
+
+        if (totalRam >= eightGB) {
+           NaConfig.INSTANCE.getEnableLiveVideoWallpaper().toggleConfigBool();
+           view.setChecked(NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool());
+           return;
+        }
+
+        String warning = "Live video backgrounds may increase battery usage and reduce performance on some devices.";
+        if (totalRam <= fourGB) {
+            warning += "\n\nWarning: Your device has low RAM (<= 4GB). Performance may be significantly affected.";
+        } else if (totalRam < eightGB) {
+            warning = "Live Video Wallpaper may slightly increase battery usage.";
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        builder.setTitle("Enable Live Video Wallpaper?");
+        builder.setMessage(warning);
+
+        CheckBoxCell checkBoxCell = new CheckBoxCell(getParentActivity(), 1, getResourceProvider());
+        checkBoxCell.setBackground(Theme.getSelectorDrawable(false));
+        checkBoxCell.setText("Don't show again", "", false, false);
+        checkBoxCell.setPadding(AndroidUtilities.dp(7), 0, AndroidUtilities.dp(7), 0);
+        checkBoxCell.setOnClickListener(v -> checkBoxCell.setChecked(!checkBoxCell.isChecked(), true));
+        builder.setView(checkBoxCell);
+
+        builder.setPositiveButton("Enable Anyway", (d, w) -> {
+            if (checkBoxCell.isChecked()) {
+                NaConfig.INSTANCE.getLiveVideoShowWarning().setConfigBool(false);
+            }
+            NaConfig.INSTANCE.getEnableLiveVideoWallpaper().toggleConfigBool();
+            view.setChecked(NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool());
+        });
+        builder.setNegativeButton(getString(R.string.Cancel), null);
+        builder.show();
+    }
+
+    @Override
+    public void onActivityResultFragment(int requestCode, int resultCode, android.content.Intent data) {
+        if (requestCode == 1024 && resultCode == android.app.Activity.RESULT_OK) {
+             if (data != null && data.getData() != null) {
+                  android.net.Uri uri = data.getData();
+                  try {
+                      getParentActivity().getContentResolver().takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                  } catch (Exception e) {}
+                  
+                  String path = AndroidUtilities.getPath(uri);
+                  if (path == null) path = uri.toString();
+                  
+                  NaConfig.INSTANCE.getLiveVideoWallpaperPath().setConfigString(path);
+                  int idx = cellGroup.rows.indexOf(liveVideoWallpaperPathRow);
+                  if (idx >= 0 && listAdapter != null) {
+                      listAdapter.notifyItemChanged(idx);
+                  }
+             }
+        }
+        super.onActivityResultFragment(requestCode, resultCode, data);
+    }
+
+    private class LiveVideoBlurCell extends FrameLayout {
+        private final TextPaint textPaint;
+        private final SeekBarView sizeBar;
+
+        public LiveVideoBlurCell(Context context) {
+            super(context);
+            setWillNotDraw(false);
+
+            textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setTextSize(AndroidUtilities.dp(16));
+
+            sizeBar = new SeekBarView(context);
+            sizeBar.setReportChanges(true);
+            sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
+                @Override
+                public void onSeekBarDrag(boolean stop, float progress) {
+                    int val = (int)(progress * 100);
+                    NaConfig.INSTANCE.getLiveVideoBlurIntensity().setConfigInt(val);
+                    LiveVideoBlurCell.this.invalidate();
+                    if (stop) {
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+                    }
+                }
+                @Override
+                public void onSeekBarPressed(boolean pressed) {
+                }
+            });
+            addView(sizeBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 38, Gravity.LEFT | Gravity.TOP, 9, 35, 43, 0));
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            textPaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+            canvas.drawText("Blur Intensity: " + NaConfig.INSTANCE.getLiveVideoBlurIntensity().Int() + "%", AndroidUtilities.dp(21), AndroidUtilities.dp(28), textPaint);
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            super.onMeasure(widthMeasureSpec, View.MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(80), View.MeasureSpec.EXACTLY));
+            sizeBar.setProgress(NaConfig.INSTANCE.getLiveVideoBlurIntensity().Int() / 100.0f);
+        }
+    }
+
     private class ListAdapter extends RecyclerListView.SelectionAdapter {
 
         private final Context mContext;
@@ -893,6 +1038,10 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
                             textCell.setTextAndValue(getString(R.string.LlmProviderGeminiKey), "", true);
                         } else if (position == cellGroup.rows.indexOf(transcribeProviderOpenAiRow)) {
                             textCell.setTextAndValue(getString(R.string.TranscribeProviderOpenAI), "", true);
+                        } else if (position == cellGroup.rows.indexOf(liveVideoWallpaperPathRow)) {
+                            String path = NaConfig.INSTANCE.getLiveVideoWallpaperPath().String();
+                            String val = TextUtils.isEmpty(path) ? getString(R.string.None) : new java.io.File(path).getName();
+                            textCell.setTextAndValue("Video Wallpaper", val, true);
                         }
                     } else if (view instanceof EmojiSetCell v1) {
                         v1.setData(EmojiHelper.getInstance().getCurrentEmojiPackInfo(), false, true);
@@ -933,6 +1082,10 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
                     break;
                 case ConfigCellCustom.CUSTOM_ITEM_StickerSize:
                     view = stickerSizeCell = new StickerSizeCell(mContext);
+                    view.setBackgroundColor(Color.TRANSPARENT);
+                    break;
+                case ConfigCellCustom.CUSTOM_ITEM_BlurIntensity:
+                    view = new LiveVideoBlurCell(mContext);
                     view.setBackgroundColor(Color.TRANSPARENT);
                     break;
                 case ConfigCellCustom.CUSTOM_ITEM_EmojiSet:
