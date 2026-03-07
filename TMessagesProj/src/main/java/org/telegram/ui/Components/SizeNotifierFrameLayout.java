@@ -104,6 +104,14 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     private boolean videoWallpaperPlaying;
     private String currentVideoPath;
     private int currentBlur = -1;
+    private boolean canPlayVideo = false;
+
+    public void setCanPlayVideo(boolean canPlay) {
+        this.canPlayVideo = canPlay;
+        if (attached) {
+             checkVideoWallpaper();
+        }
+    }
     boolean attached;
 
 
@@ -380,6 +388,15 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
 
 
     private boolean checkVideoWallpaper() {
+        if (!canPlayVideo) {
+             if (videoTextureView != null) {
+                removeView(videoTextureView);
+                videoTextureView = null;
+                releaseVideo();
+            }
+            return false;
+        }
+
         boolean enabled = NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool();
         String path = NaConfig.INSTANCE.getLiveVideoWallpaperPath().String();
 

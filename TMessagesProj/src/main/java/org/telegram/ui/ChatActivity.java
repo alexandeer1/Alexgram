@@ -17530,6 +17530,7 @@ public class ChatActivity extends BaseFragment implements
 
         public ChatActivityFragmentView(Context context, INavigationLayout parentLayout) {
             super(context, parentLayout);
+            setCanPlayVideo(true);
             adjustPanLayoutHelper = new AdjustPanLayoutHelper(this) {
 
                 @Override
