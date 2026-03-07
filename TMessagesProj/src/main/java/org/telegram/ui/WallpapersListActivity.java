@@ -1983,7 +1983,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
 
         @Override
         public int getItemViewType(int position) {
-            if (position == uploadImageRow || position == galleryRow || position == setColorRow || position == resetRow) {
+            if (position == uploadImageRow || position == galleryRow || position == setColorRow || position == resetRow || position == setVideoWallpaperRow) {
                 return 0;
             } else if (position == sectionRow || position == resetSectionRow) {
                 return 1;
