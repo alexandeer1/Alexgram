@@ -437,18 +437,6 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
         }
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        checkVideoWallpaper();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        releaseVideo();
-    }
-    
     private void playVideo(SurfaceTexture surface, String path) {
         try {
             if (videoMediaPlayer == null) {
@@ -995,6 +983,7 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        checkVideoWallpaper();
         attached = true;
         if (needBlur && !blurIsRunning) {
             blurIsRunning = true;
@@ -1017,6 +1006,7 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        releaseVideo();
         attached = false;
         blurPaintTop.setShader(null);
         blurPaintTop2.setShader(null);
