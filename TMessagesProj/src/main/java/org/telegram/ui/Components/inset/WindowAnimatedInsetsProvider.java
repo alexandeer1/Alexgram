@@ -104,8 +104,8 @@ public class WindowAnimatedInsetsProvider extends WindowInsetsAnimationCompat.Ca
         if (view == null || rootView == null || !ViewPositionWatcher.computeRectInParent(view, rootView, tmpRectF)) {
             return null;
         }
-    }
-    tmpRectF.round(tmpRect);
+
+        tmpRectF.round(tmpRect);
 
         final int left = tmpRect.left;
         final int top = tmpRect.top;
@@ -122,6 +122,7 @@ public class WindowAnimatedInsetsProvider extends WindowInsetsAnimationCompat.Ca
             Math.max(0, right),
             Math.max(0, bottom)
         );
+    }
 
     public interface Listener {
         View getAnimatedInsetsTargetView();
