@@ -1731,8 +1731,4 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
 
     }
 
-    @Override
-    public View getAnimatedInsetsTargetView() {
-        return searchField;
-    }
 }

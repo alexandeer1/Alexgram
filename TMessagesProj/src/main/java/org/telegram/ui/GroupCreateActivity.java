@@ -2176,8 +2176,4 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
 
     }
 
-    @Override
-    public View getAnimatedInsetsTargetView() {
-        return searchField;
-    }
 }

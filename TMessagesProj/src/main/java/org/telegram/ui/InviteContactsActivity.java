@@ -1165,8 +1165,4 @@ public class InviteContactsActivity extends BaseFragment implements Notification
 
     }
 
-    @Override
-    public View getAnimatedInsetsTargetView() {
-        return searchField;
-    }
 }
