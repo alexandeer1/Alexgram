@@ -4738,7 +4738,7 @@ public class AlertsCreator {
         void didSelectDate(int date);
     }
 
-    public static BottomSheet.Builder createStatusUntilDatePickerDialog(Context context, long currentDate, final StatusUntilDatePickerDelegate delegate) {
+    public static BottomSheet.Builder createStatusUntilDatePickerDialog(Context context, long currentDate, final StatusUntilDatePickerDelegate delegate, Theme.ResourcesProvider resourcesProvider) {
         if (context == null) {
             return null;
         }

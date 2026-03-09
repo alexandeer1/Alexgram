@@ -235,6 +235,16 @@ public class WindowInsetsStateHolder implements WindowInsetsProvider, WindowInse
     }
 
     @Override
+    public void onAnimatedInsetsStarted() {
+
+    }
+
+    @Override
+    public void onAnimatedInsetsFinished() {
+
+    }
+
+    @Override
     public View getAnimatedInsetsTargetView() {
         return animatedInsetsProviderTarget;
     }

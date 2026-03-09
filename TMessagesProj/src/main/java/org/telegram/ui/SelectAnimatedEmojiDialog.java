@@ -5969,7 +5969,7 @@ public class SelectAnimatedEmojiDialog extends FrameLayout implements Notificati
                         BottomSheet.Builder builder = AlertsCreator.createStatusUntilDatePickerDialog(context, System.currentTimeMillis() / 1000, date -> {
                             selected[0] = true;
                             done(date);
-                        });
+                        }, resourcesProvider);
                         builder.setOnPreDismissListener(di -> {
                             if (!selected[0]) {
                                 animateMenuShow(true, null);

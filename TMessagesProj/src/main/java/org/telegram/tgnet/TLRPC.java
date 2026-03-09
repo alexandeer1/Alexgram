@@ -36197,11 +36197,23 @@ public class TLRPC {
         public static final int constructor = 0x8df5d6e2;
         public static final String constructorName = "messageEntityFormattedDate";
         public int date;
+        public boolean relative;
+        public boolean day_of_week;
+        public boolean long_date;
+        public boolean short_date;
+        public boolean long_time;
+        public boolean short_time;
 
         public void readParams(InputSerializedData stream, boolean exception) {
             offset = stream.readInt32(exception);
             length = stream.readInt32(exception);
             date = stream.readInt32(exception);
+            relative = stream.readBool(exception);
+            day_of_week = stream.readBool(exception);
+            long_date = stream.readBool(exception);
+            short_date = stream.readBool(exception);
+            long_time = stream.readBool(exception);
+            short_time = stream.readBool(exception);
         }
 
         public void serializeToStream(OutputSerializedData stream) {
@@ -36209,6 +36221,37 @@ public class TLRPC {
             stream.writeInt32(offset);
             stream.writeInt32(length);
             stream.writeInt32(date);
+            stream.writeBool(relative);
+            stream.writeBool(day_of_week);
+            stream.writeBool(long_date);
+            stream.writeBool(short_date);
+            stream.writeBool(long_time);
+            stream.writeBool(short_time);
+        }
+
+        @Override public void serializeToJson(TLJsonBuilder builder) {
+            builder.writeString("_", constructorName);
+            builder.writeInt32("offset", offset);
+            builder.writeInt32("length", length);
+            builder.writeInt32("date", date);
+            builder.writeBool("relative", relative);
+            builder.writeBool("day_of_week", day_of_week);
+            builder.writeBool("long_date", long_date);
+            builder.writeBool("short_date", short_date);
+            builder.writeBool("long_time", long_time);
+            builder.writeBool("short_time", short_time);
+        }
+
+        @Override public void deserializeFromJson(TLJsonParser parser) {
+            offset = parser.readInt32("offset", 0);
+            length = parser.readInt32("length", 0);
+            date = parser.readInt32("date", 0);
+            relative = parser.readBool("relative", false);
+            day_of_week = parser.readBool("day_of_week", false);
+            long_date = parser.readBool("long_date", false);
+            short_date = parser.readBool("short_date", false);
+            long_time = parser.readBool("long_time", false);
+            short_time = parser.readBool("short_time", false);
         }
     }
 
