@@ -236,6 +236,15 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
     public final static int PREMIUM_FEATURE_TODO = 39;
 
     public final static int FEATURE_GIFTS = 40;
+    public final static int PREMIUM_FEATURE_SHARING_DISABLE = 41;
+
+    private BlurredBackgroundSource iBlur3Source;
+    private DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor;
+    private BlurredBackgroundSourceRenderNode iBlur3SourceGlassFrosted;
+    private BlurredBackgroundDrawableViewFactory iBlur3Factory;
+    private BlurredBackgroundDrawableViewFactory iBlur3FactoryBg;
+    private IBlur3Capture iBlur3Capture;
+    private BlurredBackgroundWithFadeDrawable navbarProtectionDrawable;
 
     private int statusBarHeight;
     private int firstViewHeight;
@@ -1434,6 +1443,13 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
     @Override
     public boolean isSwipeBackEnabled(MotionEvent event) {
         return true;
+    }
+
+    private void blur3_InvalidateBlur() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || scrollableViewNoiseSuppressor == null) {
+            return;
+        }
+        scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
     }
 
     @Override

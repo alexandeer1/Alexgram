@@ -10403,4 +10403,10 @@
     <string name="ChannelAdmins">Channel admins</string>
     <string name="ChannelSubscribers2">Channel subscribers</string>
     <string name="MembersSearch">Search people</string>
+    <string name="FormattedDate">Formatted Date</string>
+    <string name="formatterDayWithSeconds24H">HH:mm:ss</string>
+    <string name="formatterDayWithSeconds12H">h:mm:ss a</string>
+    <string name="RelativeDateFormatterWeek2">EEEE</string>
+    <string name="PremiumPreviewSharingDisable">Disable Sharing</string>
+    <string name="PremiumPreviewSharingDisableDescription">Disable sharing messages from this chat.</string>
 </resources>

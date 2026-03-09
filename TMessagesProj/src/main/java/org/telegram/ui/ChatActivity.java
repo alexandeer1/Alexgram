@@ -1728,6 +1728,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int text_mention = 157;
     private final static int text_transalte = 158;
     private final static int text_code = 159;
+    private final static int text_date = 160;
 
     private final static int view_as_topics = 59;
 

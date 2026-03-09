@@ -36193,6 +36193,25 @@ public class TLRPC {
         }
     }
 
+    public static class TL_messageEntityFormattedDate extends MessageEntity {
+        public static final int constructor = 0x8df5d6e2;
+        public static final String constructorName = "messageEntityFormattedDate";
+        public int date;
+
+        public void readParams(InputSerializedData stream, boolean exception) {
+            offset = stream.readInt32(exception);
+            length = stream.readInt32(exception);
+            date = stream.readInt32(exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(offset);
+            stream.writeInt32(length);
+            stream.writeInt32(date);
+        }
+    }
+
     public static class TL_messageEntityPhone extends MessageEntity {
         public static final int constructor = 0x9b69e34b;
         public static final String constructorName = "messageEntityPhone";

@@ -120,6 +120,8 @@ public class OAuthSheet {
         FrameLayout container = new FrameLayout(context);
         b.setCustomView(container);
 
+        ArrayList<Integer> accountNumbers = new ArrayList<>();
+
         final boolean testBackend = ConnectionsManager.getInstance(currentAccount).isTestBackend();
         accountNumbers.clear();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
