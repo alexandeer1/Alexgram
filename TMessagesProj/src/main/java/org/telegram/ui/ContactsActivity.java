@@ -1720,4 +1720,19 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
 //        animatorSearchFieldHeight.animateTo(dp(DialogsActivity.SEARCH_FIELD_HEIGHT));
         animatorSearchFieldVisible.setValue(true, true);
     }
+
+    @Override
+    public void onAnimatedInsetsStarted() {
+
+    }
+
+    @Override
+    public void onAnimatedInsetsFinished() {
+
+    }
+
+    @Override
+    public View getAnimatedInsetsTargetView() {
+        return searchField;
+    }
 }

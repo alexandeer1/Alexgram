@@ -1154,4 +1154,19 @@ public class InviteContactsActivity extends BaseFragment implements Notification
         scrollableViewNoiseSuppressor.setupRenderNodes(iBlur3Positions, 1);
         scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
     }
+
+    @Override
+    public void onAnimatedInsetsStarted() {
+
+    }
+
+    @Override
+    public void onAnimatedInsetsFinished() {
+
+    }
+
+    @Override
+    public View getAnimatedInsetsTargetView() {
+        return searchField;
+    }
 }

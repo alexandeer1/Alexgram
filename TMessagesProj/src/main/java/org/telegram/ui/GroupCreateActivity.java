@@ -2165,4 +2165,19 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
         scrollableViewNoiseSuppressor.setupRenderNodes(iBlur3Positions, buttonsContainer != null && animatorCallButtonsVisible.getFloatValue() > 0 ? 2 : 1);
         scrollableViewNoiseSuppressor.invalidateResultRenderNodes(iBlur3Capture, fragmentView.getMeasuredWidth(), fragmentView.getMeasuredHeight());
     }
+
+    @Override
+    public void onAnimatedInsetsStarted() {
+
+    }
+
+    @Override
+    public void onAnimatedInsetsFinished() {
+
+    }
+
+    @Override
+    public View getAnimatedInsetsTargetView() {
+        return searchField;
+    }
 }

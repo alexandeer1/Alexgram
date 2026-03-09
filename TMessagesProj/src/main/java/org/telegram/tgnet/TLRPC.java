@@ -36234,24 +36234,24 @@ public class TLRPC {
             builder.writeInt32("offset", offset);
             builder.writeInt32("length", length);
             builder.writeInt32("date", date);
-            builder.writeBool("relative", relative);
-            builder.writeBool("day_of_week", day_of_week);
-            builder.writeBool("long_date", long_date);
-            builder.writeBool("short_date", short_date);
-            builder.writeBool("long_time", long_time);
-            builder.writeBool("short_time", short_time);
+            builder.writeBoolean("relative", relative);
+            builder.writeBoolean("day_of_week", day_of_week);
+            builder.writeBoolean("long_date", long_date);
+            builder.writeBoolean("short_date", short_date);
+            builder.writeBoolean("long_time", long_time);
+            builder.writeBoolean("short_time", short_time);
         }
 
         @Override public void deserializeFromJson(TLJsonParser parser) {
             offset = parser.readInt32("offset", 0);
             length = parser.readInt32("length", 0);
             date = parser.readInt32("date", 0);
-            relative = parser.readBool("relative", false);
-            day_of_week = parser.readBool("day_of_week", false);
-            long_date = parser.readBool("long_date", false);
-            short_date = parser.readBool("short_date", false);
-            long_time = parser.readBool("long_time", false);
-            short_time = parser.readBool("short_time", false);
+            relative = parser.readBoolean("relative", false);
+            day_of_week = parser.readBoolean("day_of_week", false);
+            long_date = parser.readBoolean("long_date", false);
+            short_date = parser.readBoolean("short_date", false);
+            long_time = parser.readBoolean("long_time", false);
+            short_time = parser.readBoolean("short_time", false);
         }
     }
 
