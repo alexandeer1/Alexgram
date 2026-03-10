@@ -12600,7 +12600,7 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
                     ArrayList<TLRPC.MessageEntity> entities = null;
                     if (MessageObject.isGifDocument(sticker) && messageEditText != null && messageEditText.length() > 0) {
                         caption = messageEditText.getText().toString();
-                        entities = messageEditText.getEntities();
+                        entities = org.telegram.messenger.MediaDataController.getInstance(currentAccount).getEntities(new CharSequence[]{messageEditText.getText()}, true);
                         if (clearsInputField) {
                             messageEditText.setText("");
                         }

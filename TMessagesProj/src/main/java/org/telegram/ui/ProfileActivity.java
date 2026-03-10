@@ -4392,8 +4392,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (userInfo == null) {
                     return;
                 }
-                boolean current = userInfo.noforwards;
-                userInfo.noforwards = !current;
+                boolean current = userInfo.user.noforwards;
+                userInfo.user.noforwards = !current;
                 listAdapter.notifyItemChanged(restrictSavingRow);
                 getMessagesController().toggleUserNoForwards(userId, !current);
             } else if (position == addToContactsRow) {
@@ -14284,7 +14284,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == restrictSavingRow) {
                         boolean isRestricted = false;
                         if (userInfo != null) {
-                            isRestricted = userInfo.noforwards;
+                            isRestricted = userInfo.user.noforwards;
                         }
                         textCheckCell.setTextAndCheck(LocaleController.getString(R.string.RestrictSavingContent), isRestricted, false);
                     }
