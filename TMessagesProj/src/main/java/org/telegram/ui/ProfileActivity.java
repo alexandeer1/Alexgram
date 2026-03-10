@@ -700,6 +700,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private int restrictionReasonRow;
     private int notificationsDividerRow;
     private int notificationsRow;
+    private int restrictSavingRow;
     private int bizHoursRow;
     private int bizLocationRow;
     private int notificationsSimpleRow;
@@ -4387,6 +4388,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (notificationsSimpleRow >= 0 && listAdapter != null) {
                     listAdapter.notifyItemChanged(notificationsSimpleRow);
                 }
+            } else if (position == restrictSavingRow) {
+                if (userInfo == null) {
+                    return;
+                }
+                boolean current = userInfo.noforwards;
+                userInfo.noforwards = !current;
+                listAdapter.notifyItemChanged(restrictSavingRow);
+                getMessagesController().toggleUserNoForwards(userId, !current);
             } else if (position == addToContactsRow) {
                 TLRPC.User user = getMessagesController().getUser(userId);
                 Bundle args = new Bundle();
@@ -10821,6 +10830,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (actionsView == null && userId != getUserConfig().getClientUserId()) {
                     notificationsRow = rowCount++;
+                    if (!UserObject.isUserSelf(user) && !user.bot && !UserObject.isService(userId)) {
+                        restrictSavingRow = rowCount++;
+                    }
                 }
                 if (isBot && user != null && user.bot_has_main_app) {
                     botAppRow = rowCount++;
@@ -14267,7 +14279,15 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 case VIEW_TYPE_NOTIFICATIONS_CHECK_SIMPLE:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
-                    textCheckCell.setTextAndCheck(LocaleController.getString(R.string.Notifications), !getMessagesController().isDialogMuted(getDialogId(), topicId), false);
+                    if (position == notificationsSimpleRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString(R.string.Notifications), !getMessagesController().isDialogMuted(getDialogId(), topicId), false);
+                    } else if (position == restrictSavingRow) {
+                        boolean isRestricted = false;
+                        if (userInfo != null) {
+                            isRestricted = userInfo.noforwards;
+                        }
+                        textCheckCell.setTextAndCheck(LocaleController.getString(R.string.RestrictSavingContent), isRestricted, false);
+                    }
                     break;
                 case VIEW_TYPE_LOCATION:
                     ((ProfileLocationCell) holder.itemView).set(userInfo != null ? userInfo.business_location : null, notificationsDividerRow < 0 && !myProfile);
@@ -14476,7 +14496,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 return VIEW_TYPE_DIVIDER;
             } else if (position == notificationsRow) {
                 return VIEW_TYPE_NOTIFICATIONS_CHECK;
-            } else if (position == notificationsSimpleRow) {
+            } else if (position == notificationsSimpleRow || position == restrictSavingRow) {
                 return VIEW_TYPE_NOTIFICATIONS_CHECK_SIMPLE;
             } else if (position == lastSectionRow || position == membersSectionRow ||
                     position == secretSettingsSectionRow || position == settingsSectionRow || position == devicesSectionRow ||

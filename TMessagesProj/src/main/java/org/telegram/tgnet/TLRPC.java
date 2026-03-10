@@ -22089,6 +22089,7 @@ public class TLRPC {
         public long send_paid_messages_stars;
         public boolean bot_forum_view;
         public boolean bot_forum_can_manage_topics;
+        public boolean noforwards;
 
         public static User TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
             User result = null;

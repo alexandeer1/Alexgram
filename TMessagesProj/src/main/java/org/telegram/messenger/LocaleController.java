@@ -242,7 +242,12 @@ public class LocaleController {
             synchronized (this) {
                 if (chatDate == null) {
                     final Locale locale = currentLocale == null ? Locale.getDefault() : currentLocale;
-                    chatDate = createFormatter(locale, getStringInternal("chatDate", R.string.chatDate), "d MMMM");
+                    String dateFormat = NekoConfig.dateFormat.String();
+                    if (!"default".equals(dateFormat)) {
+                        chatDate = createFormatter(locale, dateFormat, "d MMMM");
+                    } else {
+                        chatDate = createFormatter(locale, getStringInternal("chatDate", R.string.chatDate), "d MMMM");
+                    }
                 }
             }
         }
@@ -255,7 +260,12 @@ public class LocaleController {
             synchronized (this) {
                 if (chatDateShort == null) {
                     final Locale locale = currentLocale == null ? Locale.getDefault() : currentLocale;
-                    chatDateShort = createFormatter(locale, getStringInternal("chatDateShort", R.string.chatDateShort), "d MMM");
+                    String dateFormat = NekoConfig.dateFormat.String();
+                    if (!"default".equals(dateFormat)) {
+                        chatDateShort = createFormatter(locale, dateFormat, "d MMM");
+                    } else {
+                        chatDateShort = createFormatter(locale, getStringInternal("chatDateShort", R.string.chatDateShort), "d MMM");
+                    }
                 }
             }
         }
@@ -268,7 +278,12 @@ public class LocaleController {
             synchronized (this) {
                 if (chatFullDate == null) {
                     final Locale locale = currentLocale == null ? Locale.getDefault() : currentLocale;
-                    chatFullDate = createFormatter(locale, getStringInternal("chatFullDate", R.string.chatFullDate), "d MMMM yyyy");
+                    String dateFormat = NekoConfig.dateFormat.String();
+                    if (!"default".equals(dateFormat)) {
+                         chatFullDate = createFormatter(locale, dateFormat, "d MMMM yyyy");
+                    } else {
+                         chatFullDate = createFormatter(locale, getStringInternal("chatFullDate", R.string.chatFullDate), "d MMMM yyyy");
+                    }
                 }
             }
         }
@@ -714,7 +729,10 @@ public class LocaleController {
         }
 
         systemDefaultLocale = Locale.getDefault();
-        is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
+        int type = NekoConfig.timeFormat.Int();
+        if (type == 1) is24HourFormat = false;
+        else if (type == 2) is24HourFormat = true;
+        else is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
         LocaleInfo currentInfo = null;
         boolean override = false;
 
@@ -2117,7 +2135,10 @@ public class LocaleController {
         if (changingConfiguration) {
             return;
         }
-        is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
+        int type = NekoConfig.timeFormat.Int();
+        if (type == 1) is24HourFormat = false;
+        else if (type == 2) is24HourFormat = true;
+        else is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
         systemDefaultLocale = newConfig.locale;
         if (languageOverride != null) {
             LocaleInfo toSet = currentLocaleInfo;

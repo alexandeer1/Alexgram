@@ -80,6 +80,8 @@ public class NekoConfig {
     public static ConfigItem repeatConfirm = addConfig("repeatConfirm", configTypeBool, true);
     public static ConfigItem disableInstantCamera = addConfig("DisableInstantCamera", configTypeBool, true);
     public static ConfigItem showSeconds = addConfig("showSeconds", configTypeBool, false);
+    public static ConfigItem dateFormat = addConfig("dateFormat", configTypeString, "default");
+    public static ConfigItem timeFormat = addConfig("timeFormat", configTypeInt, 0); // 0 = System, 1 = 12h, 2 = 24h
 
     // From NekoConfig
     public static ConfigItem useIPv6 = addConfig("IPv6", configTypeBool, false);
