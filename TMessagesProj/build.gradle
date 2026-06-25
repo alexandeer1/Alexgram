@@ -82,7 +82,9 @@ android {
             reset()
             universalApk = false
             if (!nativeTarget.isBlank()) {
-                include nativeTarget
+                nativeTarget.split(',').collect { it.trim() }.each { abi ->
+                    include abi
+                }
             } else {
                 include 'arm64-v8a', 'x86_64'
             }

@@ -21,7 +21,7 @@ jobs:
     outputs:
       build_timestamp: ${{ steps.release_build_step.outputs.build_timestamp }}
     env:
-      NATIVE_TARGET: "arm64-v8a"
+      NATIVE_TARGET: "arm64-v8a,armeabi-v7a"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,13 +61,13 @@ jobs:
           echo "build_timestamp=$BUILD_TIMESTAMP" >> "$GITHUB_OUTPUT"
           ./gradlew TMessagesProj:assembleRelease
 
-          APK=$(find TMessagesProj/build/outputs/apk -name '*arm64-v8a*.apk')
-          APK=$(dirname $APK)
-          echo "APK=$APK" >> $GITHUB_ENV
+          APK_FILE=$(find TMessagesProj/build/outputs/apk -name '*.apk' | head -n 1)
+          APK_DIR=$(dirname "$APK_FILE")
+          echo "APK_DIR=$APK_DIR" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v4
         with:
           name: Release
-          path: ${{ env.APK }}
+          path: ${{ env.APK_DIR }}
   upload:
     name: Upload release
     if: github.event.inputs.upload != 'y' && !contains(github.event.head_commit.message, '[skip upload]')
@@ -97,7 +97,6 @@ jobs:
           BUILD_TIMESTAMP: ${{ needs.build.outputs.build_timestamp }}
         run: |
           # send apk via telegram bot api
-          export mini64=$(find artifacts -name "*arm64-v8a.apk")
-          echo $mini64
+          find artifacts -name "*.apk"
           python -m pip install -r Tools/scripts/requirements.txt
           python Tools/scripts/upload.py ${{ secrets.HELPER_BOT_TOKEN }} ${{ secrets.HELPER_BOT_TARGET }} release ${{ secrets.HELPER_BOT_CANARY_TARGET }}
