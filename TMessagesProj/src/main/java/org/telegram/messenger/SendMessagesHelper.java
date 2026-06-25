@@ -178,6 +178,65 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     private final HashMap<String, byte[]> waitingForVote = new HashMap<>();
     private final LongSparseArray<Long> voteSendTime = new LongSparseArray();
     private final HashMap<String, ImportingHistory> importingHistoryFiles = new HashMap<>();
+    // [Alexgram: Auto-download restricted media before copy-forward] - Start
+    public static class DelayedRestrictedForward {
+        public MessageObject messageObject;
+        public ArrayList<MessageObject> group;
+        public long did;
+        public long payStars;
+        public long monoForumPeerId;
+        public MessageSuggestionParams suggestionParams;
+        public final HashSet<String> pendingKeys = new HashSet<>();
+    }
+    private final HashMap<String, ArrayList<DelayedRestrictedForward>> delayedRestrictedForwards = new HashMap<>();
+
+    private String getDownloadKeyForMessage(MessageObject messageObject) {
+        if (messageObject == null || messageObject.messageOwner == null || messageObject.messageOwner.media == null) {
+            return null;
+        }
+        if (messageObject.messageOwner.media.photo instanceof TLRPC.TL_photo) {
+            TLRPC.TL_photo photo = (TLRPC.TL_photo) messageObject.messageOwner.media.photo;
+            ArrayList<TLRPC.PhotoSize> sizes = photo.sizes;
+            TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(sizes, AndroidUtilities.getPhotoSize(true), false, null, true);
+            if (sizeFull != null) {
+                return FileLoader.getAttachFileName(sizeFull);
+            }
+        } else if (messageObject.messageOwner.media.document instanceof TLRPC.TL_document) {
+            TLRPC.TL_document document = (TLRPC.TL_document) messageObject.messageOwner.media.document;
+            return FileLoader.getAttachFileName(document);
+        }
+        return null;
+    }
+
+    private boolean isMessageMediaDownloaded(MessageObject messageObject) {
+        if (messageObject == null || messageObject.messageOwner == null) {
+            return true;
+        }
+        if (messageObject.messageOwner.media == null || messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaEmpty || messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage || messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaGame || messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaInvoice) {
+            return true;
+        }
+        File f = getFileLoader().getPathToMessage(messageObject.messageOwner);
+        String path = (f != null && f.exists()) ? f.getAbsolutePath() : messageObject.messageOwner.attachPath;
+        return path != null && !path.isEmpty() && new File(path).exists();
+    }
+
+    private void startDownloadForMessage(MessageObject messageObject) {
+        if (messageObject == null || messageObject.messageOwner == null || messageObject.messageOwner.media == null) {
+            return;
+        }
+        if (messageObject.messageOwner.media.photo instanceof TLRPC.TL_photo) {
+            TLRPC.TL_photo photo = (TLRPC.TL_photo) messageObject.messageOwner.media.photo;
+            ArrayList<TLRPC.PhotoSize> sizes = photo.sizes;
+            TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(sizes, AndroidUtilities.getPhotoSize(true), false, null, true);
+            if (sizeFull != null) {
+                getFileLoader().loadFile(ImageLocation.getForPhoto(sizeFull, photo), messageObject, null, FileLoader.PRIORITY_HIGH, 1);
+            }
+        } else if (messageObject.messageOwner.media.document instanceof TLRPC.TL_document) {
+            TLRPC.TL_document document = (TLRPC.TL_document) messageObject.messageOwner.media.document;
+            getFileLoader().loadFile(document, messageObject, FileLoader.PRIORITY_HIGH, 0);
+        }
+    }
+    // [Alexgram: Auto-download restricted media before copy-forward] - End
     private final LongSparseArray<ImportingHistory> importingHistoryMap = new LongSparseArray<>();
 
     private final HashMap<String, ImportingStickers> importingStickersFiles = new HashMap<>();
@@ -1492,6 +1551,23 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             }
         } else if (id == NotificationCenter.fileLoaded) {
             String path = (String) args[0];
+            // [Alexgram: Auto-download restricted media before copy-forward] - Start
+            ArrayList<DelayedRestrictedForward> restrictedList = delayedRestrictedForwards.get(path);
+            if (restrictedList != null) {
+                delayedRestrictedForwards.remove(path);
+                for (int a = 0; a < restrictedList.size(); a++) {
+                    DelayedRestrictedForward df = restrictedList.get(a);
+                    df.pendingKeys.remove(path);
+                    if (df.pendingKeys.isEmpty()) {
+                        if (df.group != null) {
+                            processForwardFromMyName(df.group, df.did, df.payStars, df.monoForumPeerId, df.suggestionParams);
+                        } else if (df.messageObject != null) {
+                            processForwardFromMyName(df.messageObject, df.did, df.payStars, df.monoForumPeerId, df.suggestionParams);
+                        }
+                    }
+                }
+            }
+            // [Alexgram: Auto-download restricted media before copy-forward] - End
             ArrayList<DelayedMessage> arr = delayedMessages.get(path);
             if (arr != null) {
                 for (int a = 0; a < arr.size(); a++) {
@@ -1501,6 +1577,25 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             }
         } else if (id == NotificationCenter.httpFileDidFailedLoad || id == NotificationCenter.fileLoadFailed) {
             String path = (String) args[0];
+
+            // [Alexgram: Auto-download restricted media before copy-forward] - Start
+            ArrayList<DelayedRestrictedForward> restrictedList = delayedRestrictedForwards.remove(path);
+            if (restrictedList != null) {
+                for (int a = 0; a < restrictedList.size(); a++) {
+                    DelayedRestrictedForward df = restrictedList.get(a);
+                    df.pendingKeys.clear();
+                }
+                AndroidUtilities.runOnUIThread(() -> {
+                    try {
+                        Toast.makeText(ApplicationLoader.applicationContext, 
+                            "Failed to download restricted media. Forward cancelled.", 
+                            Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    }
+                });
+            }
+            // [Alexgram: Auto-download restricted media before copy-forward] - End
 
             ArrayList<DelayedMessage> arr = delayedMessages.get(path);
             if (arr != null) {
@@ -1841,6 +1936,63 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         if (group == null || group.isEmpty()) {
             return;
         }
+        // [Alexgram: Auto-download restricted media before copy-forward] - Start
+        boolean isGroupRestricted = false;
+        for (int i = 0; i < group.size(); i++) {
+            MessageObject msgObj = group.get(i);
+            if (NaConfig.INSTANCE.getAllowForwardingRestriction().Bool() && (getMessagesController().isPeerNoForwards(msgObj.getDialogId(), true) || (msgObj.messageOwner != null && msgObj.messageOwner.noforwards))) {
+                isGroupRestricted = true;
+                break;
+            }
+        }
+        if (isGroupRestricted) {
+            ArrayList<MessageObject> pendingDownloadMessages = new ArrayList<>();
+            HashSet<String> pendingKeys = new HashSet<>();
+            for (int i = 0; i < group.size(); i++) {
+                MessageObject msgObj = group.get(i);
+                if (!isMessageMediaDownloaded(msgObj)) {
+                    String key = getDownloadKeyForMessage(msgObj);
+                    if (key != null) {
+                        pendingDownloadMessages.add(msgObj);
+                        pendingKeys.add(key);
+                    }
+                }
+            }
+            if (!pendingKeys.isEmpty()) {
+                DelayedRestrictedForward delayed = new DelayedRestrictedForward();
+                delayed.group = new ArrayList<>(group);
+                delayed.did = did;
+                delayed.payStars = payStars;
+                delayed.monoForumPeerId = monoForumPeerId;
+                delayed.suggestionParams = suggestionParams;
+                delayed.pendingKeys.addAll(pendingKeys);
+
+                for (String key : pendingKeys) {
+                    ArrayList<DelayedRestrictedForward> list = delayedRestrictedForwards.get(key);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        delayedRestrictedForwards.put(key, list);
+                    }
+                    list.add(delayed);
+                }
+
+                AndroidUtilities.runOnUIThread(() -> {
+                    try {
+                        Toast.makeText(ApplicationLoader.applicationContext, 
+                            "Downloading restricted album... It will be sent automatically.", 
+                            Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    }
+                });
+
+                for (MessageObject msgObj : pendingDownloadMessages) {
+                    startDownloadForMessage(msgObj);
+                }
+                return;
+            }
+        }
+        // [Alexgram: Auto-download restricted media before copy-forward] - End
         ArrayList<SendingMediaInfo> infos = new ArrayList<>();
         boolean forceDocument = false;
         for (int i = 0; i < group.size(); i++) {
@@ -1914,6 +2066,41 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
 
             File f = getFileLoader().getPathToMessage(messageObject.messageOwner);
             String path = (f != null && f.exists()) ? f.getAbsolutePath() : messageObject.messageOwner.attachPath;
+
+            // [Alexgram: Auto-download restricted media before copy-forward] - Start
+            if (isRestricted && (path == null || !new File(path).exists())) {
+                String key = getDownloadKeyForMessage(messageObject);
+                if (key != null) {
+                    DelayedRestrictedForward delayed = new DelayedRestrictedForward();
+                    delayed.messageObject = messageObject;
+                    delayed.did = did;
+                    delayed.payStars = payStars;
+                    delayed.monoForumPeerId = monoForumPeerId;
+                    delayed.suggestionParams = suggestionParams;
+                    delayed.pendingKeys.add(key);
+
+                    ArrayList<DelayedRestrictedForward> list = delayedRestrictedForwards.get(key);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        delayedRestrictedForwards.put(key, list);
+                    }
+                    list.add(delayed);
+
+                    AndroidUtilities.runOnUIThread(() -> {
+                        try {
+                            Toast.makeText(ApplicationLoader.applicationContext, 
+                                "Downloading restricted media... It will be sent automatically.", 
+                                Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            FileLog.e(e);
+                        }
+                    });
+
+                    startDownloadForMessage(messageObject);
+                    return;
+                }
+            }
+            // [Alexgram: Auto-download restricted media before copy-forward] - End
 
             if (messageObject.messageOwner.media.photo instanceof TLRPC.TL_photo) {
                 TLRPC.TL_photo photo = (TLRPC.TL_photo) messageObject.messageOwner.media.photo;
