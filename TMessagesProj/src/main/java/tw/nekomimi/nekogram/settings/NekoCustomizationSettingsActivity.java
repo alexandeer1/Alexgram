@@ -73,6 +73,7 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     private final AbstractConfigCell enableChangeNameInGroupsRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableChangeNameInGroups, LocaleController.getString("ExperimentalChangeSenderNameAbout", R.string.ExperimentalChangeSenderNameAbout), LocaleController.getString("ExperimentalChangeSenderName", R.string.ExperimentalChangeSenderName)));
     private final AbstractConfigCell enableLocalEditorPlusRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableLocalEditorPlus, LocaleController.getString("LocalEditorPlusAbout", R.string.LocalEditorPlusAbout), LocaleController.getString("LocalEditorPlus", R.string.LocalEditorPlus)));
     private final AbstractConfigCell showAdminTagInVoiceChatRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showAdminTagInVoiceChat, LocaleController.getString("ShowAdminTagInVoiceChatDesc", R.string.ShowAdminTagInVoiceChatDesc), LocaleController.getString("ShowAdminTagInVoiceChat", R.string.ShowAdminTagInVoiceChat)));
+    private final AbstractConfigCell showSenderNameOnStickerRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnSticker, LocaleController.getString("ShowSenderNameOnStickerDesc", R.string.ShowSenderNameOnStickerDesc), LocaleController.getString("ShowSenderNameOnSticker", R.string.ShowSenderNameOnSticker)));
     private final AbstractConfigCell enableCustomPrivacyRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableCustomPrivacy, LocaleController.getString("ProfilePrivacyManagerAbout", R.string.ProfilePrivacyManagerAbout), LocaleController.getString("ProfilePrivacyManager", R.string.ProfilePrivacyManager)));
     private final AbstractConfigCell enableSelectRangeInSharedMediaRow = cellGroup.appendCell(new ConfigCellTextCheck(
             NekoConfig.enableSelectRangeInSharedMedia,
@@ -132,6 +133,11 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NekoConfig.enableLocalEditorPlus.getKey())) {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
+            } else if (key.equals(NekoConfig.showSenderNameOnSticker.getKey())) {
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
             }
 
         };

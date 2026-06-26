@@ -475,6 +475,10 @@
     <string name="ShowAdminTagInVoiceChat">Show Admin Tag in Voice Chat</string>
     <string name="ShowAdminTagInVoiceChatDesc">Display admin or owner badges next to user names in voice/video chats.</string>
     <!-- [Alexgram: Admin Tag in Voice Chat] - End -->
+    <!-- [Alexgram: Sender Name on Stickers] - Start -->
+    <string name="ShowSenderNameOnSticker">Show sender name on stickers</string>
+    <string name="ShowSenderNameOnStickerDesc">Display the sender\'s name directly on sticker messages in group chats.</string>
+    <!-- [Alexgram: Sender Name on Stickers] - End -->
     <string name="Ayugram">Ayugram</string>
     <string name="ProfilePrivacyManager">Profile Privacy Manager</string>
     <string name="ProfilePrivacyManagerAbout">Allows managing individual user privacy settings directly from their profile menu.</string>

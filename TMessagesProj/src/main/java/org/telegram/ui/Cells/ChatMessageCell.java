@@ -9717,6 +9717,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     }
                     additionHeight -= dp(17);
                 } else if (messageObject.isAnyKindOfSticker()) {
+                    if (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (messageObject.isSticker() || messageObject.isAnimatedSticker())) {
+                        drawName = true;
+                    }
 
                     drawBackground = false;
                     boolean isWebpSticker = messageObject.type == MessageObject.TYPE_STICKER;
@@ -19155,7 +19158,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 nameLayout = new StaticLayout(nameStringFinal, Theme.chat_namePaint, Math.max(dp(1), nameWidthForLayout + additionalWidth + dp(2)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                 if (nameLayout.getLineCount() > 0) {
                     nameWidth = nameLayoutWidth = (int) Math.ceil(nameLayout.getLineWidth(0));
-                    if (!messageObject.isAnyKindOfSticker()) {
+                    if (!messageObject.isAnyKindOfSticker() || (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && drawNameLayout)) {
                         namesOffset += getNameHeight();
                     }
                     nameOffsetX = nameLayout.getLineLeft(0);
@@ -22279,7 +22282,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 if (currentNameBotVerificationId != 0) {
                     nameX += dp(20);
                 }
-                nameY = layoutHeight - dp(38);
+                if (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                    nameY = dp(drawPinnedTop ? 9 : 10);
+                } else {
+                    nameY = layoutHeight - dp(38);
+                }
                 float alphaProgress = currentMessageObject.isOut() && (checkBoxVisible || checkBoxAnimationInProgress) ? (1.0f - checkBoxAnimationProgress) : 1.0f;
 
                 rect.set((int) nameX - dp(12), (int) nameY - dp(5), (int) nameX + dp(12) + nameWidth, (int) nameY + dp(22));
