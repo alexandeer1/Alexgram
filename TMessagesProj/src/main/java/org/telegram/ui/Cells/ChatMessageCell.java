@@ -22272,7 +22272,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
             int oldAlpha;
 
-            if (currentMessageObject.shouldDrawWithoutBackground() && !isBookmarked) {
+            if (currentMessageObject.shouldDrawWithoutBackground() && !isBookmarked && !(tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker()))) {
                 Theme.chat_namePaint.setColor(getThemedColor(Theme.key_chat_stickerNameText));
                 if (currentMessageObject.isOutOwner()) {
                     nameX = dp(28);
@@ -22282,11 +22282,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 if (currentNameBotVerificationId != 0) {
                     nameX += dp(20);
                 }
-                if (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
-                    nameY = dp(drawPinnedTop ? 9 : 10);
-                } else {
-                    nameY = layoutHeight - dp(38);
-                }
+                nameY = layoutHeight - dp(38);
                 float alphaProgress = currentMessageObject.isOut() && (checkBoxVisible || checkBoxAnimationInProgress) ? (1.0f - checkBoxAnimationProgress) : 1.0f;
 
                 rect.set((int) nameX - dp(12), (int) nameY - dp(5), (int) nameX + dp(12) + nameWidth, (int) nameY + dp(22));
