@@ -209,10 +209,6 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
         showDialog(builder.create());
     }
 
-    @Override
-    public int getBaseGuid() {
-        return 15500;
-    }
 
     private class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private final Context mContext;
