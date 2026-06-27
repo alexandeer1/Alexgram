@@ -9378,6 +9378,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 drawForwardedName = (messageObject.messageOwner.fwd_from != null && !(messageObject.isAnyKindOfSticker() && messageObject.isDice())) || messageObject.type == MessageObject.TYPE_STORY;
                 if (!messageObject.isAnyKindOfSticker() && messageObject.type != MessageObject.TYPE_ROUND_VIDEO) {
                     drawName = (isSavedChat && !messageObject.isOutOwner() && (messageObject.getSavedDialogId() < 0 || messageObject.getSavedDialogId() == UserObject.ANONYMOUS) || messageObject.isFromGroup() && messageObject.isSupergroup() || messageObject.isRepostPreview || messageObject.isImportedForward() && messageObject.messageOwner.fwd_from.from_id == null || isSideMenuEnabled && !messageObject.isOutOwner() && (isMonoForum && isAllChats || isForum)) && (currentPosition == null || (currentPosition.flags & MessageObject.POSITION_FLAG_TOP) != 0);
+                    // [Alexgram: Sender Name on GIFs] - Force show sender name on GIFs when enabled
+                    if (!drawName && messageObject.type == MessageObject.TYPE_GIF && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnGif.Bool()) {
+                        drawName = true;
+                    }
                 }
                 mediaBackground = isMedia = messageObject.type != MessageObject.TYPE_FILE;
                 drawImageButton = true;
@@ -19355,7 +19359,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     }
                     forwardNameOffsetX[0] = forwardedNameLayout[0].getLineLeft(0);
                     forwardNameOffsetX[1] = forwardedNameLayout[1].getLineLeft(0);
-                    if (isSideMenued && !drawBackground || messageObject.type != MessageObject.TYPE_ROUND_VIDEO && !messageObject.isAnyKindOfSticker() || messageObject.type == MessageObject.TYPE_EMOJIS) {
+                    // [Alexgram: Sender Name on Stickers/GIFs] - Also add forwarded offset for stickers/GIFs when sender name is enabled
+                    final boolean isStickerFwdWithSenderName = (messageObject.isSticker() || messageObject.isAnimatedSticker()) && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool();
+                    final boolean isGifFwdWithSenderName = messageObject.type == MessageObject.TYPE_GIF && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnGif.Bool();
+                    if (isSideMenued && !drawBackground || (messageObject.type != MessageObject.TYPE_ROUND_VIDEO && (!messageObject.isAnyKindOfSticker() || isStickerFwdWithSenderName || isGifFwdWithSenderName)) || messageObject.type == MessageObject.TYPE_EMOJIS) {
                         namesOffset += dp(8) + Theme.chat_forwardNamePaint.getTextSize() * 2;
                         if (messageObject.type == MessageObject.TYPE_EMOJIS) {
                             namesOffset += dp(8);
@@ -19369,7 +19376,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
         if ((!messageObject.isGiveawayResults() && (!isThreadChat || messageObject.isQuickReply() || isSavedChat || messageObject.getReplyTopMsgId(isForum) != 0 || isForumGeneral || isMonoForum) && messageObject.hasValidReplyMessageObject() || messageObject.messageOwner.fwd_from != null && messageObject.isDice() || (messageObject.messageOwner.reply_to != null && (messageObject.messageOwner.reply_to.story_id != 0 || !TextUtils.isEmpty(messageObject.messageOwner.reply_to.quote_text) || messageObject.messageOwner.reply_to.reply_from != null))) && !messageObject.isRepostPreview) {
             if (currentPosition == null || currentPosition.minY == 0) {
-                if (isSideMenued && !drawBackground || !messageObject.isAnyKindOfSticker() && messageObject.type != MessageObject.TYPE_ROUND_VIDEO || messageObject.type == MessageObject.TYPE_EMOJIS) {
+                // [Alexgram: Sender Name on Stickers/GIFs] - Also add reply offset for stickers/GIFs when sender name is enabled
+                final boolean isStickerWithSenderName = (messageObject.isSticker() || messageObject.isAnimatedSticker()) && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool();
+                final boolean isGifWithSenderName = messageObject.type == MessageObject.TYPE_GIF && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnGif.Bool();
+                if (isSideMenued && !drawBackground || (!messageObject.isAnyKindOfSticker() || isStickerWithSenderName || isGifWithSenderName) && messageObject.type != MessageObject.TYPE_ROUND_VIDEO || messageObject.type == MessageObject.TYPE_EMOJIS) {
                     namesOffset += dp(20) + (Theme.chat_replyTextPaint.getTextSize() + Theme.chat_replyNamePaint.getTextSize());
                     if (messageObject.type == MessageObject.TYPE_EMOJIS && !drawForwardedName) {
                         namesOffset += dp(12);
@@ -22353,7 +22363,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 } else {
                     Theme.chat_namePaint.setColor(getThemedColor(Theme.key_chat_inForwardedNameText));
                 }
-                nameY = dp(drawPinnedTop ? 9 : 10);
+                // [Alexgram: Sender Name on Stickers] - position name relative to namesOffset so it appears above sticker, below reply header
+                if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                    nameY = namesOffset - getNameHeight() + dp(5);
+                    if (nameY < dp(drawPinnedTop ? 9 : 10)) {
+                        nameY = dp(drawPinnedTop ? 9 : 10);
+                    }
+                } else {
+                    nameY = dp(drawPinnedTop ? 9 : 10);
+                }
                 if (viaSpan1 != null || viaSpan2 != null) {
                     int color = getThemedColor(currentMessageObject.isOutOwner() ? Theme.key_chat_outViaBotNameText : Theme.key_chat_inViaBotNameText);
                     if (viaSpan1 != null) {

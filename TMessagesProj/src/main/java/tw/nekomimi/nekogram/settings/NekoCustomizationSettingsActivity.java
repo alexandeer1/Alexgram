@@ -74,6 +74,7 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     private final AbstractConfigCell enableLocalEditorPlusRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableLocalEditorPlus, LocaleController.getString("LocalEditorPlusAbout", R.string.LocalEditorPlusAbout), LocaleController.getString("LocalEditorPlus", R.string.LocalEditorPlus)));
     private final AbstractConfigCell showAdminTagInVoiceChatRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showAdminTagInVoiceChat, LocaleController.getString("ShowAdminTagInVoiceChatDesc", R.string.ShowAdminTagInVoiceChatDesc), LocaleController.getString("ShowAdminTagInVoiceChat", R.string.ShowAdminTagInVoiceChat)));
     private final AbstractConfigCell showSenderNameOnStickerRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnSticker, LocaleController.getString("ShowSenderNameOnStickerDesc", R.string.ShowSenderNameOnStickerDesc), LocaleController.getString("ShowSenderNameOnSticker", R.string.ShowSenderNameOnSticker)));
+    private final AbstractConfigCell showSenderNameOnGifRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnGif, LocaleController.getString("ShowSenderNameOnGifDesc", R.string.ShowSenderNameOnGifDesc), LocaleController.getString("ShowSenderNameOnGif", R.string.ShowSenderNameOnGif)));
     private final AbstractConfigCell enableCustomPrivacyRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableCustomPrivacy, LocaleController.getString("ProfilePrivacyManagerAbout", R.string.ProfilePrivacyManagerAbout), LocaleController.getString("ProfilePrivacyManager", R.string.ProfilePrivacyManager)));
     private final AbstractConfigCell enableSelectRangeInSharedMediaRow = cellGroup.appendCell(new ConfigCellTextCheck(
             NekoConfig.enableSelectRangeInSharedMedia,
@@ -92,6 +93,10 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     public NekoCustomizationSettingsActivity() {
         if (!NekoConfig.showQuickEditIconInChatList.Bool()) {
             cellGroup.rows.remove(quickEditIconOnlyOwnRow);
+        }
+        // Only show the GIF sender name row if the sticker sender name is enabled
+        if (!NekoConfig.showSenderNameOnSticker.Bool()) {
+            cellGroup.rows.remove(showSenderNameOnGifRow);
         }
         addRowsToMap(cellGroup);
     }
@@ -134,6 +139,26 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             } else if (key.equals(NekoConfig.enableLocalEditorPlus.getKey())) {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NekoConfig.showSenderNameOnSticker.getKey())) {
+                // Show or hide the GIF sub-option based on sticker name toggle
+                if ((boolean) newValue) {
+                    if (!cellGroup.rows.contains(showSenderNameOnGifRow)) {
+                        final int index = cellGroup.rows.indexOf(showSenderNameOnStickerRow) + 1;
+                        cellGroup.rows.add(index, showSenderNameOnGifRow);
+                        listAdapter.notifyItemInserted(index);
+                    }
+                } else {
+                    if (cellGroup.rows.contains(showSenderNameOnGifRow)) {
+                        final int index = cellGroup.rows.indexOf(showSenderNameOnGifRow);
+                        cellGroup.rows.remove(showSenderNameOnGifRow);
+                        listAdapter.notifyItemRemoved(index);
+                    }
+                }
+                addRowsToMap(cellGroup);
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
+            } else if (key.equals(NekoConfig.showSenderNameOnGif.getKey())) {
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
                 if (getParentLayout() != null) {
                     getParentLayout().rebuildAllFragmentViews(false, false);

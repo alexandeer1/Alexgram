@@ -478,6 +478,8 @@
     <!-- [Alexgram: Sender Name on Stickers] - Start -->
     <string name="ShowSenderNameOnSticker">Show sender name on stickers</string>
     <string name="ShowSenderNameOnStickerDesc">Display the sender\'s name directly on sticker messages in group chats.</string>
+    <string name="ShowSenderNameOnGif">Show sender name on GIFs</string>
+    <string name="ShowSenderNameOnGifDesc">Display the sender\'s name on GIF messages (works when sender name on stickers is enabled).</string>
     <!-- [Alexgram: Sender Name on Stickers] - End -->
     <string name="Ayugram">Ayugram</string>
     <string name="ProfilePrivacyManager">Profile Privacy Manager</string>

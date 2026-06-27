@@ -189,6 +189,7 @@ public class NekoConfig {
     // [Alexgram: Admin Tag in Voice Chat] - End
     // [Alexgram: Sender Name on Stickers] - Start
     public static ConfigItem showSenderNameOnSticker = addConfig("showSenderNameOnSticker", configTypeBool, false);
+    public static ConfigItem showSenderNameOnGif = addConfig("showSenderNameOnGif", configTypeBool, false);
     // [Alexgram: Sender Name on Stickers] - End
     public static ConfigItem enableCustomPrivacy = addConfig("enableCustomPrivacy", configTypeBool, true);
     public static ConfigItem enableSelectRangeInSharedMedia = addConfig("enableSelectRangeInSharedMedia", configTypeBool, true);
