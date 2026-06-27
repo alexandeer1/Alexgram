@@ -1,4 +1,4 @@
-﻿package tw.nekomimi.nekogram.settings;
+package tw.nekomimi.nekogram.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -165,7 +165,7 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                 boolean newVal = !NekoConfig.appFontIncludeSystem.Bool();
                 NekoConfig.appFontIncludeSystem.setConfigBool(newVal);
                 if (newVal && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    PaintTypeface.get(); // trigger loading
+                    PaintTypeface.get();
                 }
                 buildRows();
                 listAdapter.notifyDataSetChanged();
@@ -214,8 +214,6 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
         return 15500;
     }
 
-    // ============ Adapter ============
-
     private class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private final Context mContext;
 
@@ -253,7 +251,7 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                     view = new TextCheckCell(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
-                default: // ROW_TYPE_FONT
+                default:
                     view = new FontItemCell(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
@@ -294,14 +292,12 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                         ((FontItemCell) holder.itemView).bind(item.font, isBuiltIn, isSelected, !isLast);
                     }
                     break;
-                case ROW_TYPE_SHADOW:
                 default:
                     break;
             }
         }
     }
 
-    // ============ AppFontCell ============
     private static class AppFontCell extends FrameLayout {
         private final TextView titleView;
         private final TextView valueView;
@@ -346,7 +342,6 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
         }
     }
 
-    // ============ FontItemCell ============
     @SuppressLint("ViewConstructor")
     private static class FontItemCell extends FrameLayout {
         private final TextView nameView;
@@ -413,11 +408,8 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                     ? Theme.getColor(Theme.key_windowBackgroundWhiteBlueText)
                     : Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
 
-            // STOCK = blue-ish, SYSTEM = green/teal
             String tagLabel = isBuiltIn ? "STOCK" : "SYSTEM";
-            int tagColor = isBuiltIn
-                    ? 0xFF4A90D9  // blue
-                    : 0xFF8E44AD; // purple
+            int tagColor = isBuiltIn ? 0xFF4A90D9 : 0xFF8E44AD;
             try {
                 tagColor = isBuiltIn
                         ? Theme.getColor(Theme.key_featuredStickers_buttonText)
@@ -435,7 +427,6 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                     Color.red(tagColor), Color.green(tagColor), Color.blue(tagColor)));
             tagView.setBackground(bg);
 
-            // Eye icon tint — highlighted if selected
             eyeView.setColorFilter(isSelected
                     ? Theme.getColor(Theme.key_windowBackgroundWhiteBlueText)
                     : Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon), PorterDuff.Mode.SRC_IN);
