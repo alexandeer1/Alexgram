@@ -484,6 +484,16 @@
     <string name="Ayugram">Ayugram</string>
     <string name="ProfilePrivacyManager">Profile Privacy Manager</string>
     <string name="ProfilePrivacyManagerAbout">Allows managing individual user privacy settings directly from their profile menu.</string>
+    <!-- [Alexgram: Fonts] - Start -->
+    <string name="Fonts">Fonts</string>
+    <string name="AppFont">App font</string>
+    <string name="AppFontDefault">Default</string>
+    <string name="AppFontDesc">The font used across the app interface.</string>
+    <string name="AppFontResetDesc">Reset to the default app font?</string>
+    <string name="AvailableFonts">Available fonts</string>
+    <string name="IncludeSystemFonts">Include system fonts</string>
+    <string name="IncludeSystemFontsDesc">Show fonts provided by the system in the list below</string>
+    <!-- [Alexgram: Fonts] - End -->
 </resources>
 
 

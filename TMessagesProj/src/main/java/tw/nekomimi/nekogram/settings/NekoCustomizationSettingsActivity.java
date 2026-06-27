@@ -66,6 +66,12 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             new ConfigCellTextCheckIcon(null, "PillStack", getString(R.string.PillStackPills), R.drawable.ic_ab_search, false, () ->
                     presentFragment(new com.exteragram.messenger.pillstack.ui.PillStackPreferencesActivity()))
     );
+    // [Alexgram: Fonts] - Start
+    private final AbstractConfigCell fontsRow = cellGroup.appendCell(
+            new ConfigCellTextCheckIcon(null, "Fonts", getString(R.string.Fonts), R.drawable.msg_theme, false, () ->
+                    presentFragment(new tw.nekomimi.nekogram.settings.FontsSettingsActivity()))
+    );
+    // [Alexgram: Fonts] - End
     private final AbstractConfigCell showQuickEditIconRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showQuickEditIconInChatList, LocaleController.getString("ShowQuickEditIconDesc", R.string.ShowQuickEditIconDesc), LocaleController.getString("ShowQuickEditIcon", R.string.ShowQuickEditIcon)));
     private final AbstractConfigCell quickEditIconOnlyOwnRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.quickEditIconOnlyForOwnMessages, LocaleController.getString("QuickEditIconOnlyOwnDesc", R.string.QuickEditIconOnlyOwnDesc), LocaleController.getString("QuickEditIconOnlyOwn", R.string.QuickEditIconOnlyOwn)));
     private final AbstractConfigCell forceMusicSpeedControlRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.forceMusicSpeedControl, LocaleController.getString("ExperimentalMusicSpeedControlAbout", R.string.ExperimentalMusicSpeedControlAbout), LocaleController.getString("ExperimentalMusicSpeedControl", R.string.ExperimentalMusicSpeedControl)));

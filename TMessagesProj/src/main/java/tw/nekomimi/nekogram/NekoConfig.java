@@ -87,6 +87,10 @@ public class NekoConfig {
     public static ConfigItem tabletMode = addConfig("TabletMode", configTypeInt, 0);
 
     public static ConfigItem typeface = addConfig("TypefaceUseDefault", configTypeBool, false);
+    // [Alexgram: Fonts] - Start
+    public static ConfigItem appFontKey = addConfig("AppFontKey", configTypeString, "");
+    public static ConfigItem appFontIncludeSystem = addConfig("AppFontIncludeSystem", configTypeBool, false);
+    // [Alexgram: Fonts] - End
     public static ConfigItem nameOrder = addConfig("NameOrder", configTypeInt, 1);
     public static ConfigItem mapPreviewProvider = addConfig("MapPreviewProvider", configTypeInt, 0);
     public static ConfigItem forceBlurInChat = addConfig("forceBlurInChat", configTypeBool, false);
