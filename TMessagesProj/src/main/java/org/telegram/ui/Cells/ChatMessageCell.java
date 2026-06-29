@@ -21392,7 +21392,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         && TextUtils.isEmpty(currentMessageObject.caption)
                         && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
                 if (overlayNameOnMedia) {
-                    nameY = namesOffset + additionalTop + dp(drawPinnedTop ? 5 : 6);
+                    nameY = namesOffset + dp(drawPinnedTop ? 5 : 6);
                 } else if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
                     nameY = namesOffset - getNameHeight() + dp(5);
                     if (nameY < dp(drawPinnedTop ? 9 : 10)) {
@@ -22384,7 +22384,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         && TextUtils.isEmpty(currentMessageObject.caption)
                         && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
                 if (overlayNameOnMedia) {
-                    nameY = namesOffset + additionalTop + dp(drawPinnedTop ? 5 : 6);
+                    nameY = namesOffset + dp(drawPinnedTop ? 5 : 6);
                 } else if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
                     nameY = namesOffset - getNameHeight() + dp(5);
                     if (nameY < dp(drawPinnedTop ? 9 : 10)) {
