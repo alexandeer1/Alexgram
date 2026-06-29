@@ -48974,6 +48974,11 @@ public class ChatActivity extends BaseFragment implements
 						icons.add(R.drawable.msg_copy);
 					}
 				}
+				if (NekoConfig.showCopyFileRef.Bool() && canCopyFileRef(selectedObject)) {
+					items.add(LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
+					options.add(OPTION_COPY_REF);
+					icons.add(R.drawable.baseline_content_copy_24);
+				}
 				if (!isThreadChat() && chatMode != MODE_SCHEDULED && currentChat != null && primaryMessage != null && (currentChat.has_link || primaryMessage.hasReplies()) && currentChat.megagroup && primaryMessage.canViewThread()) {
 					if (primaryMessage.hasReplies()) {
 						items.add(LocaleController.formatPluralString("ViewReplies", primaryMessage.getRepliesCount()));
