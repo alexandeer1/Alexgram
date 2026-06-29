@@ -21325,7 +21325,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if ((currentNameStatusDrawable != null || currentNameEmojiStatusDrawable != null || topicButton != null && (drawTopic || transitionParams.animateDrawTopic)) && drawNameLayout && nameLayout != null && (currentPosition == null || currentPosition.minX == 0 && currentPosition.minY == 0) && !(currentMessageObject.deleted && !drawingToBitmap && currentMessagesGroup != null && currentMessagesGroup.messages.size() >= 1)) {
             int color;
             float nameX, nameY;
-            if (currentMessageObject.shouldDrawWithoutBackground()) {
+            if (currentMessageObject.shouldDrawWithoutBackground() && !cachedIsBookmarked && !(tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker()))) {
                 color = getThemedColor(Theme.key_chat_stickerNameText);
                 if (currentMessageObject.isOutOwner()) {
                     nameX = dp(28);
@@ -21384,7 +21384,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 } else {
                     color = getThemedColor(Theme.key_chat_inForwardedNameText);
                 }
-                nameY = dp(drawPinnedTop ? 9 : 10);
+                // [Alexgram: Sender Name on Stickers] - position name relative to namesOffset so it appears above sticker, below reply header
+                if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                    nameY = namesOffset - getNameHeight() + dp(5);
+                    if (nameY < dp(drawPinnedTop ? 9 : 10)) {
+                        nameY = dp(drawPinnedTop ? 9 : 10);
+                    }
+                } else {
+                    nameY = dp(drawPinnedTop ? 9 : 10);
+                }
             }
             if (currentMessagesGroup != null && currentMessagesGroup.transitionParams.backgroundChangeBounds) {
                 nameX += currentMessagesGroup.transitionParams.offsetLeft;
