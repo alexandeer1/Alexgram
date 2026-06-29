@@ -19162,7 +19162,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 nameLayout = new StaticLayout(nameStringFinal, Theme.chat_namePaint, Math.max(dp(1), nameWidthForLayout + additionalWidth + dp(2)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                 if (nameLayout.getLineCount() > 0) {
                     nameWidth = nameLayoutWidth = (int) Math.ceil(nameLayout.getLineWidth(0));
-                    if (!messageObject.isAnyKindOfSticker() || (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && drawNameLayout)) {
+                    boolean overlayNameOnMedia = (messageObject.isPhoto() || messageObject.isVideo())
+                            && TextUtils.isEmpty(messageObject.caption)
+                            && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
+                    if ((!messageObject.isAnyKindOfSticker() && !overlayNameOnMedia) || (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && drawNameLayout)) {
                         namesOffset += getNameHeight();
                     }
                     nameOffsetX = nameLayout.getLineLeft(0);
@@ -21385,7 +21388,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     color = getThemedColor(Theme.key_chat_inForwardedNameText);
                 }
                 // [Alexgram: Sender Name on Stickers] - position name relative to namesOffset so it appears above sticker, below reply header
-                if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                boolean overlayNameOnMedia = (currentMessageObject.isPhoto() || currentMessageObject.isVideo())
+                        && TextUtils.isEmpty(currentMessageObject.caption)
+                        && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
+                if (overlayNameOnMedia) {
+                    nameY = namesOffset + additionalTop + dp(drawPinnedTop ? 5 : 6);
+                } else if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
                     nameY = namesOffset - getNameHeight() + dp(5);
                     if (nameY < dp(drawPinnedTop ? 9 : 10)) {
                         nameY = dp(drawPinnedTop ? 9 : 10);
@@ -22372,7 +22380,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     Theme.chat_namePaint.setColor(getThemedColor(Theme.key_chat_inForwardedNameText));
                 }
                 // [Alexgram: Sender Name on Stickers] - position name relative to namesOffset so it appears above sticker, below reply header
-                if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                boolean overlayNameOnMedia = (currentMessageObject.isPhoto() || currentMessageObject.isVideo())
+                        && TextUtils.isEmpty(currentMessageObject.caption)
+                        && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
+                if (overlayNameOnMedia) {
+                    nameY = namesOffset + additionalTop + dp(drawPinnedTop ? 5 : 6);
+                } else if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
                     nameY = namesOffset - getNameHeight() + dp(5);
                     if (nameY < dp(drawPinnedTop ? 9 : 10)) {
                         nameY = dp(drawPinnedTop ? 9 : 10);

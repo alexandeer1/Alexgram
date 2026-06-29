@@ -481,6 +481,10 @@
     <string name="ShowSenderNameOnGif">Show sender name on GIFs</string>
     <string name="ShowSenderNameOnGifDesc">Display the sender\'s name on GIF messages (works when sender name on stickers is enabled).</string>
     <!-- [Alexgram: Sender Name on Stickers] - End -->
+    <!-- [Alexgram: Sender Name on Media] - Start -->
+    <string name="ShowSenderNameOnMedia">Show sender name on media like Telegram Desktop</string>
+    <string name="ShowSenderNameOnMediaDesc">Display the sender\'s name overlaying photos and videos instead of above them, similar to Telegram Desktop.</string>
+    <!-- [Alexgram: Sender Name on Media] - End -->
     <string name="Ayugram">Ayugram</string>
     <string name="ProfilePrivacyManager">Profile Privacy Manager</string>
     <string name="ProfilePrivacyManagerAbout">Allows managing individual user privacy settings directly from their profile menu.</string>

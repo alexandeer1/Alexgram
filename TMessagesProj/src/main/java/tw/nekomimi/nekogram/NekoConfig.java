@@ -194,6 +194,7 @@ public class NekoConfig {
     // [Alexgram: Sender Name on Stickers] - Start
     public static ConfigItem showSenderNameOnSticker = addConfig("showSenderNameOnSticker", configTypeBool, false);
     public static ConfigItem showSenderNameOnGif = addConfig("showSenderNameOnGif", configTypeBool, false);
+    public static ConfigItem showSenderNameOnMedia = addConfig("showSenderNameOnMedia", configTypeBool, false);
     // [Alexgram: Sender Name on Stickers] - End
     public static ConfigItem enableCustomPrivacy = addConfig("enableCustomPrivacy", configTypeBool, true);
     public static ConfigItem enableSelectRangeInSharedMedia = addConfig("enableSelectRangeInSharedMedia", configTypeBool, true);

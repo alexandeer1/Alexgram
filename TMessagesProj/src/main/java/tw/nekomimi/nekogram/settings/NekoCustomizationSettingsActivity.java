@@ -81,6 +81,7 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     private final AbstractConfigCell showAdminTagInVoiceChatRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showAdminTagInVoiceChat, LocaleController.getString("ShowAdminTagInVoiceChatDesc", R.string.ShowAdminTagInVoiceChatDesc), LocaleController.getString("ShowAdminTagInVoiceChat", R.string.ShowAdminTagInVoiceChat)));
     private final AbstractConfigCell showSenderNameOnStickerRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnSticker, LocaleController.getString("ShowSenderNameOnStickerDesc", R.string.ShowSenderNameOnStickerDesc), LocaleController.getString("ShowSenderNameOnSticker", R.string.ShowSenderNameOnSticker)));
     private final AbstractConfigCell showSenderNameOnGifRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnGif, LocaleController.getString("ShowSenderNameOnGifDesc", R.string.ShowSenderNameOnGifDesc), LocaleController.getString("ShowSenderNameOnGif", R.string.ShowSenderNameOnGif)));
+    private final AbstractConfigCell showSenderNameOnMediaRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnMedia, LocaleController.getString("ShowSenderNameOnMediaDesc", R.string.ShowSenderNameOnMediaDesc), LocaleController.getString("ShowSenderNameOnMedia", R.string.ShowSenderNameOnMedia)));
     private final AbstractConfigCell enableCustomPrivacyRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableCustomPrivacy, LocaleController.getString("ProfilePrivacyManagerAbout", R.string.ProfilePrivacyManagerAbout), LocaleController.getString("ProfilePrivacyManager", R.string.ProfilePrivacyManager)));
     private final AbstractConfigCell enableSelectRangeInSharedMediaRow = cellGroup.appendCell(new ConfigCellTextCheck(
             NekoConfig.enableSelectRangeInSharedMedia,
@@ -165,6 +166,11 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     getParentLayout().rebuildAllFragmentViews(false, false);
                 }
             } else if (key.equals(NekoConfig.showSenderNameOnGif.getKey())) {
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
+            } else if (key.equals(NekoConfig.showSenderNameOnMedia.getKey())) {
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
                 if (getParentLayout() != null) {
                     getParentLayout().rebuildAllFragmentViews(false, false);
