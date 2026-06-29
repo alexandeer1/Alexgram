@@ -470,6 +470,7 @@
     <string name="LocalEditorEditOption">Edit locally</string>
     <string name="LocalEditorDeleteOption">Delete locally</string>
     <string name="LocalEditorRestore">Restore</string>
+    <string name="LocalEditorEmptyTextError">Message text cannot be empty</string>
 
     <!-- [Alexgram: Admin Tag in Voice Chat] - Start -->
     <string name="ShowAdminTagInVoiceChat">Show Admin Tag in Voice Chat</string>

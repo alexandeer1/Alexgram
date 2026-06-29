@@ -51400,6 +51400,10 @@ public class ChatActivity extends BaseFragment implements
 		builder.setView(layout);
 		builder.setPositiveButton(LocaleController.getString(R.string.Save), (dialog, which) -> {
 			String newText = textEdit.getText().toString();
+			if (messageObject.isMediaEmpty() && android.text.TextUtils.isEmpty(newText.trim())) {
+				org.telegram.ui.Components.BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.getString("LocalEditorEmptyTextError", R.string.LocalEditorEmptyTextError), themeDelegate).show();
+				return;
+			}
 			String newTimeStr = timeEdit.getText().toString();
 			try {
 				java.util.Date parsedTime = sdf.parse(newTimeStr);
