@@ -9382,7 +9382,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     if (!drawName && messageObject.type == MessageObject.TYPE_GIF && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnGif.Bool()) {
                         drawName = true;
                     }
-                    if (!drawName && (messageObject.isPhoto() || messageObject.isVideo()) && TextUtils.isEmpty(messageObject.caption) && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool()) {
+                    if (!drawName && (messageObject.isPhoto() || messageObject.isVideo()) && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool()) {
                         drawName = true;
                     }
                 }
