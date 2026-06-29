@@ -485,6 +485,7 @@ public class ChatActivity extends BaseFragment implements
 	private final static int nkbtn_editAdmin = 2019;
 	private final static int nkbtn_editPermission = 2020;
 	private final static int nkbtn_copy_link_in_pm = 2025;
+	private final static int nkbtn_copy_fref = 2032;
 	private final static int nkbtn_repeatascopy = 2028;
 	private final static int nkbtn_setReminder = 2029;
 	private final static int nkbtn_reply_private = 2033;
@@ -1128,6 +1129,23 @@ public class ChatActivity extends BaseFragment implements
 	public ProfileChannelCell.ChannelMessageFetcher profileChannelMessageFetcher;
 	public ProfileBirthdayEffect.BirthdayEffectFetcher birthdayAssetsFetcher;
 
+	public static class FileRefClipboardItem {
+		public final TLRPC.TL_document document;
+		public final TLRPC.TL_photo photo;
+
+		public FileRefClipboardItem(TLRPC.TL_document document) {
+			this.document = document;
+			this.photo = null;
+		}
+
+		public FileRefClipboardItem(TLRPC.TL_photo photo) {
+			this.document = null;
+			this.photo = photo;
+		}
+	}
+
+	public static ArrayList<FileRefClipboardItem> fileRefClipboard = new ArrayList<>();
+
 	private LongSparseArray<TL_bots.BotInfo> botInfo = new LongSparseArray<>();
 	private String botUser;
 	private long inlineReturn;
@@ -1310,6 +1328,7 @@ public class ChatActivity extends BaseFragment implements
 	public final static int OPTION_APPLY_LOCALIZATION_OR_THEME = 5;
 	public final static int OPTION_SHARE = 6;
 	public final static int OPTION_SAVE_TO_GALLERY2 = 7;
+	public final static int OPTION_COPY_REF = 69696;
 	public final static int OPTION_REPLY = 8;
 	public final static int OPTION_ADD_TO_STICKERS_OR_MASKS = 9;
 	public final static int OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC = 10;
@@ -10984,6 +11003,9 @@ public class ChatActivity extends BaseFragment implements
 		}
 		if (canSendMessages) {
 			actionModeOtherItem.addSubItem(nkbtn_repeatascopy, R.drawable.msg_repeat, LocaleController.getString(R.string.RepeatAsCopy));
+		}
+		if (NekoConfig.showCopyFileRef.Bool()) {
+			actionModeOtherItem.addSubItem(nkbtn_copy_fref, R.drawable.baseline_content_copy_24, LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
 		}
 		actionModeOtherItem.addSubItem(nkbtn_hide, R.drawable.msg_disable, LocaleController.getString(R.string.Hide));
 		actionModeOtherItem.addSubItem(nkbtn_report, R.drawable.msg_report, LocaleController.getString(R.string.ReportChat));
@@ -35362,6 +35384,10 @@ public class ChatActivity extends BaseFragment implements
 				tw.nekomimi.nekogram.helpers.MessageNameOverrideHelper.showChangeNameDialog(this, selectedObject);
 				break;
 			}
+			case OPTION_COPY_REF: {
+				copyFileReferences();
+				break;
+			}
 			case OPTION_COPY: {
 				if (selectedObject.isDice()) {
 					AndroidUtilities.addToClipboard(selectedObject.getDiceEmoji());
@@ -38887,6 +38913,43 @@ public class ChatActivity extends BaseFragment implements
 		req.random_id = object.sponsoredId;
 		getConnectionsManager().sendRequest(req, null);
 		getMessagesController().markSponsoredAsRead(dialog_id, object);
+	}
+
+	private void copyFileReferences() {
+		ArrayList<MessageObject> msgs = getSelectedMessages1();
+		if (msgs.isEmpty()) {
+			if (selectedObject == null) return;
+			msgs = new ArrayList<>();
+			msgs.add(selectedObject);
+		}
+		fileRefClipboard.clear();
+		for (int i = 0; i < msgs.size(); ++i) {
+			MessageObject msg = msgs.get(i);
+			TLRPC.Document doc = msg.getDocument();
+			if (doc instanceof TLRPC.TL_document) {
+				fileRefClipboard.add(new FileRefClipboardItem((TLRPC.TL_document) doc));
+				continue;
+			}
+			if (msg.messageOwner != null && msg.messageOwner.media != null && msg.messageOwner.media.photo instanceof TLRPC.TL_photo) {
+				fileRefClipboard.add(new FileRefClipboardItem((TLRPC.TL_photo) msg.messageOwner.media.photo));
+				continue;
+			}
+		}
+		if (fileRefClipboard.isEmpty()) {
+			BulletinFactory.of(this).createErrorBulletin(getString(R.string.CopyFileRefFailed)).show();
+		} else {
+			BulletinFactory.of(this).createSimpleBulletin(R.raw.info, LocaleController.formatString("CopyFileRefDone", R.string.CopyFileRefDone, fileRefClipboard.size())).show();
+			if (actionBar.isActionModeShowed()) {
+				getSelectedMessages();
+			}
+		}
+	}
+
+	private boolean canCopyFileRef(MessageObject msg) {
+		if (msg == null) return false;
+		if (msg.getDocument() instanceof TLRPC.TL_document) return true;
+		if (msg.messageOwner != null && msg.messageOwner.media != null && msg.messageOwner.media.photo instanceof TLRPC.TL_photo) return true;
+		return false;
 	}
 
 	@Override
@@ -46720,6 +46783,8 @@ public class ChatActivity extends BaseFragment implements
 		} else if (id == nkbtn_repeatascopy) {
 			repeatMessage(false, true);
 			clearSelectionMode();
+		} else if (id == nkbtn_copy_fref) {
+			copyFileReferences();
 		} else if (id == nkheaderbtn_hide_title) {
 			if (avatarContainer != null) {
 				avatarContainer.setTitle("");
@@ -49461,6 +49526,11 @@ public class ChatActivity extends BaseFragment implements
 						options.add(OPTION_COPY);
 						icons.add(R.drawable.msg_copy);
 					}
+				}
+				if (NekoConfig.showCopyFileRef.Bool() && canCopyFileRef(selectedObject)) {
+					items.add(LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
+					options.add(OPTION_COPY_REF);
+					icons.add(R.drawable.baseline_content_copy_24);
 				}
 				if (!isThreadChat() && chatMode != MODE_SCHEDULED && currentChat != null && primaryMessage != null && (currentChat.has_link || primaryMessage.hasReplies()) && currentChat.megagroup && primaryMessage.canViewThread()) {
 					if (primaryMessage.hasReplies()) {

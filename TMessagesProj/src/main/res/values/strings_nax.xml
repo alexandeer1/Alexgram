@@ -499,6 +499,15 @@
     <string name="IncludeSystemFonts">Include system fonts</string>
     <string name="IncludeSystemFontsDesc">Show fonts provided by the system in the list below</string>
     <!-- [Alexgram: Fonts] - End -->
+    <!-- [Alexgram: Copy File Reference] - Start -->
+    <string name="CopyFileRef">Copy file ref</string>
+    <string name="CopyFileRefAbout">Enable copying file references from message menus and pasting them to the input menu.</string>
+    <string name="CopyFileRefFailed">Failed to copy file reference</string>
+    <string name="CopyFileRefDone">Copied %1$d file(s)</string>
+    <string name="PasteFileRef">Send files by ref</string>
+    <string name="PasteFileRefConfirm">Do you want to send the %1$d copied file(s) to this chat?</string>
+    <string name="PasteFileRefPasteText">Paste text instead</string>
+    <!-- [Alexgram: Copy File Reference] - End -->
 </resources>
 
 

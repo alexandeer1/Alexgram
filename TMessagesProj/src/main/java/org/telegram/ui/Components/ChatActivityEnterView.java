@@ -6016,9 +6016,21 @@ public class ChatActivityEnterView extends FrameLayout implements
             isInitLineCount = false;
         }
 
+        public void callSuperOnTextContextMenuItem(int id) {
+            try {
+                super.onTextContextMenuItem(id);
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }
+
         @Override
         public boolean onTextContextMenuItem(int id) {
             if (id == android.R.id.paste) {
+                if (tw.nekomimi.nekogram.NekoConfig.showCopyFileRef.Bool() && org.telegram.ui.ChatActivity.fileRefClipboard != null && !org.telegram.ui.ChatActivity.fileRefClipboard.isEmpty()) {
+                    showPasteFileRefDialog();
+                    return true;
+                }
                 isPaste = true;
 
                 ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -14277,6 +14289,41 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     public int getVisibleEmojiPadding() {
         return emojiViewVisible ? emojiPadding : 0;
+    }
+
+    private void showPasteFileRefDialog() {
+        if (parentActivity == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentActivity, resourcesProvider);
+        builder.setTitle(LocaleController.getString("PasteFileRef", R.string.PasteFileRef));
+        builder.setMessage(LocaleController.formatString("PasteFileRefConfirm", R.string.PasteFileRefConfirm, org.telegram.ui.ChatActivity.fileRefClipboard.size()));
+        builder.setPositiveButton(LocaleController.getString("Send", R.string.Send), (dialogInterface, i) -> {
+            for (org.telegram.ui.ChatActivity.FileRefClipboardItem item : org.telegram.ui.ChatActivity.fileRefClipboard) {
+                if (item.document != null) {
+                    SendMessagesHelper.SendMessageParams params = SendMessagesHelper.SendMessageParams.of(
+                        item.document, null, null, dialog_id, replyingMessageObject, getThreadMessage(), null, null, null, null, true, 0, 0, 0, null, null, false
+                    );
+                    SendMessagesHelper.getInstance(currentAccount).sendMessage(params);
+                } else if (item.photo != null) {
+                    SendMessagesHelper.SendMessageParams params = SendMessagesHelper.SendMessageParams.of(
+                        item.photo, null, dialog_id, replyingMessageObject, getThreadMessage(), null, null, null, null, true, 0, 0, 0, null, false
+                    );
+                    SendMessagesHelper.getInstance(currentAccount).sendMessage(params);
+                }
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString("PasteFileRefPasteText", R.string.PasteFileRefPasteText), (dialogInterface, i) -> {
+            if (messageEditText != null) {
+                ((ChatActivityEditTextCaption) messageEditText).callSuperOnTextContextMenuItem(android.R.id.paste);
+            }
+        });
+        builder.setNeutralButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+        if (parentFragment != null) {
+            parentFragment.showDialog(builder.create());
+        } else {
+            builder.show();
+        }
     }
 
     private MessageObject getThreadMessage() {

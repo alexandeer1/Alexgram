@@ -184,6 +184,7 @@ public class NekoConfig {
     public static ConfigItem enableEditFileName = addConfig("enableEditFileName", configTypeBool, false);
     public static ConfigItem enableChangeNameInGroups = addConfig("enableChangeNameInGroups", configTypeBool, false);
     public static ConfigItem enableLocalEditorPlus = addConfig("enableLocalEditorPlus", configTypeBool, false);
+    public static ConfigItem showCopyFileRef = addConfig("showCopyFileRef", configTypeBool, false);
     // [Alexgram: Quick Edit Icon] - Start
     public static ConfigItem showQuickEditIconInChatList = addConfig("showQuickEditIconInChatList", configTypeBool, false);
     public static ConfigItem quickEditIconOnlyForOwnMessages = addConfig("quickEditIconOnlyForOwnMessages", configTypeBool, true);
