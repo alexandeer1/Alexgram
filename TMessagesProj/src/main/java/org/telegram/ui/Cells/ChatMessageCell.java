@@ -9382,6 +9382,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     if (!drawName && messageObject.type == MessageObject.TYPE_GIF && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnGif.Bool()) {
                         drawName = true;
                     }
+                    if (!drawName && (messageObject.isPhoto() || messageObject.isVideo()) && TextUtils.isEmpty(messageObject.caption) && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool()) {
+                        drawName = true;
+                    }
                 }
                 mediaBackground = isMedia = messageObject.type != MessageObject.TYPE_FILE;
                 drawImageButton = true;
@@ -19162,10 +19165,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 nameLayout = new StaticLayout(nameStringFinal, Theme.chat_namePaint, Math.max(dp(1), nameWidthForLayout + additionalWidth + dp(2)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                 if (nameLayout.getLineCount() > 0) {
                     nameWidth = nameLayoutWidth = (int) Math.ceil(nameLayout.getLineWidth(0));
-                    boolean overlayNameOnMedia = (messageObject.isPhoto() || messageObject.isVideo())
-                            && TextUtils.isEmpty(messageObject.caption)
-                            && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
-                    if ((!messageObject.isAnyKindOfSticker() && !overlayNameOnMedia) || (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && drawNameLayout)) {
+                    if (!messageObject.isAnyKindOfSticker() || (tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && drawNameLayout)) {
                         namesOffset += getNameHeight();
                     }
                     nameOffsetX = nameLayout.getLineLeft(0);
@@ -21387,13 +21387,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 } else {
                     color = getThemedColor(Theme.key_chat_inForwardedNameText);
                 }
-                // [Alexgram: Sender Name on Stickers] - position name relative to namesOffset so it appears above sticker, below reply header
-                boolean overlayNameOnMedia = (currentMessageObject.isPhoto() || currentMessageObject.isVideo())
-                        && TextUtils.isEmpty(currentMessageObject.caption)
-                        && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
-                if (overlayNameOnMedia) {
-                    nameY = namesOffset + dp(drawPinnedTop ? 5 : 6);
-                } else if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
                     nameY = namesOffset - getNameHeight() + dp(5);
                     if (nameY < dp(drawPinnedTop ? 9 : 10)) {
                         nameY = dp(drawPinnedTop ? 9 : 10);
@@ -22379,13 +22373,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 } else {
                     Theme.chat_namePaint.setColor(getThemedColor(Theme.key_chat_inForwardedNameText));
                 }
-                // [Alexgram: Sender Name on Stickers] - position name relative to namesOffset so it appears above sticker, below reply header
-                boolean overlayNameOnMedia = (currentMessageObject.isPhoto() || currentMessageObject.isVideo())
-                        && TextUtils.isEmpty(currentMessageObject.caption)
-                        && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnMedia.Bool();
-                if (overlayNameOnMedia) {
-                    nameY = namesOffset + dp(drawPinnedTop ? 5 : 6);
-                } else if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
+                if (currentMessageObject.shouldDrawWithoutBackground() && tw.nekomimi.nekogram.NekoConfig.showSenderNameOnSticker.Bool() && (currentMessageObject.isSticker() || currentMessageObject.isAnimatedSticker())) {
                     nameY = namesOffset - getNameHeight() + dp(5);
                     if (nameY < dp(drawPinnedTop ? 9 : 10)) {
                         nameY = dp(drawPinnedTop ? 9 : 10);
