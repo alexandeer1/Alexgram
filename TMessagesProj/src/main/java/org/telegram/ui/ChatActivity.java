@@ -11005,7 +11005,7 @@ public class ChatActivity extends BaseFragment implements
 			actionModeOtherItem.addSubItem(nkbtn_repeatascopy, R.drawable.msg_repeat, LocaleController.getString(R.string.RepeatAsCopy));
 		}
 		if (NekoConfig.showCopyFileRef.Bool()) {
-			actionModeOtherItem.addSubItem(nkbtn_copy_fref, R.drawable.baseline_content_copy_24, LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
+			actionModeOtherItem.addSubItem(nkbtn_copy_fref, R.drawable.msg_copy, LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
 		}
 		actionModeOtherItem.addSubItem(nkbtn_hide, R.drawable.msg_disable, LocaleController.getString(R.string.Hide));
 		actionModeOtherItem.addSubItem(nkbtn_report, R.drawable.msg_report, LocaleController.getString(R.string.ReportChat));
@@ -48977,7 +48977,7 @@ public class ChatActivity extends BaseFragment implements
 				if (NekoConfig.showCopyFileRef.Bool() && canCopyFileRef(selectedObject)) {
 					items.add(LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
 					options.add(OPTION_COPY_REF);
-					icons.add(R.drawable.baseline_content_copy_24);
+					icons.add(R.drawable.msg_copy);
 				}
 				if (!isThreadChat() && chatMode != MODE_SCHEDULED && currentChat != null && primaryMessage != null && (currentChat.has_link || primaryMessage.hasReplies()) && currentChat.megagroup && primaryMessage.canViewThread()) {
 					if (primaryMessage.hasReplies()) {
@@ -49535,7 +49535,7 @@ public class ChatActivity extends BaseFragment implements
 				if (NekoConfig.showCopyFileRef.Bool() && canCopyFileRef(selectedObject)) {
 					items.add(LocaleController.getString("CopyFileRef", R.string.CopyFileRef));
 					options.add(OPTION_COPY_REF);
-					icons.add(R.drawable.baseline_content_copy_24);
+					icons.add(R.drawable.msg_copy);
 				}
 				if (!isThreadChat() && chatMode != MODE_SCHEDULED && currentChat != null && primaryMessage != null && (currentChat.has_link || primaryMessage.hasReplies()) && currentChat.megagroup && primaryMessage.canViewThread()) {
 					if (primaryMessage.hasReplies()) {
