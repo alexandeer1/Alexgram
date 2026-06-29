@@ -5115,6 +5115,19 @@ public class ChatActivityEnterView extends FrameLayout implements
             }
         }
 
+        if (tw.nekomimi.nekogram.NekoConfig.showCopyFileRef.Bool() && org.telegram.ui.ChatActivity.fileRefClipboard != null && !org.telegram.ui.ChatActivity.fileRefClipboard.isEmpty()) {
+            cell = new ActionBarMenuSubItem(getContext(), false, true);
+            cell.setTextAndIcon(LocaleController.getString("PasteFileRef", R.string.PasteFileRef), R.drawable.baseline_content_paste_24);
+            cell.setOnClickListener(v -> {
+                if (menuPopupWindow != null && menuPopupWindow.isShowing()) {
+                    menuPopupWindow.dismiss();
+                }
+                showPasteFileRefDialog();
+            });
+            cell.setMinimumWidth(AndroidUtilities.dp(196));
+            menuPopupLayout.addView(cell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 48 * a++, 0, 0));
+        }
+
         menuPopupLayout.updateRadialSelectors();
 
         menuPopupWindow = new ActionBarPopupWindow(menuPopupLayout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT);
