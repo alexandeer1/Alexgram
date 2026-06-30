@@ -6975,7 +6975,7 @@ public class MessagesController extends BaseController implements NotificationCe
         }
         fromCache = fromCache && user.id / 1000 != 333 && user.id != 777000;
         TLRPC.User oldUser = users.get(user.id);
-        if (NaConfig.INSTANCE.getSaveLocalLastSeen().Bool() && user.id != getUserConfig().getClientUserId() && user.status instanceof TLRPC.TL_userStatusOffline) {
+        if ((NaConfig.INSTANCE.getSaveLocalLastSeen().Bool() || user.id == getUserConfig().getClientUserId()) && user.status instanceof TLRPC.TL_userStatusOffline) {
             int lastSeen = user.status.expires;
             if (lastSeen > 0) {
                 LastSeenHelper.saveLastSeen(user.id, lastSeen);

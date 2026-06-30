@@ -9842,6 +9842,27 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
 
         updateProfileData(true);
+        if (userId != 0 && userId == getUserConfig().getClientUserId()) {
+            TLRPC.TL_users_getUsers req = new TLRPC.TL_users_getUsers();
+            TLRPC.InputUser inputUser = getMessagesController().getInputUser(userId);
+            if (inputUser != null) {
+                req.id.add(inputUser);
+                getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                    if (error == null && response instanceof org.telegram.tgnet.Vector) {
+                        for (Object o : ((org.telegram.tgnet.Vector) response).objects) {
+                            if (o instanceof TLRPC.User) {
+                                TLRPC.User resolved = (TLRPC.User) o;
+                                if (resolved.status instanceof TLRPC.TL_userStatusOffline) {
+                                    com.radolyn.ayugram.utils.LastSeenHelper.saveLastSeen(resolved.id, resolved.status.expires);
+                                    updateProfileData(true);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }));
+            }
+        }
         fixLayout();
         if (nameTextView[1] != null) {
             setParentActivityTitle(nameTextView[1].getText());
