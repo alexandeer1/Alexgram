@@ -1820,6 +1820,7 @@ public class ChatActivity extends BaseFragment implements
 	private final static int nkbtn_voice_changer = 2104;
 	private final static int nkbtn_change_font = 2107;
 	private final static int nkbtn_split_chat = 2108;
+	private final static int nkbtn_auto_download = 2109;
 	private final static int export_chat = 136;
 	private final static int import_chat = 137;
 	// [Alexgram: Advanced Tools] - End
@@ -4396,6 +4397,8 @@ public class ChatActivity extends BaseFragment implements
 				// [Alexgram: Advanced Tools] - Start
 				} else if (id == nkbtn_voice_changer) {
 					showDialog(new VoiceChangerSelectAlert(getParentActivity()));
+				} else if (id == nkbtn_auto_download) {
+					showDialog(new xyz.nextalone.nagram.ui.ChatAutoDownloadSettingsAlert(getParentActivity(), dialog_id));
 				} else if (id == nkbtn_change_font) {
 					chatActivityEnterView.getEditField().makeSelectedChangeFont();
 				} else if (id == nkbtn_split_chat) {
@@ -4892,6 +4895,11 @@ public class ChatActivity extends BaseFragment implements
 			splitChatItem.setOnClickListener(v -> {
 				headerItem.closeSubMenu();
 				actionBar.actionBarMenuOnItemClick.onItemClick(nkbtn_split_chat);
+			});
+			ActionBarMenuSubItem autoDownloadItem = ActionBarMenuItem.addItem(advancedToolsLayout, R.drawable.msg_download_settings, LocaleController.getString("ChatAutoDownloadTitle", R.string.ChatAutoDownloadTitle), false, getResourceProvider());
+			autoDownloadItem.setOnClickListener(v -> {
+				headerItem.closeSubMenu();
+				actionBar.actionBarMenuOnItemClick.onItemClick(nkbtn_auto_download);
 			});
 			headerItem.lazilyAddSwipeBackItem(R.drawable.ic_advanced_tool_na, null, "Advanced Tool", advancedToolsLayout);
 			headerItem.lazilyAddColoredGap();

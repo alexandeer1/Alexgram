@@ -612,6 +612,16 @@ public class DownloadController extends BaseController implements NotificationCe
     }
 
     public boolean canDownloadMedia(MessageObject messageObject) {
+        if (messageObject == null) {
+            return false;
+        }
+        long dialogId = messageObject.getDialogId();
+        if (dialogId != 0 && xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.isCustomEnabled(dialogId)) {
+            int mediaType = xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.getMediaType(messageObject);
+            if (mediaType != 0) {
+                return xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.isMediaAutoDownloadEnabled(dialogId, mediaType);
+            }
+        }
         if (messageObject.getDocument() != null) {
             if (AndroidUtil.isAutoDownloadDisabledFor(messageObject.getDocumentName()) || AyuFilter.isFiltered(messageObject, null)) {
                 return false;
@@ -660,6 +670,16 @@ public class DownloadController extends BaseController implements NotificationCe
     }
 
     public int canDownloadMediaType(MessageObject messageObject) {
+        if (messageObject == null) {
+            return 0;
+        }
+        long dialogId = messageObject.getDialogId();
+        if (dialogId != 0 && xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.isCustomEnabled(dialogId)) {
+            int mediaType = xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.getMediaType(messageObject);
+            if (mediaType != 0) {
+                return xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.isMediaAutoDownloadEnabled(dialogId, mediaType) ? 1 : 0;
+            }
+        }
         if (messageObject.type == MessageObject.TYPE_STORY) {
             if (!SharedConfig.isAutoplayVideo()) return 0;
             TLRPC.TL_messageMediaStory mediaStory = (TLRPC.TL_messageMediaStory) MessageObject.getMedia(messageObject);
@@ -683,6 +703,16 @@ public class DownloadController extends BaseController implements NotificationCe
     }
 
     public int canDownloadMediaType(MessageObject messageObject, long overrideSize) {
+        if (messageObject == null) {
+            return 0;
+        }
+        long dialogId = messageObject.getDialogId();
+        if (dialogId != 0 && xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.isCustomEnabled(dialogId)) {
+            int mediaType = xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.getMediaType(messageObject);
+            if (mediaType != 0) {
+                return xyz.nextalone.nagram.utils.ChatAutoDownloadHelper.isMediaAutoDownloadEnabled(dialogId, mediaType) ? 1 : 0;
+            }
+        }
         if (messageObject.type == MessageObject.TYPE_STORY) {
             if (!SharedConfig.isAutoplayVideo()) return 0;
             TLRPC.TL_messageMediaStory mediaStory = (TLRPC.TL_messageMediaStory) MessageObject.getMedia(messageObject);

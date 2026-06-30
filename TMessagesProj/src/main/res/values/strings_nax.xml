@@ -512,6 +512,15 @@
     <string name="AlwaysAskHowToJoinVoiceChat">Always ask how to join voice chats</string>
     <string name="AlwaysAskHowToJoinVoiceChatDesc">Prompt to choose whether to join as your personal account or a channel every time you join a voice/video chat.</string>
     <!-- [Alexgram: Force Select Voice Chat Profile] - End -->
+    <!-- [Alexgram: Chat-Specific Auto-Download] - Start -->
+    <string name="ChatAutoDownloadTitle">Auto Download Settings</string>
+    <string name="ChatAutoDownloadEnable">Override Global Auto Download</string>
+    <string name="ChatAutoDownloadPhotos">Photos</string>
+    <string name="ChatAutoDownloadVideos">Videos</string>
+    <string name="ChatAutoDownloadFiles">Files &amp; Documents</string>
+    <string name="ChatAutoDownloadVoice">Voice &amp; Video Notes</string>
+    <string name="ChatAutoDownloadAudio">Music &amp; Audio</string>
+    <!-- [Alexgram: Chat-Specific Auto-Download] - End -->
 </resources>
 
 
