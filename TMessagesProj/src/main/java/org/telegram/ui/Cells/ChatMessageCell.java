@@ -1659,6 +1659,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private LinkPath translationLoadingPath;
     private LoadingDrawable translationLoadingDrawable;
     private ArrayList<MessageObject.TextLayoutBlock> translationLoadingDrawableText;
+    private ArrayList<TextSelectionHelper.TextLayoutBlock> richTranslationLoadingDrawableText;
     private StaticLayout translationLoadingDrawableLayout;
 
 
@@ -11368,6 +11369,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 translationLoadingDrawable.reset();
                 translationLoadingDrawable = null;
             }
+            richTranslationLoadingDrawableText = null;
             if (timerParticlesAlpha != null) {
                 timerParticlesAlpha.set(currentMessageObject != null && currentMessageObject.needDrawBluredPreview() && currentMessageObject.messageOwner != null && currentMessageObject.messageOwner.destroyTime != 0 && MediaController.getInstance().isPlayingMessage(currentMessageObject), true);
             }
@@ -14515,6 +14517,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     delegate.getTextSelectionHelper().drawRich(currentMessageObject, layout, canvas);
                 }
                 layout.draw(canvas, padLeft, padRight, transitionParams);
+                drawRichMessageTranslationLoading(canvas, layout, alpha);
                 canvas.restore();
 
                 if (botDraftTypingAnimator != null && botDraftTypingAnimator.isRunning()) {
@@ -16934,6 +16937,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
                 if (translationLoadingDrawableText != textLayoutBlocks) {
                     translationLoadingDrawableText = textLayoutBlocks;
+                    richTranslationLoadingDrawableText = null;
                     translationLoadingPath.reset();
                     for (int i = 0; i < textLayoutBlocks.size(); ++i) {
                         MessageObject.TextLayoutBlock block = textLayoutBlocks.get(i);
@@ -29916,4 +29920,63 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         canvas.restore();
     }
 
+    private void drawRichMessageTranslationLoading(Canvas canvas, RichMessageLayout layout, float alpha) {
+        if (layout == null || layout.textBlocks.isEmpty() || alpha == 0 || currentMessageObject == null) {
+            return;
+        }
+        final TranslateController translateController = MessagesController.getInstance(currentAccount).getTranslateController();
+        final boolean translating = translateController.isTranslating(currentMessageObject);
+        if (translationLoadingFloat == null) {
+            translationLoadingFloat = new AnimatedFloat(this, 350, CubicBezierInterpolator.EASE_OUT_QUINT);
+        }
+        float translationLoading = translationLoadingFloat.set(translating ? 1 : 0);
+        if (translationLoading <= 0) {
+            return;
+        }
+        if (translationLoadingDrawable == null) {
+            translationLoadingDrawable = new LoadingDrawable();
+            translationLoadingDrawable.setAppearByGradient(true);
+            if (translationLoadingPath == null) {
+                translationLoadingPath = new LinkPath(true);
+                translationLoadingPath.setUseCornerPathImplementation(true);
+            }
+            translationLoadingDrawable.usePath(translationLoadingPath);
+            translationLoadingDrawable.setRadiiDp(5);
+            translationLoadingDrawable.reset();
+        }
+        if (richTranslationLoadingDrawableText != layout.textBlocks) {
+            richTranslationLoadingDrawableText = layout.textBlocks;
+            translationLoadingDrawableText = null;
+            translationLoadingPath.reset();
+            for (int i = 0; i < layout.textBlocks.size(); ++i) {
+                TextSelectionHelper.TextLayoutBlock block = layout.textBlocks.get(i);
+                Layout textLayout = block != null ? block.getLayout() : null;
+                if (textLayout != null) {
+                    translationLoadingPath.setCurrentLayout(textLayout, 0, block.getX(), block.getY());
+                    translationLoadingPath.setAllowReset(false);
+                    textLayout.getSelectionPath(0, textLayout.getText().length(), translationLoadingPath);
+                    translationLoadingPath.setAllowReset(true);
+                }
+            }
+            translationLoadingPath.closeRects();
+            translationLoadingDrawable.updateBounds();
+        }
+
+        if (translating && (translationLoadingDrawable.isDisappearing() || translationLoadingDrawable.isDisappeared())) {
+            translationLoadingDrawable.reset();
+            translationLoadingDrawable.resetDisappear();
+        } else if (!translating && !translationLoadingDrawable.isDisappearing() && !translationLoadingDrawable.isDisappeared()) {
+            translationLoadingDrawable.disappear();
+        }
+        int color = getThemedColor(currentMessageObject.isOutOwner() ? Theme.key_chat_messageLinkOut : Theme.key_chat_messageLinkIn);
+        translationLoadingDrawable.setColors(
+                Theme.multAlpha(color, .05f),
+                Theme.multAlpha(color, .15f),
+                Theme.multAlpha(color, .1f),
+                Theme.multAlpha(color, .3f)
+        );
+        translationLoadingDrawable.setAlpha((int) (0xFF * alpha * translationLoading));
+        translationLoadingDrawable.draw(canvas);
+        invalidate();
+    }
 }
