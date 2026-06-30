@@ -325,7 +325,7 @@ public class VoIPHelper {
 		if (SystemClock.elapsedRealtime() - lastCallTime < (chat != null ? 200 : 2000)) {
 			return;
 		}
-		if (checkJoiner && chat != null && !createCall) {
+		if (checkJoiner && chat != null && !createCall && !tw.nekomimi.nekogram.NekoConfig.forceSelectVoiceChatProfile.Bool()) {
 			TLRPC.ChatFull chatFull = accountInstance.getMessagesController().getChatFull(chat.id);
 			if (chatFull != null && chatFull.groupcall_default_join_as != null) {
 				long did = MessageObject.getPeerId(chatFull.groupcall_default_join_as);

@@ -192,6 +192,9 @@ public class NekoConfig {
     // [Alexgram: Admin Tag in Voice Chat] - Start
     public static ConfigItem showAdminTagInVoiceChat = addConfig("showAdminTagInVoiceChat", configTypeBool, true);
     // [Alexgram: Admin Tag in Voice Chat] - End
+    // [Alexgram: Always Ask How to Join Voice Chats] - Start
+    public static ConfigItem forceSelectVoiceChatProfile = addConfig("forceSelectVoiceChatProfile", configTypeBool, false);
+    // [Alexgram: Always Ask How to Join Voice Chats] - End
     // [Alexgram: Sender Name on Stickers] - Start
     public static ConfigItem showSenderNameOnSticker = addConfig("showSenderNameOnSticker", configTypeBool, false);
     public static ConfigItem showSenderNameOnGif = addConfig("showSenderNameOnGif", configTypeBool, false);

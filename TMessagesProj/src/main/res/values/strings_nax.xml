@@ -508,6 +508,10 @@
     <string name="PasteFileRefConfirm">Do you want to send the %1$d copied file(s) to this chat?</string>
     <string name="PasteFileRefPasteText">Paste text instead</string>
     <!-- [Alexgram: Copy File Reference] - End -->
+    <!-- [Alexgram: Force Select Voice Chat Profile] - Start -->
+    <string name="AlwaysAskHowToJoinVoiceChat">Always ask how to join voice chats</string>
+    <string name="AlwaysAskHowToJoinVoiceChatDesc">Prompt to choose whether to join as your personal account or a channel every time you join a voice/video chat.</string>
+    <!-- [Alexgram: Force Select Voice Chat Profile] - End -->
 </resources>
 
 

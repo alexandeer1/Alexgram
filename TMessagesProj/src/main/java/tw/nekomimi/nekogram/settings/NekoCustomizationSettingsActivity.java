@@ -80,6 +80,11 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     private final AbstractConfigCell enableLocalEditorPlusRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.enableLocalEditorPlus, LocaleController.getString("LocalEditorPlusAbout", R.string.LocalEditorPlusAbout), LocaleController.getString("LocalEditorPlus", R.string.LocalEditorPlus)));
     private final AbstractConfigCell showCopyFileRefRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showCopyFileRef, LocaleController.getString("CopyFileRefAbout", R.string.CopyFileRefAbout), LocaleController.getString("CopyFileRef", R.string.CopyFileRef)));
     private final AbstractConfigCell showAdminTagInVoiceChatRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showAdminTagInVoiceChat, LocaleController.getString("ShowAdminTagInVoiceChatDesc", R.string.ShowAdminTagInVoiceChatDesc), LocaleController.getString("ShowAdminTagInVoiceChat", R.string.ShowAdminTagInVoiceChat)));
+    private final AbstractConfigCell forceSelectVoiceChatProfileRow = cellGroup.appendCell(new ConfigCellTextCheck(
+            NekoConfig.forceSelectVoiceChatProfile,
+            LocaleController.getString("AlwaysAskHowToJoinVoiceChatDesc", R.string.AlwaysAskHowToJoinVoiceChatDesc),
+            LocaleController.getString("AlwaysAskHowToJoinVoiceChat", R.string.AlwaysAskHowToJoinVoiceChat)
+    ));
     private final AbstractConfigCell showSenderNameOnStickerRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnSticker, LocaleController.getString("ShowSenderNameOnStickerDesc", R.string.ShowSenderNameOnStickerDesc), LocaleController.getString("ShowSenderNameOnSticker", R.string.ShowSenderNameOnSticker)));
     private final AbstractConfigCell showSenderNameOnGifRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnGif, LocaleController.getString("ShowSenderNameOnGifDesc", R.string.ShowSenderNameOnGifDesc), LocaleController.getString("ShowSenderNameOnGif", R.string.ShowSenderNameOnGif)));
     private final AbstractConfigCell showSenderNameOnMediaRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showSenderNameOnMedia, LocaleController.getString("ShowSenderNameOnMediaDesc", R.string.ShowSenderNameOnMediaDesc), LocaleController.getString("ShowSenderNameOnMedia", R.string.ShowSenderNameOnMedia)));
