@@ -383,11 +383,6 @@ public class ConnectionsManager extends BaseController {
             FileLog.d("send request " + object + " with token = " + requestToken);
         }
 
-        long selfUserId = getUserConfig().getClientUserId();
-        if (selfUserId > 0) {
-            com.radolyn.ayugram.utils.LastSeenHelper.saveLastSeen(selfUserId, (int) (System.currentTimeMillis() / 1000));
-        }
-
         // --- Ghost Mode ---
         AyuGhostUtils.InterceptResult interceptResult = AyuGhostUtils.interceptRequest(object, onCompleteOrig);
         if (interceptResult.blockRequest()) {

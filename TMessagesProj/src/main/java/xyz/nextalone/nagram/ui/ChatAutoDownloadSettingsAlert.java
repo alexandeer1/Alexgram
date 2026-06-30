@@ -31,7 +31,6 @@ public class ChatAutoDownloadSettingsAlert extends BottomSheet {
         this.dialogId = dialogId;
 
         FrameLayout container = new FrameLayout(context);
-        container.setBackgroundColor(Theme.getColor(Theme.key_dialogBackground));
 
         TextView titleView = new TextView(context);
         titleView.setText(LocaleController.getString("ChatAutoDownloadTitle", R.string.ChatAutoDownloadTitle));

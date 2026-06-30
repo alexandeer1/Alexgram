@@ -58,25 +58,6 @@ public class LastSeenHelper {
                 }
             }
         });
-
-        org.telegram.ui.Components.ForegroundDetector detector = org.telegram.ui.Components.ForegroundDetector.getInstance();
-        if (detector != null) {
-            detector.addListener(new org.telegram.ui.Components.ForegroundDetector.Listener() {
-                @Override
-                public void onBecameForeground() {
-                }
-
-                @Override
-                public void onBecameBackground() {
-                    for (int i = 0; i < org.telegram.messenger.UserConfig.MAX_ACCOUNT_COUNT; i++) {
-                        long selfUserId = org.telegram.messenger.UserConfig.getInstance(i).getClientUserId();
-                        if (selfUserId > 0) {
-                            saveLastSeen(selfUserId, (int) (System.currentTimeMillis() / 1000));
-                        }
-                    }
-                }
-            });
-        }
     }
 
     public static void saveLastSeen(long userId, int timestamp) {
@@ -85,7 +66,7 @@ public class LastSeenHelper {
         }
         synchronized (cache) {
             int cached = cache.get(userId, 0);
-            if (cached >= timestamp) return;
+            if (!isSelf(userId) && cached >= timestamp) return;
             cache.put(userId, timestamp);
         }
         synchronized (pending) {

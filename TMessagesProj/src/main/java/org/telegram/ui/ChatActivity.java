@@ -4896,7 +4896,7 @@ public class ChatActivity extends BaseFragment implements
 				headerItem.closeSubMenu();
 				actionBar.actionBarMenuOnItemClick.onItemClick(nkbtn_split_chat);
 			});
-			ActionBarMenuSubItem autoDownloadItem = ActionBarMenuItem.addItem(advancedToolsLayout, R.drawable.msg_download_settings, LocaleController.getString("ChatAutoDownloadTitle", R.string.ChatAutoDownloadTitle), false, getResourceProvider());
+			ActionBarMenuSubItem autoDownloadItem = ActionBarMenuItem.addItem(advancedToolsLayout, R.drawable.msg2_data, LocaleController.getString("ChatAutoDownloadTitle", R.string.ChatAutoDownloadTitle), false, getResourceProvider());
 			autoDownloadItem.setOnClickListener(v -> {
 				headerItem.closeSubMenu();
 				actionBar.actionBarMenuOnItemClick.onItemClick(nkbtn_auto_download);
