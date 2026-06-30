@@ -733,7 +733,12 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
                     statusTextView.setText(getString(R.string.Online));
                     if (currentUser.id == UserConfig.getInstance(currentAccount).getClientUserId() && (!NekoConfig.sendOnlinePackets.Bool() || NekoConfig.sendOfflinePacketAfterOnline.Bool())) {
                         statusTextView.setTextColor(statusColor);
-                        statusTextView.setText(getString(R.string.VoipOfflineTitle));
+                        int lastSeen = com.radolyn.ayugram.utils.LastSeenHelper.getLastSeen(currentUser.id);
+                        if (lastSeen > 0) {
+                            statusTextView.setText(getString(R.string.VoipOfflineTitle) + ", " + LocaleController.formatDateOnline(lastSeen, null));
+                        } else {
+                            statusTextView.setText(getString(R.string.VoipOfflineTitle));
+                        }
                     }
                 } else {
                     statusTextView.setTextColor(statusColor);

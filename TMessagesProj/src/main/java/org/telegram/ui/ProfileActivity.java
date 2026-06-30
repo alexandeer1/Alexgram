@@ -11674,7 +11674,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         newString2 = getString(R.string.StarRatingLevelNegative).toLowerCase(Locale.ROOT);
                     } else {
                         if (!NekoConfig.sendOnlinePackets.Bool() || NekoConfig.sendOfflinePacketAfterOnline.Bool()) {
-                            newString2 = getString(R.string.VoipOfflineTitle);
+                            int lastSeen = com.radolyn.ayugram.utils.LastSeenHelper.getLastSeen(user.id);
+                            if (lastSeen > 0) {
+                                newString2 = getString(R.string.VoipOfflineTitle) + ", " + LocaleController.formatDateOnline(lastSeen, null);
+                            } else {
+                                newString2 = getString(R.string.VoipOfflineTitle);
+                            }
                         } else {
                             newString2 = LocaleController.getString(R.string.Online);
                         }

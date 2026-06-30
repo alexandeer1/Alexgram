@@ -24,17 +24,25 @@ public class LastSeenHelper {
     private static final LongSparseIntArray pending = new LongSparseIntArray();
     private static volatile boolean flushScheduled;
 
-    public static void preload() {
-        if (!NaConfig.INSTANCE.getSaveLocalLastSeen().Bool()) {
-            return;
+    public static boolean isSelf(long userId) {
+        for (int i = 0; i < org.telegram.messenger.UserConfig.MAX_ACCOUNT_COUNT; i++) {
+            if (org.telegram.messenger.UserConfig.getInstance(i).getClientUserId() == userId) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    public static void preload() {
         AyuQueues.lastSeenQueue.postRunnable(() -> {
             int cutoff = (int) (System.currentTimeMillis() / 1000) - CLEANUP_DAYS * 24 * 60 * 60;
             LastSeenDao dao = AyuData.getLastSeenDao();
             if (dao == null) {
                 return;
             }
-            dao.deleteOlderThan(cutoff);
+            if (NaConfig.INSTANCE.getSaveLocalLastSeen().Bool()) {
+                dao.deleteOlderThan(cutoff);
+            }
             List<LastSeenEntity> all = dao.getAll();
             synchronized (cache) {
                 for (LastSeenEntity e : all) {
@@ -44,16 +52,35 @@ public class LastSeenHelper {
                     }
                 }
                 for (int i = cache.size() - 1; i >= 0; i--) {
-                    if (cache.valueAt(i) < cutoff) {
+                    if (cache.valueAt(i) < cutoff && !isSelf(cache.keyAt(i))) {
                         cache.removeAt(i);
                     }
                 }
             }
         });
+
+        org.telegram.ui.Components.ForegroundDetector detector = org.telegram.ui.Components.ForegroundDetector.getInstance();
+        if (detector != null) {
+            detector.addListener(new org.telegram.ui.Components.ForegroundDetector.Listener() {
+                @Override
+                public void onBecameForeground() {
+                }
+
+                @Override
+                public void onBecameBackground() {
+                    for (int i = 0; i < org.telegram.messenger.UserConfig.MAX_ACCOUNT_COUNT; i++) {
+                        long selfUserId = org.telegram.messenger.UserConfig.getInstance(i).getClientUserId();
+                        if (selfUserId > 0) {
+                            saveLastSeen(selfUserId, (int) (System.currentTimeMillis() / 1000));
+                        }
+                    }
+                }
+            });
+        }
     }
 
     public static void saveLastSeen(long userId, int timestamp) {
-        if (!NaConfig.INSTANCE.getSaveLocalLastSeen().Bool() || timestamp <= 0) {
+        if ((!isSelf(userId) && !NaConfig.INSTANCE.getSaveLocalLastSeen().Bool()) || timestamp <= 0) {
             return;
         }
         synchronized (cache) {
@@ -138,7 +165,7 @@ public class LastSeenHelper {
     }
 
     public static int getLastSeen(long userId) {
-        if (!NaConfig.INSTANCE.getSaveLocalLastSeen().Bool()) {
+        if (!isSelf(userId) && !NaConfig.INSTANCE.getSaveLocalLastSeen().Bool()) {
             return 0;
         }
         synchronized (cache) {

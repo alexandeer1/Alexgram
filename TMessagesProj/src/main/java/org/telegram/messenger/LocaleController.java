@@ -3041,6 +3041,19 @@ public class LocaleController {
     }
 
     public static String formatUserStatus(int currentAccount, TLRPC.User user, boolean[] isOnline, boolean[] madeShorter) {
+        if (user != null && user.id == UserConfig.getInstance(currentAccount).getClientUserId()) {
+            if (!tw.nekomimi.nekogram.NekoConfig.sendOnlinePackets.Bool() || tw.nekomimi.nekogram.NekoConfig.sendOfflinePacketAfterOnline.Bool()) {
+                if (isOnline != null) {
+                    isOnline[0] = false;
+                }
+                int lastSeen = LastSeenHelper.getLastSeen(user.id);
+                if (lastSeen > 0) {
+                    return getString("Offline", R.string.VoipOfflineTitle) + ", " + formatDateOnline(lastSeen, madeShorter);
+                } else {
+                    return getString("Offline", R.string.VoipOfflineTitle);
+                }
+            }
+        }
         if (user != null && user.status != null && user.status.expires == 0) {
             if (user.status instanceof TLRPC.TL_userStatusRecently) {
                 user.status.expires = user.status.by_me ? -1000 : -100;
