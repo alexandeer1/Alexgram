@@ -389,6 +389,7 @@ public class NotificationCenter {
     public static final int updateLoginToken = totalEvents++;
     public static final int accountLogin = totalEvents++;
     public static final int voiceChangerUpdated = totalEvents++;
+    public static final int pluginsDidLoad = totalEvents++;
 
     private final SparseArray<ArrayList<NotificationCenterDelegate>> observers = new SparseArray<>();
     private final SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();

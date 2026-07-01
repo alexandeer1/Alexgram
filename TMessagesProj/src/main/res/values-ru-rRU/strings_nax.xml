@@ -485,5 +485,32 @@
     <string name="Ayugram">Ayugram</string>
     <string name="ProfilePrivacyManager">Управление конфиденциальностью профиля</string>
     <string name="ProfilePrivacyManagerAbout">Позволяет управлять настройками конфиденциальности отдельных пользователей прямо из меню их профиля.</string>
+    <!-- [Alexgram: Plugins] - Start -->
+    <string name="Plugins">Плагины</string>
+    <string name="ChoosePluginFile">Выберите .plugin файл</string>
+    <string name="CouldNotOpenFileSelector">Не удалось открыть выбор файла</string>
+    <string name="NotValidPluginFile">Это не похоже на корректный .plugin файл</string>
+    <string name="PluginInstalled">Плагин «%s» установлен</string>
+    <string name="UpdatePlugin">Обновить плагин?</string>
+    <string name="InstallPlugin">Установить плагин?</string>
+    <string name="AlreadyInstalledVersion">Уже установлен: v%1$s  →  v%2$s</string>
+    <string name="RequiresVersion">Требуется версия %s+</string>
+    <string name="Install">Установить</string>
+    <string name="FailedToInstallPlugin">Не удалось установить плагин</string>
+    <string name="InstalledPlugins">Установленные плагины</string>
+    <string name="NoPluginsHint">Плагинов пока нет. Нажмите + и выберите .plugin файл (Python, совместим с exteraGram).</string>
+    <string name="PluginTapHint">Нажмите на плагин, чтобы включить/выключить его, открыть настройки или удалить.</string>
+    <string name="Error">ошибка</string>
+    <string name="Disabled">выкл</string>
+    <string name="Enabled">вкл</string>
+    <string name="Plugin">Плагин</string>
+    <string name="EnabledToggle">Включён</string>
+    <string name="DeletePlugin">Удалить плагин</string>
+    <string name="DeletePluginInfo">Удаление убирает плагин и стирает его сохранённые настройки.</string>
+    <string name="DeletePluginTitle">Удалить плагин?</string>
+    <string name="DeletePluginAlert">«%s» и его настройки будут удалены.</string>
+    <string name="Author">Автор: %s</string>
+    <string name="Version">Версия: %s</string>
+    <!-- [Alexgram: Plugins] - End -->
 </resources>
 

@@ -521,6 +521,33 @@
     <string name="ChatAutoDownloadVoice">Voice &amp; Video Notes</string>
     <string name="ChatAutoDownloadAudio">Music &amp; Audio</string>
     <!-- [Alexgram: Chat-Specific Auto-Download] - End -->
+    <!-- [Alexgram: Plugins] - Start -->
+    <string name="Plugins">Plugins</string>
+    <string name="ChoosePluginFile">Choose .plugin file</string>
+    <string name="CouldNotOpenFileSelector">Could not open file selector</string>
+    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
+    <string name="PluginInstalled">Plugin «%s» installed</string>
+    <string name="UpdatePlugin">Update plugin?</string>
+    <string name="InstallPlugin">Install plugin?</string>
+    <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
+    <string name="RequiresVersion">Requires version %s+</string>
+    <string name="Install">Install</string>
+    <string name="FailedToInstallPlugin">Failed to install plugin</string>
+    <string name="InstalledPlugins">Installed Plugins</string>
+    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
+    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+    <string name="Error">error</string>
+    <string name="Disabled">off</string>
+    <string name="Enabled">on</string>
+    <string name="Plugin">Plugin</string>
+    <string name="EnabledToggle">Enabled</string>
+    <string name="DeletePlugin">Delete plugin</string>
+    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
+    <string name="DeletePluginTitle">Delete plugin?</string>
+    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+    <string name="Author">Author: %s</string>
+    <string name="Version">Version: %s</string>
+    <!-- [Alexgram: Plugins] - End -->
 </resources>
 
 

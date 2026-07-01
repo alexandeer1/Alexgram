@@ -31,6 +31,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.AIAssistanceSettingsActivity;
+import org.telegram.ui.Plugins.PluginsActivity;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -481,6 +482,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                     items.add(new CoreItem("Translator", "Messages, Languages, Engine", R.drawable.ic_translate, 0xFF9C27B0, v -> presentFragment(new NekoTranslatorSettingsActivity())));
                     items.add(new CoreItem("AI Assistance", "Alexgram assistant behavior & animations", R.drawable.settings_chat, 0xFF8E44AD, v -> presentFragment(new AIAssistanceSettingsActivity())));
                     items.add(new CoreItem("Chats", "UI, Privacy, Media", R.drawable.msg_discussion, 0xFF4CAF50, v -> presentFragment(new NekoChatSettingsActivity())));
+                    items.add(new CoreItem("Plugins", "Manage Python Plugins", R.drawable.msg_fave, 0xFF009688, v -> presentFragment(new PluginsActivity())));
                     if (!PasscodeHelper.isSettingsHidden()) {
                         items.add(new CoreItem("Passcode", "Security & Fingerprint", R.drawable.msg_permissions, 0xFFF44336, v -> presentFragment(new NekoPasscodeSettingsActivity())));
                     }

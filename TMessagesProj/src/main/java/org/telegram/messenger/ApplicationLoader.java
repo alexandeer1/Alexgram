@@ -322,6 +322,13 @@ public class ApplicationLoader extends Application {
 
         super.onCreate();
 
+        // ZaStoGram plugin engine: start CPython + load enabled .plugin files (off the main thread).
+        try {
+            org.telegram.plugins.PluginsController.getInstance().init(applicationContext);
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
+
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("app start time = " + (startTime = SystemClock.elapsedRealtime()));
             try {
@@ -807,7 +814,10 @@ public class ApplicationLoader extends Application {
     }
 
     public void addItemOptions(ItemOptions itemOptions) {
-
+        try {
+            org.telegram.plugins.PluginsController.getInstance().addDrawerMenuItems(itemOptions);
+        } catch (Throwable ignore) {
+        }
     }
 
     public boolean checkRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {

@@ -40,6 +40,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
       - name: Set up Ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:

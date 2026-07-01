@@ -4507,6 +4507,13 @@ public class AndroidUtilities {
 
     public static boolean openForView(File f, String fileName, String mimeType, final Activity activity, Theme.ResourcesProvider resourcesProvider, boolean restrict) {
         if (f != null && f.exists()) {
+            // ZaStoGram: a .plugin opened in-app (e.g. tapped in a chat) -> review-and-install dialog,
+            // not an external viewer/browser.
+            if (fileName != null && fileName.length() >= 7
+                    && fileName.regionMatches(true, fileName.length() - 7, ".plugin", 0, 7)
+                    && org.telegram.ui.Plugins.PluginsActivity.offerInstall(activity, f)) {
+                return true;
+            }
             String realMimeType = null;
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
