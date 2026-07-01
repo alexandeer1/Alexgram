@@ -243,6 +243,12 @@
 -dontwarn android.support.annotation.VisibleForTesting
 -dontwarn android.support.v4.app.NotificationCompat$Builder
 
+# Missing classes reported during staging R8 compilation
+-dontwarn com.google.android.gms.internal.location.**
+-dontwarn com.google.api.client.http.**
+-dontwarn com.sun.jna.**
+-dontwarn javax.naming.**
+
 -allowaccessmodification
 -keepattributes Signature,InnerClasses,EnclosingMethod
 -keepattributes SourceFile,LineNumberTable
