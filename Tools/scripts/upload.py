@@ -123,6 +123,9 @@ def get_documents() -> list[dict[str, str | Path]]:
         if apk is not None:
             documents.append({"path": apk, "caption": ""})
     if not documents:
+        for apk in artifacts_path.rglob("*.apk"):
+            documents.append({"path": apk, "caption": ""})
+    if not documents:
         documents.append({
             "path": Path("TMessagesProj/src/main/ic_launcher_nagram_block_round-playstore.png"),
             "caption": "",
