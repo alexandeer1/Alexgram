@@ -339,7 +339,11 @@ def getPythonPath() {
 
 chaquopy {
     defaultConfig {
-        version "3.13"
+        if (nativeTarget.contains("armeabi-v7a") && !nativeTarget.contains("arm64-v8a")) {
+            version "3.11"
+        } else {
+            version "3.13"
+        }
         buildPython getPythonPath()
         pyc {
             src false
