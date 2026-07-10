@@ -21,17 +21,30 @@ permissions:
   models: read
 
 jobs:
-  build:
-    name: Gradle Build
+  setup:
+    name: Setup Environment
     runs-on: ubuntu-latest
     outputs:
-      build_timestamp: ${{ steps.staging_build_step.outputs.build_timestamp }}
+      build_timestamp: ${{ steps.var.outputs.build_timestamp }}
+    steps:
+      - id: var
+        run: |
+          echo "build_timestamp=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Gradle Build (${{ matrix.abi }})
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        abi: [arm64-v8a, armeabi-v7a]
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
       CCACHE_HARDLINK: "true"
       CCACHE_NOHASHDIR: "true"
       CCACHE_MAXSIZE: "10G"
-      NATIVE_TARGET: ${{ github.ref_name == 'master' && 'arm64-v8a,armeabi-v7a' || 'arm64-v8a' }}
+      NATIVE_TARGET: ${{ matrix.abi }}
+      BUILD_TIMESTAMP: ${{ needs.setup.outputs.build_timestamp }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,8 +95,7 @@ jobs:
           TELEGRAM_APP_HASH: ${{ secrets.APP_HASH }}
         run: |
           export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
-          export BUILD_TIMESTAMP=$(date +%s)
-          echo "build_timestamp=$BUILD_TIMESTAMP" >> "$GITHUB_OUTPUT"
+          export BUILD_TIMESTAMP="${{ needs.setup.outputs.build_timestamp }}"
           ./gradlew TMessagesProj:assembleStaging
 
           APK_FILE=$(find TMessagesProj/build/outputs/apk -name '*.apk' | head -n 1)
@@ -91,13 +103,14 @@ jobs:
           echo "APK_DIR=$APK_DIR" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v4
         with:
-          name: Staging
+          name: Staging-${{ matrix.abi }}
           path: ${{ env.APK_DIR }}
   upload:
     name: Upload staging
     if: github.event.inputs.upload != 'y' && !contains(github.event.head_commit.message, '[skip upload]')
     runs-on: ubuntu-latest
     needs:
+      - setup
       - build
     steps:
       - name: Checkout
@@ -214,7 +227,7 @@ jobs:
           COMMIT_ID: ${{ github.event.head_commit.id }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          BUILD_TIMESTAMP: ${{ needs.build.outputs.build_timestamp }}
+          BUILD_TIMESTAMP: ${{ needs.setup.outputs.build_timestamp }}
           AI_SUMMARY: ${{ steps.prepare.outputs.ai_summary }}
         run: |
           # send apk via telegram bot api

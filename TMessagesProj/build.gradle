@@ -202,7 +202,11 @@ androidComponents {
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
             String gramName = 'Alexgram'
-            String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
+            String suffix = ""
+            if (!nativeTarget.isBlank()) {
+                suffix = "-${nativeTarget.replace(',', '-')}"
+            }
+            String first = String.format('%s-v%s(%s)%s', gramName, verName, verCode, suffix)
             output.outputFileName.set(
                 output.outputFileName.get()
                     .replace('TMessagesProj', first)

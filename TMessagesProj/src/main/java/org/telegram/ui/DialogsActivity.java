@@ -12,6 +12,7 @@ package org.telegram.ui;
 import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 import tw.nekomimi.nekogram.ui.HiddenChatsPasscodeActivity;
 import tw.nekomimi.nekogram.settings.HiddenChatsSettingsActivity;
+import tw.nekomimi.nekogram.NekoConfig;
 // [Alexgram: Hidden Chats] - End
 
 import static org.telegram.messenger.AndroidUtilities.dp;
