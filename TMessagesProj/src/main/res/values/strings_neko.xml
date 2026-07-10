@@ -259,6 +259,8 @@
     <string name="ConfirmSettings">Confirmations</string>
     <string name="InteractionSettings">Interactions</string>
     <string name="localPremium">Local Premium</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">Reaction</string>
     <string name="UpgradeGroup">Upgrade Group</string>
     <string name="AccDescrShowKeyboard">Show keyboard</string>

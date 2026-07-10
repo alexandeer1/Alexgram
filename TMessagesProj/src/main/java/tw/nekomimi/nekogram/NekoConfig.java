@@ -178,6 +178,7 @@ public class NekoConfig {
     public static ConfigItem mapDriftingFixForGoogleMaps = addConfig("mapDriftingFixForGoogleMaps", configTypeBool, true);
 
     public static ConfigItem localPremium = addConfig("localPremium", configTypeBool, false);
+    public static ConfigItem hidePremiumIcon = addConfig("hidePremiumIcon", configTypeBool, false);
 
     // [Alexgram: Native Features] - Start
     public static ConfigItem forceMusicSpeedControl = addConfig("forceMusicSpeedControl", configTypeBool, false);

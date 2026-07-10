@@ -318,7 +318,7 @@ public class DrawerProfileCell extends FrameLayout implements NotificationCenter
             if (isCollectible) {
                 statusGiftId = ((TLRPC.TL_emojiStatusCollectible) user.emoji_status).collectible_id;
             }
-        } else if (MessagesController.getInstance(account).isPremiumUser(user)) {
+        } else if (MessagesController.getInstance(account).isPremiumUser(user) && !NekoConfig.hidePremiumIcon.Bool()) {
             animatedStatus.animate().alpha(1f).setDuration(200).start();
             nameTextView.setDrawablePadding(AndroidUtilities.dp(4));
             if (premiumStar == null) {

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="NekoSettings">А-Настройки</string>
     <string name="IPv6">Предпочитать IPv6</string>
@@ -257,6 +257,8 @@
     <string name="ConfirmSettings">Подтверждения</string>
     <string name="InteractionSettings">Взаимодействие</string>
     <string name="localPremium">Локальный Premium</string>
+    <string name="HidePremiumIcon">Скрыть иконку Premium на главном экране</string>
+    <string name="HidePremiumIconDesc">Скрыть звезду Premium рядом с заголовком приложения</string>
     <string name="ReactionSettings">Реакции</string>
     <string name="UpgradeGroup">Обновить группу</string>
     <string name="AccDescrShowKeyboard">Показать клавиатуру</string>

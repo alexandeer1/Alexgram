@@ -134,6 +134,11 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
             }, null));
     private final AbstractConfigCell springAnimationCrossfadeRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSpringAnimationCrossfade()));
     private final AbstractConfigCell localPremiumRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.localPremium));
+    private final AbstractConfigCell hidePremiumIconRow = cellGroup.appendCell(new ConfigCellTextCheck(
+            NekoConfig.hidePremiumIcon,
+            LocaleController.getString("HidePremiumIconDesc", R.string.HidePremiumIconDesc),
+            LocaleController.getString("HidePremiumIcon", R.string.HidePremiumIcon)
+    ));
     private final AbstractConfigCell unlimitedPinnedDialogsRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.unlimitedPinnedDialogs, getString(R.string.UnlimitedPinnedDialogsAbout)));
     private final AbstractConfigCell unlimitedFavedStickersRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.unlimitedFavedStickers, getString(R.string.UnlimitedFavoredStickersAbout)));
 
@@ -323,6 +328,9 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
             cellGroup.rows.remove(drawerElementsRow);
         }
         // [Alexgram: Home Drawer] - End
+        if (!NekoConfig.localPremium.Bool()) {
+            cellGroup.rows.remove(hidePremiumIconRow);
+        }
         checkStoriesRows();
         checkUseDeletedIconRows();
         checkSaveBotMsgRows();
@@ -373,6 +381,24 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
                 checkStoriesRows();
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NekoConfig.localPremium.getKey())) {
+                boolean localPremiumEnabled = (boolean) newValue;
+                if (localPremiumEnabled) {
+                    if (!cellGroup.rows.contains(hidePremiumIconRow)) {
+                        final int index = cellGroup.rows.indexOf(localPremiumRow) + 1;
+                        cellGroup.rows.add(index, hidePremiumIconRow);
+                        listAdapter.notifyItemInserted(index);
+                    }
+                } else {
+                    if (cellGroup.rows.contains(hidePremiumIconRow)) {
+                        final int index = cellGroup.rows.indexOf(hidePremiumIconRow);
+                        cellGroup.rows.remove(hidePremiumIconRow);
+                        listAdapter.notifyItemRemoved(index);
+                    }
+                }
+                addRowsToMap(cellGroup);
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+            } else if (key.equals(NekoConfig.hidePremiumIcon.getKey())) {
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
             } else if (key.equals(NaConfig.INSTANCE.getUseDeletedIcon().getKey())) {
