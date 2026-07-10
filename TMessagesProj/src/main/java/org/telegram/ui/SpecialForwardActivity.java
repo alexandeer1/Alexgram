@@ -1903,7 +1903,12 @@ public class SpecialForwardActivity extends ChatActivity {
                     tabFilter.title = filter.name;
                     tabFilter.emoticon = filter.emoticon;
                     tabFilter.filter = filter;
-                    tabFilter.iconRes = R.drawable.msg_folders;
+                    if (tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(filter)) {
+                        tw.nekomimi.nekogram.tabs.TabsByTypeEntry entry = tw.nekomimi.nekogram.tabs.TabsByTypeManager.getTabFromFilter(filter);
+                        tabFilter.iconRes = entry != null ? entry.iconResId : R.drawable.msg_folders;
+                    } else {
+                        tabFilter.iconRes = R.drawable.msg_folders;
+                    }
                     tabs.add(tabFilter);
                 }
             }
@@ -2299,7 +2304,7 @@ public class SpecialForwardActivity extends ChatActivity {
                     if (!DialogObject.isUserDialog(dialogId)) continue;
                     TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(dialogId);
                     if (user == null || !user.bot) continue;
-                } else if (activeTab.id > 0 && activeTab.filter != null) { // Custom folder
+                } else if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) { // Custom folder & Tabs by type
                     if (!activeTab.filter.includesDialog(org.telegram.messenger.AccountInstance.getInstance(currentAccount), dialogId, dialog)) continue;
                 }
                 
@@ -2307,7 +2312,7 @@ public class SpecialForwardActivity extends ChatActivity {
             }
 
             // Add explicitly folder-included chats (alwaysShow & pinnedDialogs) that might not be in dialogs_dict/allDialogs
-            if (activeTab.id > 0 && activeTab.filter != null) {
+            if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) {
                 ArrayList<Long> folderIds = new ArrayList<>(activeTab.filter.alwaysShow);
                 for (int a = 0; a < activeTab.filter.pinnedDialogs.size(); a++) {
                     long did = activeTab.filter.pinnedDialogs.keyAt(a);
@@ -2411,7 +2416,7 @@ public class SpecialForwardActivity extends ChatActivity {
                             if (!DialogObject.isUserDialog(id)) continue;
                             TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(id);
                             if (user == null || !user.bot) continue;
-                        } else if (activeTab.id > 0 && activeTab.filter != null) {
+                        } else if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) {
                             TLRPC.Dialog tempDialog = new TLRPC.TL_dialog();
                             tempDialog.id = id;
                             if (!activeTab.filter.includesDialog(org.telegram.messenger.AccountInstance.getInstance(currentAccount), id, tempDialog)) continue;
@@ -2463,7 +2468,7 @@ public class SpecialForwardActivity extends ChatActivity {
                             if (!DialogObject.isUserDialog(id)) continue;
                             TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(id);
                             if (user == null || !user.bot) continue;
-                        } else if (activeTab.id > 0 && activeTab.filter != null) {
+                        } else if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) {
                             TLRPC.Dialog tempDialog = new TLRPC.TL_dialog();
                             tempDialog.id = id;
                             if (!activeTab.filter.includesDialog(org.telegram.messenger.AccountInstance.getInstance(currentAccount), id, tempDialog)) continue;
