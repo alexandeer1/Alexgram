@@ -202,6 +202,9 @@ public class NekoConfig {
     // [Alexgram: Sender Name on Stickers] - End
     public static ConfigItem enableCustomPrivacy = addConfig("enableCustomPrivacy", configTypeBool, true);
     public static ConfigItem enableSelectRangeInSharedMedia = addConfig("enableSelectRangeInSharedMedia", configTypeBool, true);
+    // [Alexgram: Hide Birthdays] - Start
+    public static ConfigItem hideBirthdayBanners = addConfig("hideBirthdayBanners", configTypeBool, false);
+    // [Alexgram: Hide Birthdays] - End
     // [Alexgram: Native Features] - End
 
 

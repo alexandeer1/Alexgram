@@ -10970,6 +10970,11 @@
     <string name="QuickEditIconOnlyOwnDesc">Only show the edit icon when the message can still be edited</string>
     <!-- [Alexgram: Quick Edit Icon] - End -->
 
+    <!-- [Alexgram: Hide Birthdays] - Start -->
+    <string name="HideBirthdayBanners">Hide Birthdays in Chat List</string>
+    <string name="HideBirthdayBannersDesc">Hide contact birthday banners and suggestion cards in the chat list</string>
+    <!-- [Alexgram: Hide Birthdays] - End -->
+
     <!-- [Alexgram: Tabs by Type - Custom FAB] -->
     <string name="create_folder_change_fab_title">FAB button</string>
     <string name="folder_fab_settings_fab_create_chat">New chat</string>

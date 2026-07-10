@@ -94,6 +94,13 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             LocaleController.getString("SelectRangeSharedMediaAbout", R.string.SelectRangeSharedMediaAbout),
             LocaleController.getString("SelectRangeSharedMedia", R.string.SelectRangeSharedMedia)
     ));
+    // [Alexgram: Hide Birthdays] - Start
+    private final AbstractConfigCell hideBirthdayBannersRow = cellGroup.appendCell(new ConfigCellTextCheck(
+            NekoConfig.hideBirthdayBanners,
+            LocaleController.getString("HideBirthdayBannersDesc", R.string.HideBirthdayBannersDesc),
+            LocaleController.getString("HideBirthdayBanners", R.string.HideBirthdayBanners)
+    ));
+    // [Alexgram: Hide Birthdays] - End
 
     private final AbstractConfigCell sendVideoAsRoundRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSendVideoAsRound()));
     private final AbstractConfigCell sendLockedCustomEmojiAsStickerRow = cellGroup.appendCell(
@@ -143,6 +150,11 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     }
                 }
                 addRowsToMap(cellGroup);
+            } else if (key.equals(NekoConfig.hideBirthdayBanners.getKey())) {
+                getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload, true);
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
             } else if (key.equals(NekoConfig.forceMusicSpeedControl.getKey())) {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NekoConfig.enableEditFileName.getKey())) {

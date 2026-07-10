@@ -406,6 +406,11 @@
     <string name="ShowQuickEditIconDesc">Показывать значок карандаша рядом с сообщениями для быстрого доступа к редактированию</string>
     <string name="QuickEditIconOnlyOwn">Только для редактируемых сообщений</string>
     <string name="QuickEditIconOnlyOwnDesc">Показывать значок редактирования только в том случае, если сообщение еще можно отредактировать</string>
+
+    <!-- [Alexgram: Hide Birthdays] - Start -->
+    <string name="HideBirthdayBanners">Скрыть дни рождения в списке чатов</string>
+    <string name="HideBirthdayBannersDesc">Скрывать баннеры и карточки дней рождения контактов в списке чатов</string>
+    <!-- [Alexgram: Hide Birthdays] - End -->
     <string name="create_folder_change_fab_title">Кнопка FAB</string>
     <string name="folder_fab_settings_fab_create_chat">Новый чат</string>
     <string name="bookmarks_title">Закладки</string>
