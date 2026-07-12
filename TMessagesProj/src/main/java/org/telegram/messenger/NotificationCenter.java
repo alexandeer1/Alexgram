@@ -158,6 +158,9 @@ public class NotificationCenter {
     public static final int businessLinkCreated = totalEvents++;
     public static final int needDeleteBusinessLink = totalEvents++;
     public static final int messageTranslated = totalEvents++;
+    // [Alexgram: Main Tabs Hiding Search Bar] - Start
+    public static final int mainTabsLayoutChanged = totalEvents++;
+    // [Alexgram: Main Tabs Hiding Search Bar] - End
     public static final int messageTranslating = totalEvents++;
     public static final int dialogIsTranslatable = totalEvents++;
     public static final int dialogTranslate = totalEvents++;

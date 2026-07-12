@@ -110,6 +110,14 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     ));
     // [Alexgram: Hide Search Bar] - End
 
+    // [Alexgram: Main Tabs Hiding Search Bar] - Start
+    private final AbstractConfigCell mainTabsShowSearchButtonRow = cellGroup.appendCell(new ConfigCellTextCheck(
+            NaConfig.INSTANCE.getMainTabsShowSearchButton(),
+            LocaleController.getString("MainTabsShowSearchButtonDesc", R.string.MainTabsShowSearchButtonDesc),
+            LocaleController.getString("MainTabsShowSearchButton", R.string.MainTabsShowSearchButton)
+    ));
+    // [Alexgram: Main Tabs Hiding Search Bar] - End
+
     private final AbstractConfigCell sendVideoAsRoundRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSendVideoAsRound()));
     private final AbstractConfigCell sendLockedCustomEmojiAsStickerRow = cellGroup.appendCell(
             new ConfigCellTextCheck(
@@ -165,6 +173,8 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                 }
             } else if (key.equals(NaConfig.INSTANCE.getHideHomeSearchField().getKey())) {
                 getNotificationCenter().postNotificationName(NotificationCenter.updateSearchSettings);
+            } else if (key.equals(NaConfig.INSTANCE.getMainTabsShowSearchButton().getKey())) {
+                getNotificationCenter().postNotificationName(NotificationCenter.mainTabsLayoutChanged);
             } else if (key.equals(NekoConfig.forceMusicSpeedControl.getKey())) {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NekoConfig.enableEditFileName.getKey())) {

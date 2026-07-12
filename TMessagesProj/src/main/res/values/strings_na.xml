@@ -178,4 +178,8 @@
     <string name="HideHomeSearchField">Hide Search Bar</string>
     <string name="HideHomeSearchFieldDesc">Hide the search bar in the chat list. You can still search by clicking the search icon on the top right.</string>
     <!-- [Alexgram: Hide Search Bar] - End -->
+    <!-- [Alexgram: Main Tabs Hiding Search Bar] - Start -->
+    <string name="MainTabsShowSearchButton">Show Search Icon in Bottom Bar</string>
+    <string name="MainTabsShowSearchButtonDesc">Display a search icon in the bottom bar next to the main navigation tabs.</string>
+    <!-- [Alexgram: Main Tabs Hiding Search Bar] - End -->
 </resources>

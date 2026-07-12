@@ -1582,6 +1582,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val mainTabsShowSearchButton =
+        addConfig(
+            "MainTabsShowSearchButton",
+            ConfigItem.configTypeBool,
+            false
+        )
     val hideContacts =
         addConfig(
             "HideContacts",

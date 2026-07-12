@@ -3058,6 +3058,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 .add(NotificationCenter.messageSendError)
                 .add(NotificationCenter.needReloadRecentDialogsSearch)
                 .add(NotificationCenter.updateSearchSettings)
+                .add(NotificationCenter.mainTabsLayoutChanged)
                 .add(NotificationCenter.replyMessagesDidLoad)
                 .add(NotificationCenter.topicsDidLoaded)
                 .add(NotificationCenter.reloadHints)
@@ -11089,6 +11090,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         } else if (id == NotificationCenter.updateSearchSettings) {
             refreshSearchSettingsUi();
+        } else if (id == NotificationCenter.mainTabsLayoutChanged) {
+            checkUi_itemSearchVisibility();
         } else if (id == NotificationCenter.replyMessagesDidLoad) {
             updateVisibleRows(MessagesController.UPDATE_MASK_MESSAGE_TEXT);
         } else if (id == NotificationCenter.reloadHints) {
@@ -14155,6 +14158,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    @Override
+    public boolean hasSearch() {
+        return isSupportSearch();
+    }
+
+    @Override
+    public void onSearchButtonClicked() {
+        showSearch(true, false, true);
+        if (fragmentSearchFieldWatcher != null) {
+            fragmentSearchFieldWatcher.toggleSearch(true);
+        }
+        AndroidUtilities.runOnUIThread(() -> {
+            if (fragmentSearchField != null && fragmentSearchField.editText != null) {
+                fragmentSearchField.editText.requestFocus();
+                AndroidUtilities.showKeyboard(fragmentSearchField.editText);
+            }
+        }, 100);
+    }
+
     private void showItemOptions() {
         ItemOptions io = ItemOptions.makeOptions(this, optionsItem);
         io.setColors(getThemedColor(Theme.key_actionBarDefaultTitle), getThemedColor(Theme.key_actionBarDefaultTitle));
@@ -14746,7 +14768,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         final float factor1 = animatorSearchButtonVisible.getFloatValue();
         final float factor2 = 1f - getRightSlidingProgress();
         final float factor3 = 1f - animatorDoneButtonVisible.getFloatValue();
-        final float factor = factor0 * factor1 * factor2 * factor3;
+        final float factor = shouldReplaceHomeSearchFieldWithMainTabsButton()
+                ? 0
+                : factor0 * factor1 * factor2 * factor3;
         FragmentFloatingButton.setAnimatedVisibility(searchItem, factor);
         if (dialogStoriesCell != null) {
             dialogStoriesCell.invalidate();
@@ -15141,6 +15165,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 && !onlySelect
                 && folderId == 0
                 && searchString == null);
+    }
+
+    private boolean shouldReplaceHomeSearchFieldWithMainTabsButton() {
+        return hasMainTabs
+                && NaConfig.INSTANCE.getMainTabsShowSearchButton().Bool()
+                && !NaConfig.INSTANCE.getHideBottomNavigationBar().Bool();
     }
 
     private void refreshSearchSettingsUi() {
