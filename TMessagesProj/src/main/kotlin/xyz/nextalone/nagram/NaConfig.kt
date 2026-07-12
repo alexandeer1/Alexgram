@@ -408,6 +408,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val hideHomeSearchField =
+        addConfig(
+            "HideHomeSearchField",
+            ConfigItem.configTypeBool,
+            false
+        )
     val showQuickReplyInBotCommands =
         addConfig(
             "ShowQuickReplyInBotCommands",

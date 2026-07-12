@@ -3057,6 +3057,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 .add(NotificationCenter.messageReceivedByServer)
                 .add(NotificationCenter.messageSendError)
                 .add(NotificationCenter.needReloadRecentDialogsSearch)
+                .add(NotificationCenter.updateSearchSettings)
                 .add(NotificationCenter.replyMessagesDidLoad)
                 .add(NotificationCenter.topicsDidLoaded)
                 .add(NotificationCenter.reloadHints)
@@ -11086,6 +11087,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (searchViewPager != null && searchViewPager.dialogsSearchAdapter != null) {
                 searchViewPager.dialogsSearchAdapter.loadRecentSearch();
             }
+        } else if (id == NotificationCenter.updateSearchSettings) {
+            refreshSearchSettingsUi();
         } else if (id == NotificationCenter.replyMessagesDidLoad) {
             updateVisibleRows(MessagesController.UPDATE_MASK_MESSAGE_TEXT);
         } else if (id == NotificationCenter.reloadHints) {
@@ -15133,7 +15136,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private boolean shouldShowIdleSearchField() {
-        return true;
+        return !(NaConfig.INSTANCE.getHideHomeSearchField().Bool()
+                && initialDialogsType == DIALOGS_TYPE_DEFAULT
+                && !onlySelect
+                && folderId == 0
+                && searchString == null);
+    }
+
+    private void refreshSearchSettingsUi() {
+        additionNavigationBarHeight = hasMainTabs && !NaConfig.INSTANCE.getHideBottomNavigationBar().Bool() ? dp(MainTabsHelper.getMainTabsHeightWithMargins()) : 0;
+        additionFloatingButtonOffset = hasMainTabs && !NaConfig.INSTANCE.getHideBottomNavigationBar().Bool() ? dp(MainTabsHelper.getMainTabsHeight() + MainTabsHelper.getMainTabsMargin()) : 0;
+        invalidateScrollY = true;
+        checkUi_searchFieldVisibility();
+        if (viewPages != null) {
+            for (ViewPage page : viewPages) {
+                if (page != null && page.listView != null) {
+                    page.listView.requestLayout();
+                }
+            }
+        }
     }
 
     private int getIdleSearchFieldHeight() {

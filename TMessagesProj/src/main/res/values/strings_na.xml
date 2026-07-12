@@ -174,5 +174,8 @@
     <string name="HiddenAccountsAutoLockDesc">When enabled, the vault re-locks automatically when the app goes to background.</string>
     <string name="HiddenAccountsSection">Accounts</string>
     <string name="HiddenAccountsPINManagement">PIN Management</string>
-    <!-- [Alexgram: Hidden Accounts] - End -->
+    <!-- [Alexgram: Hide Search Bar] - Start -->
+    <string name="HideHomeSearchField">Hide Search Bar</string>
+    <string name="HideHomeSearchFieldDesc">Hide the search bar in the chat list. You can still search by clicking the search icon on the top right.</string>
+    <!-- [Alexgram: Hide Search Bar] - End -->
 </resources>
