@@ -477,6 +477,9 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
 
                 } else if (position == coreSettingsRow) {
                     List<CoreItem> items = new ArrayList<>();
+                    // [Alexgram: Accounts Settings] - Start
+                    items.add(new CoreItem("Accounts", "Limits, Startup & Performance", R.drawable.msg_contacts, 0xFF3F51B5, v -> presentFragment(new AccountsSettingsActivity())));
+                    // [Alexgram: Accounts Settings] - End
                     items.add(new CoreItem("General", "Appearance, Language, Behavior", R.drawable.msg_settings, 0xFF2196F3, v -> presentFragment(new NekoGeneralSettingsActivity())));
                     items.add(new CoreItem(LocaleController.getString("Customization", R.string.Customization), "Icons, Styles, Theme & Decoration", R.drawable.msg_theme, 0xFFFF9C00, v -> presentFragment(new NekoCustomizationSettingsActivity())));
                     items.add(new CoreItem("Translator", "Messages, Languages, Engine", R.drawable.ic_translate, 0xFF9C27B0, v -> presentFragment(new NekoTranslatorSettingsActivity())));

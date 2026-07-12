@@ -52,7 +52,6 @@ import tw.nekomimi.nekogram.config.cell.AbstractConfigCell;
 import tw.nekomimi.nekogram.config.cell.ConfigCellCustom;
 import tw.nekomimi.nekogram.config.cell.ConfigCellDivider;
 import tw.nekomimi.nekogram.config.cell.ConfigCellHeader;
-import tw.nekomimi.nekogram.config.cell.ConfigCellNumberPicker;
 import tw.nekomimi.nekogram.config.cell.ConfigCellSelectBox;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheck;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextDetail;
@@ -109,9 +108,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
             getString(R.string.LastFirst),
             getString(R.string.FirstLast)
     }, null));
-    // [Alexgram: Max Active Accounts] - Start
-    private final AbstractConfigCell maxActiveAccountsRow = cellGroup.appendCell(new ConfigCellNumberPicker("MaxActiveAccounts", NaConfig.INSTANCE.getMaxActiveAccounts(), 10, 100));
-    // [Alexgram: Max Active Accounts] - End
+    // [Alexgram: Accounts Settings] - maxActiveAccountsRow moved to AccountsSettingsActivity
     private final AbstractConfigCell searchEngineInSearchBarRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSearchEngineInSearchBar(), getString(R.string.SearchEngineInSearchBarDescription)));
     private final AbstractConfigCell dividerGeneral = cellGroup.appendCell(new ConfigCellDivider());
 
@@ -423,10 +420,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
                 }
             } else if (key.equals(NaConfig.INSTANCE.getSearchEngineInSearchBar().getKey())) {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
-            // [Alexgram: Max Active Accounts] - Start
-            } else if (key.equals(NaConfig.INSTANCE.getMaxActiveAccounts().getKey())) {
-                tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
-            // [Alexgram: Max Active Accounts] - End
+            // [Alexgram: Accounts Settings] - maxActiveAccounts handler moved to AccountsSettingsActivity
             }
         };
 

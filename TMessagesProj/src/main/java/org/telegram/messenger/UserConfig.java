@@ -125,15 +125,15 @@ public class UserConfig extends BaseController {
         return false;
     }
 
-    // [Alexgram: Max Active Accounts] - Start
+    // [Alexgram: Accounts Settings] - Start
     public static int getMaxAccountCount() {
         try {
-            return tw.nekomimi.nekogram.NekoConfig.getPreferences().getInt("MaxActiveAccounts", 10);
+            return xyz.nextalone.nagram.NaConfig.INSTANCE.getMaxAccountCount().Int();
         } catch (Exception e) {
             return 10;
         }
     }
-    // [Alexgram: Max Active Accounts] - End
+    // [Alexgram: Accounts Settings] - End
 
     public int getNewMessageId() {
         int id;

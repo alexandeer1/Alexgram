@@ -644,14 +644,26 @@ object NaConfig {
             ConfigItem.configTypeInt,
             0
         )
-    // [Alexgram: Max Active Accounts] - Start
+    // [Alexgram: Accounts Settings] - Start
+    val maxAccountCount =
+        addConfig(
+            "MaxAccountCount",
+            ConfigItem.configTypeInt,
+            100
+        )
     val maxActiveAccounts =
         addConfig(
             "MaxActiveAccounts",
             ConfigItem.configTypeInt,
             10
         )
-    // [Alexgram: Max Active Accounts] - End
+    val startupActiveAccounts =
+        addConfig(
+            "StartupActiveAccounts",
+            ConfigItem.configTypeInt,
+            3
+        )
+    // [Alexgram: Accounts Settings] - End
     val showVoiceChangerInChatMenu =
         addConfig(
             "ShowVoiceChangerInChatMenu",
