@@ -8,6 +8,8 @@
 
 package org.telegram.ui.Components;
 
+import android.os.Build;
+
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
 import static org.telegram.messenger.AndroidUtilities.replaceArrows;
@@ -584,7 +586,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 canvas.restore();
                 return b;
             }
-        }
         }
         return super.drawChild(canvas, child, drawingTime);
     }

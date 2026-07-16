@@ -8506,13 +8506,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                     emojiView.hideSearchKeyboard();
                 }
             }
-<<<<<<< ours
-            if (allowConfirm && showConfirmAlert(() -> {
-                sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, payStars, false, internalParams);
-=======
             if (allowConfirmFinal && showConfirmAlert(() -> {
-                sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, payStars, false);
->>>>>>> theirs
+                sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, payStars, false, internalParams);
             })) {
                 return;
             }
@@ -9187,14 +9182,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         return encryptedChat == null || AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 101;
     }
 
-<<<<<<< ours
     // [Alexgram: Special Forward] - Start
     private boolean isSpecialForward() {
         return delegate instanceof org.telegram.ui.SpecialForwardActivity || parentFragment instanceof org.telegram.ui.SpecialForwardActivity;
-=======
+    }
+
     private boolean isSlowModeIgnored() {
         return isInScheduleMode() || animatorEphemeralMessageVisibility.getValue();
->>>>>>> theirs
     }
 
     public void checkSendButton(boolean animated) {
@@ -15160,7 +15154,6 @@ public class ChatActivityEnterView extends FrameLayout implements
             }
         }
         }
-    }
 
     public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == 2) {

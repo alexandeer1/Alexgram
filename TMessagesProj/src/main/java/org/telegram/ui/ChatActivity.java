@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This is the source code of Telegram for Android v. 5.x.x.
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
@@ -554,7 +554,7 @@ public class ChatActivity extends BaseFragment implements
 	private View progressView2;
 	private FrameLayout bottomOverlay;
 	private BlurredBackgroundWithFadeDrawable fadeDrawable;
-	private ChatInputViewsContainer chatInputViewsContainer;
+	public ChatInputViewsContainer chatInputViewsContainer;
 	private View roundVideoRecordBackground;
 
 	private FrameLayout chatInputBubbleContainer;
@@ -1154,7 +1154,7 @@ public class ChatActivity extends BaseFragment implements
 
 	public static ArrayList<FileRefClipboardItem> fileRefClipboard = new ArrayList<>();
 
-	private LongSparseArray<TL_bots.BotInfo> botInfo = new LongSparseArray<>();
+	public final LongSparseArray<TL_bots.BotInfo> botInfo = new LongSparseArray<>();
 	private String botUser;
 	private long inlineReturn;
 	private String voiceChatHash;
@@ -4128,7 +4128,7 @@ public class ChatActivity extends BaseFragment implements
 					ArrayList<Integer> toDeleteMessagesIds = new ArrayList<>();
 					MessageObject replyTo = getThreadMessage();
 					ArrayList<Character> suffice_en = new ArrayList(Arrays.asList(',', '.', '!', '?', ':', ';', '(', ')'));
-					ArrayList<Character> suffice_zh = new ArrayList(Arrays.asList('∩╝î', 'πÇé', '∩╝ü', '∩╝ƒ', '∩╝Ü', '∩╝¢', '∩╝ê', '∩╝ë'));
+					ArrayList<Character> suffice_zh = new ArrayList(Arrays.asList('，', '。', '！', '？', '：', '；', '（', '）'));
 					for (int a = 1; a >= 0; a--) {
 						ArrayList<Integer> ids = new ArrayList<>();
 						for (int b = 0; b < selectedMessagesCanCopyIds[a].size(); b++) {
@@ -4149,7 +4149,7 @@ public class ChatActivity extends BaseFragment implements
 								if (!suffice_en.contains(str.charAt(str.length() - 1)) && !suffice_zh.contains(str.charAt(str.length() - 1))) {
 									// add comma refer to language
 									if (LocaleController.getInstance().getCurrentLocale().getLanguage().equals("zh")) {
-										str.append('∩╝î');
+										str.append('，');
 									} else {
 										str.append(',');
 									}
@@ -4598,14 +4598,31 @@ public class ChatActivity extends BaseFragment implements
 			avatarContainer = new ChatAvatarContainer(context, this, currentEncryptedChat != null, themeDelegate) {
 			@Override
 			protected boolean onAvatarClick() {
-			if (currentUser != null && currentUser.linked_community_id != 0) {
-			showDialog(new CommunitySheet(ChatActivity.this, currentUser.linked_community_id));
-			return true;
-			} else if (currentChat != null && currentChat.linked_community_id != 0) {
-			showDialog(new CommunitySheet(ChatActivity.this, currentChat.linked_community_id));
-			return true;
-			}
-			return false;
+				if (currentUser != null && currentUser.linked_community_id != 0) {
+					showDialog(new CommunitySheet(ChatActivity.this, currentUser.linked_community_id));
+					return true;
+				} else if (currentChat != null && currentChat.linked_community_id != 0) {
+					showDialog(new CommunitySheet(ChatActivity.this, currentChat.linked_community_id));
+					return true;
+				}
+				if (dialog_id == TemplatesManager.getInstance(currentAccount).getTemplatesChannelId()) {
+					return true;
+				}
+				if (isTitleCentered()) {
+					if (editTextItem != null && editTextItem.getView() != null && editTextItem.getView().getVisibility() == VISIBLE) {
+						editTextItem.getView().performClick();
+						return true;
+					}
+					if (attachItem != null && attachItem.getView() != null && attachItem.getView().getVisibility() == VISIBLE) {
+						attachItem.getView().performClick();
+						return true;
+					}
+					if (headerItem != null) {
+						headerItem.performClick();
+						return true;
+					}
+				}
+				return super.onAvatarClick();
 			}
 
 			@Override
@@ -4623,30 +4640,7 @@ public class ChatActivity extends BaseFragment implements
 				openSearchWithText(isSupportedTags() ? "" : null);
 			}
 
-			@Override
-			protected boolean onAvatarClick() {
-				if (dialog_id == TemplatesManager.getInstance(currentAccount).getTemplatesChannelId()) {
-					return true;
-				}
-				if (isTitleCentered()) {
-					if (editTextItem != null && editTextItem.getView() != null && editTextItem.getView().getVisibility() == VISIBLE) {
-						editTextItem.getView().performClick();
-						return true;
-					}
 
-					if (attachItem != null && attachItem.getView() != null && attachItem.getView().getVisibility() == VISIBLE) {
-						attachItem.getView().performClick();
-						return true;
-					}
-
-					if (headerItem != null) {
-						headerItem.performClick();
-						return true;
-					}
-				}
-
-				return super.onAvatarClick();
-			}
 
 			@Override
 			protected boolean isCentered() {
@@ -47758,7 +47752,7 @@ public class ChatActivity extends BaseFragment implements
 				FileLog.e(e);
 			}
 			if (formattedUrl.length() > 204) {
-				formattedUrl = formattedUrl.substring(0, 204) + "ΓÇª";
+				formattedUrl = formattedUrl.substring(0, 204) + "…";
 			}
 			SpannableString s = new SpannableString(formattedUrl);
 			s.setSpan(span, 0, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -50816,11 +50810,11 @@ public class ChatActivity extends BaseFragment implements
 							+ "- **MEDIA FALLBACK**: If no image file is provided but a [Photo] or [Video] tag is present, summarize the provided text/caption and explicitly note that you were unable to analyze the media directly.\n"
 							+ "- **NO METADATA**: Do NOT mention user names, chat names, or technical tags in the final summary.\n"
 							+ "- **CONTENT ONLY**: Focus exclusively on the message meaning and visual insights.\n"
-							+ "- **FORMATTING**: Use Bold for emphasis, > for quotes of important phrases, and clean bullets (ΓÇó).\n\n"
+							+ "- **FORMATTING**: Use Bold for emphasis, > for quotes of important phrases, and clean bullets (•).\n\n"
 							+ "Formatting Guidelines:\n"
 							+ "- Use **Bold** for key terms and headlines.\n"
 							+ "- Use `> ` for direct quotes or critical insights.\n"
-							+ "- Use ΓÇó for bullet points.\n"
+							+ "- Use • for bullet points.\n"
 							+ "- Use short paragraphs for explanations.\n"
 							+ "- Keep spacing clean for easy scanning.\n\n"
 							+ "Optimization:\n"
@@ -50871,7 +50865,7 @@ public class ChatActivity extends BaseFragment implements
 								if (getParentActivity() != null) {
 									android.widget.TextView summaryView = new android.widget.TextView(getParentActivity());
 									// Pre-process common Markdown bullet points to look better
-									String processedResult = result.replaceAll("(?m)^[\\*\\-] ", "ΓÇó ");
+									String processedResult = result.replaceAll("(?m)^[\\*\\-] ", "• ");
 									// Make it beautiful: Parse Markdown using Telegram's internal parser
 									CharSequence formattedResult = tw.nekomimi.nekogram.helpers.EntitiesHelper.parseMarkdown(processedResult);
 									// Handle Emojis

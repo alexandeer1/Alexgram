@@ -8,6 +8,8 @@
 
 package org.telegram.ui;
 
+import org.telegram.messenger.BuildConfig;
+
 // [Alexgram: Hidden Chats] - Start
 import tw.nekomimi.nekogram.helpers.HiddenChatsController;
 import tw.nekomimi.nekogram.ui.HiddenChatsPasscodeActivity;

@@ -10107,7 +10107,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         return out;
     }
 
-    private static TL_iv.PageBlock toInputPageBlock(TL_iv.PageBlock block) {
+    public static TL_iv.PageBlock toInputPageBlock(TL_iv.PageBlock block) {
         return block;
     }
 

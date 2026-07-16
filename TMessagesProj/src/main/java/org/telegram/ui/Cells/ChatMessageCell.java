@@ -19153,7 +19153,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 currentNameString = "";
             }
             final int bookmarkReservedWidth = cachedIsBookmarked ? dp(16) : 0;
-            final int nameWidthForLayout = Math.max(dp(1), nameWidth - bookmarkReservedWidth);
+            int nameWidthForLayout = Math.max(dp(1), nameWidth - bookmarkReservedWidth);
             int additionalWidth = dp(currentMessageObject.isSponsored() ? -24 : 0);
             CharSequence nameStringFinal = AndroidUtilities.removeDiacritics(currentNameString.replace('\n', ' ').replace('\u200F', ' '));
             try {
@@ -19168,7 +19168,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             if (adminString != null) {
                 nameWidth -= dp(8);
             }
-            final int nameWidthForLayout = Math.max(dp(1), nameWidth - bookmarkReservedWidth);
+            nameWidthForLayout = Math.max(dp(1), nameWidth - bookmarkReservedWidth);
             nameStringFinal = TextUtils.ellipsize(nameStringFinal, Theme.chat_namePaint, nameWidthForLayout + additionalWidth - (viaBot ? viaWidth : 0), TextUtils.TruncateAt.END);
 
             if (viaGuestBot) {
