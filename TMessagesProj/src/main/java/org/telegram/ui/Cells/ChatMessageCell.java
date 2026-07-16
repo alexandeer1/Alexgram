@@ -102,6 +102,7 @@ import androidx.core.math.MathUtils;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.AppGlobalConfig;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BotForumHelper;
 import org.telegram.messenger.BotInlineKeyboard;
@@ -18640,7 +18641,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         } else if (currentMessageObject.isRepostPreview) {
             timeString = LocaleController.formatSmallDateChat(messageObject.messageOwner.date) + ", " + LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
         } else if (edited && !showAyuDeletedMark) {
-            timeString = TimeStringHelper.createEditedString(currentMessageObject, translated, showBookmarkInTime, senderNameColor);
+            timeString = AppGlobalConfig.getInstance(currentAccount).messagePrimaryEditedDate.get() ?
+                LocaleController.formatPmEditedDate(messageObject.messageOwner.edit_date) :
+                TimeStringHelper.createEditedString(currentMessageObject, translated, showBookmarkInTime, senderNameColor);
         } else if (!edited && showAyuDeletedMark) {
             timeString = TimeStringHelper.createDeletedString(currentMessageObject, edited, translated, showBookmarkInTime, senderNameColor);
         } else if (edited && showAyuDeletedMark) {
