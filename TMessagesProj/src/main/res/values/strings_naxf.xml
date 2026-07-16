@@ -38,6 +38,11 @@
     <string name="AvatarCornersRight">Round</string>
     <string name="SingleCornerRadius">Unified corner radius</string>
     <string name="SingleCornerRadiusInfo">Topic groups will use the same avatar shape as chat messages.</string>
+    <string name="LaunchAnimationStyle">Startup Splash Animation</string>
+    <string name="LaunchAnimationStyleAlexgram">Alexgram</string>
+    <string name="LaunchAnimationStyleTelegram">Telegram</string>
+    <string name="LaunchAnimationStyleIcon">App Icon</string>
+    <string name="LaunchAnimationStyleNone">None</string>
     <string name="CreationDateChat">**%1$s** was created on **%2$s**.</string>
     <string name="JoinDateChat">You joined **%1$s** on **%2$s**.</string>
     <string name="CreationDateUserApproximately">**%1$s** created their account approximately on **%2$s**.</string>

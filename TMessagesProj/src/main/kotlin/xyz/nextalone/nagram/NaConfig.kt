@@ -534,6 +534,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val launchAnimationStyle =
+        addConfig(
+            "LaunchAnimationStyle",
+            ConfigItem.configTypeInt,
+            0
+        )
     val searchHashtagDefaultPageChannel =
         addConfig(
             "SearchHashtagDefaultPageChannel",

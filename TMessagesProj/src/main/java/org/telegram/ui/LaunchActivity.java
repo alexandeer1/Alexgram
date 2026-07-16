@@ -297,6 +297,8 @@ import tw.nekomimi.nekogram.utils.ProxyUtil;
 import xyz.nextalone.nagram.NaConfig;
 import tw.nekomimi.nekogram.ui.icons.IconsResources;
 import tw.nekomimi.nekogram.ui.AlexgramSplashView;
+import tw.nekomimi.nekogram.ui.TelegramSplashView;
+import tw.nekomimi.nekogram.ui.IconSplashView;
 
 public class LaunchActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate,
         NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, IPipActivity {
@@ -970,24 +972,43 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
         // ── Alexgram premium splash animation ──
         if (savedInstanceState == null) {
-            AlexgramSplashView splashView = new AlexgramSplashView(this);
-            frameLayout.addView(splashView, new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT));
-            splashView.bringToFront();
-            splashView.setOnFinishedCallback(() -> {
-                splashView.animate()
-                        .alpha(0f)
-                        .setDuration(250)
-                        .withEndAction(() -> {
-                            if (splashView.getParent() != null) {
-                                frameLayout.removeView(splashView);
-                                getWindow().setBackgroundDrawableResource(R.drawable.transparent);
-                            }
-                        })
-                        .start();
-            });
+            int style = NaConfig.INSTANCE.getLaunchAnimationStyle().Int();
+            if (style != 3) { // 3 = None
+                View splashView;
+                if (style == 1) { // 1 = Telegram
+                    splashView = new TelegramSplashView(this);
+                } else if (style == 2) { // 2 = Icon
+                    splashView = new IconSplashView(this);
+                } else { // 0 = Alexgram
+                    splashView = new AlexgramSplashView(this);
+                }
+                frameLayout.addView(splashView, new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT));
+                splashView.bringToFront();
+
+                if (splashView instanceof AlexgramSplashView) {
+                    ((AlexgramSplashView) splashView).setOnFinishedCallback(() -> fadeOutSplash(splashView));
+                } else if (splashView instanceof TelegramSplashView) {
+                    ((TelegramSplashView) splashView).setOnFinishedCallback(() -> fadeOutSplash(splashView));
+                } else if (splashView instanceof IconSplashView) {
+                    ((IconSplashView) splashView).setOnFinishedCallback(() -> fadeOutSplash(splashView));
+                }
+            }
         }
+    }
+
+    private void fadeOutSplash(View splashView) {
+        splashView.animate()
+                .alpha(0f)
+                .setDuration(250)
+                .withEndAction(() -> {
+                    if (splashView.getParent() != null) {
+                        frameLayout.removeView(splashView);
+                        getWindow().setBackgroundDrawableResource(R.drawable.transparent);
+                    }
+                })
+                .start();
     }
 
     public void checkFrameMetrics() {

@@ -24,6 +24,7 @@ import tw.nekomimi.nekogram.config.cell.ConfigCellCustom;
 import tw.nekomimi.nekogram.config.cell.ConfigCellHeader;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheck;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheckIcon;
+import tw.nekomimi.nekogram.config.cell.ConfigCellSelectBox;
 import tw.nekomimi.nekogram.ui.cells.AvatarCornersPreviewCell;
 import xyz.nextalone.nagram.NaConfig;
 
@@ -72,6 +73,21 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     presentFragment(new tw.nekomimi.nekogram.settings.FontsSettingsActivity()))
     );
     // [Alexgram: Fonts] - End
+    // [Alexgram: Launch Animation] - Start
+    private final AbstractConfigCell launchAnimationStyleRow = cellGroup.appendCell(
+            new ConfigCellSelectBox(
+                    "LaunchAnimationStyle",
+                    NaConfig.INSTANCE.getLaunchAnimationStyle(),
+                    new String[]{
+                            getString(R.string.LaunchAnimationStyleAlexgram),
+                            getString(R.string.LaunchAnimationStyleTelegram),
+                            getString(R.string.LaunchAnimationStyleIcon),
+                            getString(R.string.LaunchAnimationStyleNone)
+                    },
+                    null
+            )
+    );
+    // [Alexgram: Launch Animation] - End
     private final AbstractConfigCell showQuickEditIconRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showQuickEditIconInChatList, LocaleController.getString("ShowQuickEditIconDesc", R.string.ShowQuickEditIconDesc), LocaleController.getString("ShowQuickEditIcon", R.string.ShowQuickEditIcon)));
     private final AbstractConfigCell quickEditIconOnlyOwnRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.quickEditIconOnlyForOwnMessages, LocaleController.getString("QuickEditIconOnlyOwnDesc", R.string.QuickEditIconOnlyOwnDesc), LocaleController.getString("QuickEditIconOnlyOwn", R.string.QuickEditIconOnlyOwn)));
     private final AbstractConfigCell forceMusicSpeedControlRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.forceMusicSpeedControl, LocaleController.getString("ExperimentalMusicSpeedControlAbout", R.string.ExperimentalMusicSpeedControlAbout), LocaleController.getString("ExperimentalMusicSpeedControl", R.string.ExperimentalMusicSpeedControl)));
