@@ -117,6 +117,19 @@ def get_large_file_notice(file_path: Path) -> str:
 
 
 def get_documents() -> list[dict[str, str | Path]]:
+    apk_path_env = os.environ.get("APK_PATH")
+    if apk_path_env:
+        apk_path = Path(apk_path_env)
+        if apk_path.is_dir():
+            documents = []
+            for apk in apk_path.rglob("*.apk"):
+                documents.append({"path": apk, "caption": ""})
+            if documents:
+                documents[-1]["caption"] = get_caption()
+                return documents
+        elif apk_path.is_file():
+            return [{"path": apk_path, "caption": get_caption()}]
+
     documents: list[dict[str, str | Path]] = []
     for abi in ["armeabi-v7a", "arm64-v8a"]:
         apk = find_apk(abi)

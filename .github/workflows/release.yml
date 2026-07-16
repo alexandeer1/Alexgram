@@ -31,9 +31,9 @@ jobs:
     needs: setup
     strategy:
       matrix:
-        abi: [arm64-v8a, armeabi-v7a]
+        abi: [arm64-v8a, armeabi-v7a, x86_64, universal]
     env:
-      NATIVE_TARGET: ${{ matrix.abi }}
+      NATIVE_TARGET: ${{ matrix.abi == 'universal' && 'arm64-v8a,armeabi-v7a,x86,x86_64' || matrix.abi }}
       BUILD_TIMESTAMP: ${{ needs.setup.outputs.build_timestamp }}
     steps:
       - name: Checkout
@@ -84,25 +84,8 @@ jobs:
         with:
           name: Release-${{ matrix.abi }}
           path: ${{ env.APK_DIR }}
-  upload:
-    name: Upload release
-    if: github.event.inputs.upload != 'y' && !contains(github.event.head_commit.message, '[skip upload]')
-    runs-on: ubuntu-latest
-    needs:
-      - setup
-      - build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
       - name: Send to Telegram
+        if: github.event.inputs.upload != 'y' && !contains(github.event.head_commit.message, '[skip upload]')
         env:
           APP_ID: ${{ secrets.APP_ID }}
           APP_HASH: ${{ secrets.APP_HASH }}
@@ -112,8 +95,9 @@ jobs:
           COMMIT_URL: ${{ github.event.head_commit.url }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           BUILD_TIMESTAMP: ${{ needs.setup.outputs.build_timestamp }}
+          APK_PATH: ${{ env.APK_DIR }}
         run: |
           # send apk via telegram bot api
-          find artifacts -name "*.apk"
+          find ${{ env.APK_DIR }} -name "*.apk"
           python -m pip install -r Tools/scripts/requirements.txt
           python Tools/scripts/upload.py ${{ secrets.HELPER_BOT_TOKEN }} ${{ secrets.HELPER_BOT_TARGET }} release ${{ secrets.HELPER_BOT_CANARY_TARGET }}
