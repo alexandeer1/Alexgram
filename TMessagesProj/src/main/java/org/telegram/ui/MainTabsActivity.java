@@ -1184,8 +1184,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         if (searchTabButton != null) {
             boolean showSearch = NaConfig.INSTANCE.getMainTabsShowSearchButton().Bool();
-            searchTabButton.setClickable(factor > 1 && showSearch);
-            searchTabButton.setEnabled(factor > 1 && showSearch);
+            searchTabButton.setClickable(factor >= 1.0f && showSearch);
+            searchTabButton.setEnabled(factor >= 1.0f && showSearch);
             searchTabButton.setAlpha(factor);
             searchTabButton.setVisibility(factor > 0 && showSearch ? View.VISIBLE : View.GONE);
         }
