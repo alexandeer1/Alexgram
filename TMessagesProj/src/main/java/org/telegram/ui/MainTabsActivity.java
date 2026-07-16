@@ -1163,6 +1163,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null) return;
         if (NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
             tabsView.setVisibility(View.GONE);
+            if (searchTabButton != null) {
+                searchTabButton.setVisibility(View.GONE);
+            }
             return;
         }
         final boolean isUpdateLayoutVisible = updateLayoutWrapper.isUpdateLayoutVisible();
@@ -1178,6 +1181,14 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.setEnabled(factor > 1);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
+
+        if (searchTabButton != null) {
+            boolean showSearch = NaConfig.INSTANCE.getMainTabsShowSearchButton().Bool();
+            searchTabButton.setClickable(factor > 1 && showSearch);
+            searchTabButton.setEnabled(factor > 1 && showSearch);
+            searchTabButton.setAlpha(factor);
+            searchTabButton.setVisibility(factor > 0 && showSearch ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void checkUi_callTabVisible(boolean callTabsVisible, boolean animated) {
@@ -1508,7 +1519,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             tabsLp.width = maxTabsWidth;
             tabsView.setLayoutParams(tabsLp);
         }
-        searchTabButton.setVisibility(View.VISIBLE);
+        final float factor = animatorTabsVisible.getFloatValue();
+        searchTabButton.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
 
         int bgPadding = dp(MainTabsHelper.getMainTabsMargin() - 0.334f);
         int leftVisualPad = tabsBarContainer.getPaddingLeft() + bgPadding;
