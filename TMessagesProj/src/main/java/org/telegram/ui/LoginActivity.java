@@ -1677,9 +1677,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
     }
 
     private void needFinishActivity(boolean afterSignup, boolean showSetPasswordConfirm, int otherwiseRelogin) {
-        if (getParentActivity() != null) {
-            AndroidUtilities.setLightStatusBar(getParentActivity().getWindow(), false);
-        }
+            AndroidUtilities.setLightStatusBar(getParentActivity(), false);
         clearCurrentState();
         if (getParentActivity() instanceof LaunchActivity) {
             if (newAccount) {

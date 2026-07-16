@@ -281,7 +281,7 @@ public class DialogsEmptyCell extends LinearLayout {
             }
         }
         if (currentType == TYPE_WELCOME_NO_CONTACTS || currentType == TYPE_WELCOME_WITH_CONTACTS) {
-            offset -= (int) (ActionBar.getCurrentActionBarHeight() / 2f) * (1f - utyanCollapseProgress);
+            offset -= (int) ((ActionBar.getCurrentActionBarHeight() / 2f) * (1f - utyanCollapseProgress));
         }
         imageView.setTranslationY(offset);
         titleView.setTranslationY(offset);
@@ -292,19 +292,12 @@ public class DialogsEmptyCell extends LinearLayout {
         int totalHeight;
         if (getParent() instanceof View) {
             View view = (View) getParent();
-            totalHeight = view.getMeasuredHeight();
-            if (view.getPaddingTop() != 0 && Build.VERSION.SDK_INT >= 21) {
-                totalHeight -= AndroidUtilities.statusBarHeight;
-            }
+            totalHeight = view.getMeasuredHeight() - view.getPaddingTop() - view.getPaddingBottom();
         } else {
             totalHeight = MeasureSpec.getSize(heightMeasureSpec);
         }
         if (totalHeight == 0) {
-            totalHeight = AndroidUtilities.displaySize.y - ActionBar.getCurrentActionBarHeight()
-                    - (Build.VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0);
-        }
-        if (getParent() instanceof BlurredRecyclerView) {
-            totalHeight -= ((BlurredRecyclerView) getParent()).blurTopPadding;
+            totalHeight = AndroidUtilities.displaySize.y - ActionBar.getCurrentActionBarHeight() - AndroidUtilities.statusBarHeight;
         }
 
         return (int) (totalHeight + (AndroidUtilities.dp(320) - totalHeight) * utyanCollapseProgress);
@@ -320,15 +313,14 @@ public class DialogsEmptyCell extends LinearLayout {
             if (getParent() instanceof View) {
                 View view = (View) getParent();
                 totalHeight = view.getMeasuredHeight();
-                if (view.getPaddingTop() != 0 && Build.VERSION.SDK_INT >= 21) {
+                if (view.getPaddingTop() != 0) {
                     totalHeight -= AndroidUtilities.statusBarHeight;
                 }
             } else {
                 totalHeight = MeasureSpec.getSize(heightMeasureSpec);
             }
             if (totalHeight == 0) {
-                totalHeight = AndroidUtilities.displaySize.y - ActionBar.getCurrentActionBarHeight()
-                        - (Build.VERSION.SDK_INT >= 21 ? AndroidUtilities.statusBarHeight : 0);
+                totalHeight = AndroidUtilities.displaySize.y - ActionBar.getCurrentActionBarHeight() - AndroidUtilities.statusBarHeight;
             }
 
             if (getParent() instanceof BlurredRecyclerView) {

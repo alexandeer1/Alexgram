@@ -58,6 +58,7 @@ import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.utils.LeakDetector;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.ArticleViewer;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
@@ -495,7 +496,7 @@ public abstract class BaseFragment {
         }
 
         if (hasForceLightStatusBar() && !AndroidUtilities.isTablet() && getParentLayout().getLastFragment() == this && getParentActivity() != null && !finishing) {
-            AndroidUtilities.setLightStatusBar(getParentActivity().getWindow(), ColorUtils.calculateLuminance(Theme.getColor(Theme.key_actionBarDefault)) > 0.7f);
+            AndroidUtilities.setLightStatusBar(getParentActivity(), ColorUtils.calculateLuminance(Theme.getColor(Theme.key_actionBarDefault)) > 0.7f);
         }
 
         if (sheetsStack != null) {
@@ -1020,7 +1021,7 @@ public abstract class BaseFragment {
                 } else {
                     AndroidUtilities.setLightNavigationBar(bottomSheet[0], true);
                 }
-                AndroidUtilities.setLightStatusBar(getWindow(), fragment.isLightStatusBar());
+                AndroidUtilities.setLightStatusBar(this, fragment.isLightStatusBar());
                 fragment.onBottomSheetCreated();
             }
 
@@ -1459,6 +1460,16 @@ public abstract class BaseFragment {
     }
 
 
+
+    private Bulletin.Delegate bulletinDelegate;
+
+    public void setBulletinDelegate(Bulletin.Delegate bulletinDelegate) {
+        this.bulletinDelegate = bulletinDelegate;
+    }
+
+    public Bulletin.Delegate getBulletinDelegate() {
+        return bulletinDelegate;
+    }
 
     protected void dumpCanvas() {
         AndroidUtilities.dumpCanvas(fragmentView);

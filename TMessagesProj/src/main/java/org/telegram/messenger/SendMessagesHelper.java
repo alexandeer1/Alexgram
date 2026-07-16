@@ -3839,6 +3839,28 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         });
     }
 
+    public int editRichMessage(MessageObject messageObject, TL_iv.RichMessage rich, ArrayList<TLRPC.InputUser> users, final BaseFragment fragment) {
+        if (messageObject == null || rich == null) {
+            return 0;
+        }
+        final TLRPC.TL_messages_editMessage req = new TLRPC.TL_messages_editMessage();
+        req.peer = getMessagesController().getInputPeer(messageObject.getDialogId());
+        req.id = messageObject.getId();
+        req.rich_message = richMessageToInputRichMessage(rich, users);
+        req.flags |= TLObject.FLAG_23;
+        if (messageObject.messageOwner != null && (messageObject.messageOwner.flags & 1073741824) != 0) {
+            req.quick_reply_shortcut_id = messageObject.messageOwner.quick_reply_shortcut_id;
+            req.flags |= 131072;
+        }
+        return getConnectionsManager().sendRequest(req, (response, error) -> {
+            if (error == null) {
+                getMessagesController().processUpdates((TLRPC.Updates) response, false);
+            } else if (fragment != null) {
+                AndroidUtilities.runOnUIThread(() -> AlertsCreator.processError(currentAccount, error, fragment, req));
+            }
+        });
+    }
+
     public void deletePollOption(MessageObject messageObject, byte[] option) {
         if (messageObject == null) {
             return;
@@ -4588,7 +4610,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         long stars = sendMessageParams.stars;
         int pollIndex = sendMessageParams.pollIndex;
         PollSendParams pollSendParams = sendMessageParams.pollSendParams;
-        TL_iv.TL_inputRichMessage inputRichMessage = sendMessageParams.inputRichMessage;
+        TL_iv.RichMessage richMessage = sendMessageParams.richMessage;
 
         boolean canSendGames = sendMessageParams.canSendGames;
         boolean canUsePangu = sendMessageParams.canUsePangu == null ? NaConfig.INSTANCE.getEnablePanguOnSending().Bool() : sendMessageParams.canUsePangu;
@@ -4598,10 +4620,10 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         if (peer == 0) {
             return;
         }
-        if (inputRichMessage != null && DialogObject.isEncryptedDialog(peer)) {
+        if (richMessage != null && DialogObject.isEncryptedDialog(peer)) {
             return;
         }
-        if (message == null && caption == null && inputRichMessage == null) {
+        if (message == null && caption == null && richMessage == null) {
             caption = "";
         }
 
@@ -4768,11 +4790,11 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                     TLRPC.Chat chat = getMessagesController().getChat(-peer);
                     canSendStickers = ChatObject.canSendStickers(chat);
                 }
-                if (inputRichMessage != null) {
+                if (richMessage != null) {
                     newMsg = new TLRPC.TL_message();
                     newMsg.media = new TLRPC.TL_messageMediaEmpty();
                     newMsg.message = "";
-                    newMsg.rich_message = inputRichMessageToRichMessage(inputRichMessage);
+                    newMsg.rich_message = richMessage;
                     type = MEDIA_TYPE_RICH;
                 } else if (message != null) {
                     if (encryptedChat != null) {
@@ -5649,7 +5671,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                 reqSend.peer = sendToPeer;
                 reqSend.random_id = newMsg.random_id;
                 reqSend.no_webpage = true;
-                reqSend.rich_message = inputRichMessage;
+                reqSend.rich_message = richMessageToInputRichMessage(newMsg.rich_message, sendMessageParams.richMessageInputUsers);
                 if (payStars > 0) {
                     reqSend.flags |= 2097152;
                     reqSend.allow_paid_stars = payStars;
@@ -9734,11 +9756,11 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         prepareSendingArticle(accountInstance, blocks, null, null, null, rtl, dialogId, replyToMsg, replyToTopMsg, notify, scheduleDate, scheduleRepeatPeriod, quickReplyShortcut, quickReplyShortcutId, effectId, monoForumPeerId, payStars);
     }
 
-    public static void prepareSendingArticle(AccountInstance accountInstance, ArrayList<TL_iv.PageBlock> blocks, ArrayList<TLRPC.InputPhoto> photos, ArrayList<TLRPC.InputDocument> documents, ArrayList<TLRPC.InputUser> users, boolean rtl, long dialogId, MessageObject replyToMsg, MessageObject replyToTopMsg, boolean notify, int scheduleDate, int scheduleRepeatPeriod, String quickReplyShortcut, int quickReplyShortcutId, long effectId, long monoForumPeerId, long payStars) {
+    public static void prepareSendingArticle(AccountInstance accountInstance, ArrayList<TL_iv.PageBlock> blocks, ArrayList<TLRPC.Photo> photos, ArrayList<TLRPC.Document> documents, ArrayList<TLRPC.InputUser> users, boolean rtl, long dialogId, MessageObject replyToMsg, MessageObject replyToTopMsg, boolean notify, int scheduleDate, int scheduleRepeatPeriod, String quickReplyShortcut, int quickReplyShortcutId, long effectId, long monoForumPeerId, long payStars) {
         if (blocks == null || blocks.isEmpty()) {
             return;
         }
-        TL_iv.TL_inputRichMessage rich = new TL_iv.TL_inputRichMessage();
+        TL_iv.RichMessage rich = new TL_iv.RichMessage();
         rich.rtl = rtl;
         for (TL_iv.PageBlock block : blocks) {
             TL_iv.PageBlock copy = toInputPageBlock(block);
@@ -9749,30 +9771,31 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         if (rich.blocks.isEmpty()) {
             return;
         }
-        if (photos != null && !photos.isEmpty()) {
-            rich.flags |= TLObject.FLAG_2;
-            rich.photos.addAll(photos);
-        }
-        if (documents != null && !documents.isEmpty()) {
-            rich.flags |= TLObject.FLAG_3;
-            rich.documents.addAll(documents);
-        }
-        if (users != null && !users.isEmpty()) {
-            rich.flags |= TLObject.FLAG_4;
-            rich.users.addAll(users);
-        }
         java.util.IdentityHashMap<Object, Boolean> seen = new java.util.IdentityHashMap<>();
         for (TL_iv.PageBlock b : rich.blocks) {
             clearRichTextParentsInBlock(b, seen);
         }
 
         SendMessageParams params = SendMessageParams.ofRichMessage(rich, dialogId, replyToMsg, replyToTopMsg, null, null, notify, scheduleDate, scheduleRepeatPeriod);
+        params.richMessageInputUsers = users;
         params.quick_reply_shortcut = quickReplyShortcut;
         params.quick_reply_shortcut_id = quickReplyShortcutId;
         params.effect_id = effectId;
         params.monoForumPeer = monoForumPeerId;
         params.payStars = payStars;
         accountInstance.getSendMessagesHelper().sendMessage(params);
+    }
+
+    private static TL_iv.TL_inputRichMessage richMessageToInputRichMessage(TL_iv.RichMessage rich, ArrayList<TLRPC.InputUser> users) {
+        if (rich == null) return null;
+        TL_iv.TL_inputRichMessage input = new TL_iv.TL_inputRichMessage();
+        input.rtl = rich.rtl;
+        input.blocks = new ArrayList<>(rich.blocks);
+        if (users != null && !users.isEmpty()) {
+            input.flags |= TLObject.FLAG_4;
+            input.users.addAll(users);
+        }
+        return input;
     }
 
     private static TL_iv.RichMessage inputRichMessageToRichMessage(TL_iv.TL_inputRichMessage input) {
@@ -12298,11 +12321,12 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         public boolean isLivePhoto;
         public long livePhotoTimestamp;
         public long dice_stake;
-        public TL_iv.TL_inputRichMessage inputRichMessage;
+        public TL_iv.RichMessage richMessage;
+        public ArrayList<TLRPC.InputUser> richMessageInputUsers;
 
-        public static SendMessageParams ofRichMessage(TL_iv.TL_inputRichMessage inputRichMessage, long peer, MessageObject replyToMsg, MessageObject replyToTopMsg, TLRPC.ReplyMarkup replyMarkup, HashMap<String, String> params, boolean notify, int scheduleDate, int scheduleRepeatPeriod) {
+        public static SendMessageParams ofRichMessage(TL_iv.RichMessage richMessage, long peer, MessageObject replyToMsg, MessageObject replyToTopMsg, TLRPC.ReplyMarkup replyMarkup, HashMap<String, String> params, boolean notify, int scheduleDate, int scheduleRepeatPeriod) {
             SendMessageParams p = of(null, null, null, null, null, null, null, null, null, null, peer, null, replyToMsg, replyToTopMsg, null, true, null, null, replyMarkup, params, notify, scheduleDate, scheduleRepeatPeriod, 0, null, null, false);
-            p.inputRichMessage = inputRichMessage;
+            p.richMessage = richMessage;
             return p;
         }
 

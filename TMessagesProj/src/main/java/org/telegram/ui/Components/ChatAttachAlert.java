@@ -4365,7 +4365,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (baseFragment != null) {
-            AndroidUtilities.setLightStatusBar(getWindow(), baseFragment.isLightStatusBar());
+            AndroidUtilities.setLightStatusBar(this, baseFragment.isLightStatusBar());
         }
     }
 
@@ -5796,11 +5796,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                 buttonsRecyclerViewWrapper.setVisibility(View.VISIBLE);
             }
 
-            if (getWindow() != null && baseFragment != null) {
+            if (baseFragment != null) {
                 if (show) {
-                    AndroidUtilities.setLightStatusBar(getWindow(), isLightStatusBar());
+                    AndroidUtilities.setLightStatusBar(this, isLightStatusBar());
                 } else {
-                    AndroidUtilities.setLightStatusBar(getWindow(), baseFragment.isLightStatusBar());
+                    AndroidUtilities.setLightStatusBar(this, baseFragment.isLightStatusBar());
                 }
             }
             if (animated) {
@@ -6961,7 +6961,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             containerView.invalidate();
         });
         if (baseFragment != null) {
-            AndroidUtilities.setLightStatusBar(getWindow(), baseFragment.isLightStatusBar());
+            AndroidUtilities.setLightStatusBar(this, baseFragment.isLightStatusBar());
         }
         captionLimitBulletinShown = false;
         super.dismiss();

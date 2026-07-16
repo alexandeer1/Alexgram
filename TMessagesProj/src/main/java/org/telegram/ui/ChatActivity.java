@@ -4750,9 +4750,6 @@ public class ChatActivity extends BaseFragment implements
 					showAudioCallAsIcon = false;
 					audioCallIconItem.setVisibility(View.GONE);
 				}
-				if (avatarContainer != null) {
-					avatarContainer.setTitleExpand(showAudioCallAsIcon);
-				}
 			}
 		}
 
@@ -9541,11 +9538,11 @@ public class ChatActivity extends BaseFragment implements
 			contentView.addView(actionBarSearchTags, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 40, Gravity.FILL_HORIZONTAL | Gravity.TOP));
 		}
 
-		final BlurredBackgroundDrawable topPanelLayoutBackground = glassBackgroundDrawableFactory.create(topPanelLayout, BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate));
-		topPanelLayoutBackground.setRadius(dp(18));
-		topPanelLayoutBackground.setPadding(dp(7));
 		topPanelLayout.setPadding(dp(7) + getSideMenuWidth(), dp(7), dp(7), dp(7));
-		topPanelLayout.setBlurredBackground(topPanelLayoutBackground);
+		topPanelLayout.setBlurredBackground(glassBackgroundDrawableFactory.create(topPanelLayout)
+			.setColorProvider(BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate))
+			.setRadius(dp(18))
+			.setPadding(dp(7)));
 
 		if (chatMode == MODE_SEARCH) {
 			messagesSearchListContainer.setVisibility(View.VISIBLE);
@@ -18040,6 +18037,7 @@ public class ChatActivity extends BaseFragment implements
 		}
 	}
 
+	private boolean shouldHaveLightStatusBarIcons;
 	private boolean shouldHaveLightNavigationBarIcons;
 
 	public boolean isShouldHaveLightNavigationBarIcons() {
@@ -18259,10 +18257,13 @@ public class ChatActivity extends BaseFragment implements
 			}
 
 			final BlurredBackgroundSource source = wallpaperBitmapProvider.updateSourceFromBackgroundViewDrawable(drawable);
+			final int statusBarColor = wallpaperBitmapProvider.getStatusBarColor(source);
+			final float statusBarBrightness = AndroidUtilities.computePerceivedBrightness(statusBarColor);
 			final int navigationBarColor = wallpaperBitmapProvider.getNavigationBarColor(source);
-			final float brightness = AndroidUtilities.computePerceivedBrightness(navigationBarColor);
-			final boolean isDark = brightness <= 0.9f;
-			shouldHaveLightNavigationBarIcons = isDark;
+			final float navigationBarBrightness = AndroidUtilities.computePerceivedBrightness(navigationBarColor);
+
+			shouldHaveLightStatusBarIcons = statusBarBrightness <= 0.721f;
+			shouldHaveLightNavigationBarIcons = navigationBarBrightness <= 0.9f;
 
 			navbarContentSourceWallpaper.setSource(source);
 			if (chatInputViewsContainer != null) {
@@ -25187,9 +25188,6 @@ public class ChatActivity extends BaseFragment implements
 				if (headerItem != null) {
 					// showAudioCallAsIcon = userInfo.phone_calls_available && !inPreviewMode;
 					showAudioCallAsIcon = false;
-					if (avatarContainer != null) {
-						avatarContainer.setTitleExpand(showAudioCallAsIcon);
-					}
 					if (userInfo.phone_calls_available) {
 						if (showAudioCallAsIcon) {
 							if (audioCallIconItem != null) {
@@ -31032,7 +31030,6 @@ public class ChatActivity extends BaseFragment implements
 		}
 		if (avatarContainer != null) {
 			avatarContainer.setOccupyStatusBar(!value);
-			avatarContainer.setTitleExpand(showAudioCallAsIcon);
 			avatarContainer.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !value ? 56 : (chatMode == MODE_PINNED ? 10 : 0), 0, isTitleCentered() ? 0 : 40, 0));
 		}
 		if (chatActivityEnterView != null) {
@@ -45113,9 +45110,7 @@ public class ChatActivity extends BaseFragment implements
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, 0, new Class[]{ChatActivityEnterView.class}, new String[]{"lockShadowDrawable"}, null, null, null, Theme.key_chat_messagePanelVoiceLockShadow));
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, ThemeDescription.FLAG_USEBACKGROUNDDRAWABLE | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, new Class[]{ChatActivityEnterView.class}, new String[]{"recordDeleteImageView"}, null, null, null, Theme.key_listSelector));
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, ThemeDescription.FLAG_BACKGROUNDFILTER, new Class[]{ChatActivityEnterView.class}, new String[]{"recordedAudioBackground"}, null, null, null, Theme.key_chat_recordedVoiceBackground));
-		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, 0, null, null, null, null, Theme.key_chat_recordTime));
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, 0, null, null, null, null, Theme.key_chat_recordVoiceCancel));
-		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, ThemeDescription.FLAG_TEXTCOLOR, new Class[]{ChatActivityEnterView.class}, new String[]{"recordedAudioTimeTextView"}, null, null, null, Theme.key_chat_messagePanelVoiceDuration));
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, 0, null, null, null, null, Theme.key_chat_recordVoiceCancel));
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, ThemeDescription.FLAG_IMAGECOLOR, new Class[]{ChatActivityEnterView.class}, new String[]{"cancelBotButton"}, null, null, null, Theme.key_chat_messagePanelCancelInlineBot));
 		themeDescriptions.add(new ThemeDescription(chatActivityEnterView, ThemeDescription.FLAG_USEBACKGROUNDDRAWABLE | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, new Class[]{ChatActivityEnterView.class}, new String[]{"cancelBotButton"}, null, null, null, Theme.key_listSelector));
@@ -46645,7 +46640,7 @@ public class ChatActivity extends BaseFragment implements
 		if (actionBar == null) {
 			return !Theme.isCurrentThemeDark();
 		}
-		return AndroidUtilities.computePerceivedBrightness(actionBar.getBackgroundColor()) > 0.721f;
+		return !shouldHaveLightStatusBarIcons;
 	}
 
 	public MessageObject.GroupedMessages getGroup(long id) {

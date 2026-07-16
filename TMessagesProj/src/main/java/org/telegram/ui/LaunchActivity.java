@@ -154,6 +154,7 @@ import org.telegram.messenger.pip.activity.IPipActivityListener;
 import org.telegram.messenger.utils.FrameMetricsOverlayView;
 import org.telegram.messenger.utils.LeakDetector;
 import org.telegram.messenger.utils.WindowVisibilityManager;
+import org.telegram.messenger.video.VideoAds;
 import org.telegram.messenger.voip.VideoCapturerDevice;
 import org.telegram.messenger.voip.VoIPGroupNotification;
 import org.telegram.messenger.voip.VoIPPendingCall;
@@ -658,25 +659,29 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.closeOtherAppActivities, this);
 
         currentConnectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.needShowAlert);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.reloadInterface);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.suggestedLangpack);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.themeAccentListUpdated);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.needSetDayNightTheme);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.needCheckSystemBarColors);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.closeOtherAppActivities);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetPasscode);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewWallpapper);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.notificationsCountUpdated);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.screenStateChanged);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.showBulletin);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.requestPermissions);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.billingConfirmPurchaseError);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.tlSchemeParseException);
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.memoryLeakFoundException);
-        NotificationCenter.getInstance(currentAccount).addObserver(this,
-                NotificationCenter.currentUserPremiumStatusChanged);
+        if (globalObserversGroup != null) {
+            globalObserversGroup.removeAllObservers();
+            globalObserversGroup = null;
+        }
+        globalObserversGroup = NotificationCenter.getGlobalInstance()
+                .createObserversGroup(this)
+                .add(NotificationCenter.needShowAlert)
+                .add(NotificationCenter.reloadInterface)
+                .add(NotificationCenter.suggestedLangpack)
+                .add(NotificationCenter.didSetNewTheme)
+                .add(NotificationCenter.themeAccentListUpdated)
+                .add(NotificationCenter.needSetDayNightTheme)
+                .add(NotificationCenter.needCheckSystemBarColors)
+                .add(NotificationCenter.closeOtherAppActivities)
+                .add(NotificationCenter.didSetPasscode)
+                .add(NotificationCenter.didSetNewWallpapper)
+                .add(NotificationCenter.notificationsCountUpdated)
+                .add(NotificationCenter.screenStateChanged)
+                .add(NotificationCenter.showBulletin)
+                .add(NotificationCenter.requestPermissions)
+                .add(NotificationCenter.billingConfirmPurchaseError)
+                .add(NotificationCenter.tlSchemeParseException)
+                .add(NotificationCenter.memoryLeakFoundException);
         NotificationCenter.getGlobalInstance().addObserver(drawerLayoutAdapter,
                 NotificationCenter.proxySettingsChanged);
         LiteMode.addOnPowerSaverAppliedListener(onPowerSaverCallback = this::onPowerSaver);
@@ -840,7 +845,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             EmojiHelper.getInstance().checkEmojiPacks();
             PagePreviewRulesHelper.getInstance().checkPagePreviewRules();
         });
-        BackupAgent.requestBackup(this);
+        BackupAgent.requestBackup();
 
         RestrictedLanguagesSelectActivity.checkRestrictedLanguages(false);
         int animationStyle = NaConfig.INSTANCE.getBackAnimationStyle().Int();
@@ -1332,7 +1337,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     int color = Theme.getColor(Theme.key_actionBarDefault, null, true);
                     enable = ColorUtils.calculateLuminance(color) > 0.7f;
                 }
-                AndroidUtilities.setLightStatusBar(getWindow(), enable, forceLightStatusBar);
+                AndroidUtilities.setLightStatusBar(this, enable);
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && checkNavigationBar
                     && (!useCurrentFragment || currentFragment == null || !currentFragment.isInPreviewMode())) {
@@ -1370,7 +1375,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         mode == 0 && AndroidUtilities.computePerceivedBrightness(color) >= .721f || mode == 1);
             }
         }
-        if ((SharedConfig.noStatusBar || forceLightStatusBar) && checkStatusBar) {
+        if (checkStatusBar) {
             getWindow().setStatusBarColor(0);
         }
     }
@@ -2184,60 +2189,41 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         return mainFragmentsStack.size();
     }
 
+    private NotificationCenter.ObserversGroup observersGroup;
+    private NotificationCenter.ObserversGroup globalObserversGroup;
+
     private void checkCurrentAccount() {
-        if (currentAccount != UserConfig.selectedAccount) {
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.openBoostForUsersDialog);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.appDidLogout);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.mainUserInfoChanged);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.attachMenuBotsDidLoad);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.didUpdateConnectionState);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.needShowAlert);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.wasUnableToFindCurrentLocation);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.openArticle);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.hasNewContactsToImport);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.needShowPlayServicesAlert);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.fileLoaded);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.fileLoadFailed);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.historyImportProgressChanged);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.groupCallUpdated);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.stickersImportComplete);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.currentUserPremiumStatusChanged);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.chatSwitchedForum);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.guardBotDecisionResult);
+        if (currentAccount == UserConfig.selectedAccount && observersGroup != null) {
+            return;
         }
+
+        if (observersGroup != null) {
+            observersGroup.removeAllObservers();
+            observersGroup = null;
+        }
+
         currentAccount = UserConfig.selectedAccount;
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.openBoostForUsersDialog);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.appDidLogout);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.mainUserInfoChanged);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.attachMenuBotsDidLoad);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.didUpdateConnectionState);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.needShowAlert);
-        NotificationCenter.getInstance(currentAccount).addObserver(this,
-                NotificationCenter.wasUnableToFindCurrentLocation);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.openArticle);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.hasNewContactsToImport);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.needShowPlayServicesAlert);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.fileLoaded);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.fileLoadFailed);
-        NotificationCenter.getInstance(currentAccount).addObserver(this,
-                NotificationCenter.historyImportProgressChanged);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.groupCallUpdated);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.stickersImportComplete);
-        NotificationCenter.getInstance(currentAccount).addObserver(this,
-                NotificationCenter.currentUserShowLimitReachedDialog);
-        NotificationCenter.getInstance(currentAccount).addObserver(this,
-                NotificationCenter.currentUserPremiumStatusChanged);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.chatSwitchedForum);
-        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.guardBotDecisionResult);
+        observersGroup = NotificationCenter.getInstance(currentAccount)
+                .createObserversGroup(this)
+                .add(NotificationCenter.openBoostForUsersDialog)
+                .add(NotificationCenter.appDidLogout)
+                .add(NotificationCenter.mainUserInfoChanged)
+                .add(NotificationCenter.attachMenuBotsDidLoad)
+                .add(NotificationCenter.didUpdateConnectionState)
+                .add(NotificationCenter.needShowAlert)
+                .add(NotificationCenter.wasUnableToFindCurrentLocation)
+                .add(NotificationCenter.openArticle)
+                .add(NotificationCenter.hasNewContactsToImport)
+                .add(NotificationCenter.needShowPlayServicesAlert)
+                .add(NotificationCenter.fileLoaded)
+                .add(NotificationCenter.fileLoadFailed)
+                .add(NotificationCenter.historyImportProgressChanged)
+                .add(NotificationCenter.groupCallUpdated)
+                .add(NotificationCenter.stickersImportComplete)
+                .add(NotificationCenter.currentUserShowLimitReachedDialog)
+                .add(NotificationCenter.currentUserPremiumStatusChanged)
+                .add(NotificationCenter.chatSwitchedForum)
+                .add(NotificationCenter.guardBotDecisionResult);
     }
 
     private void checkLayout() {
@@ -8416,57 +8402,18 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             return;
         }
         finished = true;
-        if (currentAccount != -1) {
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.appDidLogout);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.openBoostForUsersDialog);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.mainUserInfoChanged);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.attachMenuBotsDidLoad);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.didUpdateConnectionState);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.needShowAlert);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.wasUnableToFindCurrentLocation);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.openArticle);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.hasNewContactsToImport);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.needShowPlayServicesAlert);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.fileLoaded);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.fileLoadFailed);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.historyImportProgressChanged);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.groupCallUpdated);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.stickersImportComplete);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.currentUserShowLimitReachedDialog);
-            NotificationCenter.getInstance(currentAccount).removeObserver(this,
-                    NotificationCenter.currentUserPremiumStatusChanged);
+        if (observersGroup != null) {
+            observersGroup.removeAllObservers();
+            observersGroup = null;
         }
-
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.needShowAlert);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewWallpapper);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.notificationsCountUpdated);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.suggestedLangpack);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.reloadInterface);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.themeAccentListUpdated);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.needSetDayNightTheme);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.needCheckSystemBarColors);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.closeOtherAppActivities);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetPasscode);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.screenStateChanged);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.showBulletin);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.requestPermissions);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.billingConfirmPurchaseError);
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.tlSchemeParseException);
+        if (globalObserversGroup != null) {
+            globalObserversGroup.removeAllObservers();
+            globalObserversGroup = null;
+        }
         if (drawerLayoutAdapter != null) {
             NotificationCenter.getGlobalInstance().removeObserver(drawerLayoutAdapter,
                     NotificationCenter.proxySettingsChanged);
         }
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.memoryLeakFoundException);
 
         if (onPowerSaverCallback != null) {
             LiteMode.removeOnPowerSaverAppliedListener(onPowerSaverCallback);
@@ -8824,10 +8771,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         .unregisterOnBackInvokedCallback((OnBackInvokedCallback) onBackInvokedCallback);
             }
         }
-        if (instance == this) {
-            clearFragments();
-            instance = null;
-        }
+        Bulletin.removeDelegate(frameLayout);
+        VideoAds.dropCache();
+
+        clearFragments();
+        instance = null;
         super.onDestroy();
         onFinish();
         if (flagSecureReason != null) {
