@@ -503,7 +503,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
         }
         if (savedInstanceState == null) {
-            getWindow().setBackgroundDrawableResource(R.drawable.splash_background);
+            int style = xyz.nextalone.nagram.NaConfig.INSTANCE.getLaunchAnimationStyle().Int();
+            if (style == 1 || style == 2) {
+                boolean isDark = Theme.isCurrentThemeDark();
+                getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(isDark ? 0xFF1F2732 : 0xFFFFFFFF));
+            } else {
+                getWindow().setBackgroundDrawableResource(R.drawable.splash_background);
+            }
         } else {
             getWindow().setBackgroundDrawableResource(R.drawable.transparent);
         }
@@ -1010,6 +1016,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     if (splashView.getParent() != null) {
                         frameLayout.removeView(splashView);
                         getWindow().setBackgroundDrawableResource(R.drawable.transparent);
+                        checkSystemBarColors();
                     }
                 })
                 .start();

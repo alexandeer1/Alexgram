@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.AnimatedVectorDrawable;
@@ -11,16 +12,26 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.Theme;
 
 public class TelegramSplashView extends FrameLayout {
 
     private final ImageView imageView;
     private Runnable onFinished;
     private boolean isFinished = false;
+    private final Runnable fallbackRunnable = this::finish;
 
     public TelegramSplashView(Context context) {
         super(context);
-        setBackgroundColor(0xFF061B3D); // Deep blue background matching Theme.TMessages.Start
+        
+        boolean isDark = Theme.isCurrentThemeDark();
+        setBackgroundColor(isDark ? 0xFF1F2732 : 0xFFFFFFFF);
+
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            AndroidUtilities.setLightStatusBar(activity, !isDark);
+            AndroidUtilities.setLightNavigationBar(activity, !isDark);
+        }
 
         imageView = new ImageView(context);
         Drawable drawable = context.getDrawable(R.drawable.tg_splash_320);
@@ -43,11 +54,24 @@ public class TelegramSplashView extends FrameLayout {
                     }
                 });
             }
-            avd.start();
         }
+    }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Drawable drawable = imageView.getDrawable();
+        if (drawable instanceof AnimatedVectorDrawable) {
+            ((AnimatedVectorDrawable) drawable).start();
+        }
         // Timer fallback to ensure the splash screen doesn't get stuck (e.g. 1000ms)
-        postDelayed(() -> finish(), 1000);
+        postDelayed(fallbackRunnable, 1000);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        removeCallbacks(fallbackRunnable);
     }
 
     public void setOnFinishedCallback(Runnable callback) {
@@ -62,3 +86,4 @@ public class TelegramSplashView extends FrameLayout {
         }
     }
 }
+
