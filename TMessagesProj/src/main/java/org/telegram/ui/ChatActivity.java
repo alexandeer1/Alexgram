@@ -4652,6 +4652,7 @@ public class ChatActivity extends BaseFragment implements
 				return isInPreviewMode();
 			}
 		};
+		avatarContainer.setGlassMode();
 		avatarContainer.allowShorterStatus = true;
 		avatarContainer.premiumIconHiddable = true;
 		avatarContainer.allowDrawStories = dialog_id < 0 && !isTopic;
@@ -5142,12 +5143,18 @@ public class ChatActivity extends BaseFragment implements
 
 		final ViewPositionWatcher viewPositionWatcher = new ViewPositionWatcher(contentView);
 
-		glassBackgroundDrawableFactory.setSourceRootView(viewPositionWatcher, contentView);
-		glassBackgroundDrawableFactoryFrosted.setSourceRootView(viewPositionWatcher, contentView);
-		navbarContentDrawableFactory.setSourceRootView(viewPositionWatcher, contentView);
-		scrimBlur3Factory.setSourceRootView(viewPositionWatcher, contentView);
+		final ViewGroup parentView = parentChatActivity != null ? parentChatActivity.contentView : contentView;
+		glassBackgroundDrawableFactory.setSourceRootView(viewPositionWatcher, parentView);
+		glassBackgroundDrawableFactoryFrosted.setSourceRootView(viewPositionWatcher, parentView);
+		navbarContentDrawableFactory.setSourceRootView(viewPositionWatcher, parentView);
+		scrimBlur3Factory.setSourceRootView(viewPositionWatcher, parentView);
 
 		contentView.setOccupyStatusBar(!inBubbleMode && !isInsideContainer && !inPreviewMode);
+
+		actionBar.setupGlass(
+			glassBackgroundDrawableFactory,
+			BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate),
+			ChatObject.isForum(currentChat));
 		// [Alexgram: Star Fall Decoration] - Start
 		if (NaConfig.INSTANCE.getStarFallInChat().Bool()) {
 			StarFallView starFallView = new StarFallView(context);
