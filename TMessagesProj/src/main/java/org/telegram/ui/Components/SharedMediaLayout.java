@@ -202,6 +202,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     public static final int TAB_BOT_PREVIEWS = 13;
     public static final int TAB_GIFTS = 14;
     public static final int TAB_POLL = 15;
+    // [Alexgram: Friends Activities] - Start
+    public static final int TAB_FRIENDS_ACTIVITIES = 100; // High number to avoid upstream conflicts
+    // [Alexgram: Friends Activities] - End
     private static final int TAB_STORIES_ALBUM_PREFIX = 0x00010000;
     private static final int TAB_STORIES_ALBUM_MASK = 0x0000FFFF;
 
@@ -671,6 +674,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     private PollAdapter pollAdapter;
     private GifAdapter gifAdapter;
     private CommonGroupsAdapter commonGroupsAdapter;
+    // [Alexgram: Friends Activities] - Start
+    private FriendsActivitiesAdapter friendsActivitiesAdapter;
+    // [Alexgram: Friends Activities] - End
     private ChannelRecommendationsAdapter channelRecommendationsAdapter;
     private SavedDialogsAdapter savedDialogsAdapter;
     private SavedMessagesSearchAdapter savedMessagesSearchAdapter;
@@ -2322,6 +2328,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         linksSearchAdapter = new MediaSearchAdapter(context, 3);
         groupUsersSearchAdapter = new GroupUsersSearchAdapter(context);
         commonGroupsAdapter = new CommonGroupsAdapter(context);
+        // [Alexgram: Friends Activities] - Start
+        friendsActivitiesAdapter = new FriendsActivitiesAdapter(context);
+        // [Alexgram: Friends Activities] - End
         channelRecommendationsAdapter = new ChannelRecommendationsAdapter(context);
         savedDialogsAdapter = new SavedDialogsAdapter(context);
         savedMessagesSearchAdapter = new SavedMessagesSearchAdapter(context);
@@ -7222,6 +7231,14 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 if (hasMedia[6] > 0) {
                     tabs.add(new Pair(TAB_COMMON_GROUPS, getString(R.string.SharedGroupsTab2)));
                 }
+                // [Alexgram: Friends Activities] - Start
+                if (xyz.nextalone.nagram.NaConfig.INSTANCE.getFriendsActivities().Bool()
+                        && dialog_id > 0
+                        && profileActivity != null
+                        && profileActivity.getUserConfig().getClientUserId() != dialog_id) {
+                    tabs.add(new Pair(TAB_FRIENDS_ACTIVITIES, getString(R.string.FriendsActivitiesTab)));
+                }
+                // [Alexgram: Friends Activities] - End
                 if (hasRecommendations) {
                     tabs.add(new Pair(TAB_RECOMMENDED_CHANNELS, getString(dialog_id > 0 ? R.string.SimilarBotsTab : R.string.SimilarChannelsTab)));
                 }
@@ -7509,6 +7526,14 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                     recycleAdapter(currentAdapter);
                     mediaPages[a].listView.setAdapter(commonGroupsAdapter);
                 }
+            // [Alexgram: Friends Activities] - Start
+            } else if (mediaPages[a].selectedType == TAB_FRIENDS_ACTIVITIES) {
+                sections = true;
+                if (currentAdapter != friendsActivitiesAdapter) {
+                    recycleAdapter(currentAdapter);
+                    mediaPages[a].listView.setAdapter(friendsActivitiesAdapter);
+                }
+            // [Alexgram: Friends Activities] - End
             } else if (mediaPages[a].selectedType == TAB_GROUPUSERS) {
                 sections = true;
                 if (currentAdapter != chatUsersAdapter) {
@@ -7614,7 +7639,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             if (giftsContainer != null && mediaPages[a].selectedType != TAB_GIFTS && giftsContainer.getParent() == mediaPages[a]) {
                 mediaPages[a].removeView(giftsContainer);
             }
-            if (mediaPages[a].selectedType == TAB_PHOTOVIDEO || mediaPages[a].selectedType == TAB_SAVED_DIALOGS || isAnyStoryPageType(mediaPages[a].selectedType)|| mediaPages[a].selectedType == TAB_VOICE || mediaPages[a].selectedType == TAB_GIF || mediaPages[a].selectedType == TAB_COMMON_GROUPS || mediaPages[a].selectedType == TAB_GROUPUSERS && !delegate.canSearchMembers() || mediaPages[a].selectedType == TAB_RECOMMENDED_CHANNELS || mediaPages[a].selectedType == TAB_BOT_PREVIEWS || mediaPages[a].selectedType == TAB_GIFTS) {
+            if (mediaPages[a].selectedType == TAB_PHOTOVIDEO || mediaPages[a].selectedType == TAB_SAVED_DIALOGS || isAnyStoryPageType(mediaPages[a].selectedType)|| mediaPages[a].selectedType == TAB_VOICE || mediaPages[a].selectedType == TAB_GIF || mediaPages[a].selectedType == TAB_COMMON_GROUPS || mediaPages[a].selectedType == TAB_FRIENDS_ACTIVITIES /* [Alexgram: Friends Activities] */ || mediaPages[a].selectedType == TAB_GROUPUSERS && !delegate.canSearchMembers() || mediaPages[a].selectedType == TAB_RECOMMENDED_CHANNELS || mediaPages[a].selectedType == TAB_BOT_PREVIEWS || mediaPages[a].selectedType == TAB_GIFTS) {
                 if (animated) {
                     searchItemState = 2;
                 } else {
@@ -7654,6 +7679,12 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 if (!commonGroupsAdapter.loading && !commonGroupsAdapter.endReached && commonGroupsAdapter.chats.isEmpty()) {
                     commonGroupsAdapter.getChats(0, 100);
                 }
+            // [Alexgram: Friends Activities] - Start
+            } else if (mediaPages[a].selectedType == TAB_FRIENDS_ACTIVITIES) {
+                if (!friendsActivitiesAdapter.loading && !friendsActivitiesAdapter.endReached && friendsActivitiesAdapter.messages.isEmpty()) {
+                    friendsActivitiesAdapter.loadMessages(0);
+                }
+            // [Alexgram: Friends Activities] - End
             } else if (mediaPages[a].selectedType == TAB_GROUPUSERS) {
 
             } else if (isAnyStoryPageType(mediaPages[a].selectedType)) {
@@ -10349,6 +10380,226 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         }
     }
 
+    // [Alexgram: Friends Activities] - Start
+    /**
+     * FriendsActivitiesAdapter — shows recent messages of a contact in shared groups/channels.
+     * Implements the "Spy on Friends" feature: go to a contact's profile → Activities tab.
+     */
+    private class FriendsActivitiesAdapter extends RecyclerListView.SelectionAdapter {
+
+        private static final int VIEW_TYPE_ACTIVITY   = 0;
+        private static final int VIEW_TYPE_EMPTY      = 1;
+        private static final int VIEW_TYPE_LOADING    = 2;
+
+        private final Context mContext;
+        final java.util.ArrayList<org.telegram.tgnet.TLRPC.Message> messages = new java.util.ArrayList<>();
+        final java.util.ArrayList<Long> chatIds = new java.util.ArrayList<>();
+        boolean loading;
+        boolean firstLoaded;
+        boolean endReached;
+        private int offsetId = 0;
+
+        FriendsActivitiesAdapter(Context context) {
+            mContext = context;
+        }
+
+        void loadMessages(int fromOffset) {
+            if (loading) return;
+            if (dialog_id <= 0) return;
+            // First get common groups, then search in each
+            if (fromOffset == 0) {
+                messages.clear();
+                chatIds.clear();
+                endReached = false;
+                firstLoaded = false;
+                offsetId = 0;
+                notifyDataSetChanged();
+            }
+            loading = true;
+            notifyDataSetChanged();
+
+            final org.telegram.tgnet.TLRPC.TL_messages_getCommonChats req = new org.telegram.tgnet.TLRPC.TL_messages_getCommonChats();
+            req.user_id = profileActivity.getMessagesController().getInputUser(dialog_id);
+            if (req.user_id == null || req.user_id instanceof org.telegram.tgnet.TLRPC.TL_inputUserEmpty) {
+                loading = false;
+                endReached = true;
+                notifyDataSetChanged();
+                return;
+            }
+            req.limit = 100;
+            req.max_id = 0;
+
+            final int reqId = profileActivity.getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                if (error == null && response instanceof org.telegram.tgnet.TLRPC.messages_Chats) {
+                    org.telegram.tgnet.TLRPC.messages_Chats res = (org.telegram.tgnet.TLRPC.messages_Chats) response;
+                    if (res.chats.isEmpty()) {
+                        loading = false;
+                        firstLoaded = true;
+                        endReached = true;
+                        notifyDataSetChanged();
+                        return;
+                    }
+                    
+                    profileActivity.getMessagesController().putChats(res.chats, false);
+                    final int[] completedSearches = {0};
+                    final int totalChats = res.chats.size();
+                    
+                    for (org.telegram.tgnet.TLRPC.Chat chat : res.chats) {
+                        org.telegram.tgnet.TLRPC.TL_messages_search searchReq = new org.telegram.tgnet.TLRPC.TL_messages_search();
+                        searchReq.limit = 50;
+                        searchReq.from_id = profileActivity.getMessagesController().getInputPeer(dialog_id);
+                        if (searchReq.from_id == null) {
+                            completedSearches[0]++;
+                            if (completedSearches[0] == totalChats) {
+                                java.util.Collections.sort(messages, (m1, m2) -> Integer.compare(m2.date, m1.date));
+                                loading = false;
+                                firstLoaded = true;
+                                endReached = true;
+                                notifyDataSetChanged();
+                            }
+                            continue;
+                        }
+                        searchReq.peer = org.telegram.messenger.MessagesController.getInputPeer(chat);
+                        searchReq.filter = new org.telegram.tgnet.TLRPC.TL_inputMessagesFilterEmpty();
+                        searchReq.q = "";
+                        
+                        final int searchReqId = profileActivity.getConnectionsManager().sendRequest(searchReq, (searchResponse, searchError) -> AndroidUtilities.runOnUIThread(() -> {
+                            completedSearches[0]++;
+                            if (searchError == null && searchResponse instanceof org.telegram.tgnet.TLRPC.messages_Messages) {
+                                org.telegram.tgnet.TLRPC.messages_Messages searchRes = (org.telegram.tgnet.TLRPC.messages_Messages) searchResponse;
+                                profileActivity.getMessagesController().putUsers(searchRes.users, false);
+                                profileActivity.getMessagesController().putChats(searchRes.chats, false);
+                                for (org.telegram.tgnet.TLRPC.Message msg : searchRes.messages) {
+                                    if (msg instanceof org.telegram.tgnet.TLRPC.TL_message || msg instanceof org.telegram.tgnet.TLRPC.TL_messageService) {
+                                        messages.add(msg);
+                                        long peerId = org.telegram.messenger.MessageObject.getPeerId(msg.peer_id);
+                                        if (!chatIds.contains(peerId)) chatIds.add(peerId);
+                                    }
+                                }
+                            }
+                            if (completedSearches[0] == totalChats) {
+                                // Sort by date descending
+                                java.util.Collections.sort(messages, (m1, m2) -> Integer.compare(m2.date, m1.date));
+                                loading = false;
+                                firstLoaded = true;
+                                endReached = true;
+                                notifyDataSetChanged();
+                            }
+                        }));
+                        profileActivity.getConnectionsManager().bindRequestToGuid(searchReqId, profileActivity.getClassGuid());
+                    }
+                } else {
+                    loading = false;
+                    firstLoaded = true;
+                    endReached = true;
+                    notifyDataSetChanged();
+                }
+            }));
+            profileActivity.getConnectionsManager().bindRequestToGuid(reqId, profileActivity.getClassGuid());
+        }
+
+        @Override
+        public boolean isEnabled(RecyclerView.ViewHolder holder) {
+            return holder.getItemViewType() == VIEW_TYPE_ACTIVITY;
+        }
+
+        @Override
+        public int getItemCount() {
+            if (messages.isEmpty() && !loading) return 1; // empty or loading row
+            if (loading && messages.isEmpty()) return 1;
+            return messages.size() + (endReached ? 0 : 1);
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (messages.isEmpty()) {
+                return loading ? VIEW_TYPE_LOADING : VIEW_TYPE_EMPTY;
+            }
+            if (position < messages.size()) return VIEW_TYPE_ACTIVITY;
+            return VIEW_TYPE_LOADING;
+        }
+
+        @NonNull
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view;
+            switch (viewType) {
+                case VIEW_TYPE_ACTIVITY:
+                    view = new org.telegram.ui.Cells.ProfileSearchCell(mContext, resourcesProvider);
+                    break;
+                case VIEW_TYPE_EMPTY: {
+                    View emptyView = createEmptyStubView(mContext, 6, dialog_id, resourcesProvider);
+                    // Override text for friendsActivities
+                    if (emptyView instanceof android.widget.LinearLayout) {
+                        for (int i = 0; i < ((android.widget.LinearLayout) emptyView).getChildCount(); i++) {
+                            android.view.View child = ((android.widget.LinearLayout) emptyView).getChildAt(i);
+                            if (child instanceof android.widget.TextView) {
+                                ((android.widget.TextView) child).setText(getString(R.string.FriendsActivitiesEmpty));
+                            }
+                        }
+                    }
+                    emptyView.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.MATCH_PARENT));
+                    return new RecyclerListView.Holder(emptyView);
+                }
+                case VIEW_TYPE_LOADING:
+                default: {
+                    FlickerLoadingView flickerLoadingView = new FlickerLoadingView(mContext, resourcesProvider);
+                    flickerLoadingView.setIsSingleCell(true);
+                    flickerLoadingView.showDate(false);
+                    flickerLoadingView.setViewType(FlickerLoadingView.DIALOG_TYPE);
+                    view = flickerLoadingView;
+                    break;
+                }
+            }
+            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            return new RecyclerListView.Holder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            if (holder.getItemViewType() == VIEW_TYPE_ACTIVITY && position < messages.size()) {
+                org.telegram.tgnet.TLRPC.Message msg = messages.get(position);
+                long peerId = org.telegram.messenger.MessageObject.getPeerId(msg.peer_id);
+                org.telegram.tgnet.TLRPC.Chat chat = peerId < 0 ? profileActivity.getMessagesController().getChat(-peerId) : null;
+                org.telegram.tgnet.TLRPC.User peer = peerId > 0 ? profileActivity.getMessagesController().getUser(peerId) : null;
+
+                if (!(holder.itemView instanceof org.telegram.ui.Cells.ProfileSearchCell)) return;
+                org.telegram.ui.Cells.ProfileSearchCell cell = (org.telegram.ui.Cells.ProfileSearchCell) holder.itemView;
+
+                // Show chat name as title, message preview as subtitle
+                String chatName = chat != null ? chat.title : (peer != null ? org.telegram.messenger.UserObject.getUserName(peer) : "Chat");
+                String msgText = msg.message != null && !msg.message.isEmpty() ? msg.message : "[Media]";
+
+                if (chat != null) {
+                    cell.setData(chat, null, chatName, msgText, false, false);
+                } else if (peer != null) {
+                    cell.setData(peer, null, chatName, msgText, false, false);
+                } else {
+                    cell.setData(null, null, chatName, msgText, false, false);
+                }
+
+                // Trigger load more
+                if (!endReached && !loading && position >= messages.size() - 5) {
+                    loadMessages(offsetId);
+                }
+
+                cell.setOnClickListener(v -> {
+                    android.os.Bundle args = new android.os.Bundle();
+                    if (peerId < 0) {
+                        args.putLong("chat_id", -peerId);
+                    } else {
+                        args.putLong("user_id", peerId);
+                    }
+                    args.putInt("message_id", msg.id);
+                    profileActivity.presentFragment(new org.telegram.ui.ChatActivity(args));
+                });
+            } else if (holder.getItemViewType() == VIEW_TYPE_LOADING && !loading) {
+                loadMessages(offsetId);
+            }
+        }
+    }
+    // [Alexgram: Friends Activities] - End
+
     private class ChannelRecommendationsAdapter extends RecyclerListView.SelectionAdapter {
 
         private final Context mContext;
@@ -12785,6 +13036,9 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             case TAB_LINKS:      return getString(R.string.SharedLinksTab2);
             case TAB_FILES:      return getString(R.string.SharedFilesTab2);
             case TAB_GIF:        return getString(R.string.SharedGIFsTab2);
+            // [Alexgram: Friends Activities] - Start
+            case TAB_FRIENDS_ACTIVITIES: return getString(R.string.FriendsActivitiesTab);
+            // [Alexgram: Friends Activities] - End
         }
         return null;
     }

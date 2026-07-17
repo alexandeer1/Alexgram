@@ -548,6 +548,13 @@
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <!-- [Alexgram: Plugins] - End -->
+    <!-- [Alexgram: Friends Activities] - Start -->
+    <string name="FriendsActivities">Friends Activities</string>
+    <string name="FriendsActivitiesDesc">Spy on Friends — see your contacts\' recent messages in shared groups and channels via the Activities tab on their profile.</string>
+    <string name="FriendsActivitiesTab">Activities</string>
+    <string name="FriendsActivitiesEmpty">No recent activities in shared chats.</string>
+    <string name="FriendsActivitiesHowItWorks">Go to a contact\'s profile → tap the Activities tab to see their latest messages in groups and channels you both share.</string>
+    <!-- [Alexgram: Friends Activities] - End -->
 </resources>
 
 

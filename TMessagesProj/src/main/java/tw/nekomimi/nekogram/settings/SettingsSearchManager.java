@@ -82,6 +82,9 @@ public class SettingsSearchManager {
         add(target, "Assistant Persona", "Choose between different AI personalities", "persona_preset", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_contacts);
         add(target, "AI Background Animation", "Toggle the animated background in AI settings", "background_animation", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_sticker);
         add(target, "Particle Effects", "Show dynamic particles on AI interaction", "particle_effects", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_info);
+        // [Alexgram: Friends Activities] - Start
+        add(target, "Friends Activities", "Spy on Friends — see contacts' recent messages in shared groups and channels", "FriendsActivities", NekoCustomizationSettingsActivity.class, "Customization", R.drawable.msg_groups);
+        // [Alexgram: Friends Activities] - End
     }
 
     private void loadIndex() {

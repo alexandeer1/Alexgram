@@ -1600,6 +1600,14 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    // [Alexgram: Friends Activities] - Start
+    val friendsActivities =
+        addConfig(
+            "FriendsActivities",
+            ConfigItem.configTypeBool,
+            false
+        )
+    // [Alexgram: Friends Activities] - End
     val showNotificationPreviewWhenLocked =
         addConfig(
             "ShowNotificationPreviewWhenLocked",

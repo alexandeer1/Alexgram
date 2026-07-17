@@ -142,6 +142,14 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             )
     );
 
+    // [Alexgram: Friends Activities] - Start
+    private final AbstractConfigCell friendsActivitiesRow = cellGroup.appendCell(new ConfigCellTextCheck(
+            NaConfig.INSTANCE.getFriendsActivities(),
+            LocaleController.getString("FriendsActivitiesDesc", R.string.FriendsActivitiesDesc),
+            LocaleController.getString("FriendsActivities", R.string.FriendsActivities)
+    ));
+    // [Alexgram: Friends Activities] - End
+
     public NekoCustomizationSettingsActivity() {
         if (!NekoConfig.showQuickEditIconInChatList.Bool()) {
             cellGroup.rows.remove(quickEditIconOnlyOwnRow);
