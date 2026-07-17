@@ -3677,6 +3677,9 @@ public class ChatActivity extends BaseFragment implements
 		if (avatarContainer != null) {
 			avatarContainer.onDestroy();
 		}
+		if (actionBar != null) {
+			actionBar.setChatAvatarContainer(null);
+		}
 		if (mentionContainer != null && mentionContainer.getAdapter() != null) {
 			mentionContainer.getAdapter().onDestroy();
 		}
@@ -4657,6 +4660,7 @@ public class ChatActivity extends BaseFragment implements
 		avatarContainer.premiumIconHiddable = true;
 		avatarContainer.allowDrawStories = dialog_id < 0 && !isTopic;
 		avatarContainer.setClipChildren(false);
+		actionBar.setChatAvatarContainer(avatarContainer);
 		AndroidUtilities.updateViewVisibilityAnimated(avatarContainer, true, 1f, false);
 		updateTopicTitleIcon();
 		if (inPreviewMode || inBubbleMode || isInsideContainer) {

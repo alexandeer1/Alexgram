@@ -895,6 +895,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     if (subtitleTextView != null && !TextUtils.isEmpty(subtitle)) {
                         animators.add(ObjectAnimator.ofFloat(subtitleTextView, View.ALPHA, 0));
                     }
+                    if (chatAvatarContainer != null) {
+                        animators.add(ObjectAnimator.ofFloat(chatAvatarContainer, View.ALPHA, 0.0f));
+                    }
                 }
                 if (menu != null) {
                     animators.add(ObjectAnimator.ofFloat(menu, View.ALPHA, 0));
@@ -938,6 +941,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                         }
                         if (subtitleTextView != null && !TextUtils.isEmpty(subtitle)) {
                             subtitleTextView.setVisibility(INVISIBLE);
+                        }
+                        if (chatAvatarContainer != null) {
+                            chatAvatarContainer.setVisibility(INVISIBLE);
                         }
                         if (menu != null) {
                             menu.setVisibility(INVISIBLE);
@@ -1006,6 +1012,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (subtitleTextView != null && !TextUtils.isEmpty(subtitle)) {
                 subtitleTextView.setVisibility(INVISIBLE);
             }
+            if (chatAvatarContainer != null) {
+                chatAvatarContainer.setVisibility(INVISIBLE);
+                chatAvatarContainer.setAlpha(0.0f);
+            }
             if (menu != null) {
                 menu.setVisibility(INVISIBLE);
             }
@@ -1062,6 +1072,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (subtitleTextView != null && !TextUtils.isEmpty(subtitle)) {
                 animators.add(ObjectAnimator.ofFloat(subtitleTextView, View.ALPHA, 1));
             }
+            if (chatAvatarContainer != null) {
+                animators.add(ObjectAnimator.ofFloat(chatAvatarContainer, View.ALPHA, 1.0f));
+            }
         }
         if (menu != null) {
             animators.add(ObjectAnimator.ofFloat(menu, View.ALPHA, 1));
@@ -1115,6 +1128,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             if (subtitleTextView != null && !TextUtils.isEmpty(subtitle)) {
                 subtitleTextView.setVisibility(VISIBLE);
+            }
+            if (chatAvatarContainer != null) {
+                chatAvatarContainer.setVisibility(VISIBLE);
             }
         }
         if (menu != null) {
