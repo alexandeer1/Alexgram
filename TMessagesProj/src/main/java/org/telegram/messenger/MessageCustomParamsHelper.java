@@ -114,9 +114,9 @@ public class MessageCustomParamsHelper {
             flags |= message.translatedVoiceTranscription != null ? 256 : 0;
 
             flags = setFlag(flags, FLAG_12, message.translatedSummaryLanguage != null);
-            flags = setFlag(flags, FLAG_13, message.translatedRichMessage != null);
-            flags = setFlag(flags, FLAG_14, message.translatedButtonsLanguage != null);
-            flags = setFlag(flags, FLAG_15, message.translatedButtons != null);
+            flags = setFlag(flags, FLAG_13, message.translatedButtonsLanguage != null);
+            flags = setFlag(flags, FLAG_14, message.translatedButtons != null);
+            flags = setFlag(flags, FLAG_15, message.translatedRichMessage != null);
         }
 
         @Override
@@ -167,17 +167,17 @@ public class MessageCustomParamsHelper {
                 stream.writeString(message.translatedSummaryLanguage);
             }
             if (hasFlag(flags, FLAG_13)) {
-                message.translatedRichMessage.serializeToStream(stream);
-            }
-            if (hasFlag(flags, FLAG_14)) {
                 stream.writeString(message.translatedButtonsLanguage);
             }
-            if (hasFlag(flags, FLAG_15)) {
+            if (hasFlag(flags, FLAG_14)) {
                 stream.writeInt32(message.translatedButtons.size());
                 for (java.util.Map.Entry<String, String> entry : message.translatedButtons.entrySet()) {
                     stream.writeString(entry.getKey());
                     stream.writeString(entry.getValue());
                 }
+            }
+            if (hasFlag(flags, FLAG_15)) {
+                message.translatedRichMessage.serializeToStream(stream);
             }
         }
 
@@ -227,12 +227,9 @@ public class MessageCustomParamsHelper {
                 message.translatedSummaryLanguage = stream.readString(exception);
             }
             if (hasFlag(flags, FLAG_13)) {
-                message.translatedRichMessage = TL_iv.RichMessage.TLdeserialize(stream, stream.readInt32(exception), exception);
-            }
-            if (hasFlag(flags, FLAG_14)) {
                 message.translatedButtonsLanguage = stream.readString(exception);
             }
-            if (hasFlag(flags, FLAG_15)) {
+            if (hasFlag(flags, FLAG_14)) {
                 int size = stream.readInt32(exception);
                 message.translatedButtons = new java.util.HashMap<>();
                 for (int i = 0; i < size; i++) {
@@ -240,6 +237,9 @@ public class MessageCustomParamsHelper {
                     String value = stream.readString(exception);
                     message.translatedButtons.put(key, value);
                 }
+            }
+            if (hasFlag(flags, FLAG_15)) {
+                message.translatedRichMessage = TL_iv.RichMessage.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
         }
 
