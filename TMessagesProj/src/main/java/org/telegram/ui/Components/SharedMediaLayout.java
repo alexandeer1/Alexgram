@@ -2508,7 +2508,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                             if (selectRangeItem != null) {
                                 int closestTab = getClosestTab();
                                 selectRangeItem.setVisibility(tw.nekomimi.nekogram.NekoConfig.enableSelectRangeInSharedMedia.Bool() &&
-                                        closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS
+                                        closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS && closestTab != TAB_FRIENDS_ACTIVITIES
                                         ? View.VISIBLE : View.GONE);
                             }
                             selectedMessagesCountTextView.setNumber(selectedFiles[0].size() + selectedFiles[1].size(), false);
@@ -2564,7 +2564,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                             if (selectRangeItem != null) {
                                 int closestTab = getClosestTab();
                                 selectRangeItem.setVisibility(tw.nekomimi.nekogram.NekoConfig.enableSelectRangeInSharedMedia.Bool() &&
-                                        closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS
+                                        closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS && closestTab != TAB_FRIENDS_ACTIVITIES
                                         ? View.VISIBLE : View.GONE);
                             }
                             AnimatorSet animatorSet = new AnimatorSet();
@@ -3676,7 +3676,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                         return FlickerLoadingView.LINKS_TYPE;
                     } else if (mediaPage.selectedType == TAB_GROUPUSERS) {
                         return FlickerLoadingView.USERS_TYPE;
-                    } else if (mediaPage.selectedType == TAB_COMMON_GROUPS) {
+                    } else if (mediaPage.selectedType == TAB_COMMON_GROUPS || mediaPage.selectedType == TAB_FRIENDS_ACTIVITIES) {
                         if (scrollSlidingTextTabStrip.getTabsCount() == 1) {
                             setIsSingleCell(true);
                         }
@@ -4883,6 +4883,12 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             if (lastVisiblePosition + 1 >= profileActivity.getMessagesController().getSavedMessagesController().getLoadedCount()) {
                 profileActivity.getMessagesController().getSavedMessagesController().loadDialogs(false);
             }
+        } else if (mediaPage.selectedType == TAB_FRIENDS_ACTIVITIES) {
+            if (visibleItemCount > 0 && friendsActivitiesAdapter != null) {
+                if (!friendsActivitiesAdapter.endReached && !friendsActivitiesAdapter.loading && !friendsActivitiesAdapter.messages.isEmpty() && firstVisibleItem + visibleItemCount >= totalItemCount - 5) {
+                    friendsActivitiesAdapter.loadMessages(friendsActivitiesAdapter.offsetId);
+                }
+            }
         } else if (mediaPage.selectedType != TAB_RECOMMENDED_CHANNELS && mediaPage.selectedType != TAB_SAVED_MESSAGES && mediaPage.selectedType != TAB_BOT_PREVIEWS && mediaPage.selectedType != TAB_GIFTS) {
             final int threshold;
             if (mediaPage.selectedType == 0) {
@@ -5006,6 +5012,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             type != TAB_VOICE &&
             type != TAB_GIF &&
             type != TAB_COMMON_GROUPS &&
+            type != TAB_FRIENDS_ACTIVITIES &&
             type != TAB_SAVED_DIALOGS &&
             type != TAB_RECOMMENDED_CHANNELS &&
             type != TAB_BOT_PREVIEWS &&
@@ -7337,7 +7344,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             }
             viewPool = mediaPages[a].searchViewPool;
             if (animated) {
-                if (mediaPages[a].selectedType == TAB_PHOTOVIDEO || mediaPages[a].selectedType == TAB_VOICE || mediaPages[a].selectedType == TAB_GIF || mediaPages[a].selectedType == TAB_COMMON_GROUPS || mediaPages[a].selectedType == TAB_GROUPUSERS && !delegate.canSearchMembers()) {
+                if (mediaPages[a].selectedType == TAB_PHOTOVIDEO || mediaPages[a].selectedType == TAB_VOICE || mediaPages[a].selectedType == TAB_GIF || mediaPages[a].selectedType == TAB_COMMON_GROUPS || mediaPages[a].selectedType == TAB_FRIENDS_ACTIVITIES || (mediaPages[a].selectedType == TAB_GROUPUSERS && !delegate.canSearchMembers())) {
                     searching = false;
                     if (searchTagsList != null) {
                         searchTagsList.show(false);
@@ -7952,7 +7959,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         if (selectRangeItem != null) {
             int closestTab = getClosestTab();
             selectRangeItem.setVisibility(tw.nekomimi.nekogram.NekoConfig.enableSelectRangeInSharedMedia.Bool() &&
-                    closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS
+                    closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS && closestTab != TAB_FRIENDS_ACTIVITIES
                     ? View.VISIBLE : View.GONE);
         }
         selectedMessagesCountTextView.setNumber(1, false);
@@ -8032,7 +8039,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 if (selectRangeItem != null) {
                     int closestTab = getClosestTab();
                     selectRangeItem.setVisibility(tw.nekomimi.nekogram.NekoConfig.enableSelectRangeInSharedMedia.Bool() &&
-                            closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS
+                            closestTab != TAB_STORIES && closestTab != TAB_BOT_PREVIEWS && closestTab != TAB_GIFTS && closestTab != TAB_COMMON_GROUPS && closestTab != TAB_GROUPUSERS && closestTab != TAB_FRIENDS_ACTIVITIES
                             ? View.VISIBLE : View.GONE);
                 }
                 updateStoriesPinButton();
@@ -10445,6 +10452,10 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                     final int totalChats = res.chats.size();
                     
                     for (org.telegram.tgnet.TLRPC.Chat chat : res.chats) {
+                        org.telegram.tgnet.TLRPC.Chat actualChat = profileActivity.getMessagesController().getChat(chat.id);
+                        if (actualChat == null) {
+                            actualChat = chat;
+                        }
                         org.telegram.tgnet.TLRPC.TL_messages_search searchReq = new org.telegram.tgnet.TLRPC.TL_messages_search();
                         searchReq.limit = 50;
                         searchReq.from_id = profileActivity.getMessagesController().getInputPeer(dialog_id);
@@ -10459,7 +10470,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                             }
                             continue;
                         }
-                        searchReq.peer = org.telegram.messenger.MessagesController.getInputPeer(chat);
+                        searchReq.peer = org.telegram.messenger.MessagesController.getInputPeer(actualChat);
                         searchReq.filter = new org.telegram.tgnet.TLRPC.TL_inputMessagesFilterEmpty();
                         searchReq.q = "";
                         
@@ -10471,11 +10482,15 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                                 profileActivity.getMessagesController().putChats(searchRes.chats, false);
                                 for (org.telegram.tgnet.TLRPC.Message msg : searchRes.messages) {
                                     if (msg instanceof org.telegram.tgnet.TLRPC.TL_message || msg instanceof org.telegram.tgnet.TLRPC.TL_messageService) {
-                                        messages.add(msg);
-                                        long peerId = org.telegram.messenger.MessageObject.getPeerId(msg.peer_id);
-                                        if (!chatIds.contains(peerId)) chatIds.add(peerId);
+                                        if (org.telegram.messenger.MessageObject.getPeerId(msg.from_id) == dialog_id) {
+                                            messages.add(msg);
+                                            long peerId = org.telegram.messenger.MessageObject.getPeerId(msg.peer_id);
+                                            if (!chatIds.contains(peerId)) chatIds.add(peerId);
+                                        }
                                     }
                                 }
+                            } else if (searchError != null) {
+                                org.telegram.messenger.FileLog.d("FriendsActivities search error for chat " + chat.id + " (" + chat.title + "): " + searchError.text);
                             }
                             if (completedSearches[0] == totalChats) {
                                 // Sort by date descending
@@ -12192,7 +12207,11 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         float progress = 0;
         for (int i = 0; i < mediaPages.length; ++i) {
             if (mediaPages[i] != null) {
-                progress += mediaPages[i].selectedType * (1f - Math.abs(mediaPages[i].getTranslationX() / getWidth()));
+                int type = mediaPages[i].selectedType;
+                if (type == TAB_FRIENDS_ACTIVITIES) {
+                    type = TAB_COMMON_GROUPS;
+                }
+                progress += type * (1f - Math.abs(mediaPages[i].getTranslationX() / getWidth()));
             }
         }
         return progress;

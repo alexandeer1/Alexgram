@@ -8430,6 +8430,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             } else {
                 mediaCounterTextView.setText(LocaleController.formatPluralStringComma("ProfilePollsCount", mediaCount[MediaDataController.MEDIA_POLL]));
             }
+        } else if (id == SharedMediaLayout.TAB_FRIENDS_ACTIVITIES) {
+            mediaCounterTextView.setText(LocaleController.getString(R.string.FriendsActivitiesTab));
         }
     }
     private boolean isStarRatingVisible1;
