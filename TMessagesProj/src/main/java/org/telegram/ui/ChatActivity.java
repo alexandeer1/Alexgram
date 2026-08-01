@@ -46728,7 +46728,7 @@ public class ChatActivity extends BaseFragment implements
 
 	@Override
 	public boolean isLightStatusBar() {
-		if (isReport()) {
+		if (isReport() || (actionBar != null && actionBar.isActionModeShowed())) {
 			Theme.ResourcesProvider resourcesProvider = getResourceProvider();
 			int color;
 			if (resourcesProvider != null) {
@@ -46737,6 +46737,18 @@ public class ChatActivity extends BaseFragment implements
 				color = Theme.getColor(Theme.key_actionBarActionModeDefault, null, true);
 			}
 			return ColorUtils.calculateLuminance(color) > 0.7f;
+		}
+		if (actionBar != null && actionBar.getVisibility() == View.VISIBLE && actionBar.getAlpha() > 0.8f) {
+			Theme.ResourcesProvider resourcesProvider = getResourceProvider();
+			int color;
+			if (resourcesProvider != null) {
+				color = resourcesProvider.getColorOrDefault(Theme.key_actionBarDefault);
+			} else {
+				color = Theme.getColor(Theme.key_actionBarDefault, null, true);
+			}
+			if (Color.alpha(color) > 0) {
+				return ColorUtils.calculateLuminance(color) > 0.7f;
+			}
 		}
 		if (actionBar == null) {
 			return !Theme.isCurrentThemeDark();

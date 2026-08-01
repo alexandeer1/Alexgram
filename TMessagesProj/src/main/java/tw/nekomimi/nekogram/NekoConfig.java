@@ -128,6 +128,46 @@ public class NekoConfig {
     public static ConfigItem showIdAndDc = addConfig("ShowIdAndDc", configTypeBool, true);
 
     public static ConfigItem cachePath = addConfig("cache_path", configTypeString, "");
+
+    // [Alexgram: Bubble Style Customization] - Start
+    public static ConfigItem enableCustomBubbleStyle = addConfig("enableCustomBubbleStyle", configTypeBool, false);
+    public static ConfigItem inBubbleColor = addConfig("inBubbleColor", configTypeInt, 0xFFFFFFFF);
+    public static ConfigItem inBubbleAlpha = addConfig("inBubbleAlpha", configTypeInt, 100);
+    public static ConfigItem inTextColor = addConfig("inTextColor", configTypeInt, 0);
+    public static ConfigItem outBubbleColor = addConfig("outBubbleColor", configTypeInt, 0xFF0088FF);
+    public static ConfigItem outBubbleAlpha = addConfig("outBubbleAlpha", configTypeInt, 100);
+    public static ConfigItem outTextColor = addConfig("outTextColor", configTypeInt, 0);
+
+    public static int getEffectiveInBubbleColor(int defaultColor) {
+        if (!enableCustomBubbleStyle.Bool()) return defaultColor;
+        int color = inBubbleColor.Int();
+        if (color == 0) color = defaultColor;
+        int alpha = Math.round((inBubbleAlpha.Int() / 100.0f) * 255.0f);
+        alpha = Math.max(0, Math.min(255, alpha));
+        return (alpha << 24) | (color & 0x00FFFFFF);
+    }
+
+    public static int getEffectiveOutBubbleColor(int defaultColor) {
+        if (!enableCustomBubbleStyle.Bool()) return defaultColor;
+        int color = outBubbleColor.Int();
+        if (color == 0) color = defaultColor;
+        int alpha = Math.round((outBubbleAlpha.Int() / 100.0f) * 255.0f);
+        alpha = Math.max(0, Math.min(255, alpha));
+        return (alpha << 24) | (color & 0x00FFFFFF);
+    }
+
+    public static int getEffectiveInTextColor(int defaultColor) {
+        if (!enableCustomBubbleStyle.Bool()) return defaultColor;
+        int color = inTextColor.Int();
+        return color != 0 ? (color | 0xFF000000) : defaultColor;
+    }
+
+    public static int getEffectiveOutTextColor(int defaultColor) {
+        if (!enableCustomBubbleStyle.Bool()) return defaultColor;
+        int color = outTextColor.Int();
+        return color != 0 ? (color | 0xFF000000) : defaultColor;
+    }
+    // [Alexgram: Bubble Style Customization] - End
     public static ConfigItem customSavePath = addConfig("customSavePath", configTypeString, "Alexgram");
 
     public static ConfigItem translationProvider = addConfig("translationProvider", configTypeInt, 1);

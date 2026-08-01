@@ -9678,6 +9678,37 @@ public class Theme {
                 return animatingColors.valueAt(index);
             }
         }
+        // [Alexgram: Bubble Style Customization] - Start
+        if (tw.nekomimi.nekogram.NekoConfig.enableCustomBubbleStyle.Bool()) {
+            if (key == key_chat_inBubble || key == key_chat_inBubbleSelected) {
+                int def = getDefaultColor(key_chat_inBubble);
+                if (currentColors != null && currentColors.indexOfKey(key_chat_inBubble) >= 0) {
+                    def = currentColors.get(key_chat_inBubble);
+                }
+                int color = tw.nekomimi.nekogram.NekoConfig.getEffectiveInBubbleColor(def);
+                return key == key_chat_inBubbleSelected ? multAlpha(color, 0.85f) : color;
+            } else if (key == key_chat_outBubble || key == key_chat_outBubbleSelected) {
+                int def = getDefaultColor(key_chat_outBubble);
+                if (currentColors != null && currentColors.indexOfKey(key_chat_outBubble) >= 0) {
+                    def = currentColors.get(key_chat_outBubble);
+                }
+                int color = tw.nekomimi.nekogram.NekoConfig.getEffectiveOutBubbleColor(def);
+                return key == key_chat_outBubbleSelected ? multAlpha(color, 0.85f) : color;
+            } else if (key == key_chat_messageTextIn) {
+                int def = getDefaultColor(key_chat_messageTextIn);
+                if (currentColors != null && currentColors.indexOfKey(key_chat_messageTextIn) >= 0) {
+                    def = currentColors.get(key_chat_messageTextIn);
+                }
+                return tw.nekomimi.nekogram.NekoConfig.getEffectiveInTextColor(def);
+            } else if (key == key_chat_messageTextOut) {
+                int def = getDefaultColor(key_chat_messageTextOut);
+                if (currentColors != null && currentColors.indexOfKey(key_chat_messageTextOut) >= 0) {
+                    def = currentColors.get(key_chat_messageTextOut);
+                }
+                return tw.nekomimi.nekogram.NekoConfig.getEffectiveOutTextColor(def);
+            }
+        }
+        // [Alexgram: Bubble Style Customization] - End
         if (NaConfig.INSTANCE.getHideDividers().Bool() && key_divider == key) {
             return 0x00ffffff;
         }

@@ -72,7 +72,14 @@ public class PaintTypeface {
 
         public Typeface get() {
             if (typeface == null) {
-                typeface = loader.load();
+                try {
+                    typeface = loader.load();
+                } catch (Throwable e) {
+                    typeface = Typeface.DEFAULT;
+                }
+                if (typeface == null) {
+                    typeface = Typeface.DEFAULT;
+                }
             }
             return typeface;
         }

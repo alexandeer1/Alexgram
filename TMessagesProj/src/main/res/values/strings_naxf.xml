@@ -47,4 +47,26 @@
     <string name="JoinDateChat">You joined **%1$s** on **%2$s**.</string>
     <string name="CreationDateUserApproximately">**%1$s** created their account approximately on **%2$s**.</string>
     <string name="CreationDateSelfApproximately">You created your account approximately on **%1$s**.</string>
+
+    <!-- [Alexgram: Bubble Style Customization] - Start -->
+    <string name="BubbleStyleTitle">Bubble Style &amp; Transparency</string>
+    <string name="BubbleStyleDesc">Customize incoming and outgoing message bubble colors and transparency with live chat wallpaper preview</string>
+    <string name="EnableCustomBubbleStyle">Enable Custom Bubble Style</string>
+    <string name="EnableCustomBubbleStyleDesc">Override default theme bubble colors and transparency</string>
+    <string name="IncomingBubbleSection">Incoming Messages (Received)</string>
+    <string name="OutgoingBubbleSection">Outgoing Messages (Sent)</string>
+    <string name="BubbleColor">Bubble Color</string>
+    <string name="BubbleTextColor">Message Text Color</string>
+    <string name="BubbleTransparency">Opacity</string>
+    <string name="Presets">Quick Presets</string>
+    <string name="ResetBubbleStyle">Reset to Default</string>
+    <string name="PresetGlassmorphic">Glassmorphic Translucent</string>
+    <string name="PresetCyberpunk">Neon Cyberpunk</string>
+    <string name="PresetSunset">Warm Sunset</string>
+    <string name="PresetEmerald">Emerald Glass</string>
+    <string name="PresetMinimalist">Pure Minimalist</string>
+    <string name="PresetMidnight">Midnight AMOLED</string>
+    <string name="PresetPastel">Pastel Dream</string>
+    <string name="PresetRoyal">Deep Royal</string>
+    <!-- [Alexgram: Bubble Style Customization] - End -->
 </resources>

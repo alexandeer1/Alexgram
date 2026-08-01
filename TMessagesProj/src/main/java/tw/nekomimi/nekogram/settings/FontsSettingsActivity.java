@@ -153,6 +153,8 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setVerticalScrollBarEnabled(false);
         listView.setItemAnimator(null);
+        listView.setPadding(0, 0, 0, AndroidUtilities.dp(16));
+        listView.setClipToPadding(false);
 
         listAdapter = new ListAdapter(context);
         listView.setAdapter(listAdapter);
@@ -252,6 +254,7 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
             }
+            view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             return new RecyclerView.ViewHolder(view) {};
         }
 
@@ -287,6 +290,9 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
                         boolean isSelected = item.font.getKey().equals(NekoConfig.appFontKey.String());
                         ((FontItemCell) holder.itemView).bind(item.font, isBuiltIn, isSelected, !isLast);
                     }
+                    break;
+                case ROW_TYPE_SHADOW:
+                    holder.itemView.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
                     break;
                 default:
                     break;
@@ -366,9 +372,9 @@ public class FontsSettingsActivity extends BaseFragment implements NotificationC
             LinearLayout nameRow = new LinearLayout(context);
             nameRow.setOrientation(LinearLayout.HORIZONTAL);
             nameRow.setGravity(Gravity.CENTER_VERTICAL);
-            nameRow.addView(nameView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
+            nameRow.addView(nameView, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
             nameRow.addView(tagView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT,
-                    0, 0, 8, 0, 0, 0));
+                    0, Gravity.CENTER_VERTICAL, 8, 0, 0, 0));
 
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);

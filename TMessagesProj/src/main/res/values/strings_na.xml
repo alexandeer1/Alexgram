@@ -182,4 +182,32 @@
     <string name="MainTabsShowSearchButton">Show Search Icon in Bottom Bar</string>
     <string name="MainTabsShowSearchButtonDesc">Display a search icon in the bottom bar next to the main navigation tabs.</string>
     <!-- [Alexgram: Main Tabs Hiding Search Bar] - End -->
+    <!-- [Alexgram: Session Management] - Start -->
+    <string name="SessionManagementHeader">Session Management</string>
+    <string name="SessionManagementTitle">Account Session Manager</string>
+    <string name="SessionManagementDesc">Manage logged-in sessions, active devices, and session backup export/import.</string>
+    <string name="ExportSessionsTitle">Export Account Sessions</string>
+    <string name="ExportSessionsDesc">Export active account sessions and configuration backup to JSON file.</string>
+    <string name="ImportSessionTitle">Import Account Session</string>
+    <string name="ImportSessionDesc">Import session configuration file (.json or .session) from storage.</string>
+    <string name="TelegramActiveDevices">Telegram Active Devices</string>
+    <string name="TelegramActiveDevicesDesc">View active devices and manage sessions registered with Telegram servers.</string>
+    <string name="WebSessionsTitleNa">Web Sessions</string>
+    <string name="WebSessionsDesc">Manage authorized websites and web application sessions.</string>
+    <string name="ScanSessionQRCode">Scan Session QR Code</string>
+    <string name="ScanSessionQRCodeDesc">Authorize another desktop or web client by scanning its QR code.</string>
+    <string name="SessionEncryptExport">Password Protect Backup</string>
+    <string name="SessionEncryptExportDesc">Encrypt exported session backup files with a password.</string>
+    <string name="ActiveSessionsSection">Active Account Sessions</string>
+    <string name="SessionBackupSection">Backup &amp; Restore</string>
+    <string name="SessionToolsSection">Session Tools &amp; Devices</string>
+    <string name="SessionDetailsTitle">Session Details</string>
+    <string name="SwitchToAccount">Switch to Account</string>
+    <string name="TerminateAllOtherSessions">Terminate All Other Sessions</string>
+    <string name="TerminateAllOtherSessionsConfirm">Are you sure you want to terminate all other active Telegram sessions?</string>
+    <string name="SessionExportSuccess">Session backup exported successfully to Downloads!</string>
+    <string name="SessionExportError">Failed to export session backup.</string>
+    <string name="SessionImportSuccess">Successfully processed session backup for %1$s!</string>
+    <string name="SessionImportError">Failed to import session backup: Invalid or corrupted file format.</string>
+    <!-- [Alexgram: Session Management] - End -->
 </resources>

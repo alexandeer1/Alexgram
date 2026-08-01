@@ -16,6 +16,9 @@ import static org.telegram.messenger.LocaleController.formatString;
 import static org.telegram.messenger.LocaleController.getString;
 import static org.telegram.messenger.MessagesController.findUpdatesAndRemove;
 
+import tw.nekomimi.nekogram.helpers.AccountSessionManager;
+import org.telegram.ui.LaunchActivity;
+
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -276,6 +279,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             // [Alexgram: Bot Login] - Start
             VIEW_BOT_LOGIN = 20;
             // [Alexgram: Bot Login] - End
+
+    private static final int REQUEST_PICK_LOGIN_SESSION_FILE = 2108;
 
     public final static int COUNTRY_STATE_NOT_SET_OR_VALID = 0,
             COUNTRY_STATE_EMPTY = 1,
@@ -558,6 +563,76 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         getNotificationCenter().addObserver(this, NotificationCenter.newSuggestionsAvailable);
         return super.onFragmentCreate();
     }
+
+    // [Alexgram: Session Login] - Start
+
+    private void processLoginSessionUri(Uri uri, String password) {
+        if (getParentActivity() == null) return;
+        AccountSessionManager.importSessionFromUri(getParentActivity(), uri, password, new AccountSessionManager.SessionImportCallback() {
+            @Override
+            public void onImportSuccess(int targetAccountIndex, String summary) {
+                if (getParentActivity() == null) return;
+                AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                builder.setTitle(LocaleController.getString("ImportSessionTitle", R.string.ImportSessionTitle));
+                builder.setMessage("Session imported successfully!\n\n" + summary);
+                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), (dialog, which) -> {
+                    if (targetAccountIndex >= 0) {
+                        UserConfig.selectedAccount = targetAccountIndex;
+                        UserConfig.getInstance(targetAccountIndex).saveConfig(false);
+                        UserConfig.getInstance(0).saveConfig(false);
+                        if (getParentActivity() != null) {
+                            Intent intent = new Intent(getParentActivity(), LaunchActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            getParentActivity().startActivity(intent);
+                            getParentActivity().finish();
+                        }
+                    }
+                });
+                builder.show();
+            }
+
+            @Override
+            public void onImportFailed(String errorMessage) {
+                if (errorMessage != null && errorMessage.contains("Password required")) {
+                    promptLoginSessionPasswordDialog(pass -> processLoginSessionUri(uri, pass));
+                } else {
+                    BulletinFactory.of(LoginActivity.this)
+                            .createErrorBulletin(errorMessage != null ? errorMessage : LocaleController.getString("SessionImportError", R.string.SessionImportError))
+                            .show();
+                }
+            }
+        });
+    }
+
+    private void promptLoginSessionPasswordDialog(OnLoginSessionPasswordEntered listener) {
+        if (getParentActivity() == null) return;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        builder.setTitle(LocaleController.getString("ImportSessionTitle", R.string.ImportSessionTitle));
+
+        final android.widget.EditText editText = new android.widget.EditText(getParentActivity());
+        editText.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        editText.setHint("Enter Password");
+        android.widget.LinearLayout container = new android.widget.LinearLayout(getParentActivity());
+        container.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int dp20 = AndroidUtilities.dp(20);
+        container.setPadding(dp20, dp20 / 2, dp20, dp20 / 2);
+        container.addView(editText);
+        builder.setView(container);
+
+        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), (dialog, which) -> {
+            String text = editText.getText().toString();
+            if (listener != null) {
+                listener.onPasswordEntered(text);
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+        builder.show();
+    }
+
+    private interface OnLoginSessionPasswordEntered {
+        void onPasswordEntered(String password);
+    }
+    // [Alexgram: Session Login] - End
 
     private View cachedFragmentView;
     @Override
@@ -1224,6 +1299,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PICK_LOGIN_SESSION_FILE && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+            processLoginSessionUri(uri, null);
+            return;
+        }
         LoginActivityRegisterView registerView = (LoginActivityRegisterView) views[VIEW_REGISTER];
         if (registerView != null) {
             registerView.imageUpdater.onActivityResult(requestCode, resultCode, data);
@@ -2586,6 +2666,30 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                     testBackendCheckBox.setVisibility(GONE);
                 }
             }
+
+            // [Alexgram: Session Login] - Start
+            if (activityMode == MODE_LOGIN) {
+                TextView loginWithSessionButton = new TextView(context);
+                loginWithSessionButton.setText(LocaleController.getString("ImportSessionTitle", R.string.ImportSessionTitle));
+                loginWithSessionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+                loginWithSessionButton.setTypeface(AndroidUtilities.bold());
+                loginWithSessionButton.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+                loginWithSessionButton.setGravity(Gravity.CENTER_HORIZONTAL);
+                loginWithSessionButton.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(10), AndroidUtilities.dp(16), AndroidUtilities.dp(10));
+                loginWithSessionButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(8), 0, Theme.getColor(Theme.key_listSelector)));
+                addView(loginWithSessionButton, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 16, 12, 16, 0));
+                loginWithSessionButton.setOnClickListener(v -> {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("*/*");
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        startActivityForResult(Intent.createChooser(intent, LocaleController.getString("ImportSessionTitle", R.string.ImportSessionTitle)), REQUEST_PICK_LOGIN_SESSION_FILE);
+                    } catch (Exception e) {
+                        Toast.makeText(getParentActivity(), LocaleController.getString("SessionImportError", R.string.SessionImportError), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            // [Alexgram: Session Login] - End
 
             if (bottomMargin > 0 && !AndroidUtilities.isSmallScreen()) {
                 Space bottomSpacer = new Space(context);

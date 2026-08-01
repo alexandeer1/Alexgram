@@ -66,6 +66,17 @@ public class AccountsSettingsActivity extends BaseNekoXSettingsActivity {
     private final AbstractConfigCell dividerHidden = cellGroup.appendCell(new ConfigCellDivider());
     // [Alexgram: Hidden Accounts] - End
 
+    // [Alexgram: Session Management] - Start
+    // Session Management section (placed at the last position)
+    private final AbstractConfigCell headerSession = cellGroup.appendCell(
+            new ConfigCellHeader(getString(R.string.SessionManagementHeader)));
+
+    private final AbstractConfigCell sessionManagementRow = cellGroup.appendCell(
+            new ConfigCellText("SessionManagementTitle", () -> {}));
+
+    private final AbstractConfigCell dividerSession = cellGroup.appendCell(new ConfigCellDivider());
+    // [Alexgram: Session Management] - End
+
     @Override
     protected RecyclerListView.SelectionAdapter getListAdapter() {
         return listAdapter;
@@ -108,9 +119,9 @@ public class AccountsSettingsActivity extends BaseNekoXSettingsActivity {
         return superView;
     }
 
-    // [Alexgram: Hidden Accounts] - Start
     @Override
     protected void handleCellClick(View view, int position, float x, float y) {
+        // [Alexgram: Hidden Accounts] - Start
         // Intercept Hidden Accounts row click before base class handles it
         if (position == cellGroup.rows.indexOf(hiddenAccountsRow)) {
             HiddenAccountsController ctrl = HiddenAccountsController.getInstance();
@@ -123,9 +134,17 @@ public class AccountsSettingsActivity extends BaseNekoXSettingsActivity {
             }
             return;
         }
+        // [Alexgram: Hidden Accounts] - End
+
+        // [Alexgram: Session Management] - Start
+        if (position == cellGroup.rows.indexOf(sessionManagementRow)) {
+            presentFragment(new AccountSessionManagerActivity());
+            return;
+        }
+        // [Alexgram: Session Management] - End
+
         super.handleCellClick(view, position, x, y);
     }
-    // [Alexgram: Hidden Accounts] - End
 
     private class ListAdapter extends BaseListAdapter {
         public ListAdapter(Context context) {

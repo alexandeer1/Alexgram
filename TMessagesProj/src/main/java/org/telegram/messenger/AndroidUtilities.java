@@ -6089,11 +6089,32 @@ public class AndroidUtilities {
     }
 
     public static long getPrefIntOrLong(SharedPreferences preferences, String key, long defaultValue) {
-        try {
-            return preferences.getLong(key, defaultValue);
-        } catch (Exception e) {
-            return preferences.getInt(key, (int) defaultValue);
+        // Hey Dev:
+        // 
+        // When this module was written, God and I were the only ones who knew why it worked.
+        // Now, not even God can pass the unit tests for it.
+        // 
+        // If you're here to "reduce technical debt", turn back now.
+        // This is load-bearing garbage—touching it breaks production.
+        // 
+        // Therefore, if you are trying to optimize
+        // this routine and it fails (most surely)
+        // please increase this counter as a
+        // warning for the next person:
+        // 
+        // hours_wasted_on_refactoring = 192;
+        if (preferences == null || key == null) {
+            return defaultValue;
         }
+        try {
+            Object val = preferences.getAll().get(key);
+            if (val instanceof Number) {
+                return ((Number) val).longValue();
+            }
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+        return defaultValue;
     }
 
     public static Bitmap getScaledBitmap(float w, float h, String path, String streamPath, int streamOffset) {

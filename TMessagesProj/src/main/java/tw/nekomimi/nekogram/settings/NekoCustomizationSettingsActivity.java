@@ -73,6 +73,12 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     presentFragment(new tw.nekomimi.nekogram.settings.FontsSettingsActivity()))
     );
     // [Alexgram: Fonts] - End
+    // [Alexgram: Bubble Style Customization] - Start
+    private final AbstractConfigCell bubbleStyleRow = cellGroup.appendCell(
+            new ConfigCellTextCheckIcon(null, "BubbleStyle", getString(R.string.BubbleStyleTitle), R.drawable.msg_theme, false, () ->
+                    presentFragment(new tw.nekomimi.nekogram.settings.BubbleStyleSettingsActivity()))
+    );
+    // [Alexgram: Bubble Style Customization] - End
     // [Alexgram: Launch Animation] - Start
     private final AbstractConfigCell launchAnimationStyleRow = cellGroup.appendCell(
             new ConfigCellSelectBox(
