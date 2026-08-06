@@ -2065,6 +2065,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         } else if (id == DrawerLayoutAdapter.nkbtnBookmarks) {
             presentFragment(new BookmarkManagerActivity());
             drawerLayoutContainer.closeDrawer(false);
+        } else if (id == DrawerLayoutAdapter.nkbtnFeed) {
+            presentFragment(new com.exteragram.messenger.feed.ui.FeedActivity());
+            drawerLayoutContainer.closeDrawer(false);
         } else if (id == DrawerLayoutAdapter.nkbtnRecentChats) {
             presentFragment(new ChatHistoryActivity());
             drawerLayoutContainer.closeDrawer(false);

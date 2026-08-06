@@ -1800,6 +1800,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val drawerItemFeed =
+        addConfig(
+            "DrawerItemFeed",
+            ConfigItem.configTypeBool,
+            true
+        )
     // [Alexgram: Home Drawer Items] - End
 
     val preferredTranslateTargetLangList = ArrayList<String>()

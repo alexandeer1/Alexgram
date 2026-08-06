@@ -151,6 +151,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     public boolean allowShorterStatus = false;
     public boolean premiumIconHiddable = false;
+    private boolean isFeedAvatar;
 
     private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable emojiStatusDrawable;
     private final AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable botVerificationDrawable;
@@ -565,7 +566,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
-        if (child == avatarImageView) {
+        if (!isFeedAvatar && child == avatarImageView) {
             final boolean hasTimer = timeItem != null && timeItem.getVisibility() == VISIBLE;
             final boolean hasCommunity = communityItem != null && communityItem.getVisibility() == VISIBLE;
             if (hasTimer || hasCommunity) {
@@ -1591,6 +1592,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
 
     public void setChatAvatar(TLRPC.Chat chat) {
+        if (isFeedAvatar) {
+            return;
+        }
         avatarDrawable.setInfo(currentAccount, chat);
         if (avatarImageView != null) {
             avatarImageView.setForUserOrChat(chat, avatarDrawable);
@@ -1603,6 +1607,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
 
     public void setUserAvatar(TLRPC.User user, boolean showSelf) {
+        if (isFeedAvatar) {
+            return;
+        }
         avatarDrawable.setInfo(currentAccount, user);
         if (UserObject.isReplyUser(user)) {
             avatarDrawable.setAvatarType(AvatarDrawable.AVATAR_TYPE_REPLIES);
@@ -1631,7 +1638,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
 
     public void checkAndUpdateAvatar() {
-        if (parentFragment == null) {
+        if (isFeedAvatar || parentFragment == null) {
             return;
         }
 
@@ -1712,6 +1719,33 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 avatarImageView.setForUserOrChat(chat, avatarDrawable);
                 avatarImageView.setRoundRadius(org.telegram.messenger.AvatarCornerHelper.getAvatarRoundRadius(42.0f, chat.forum, chat.forum && ChatObject.hasStories(chat)));
             }
+        }
+    }
+
+    public void setFeedAvatar() {
+        this.isFeedAvatar = true;
+        this.allowDrawStories = false;
+        if (this.timeItem != null) {
+            this.timeItem.setVisibility(GONE);
+        }
+        if (this.communityItem != null) {
+            this.communityItem.setVisibility(GONE);
+        }
+        int radius = org.telegram.messenger.AvatarCornerHelper.getAvatarRoundRadius(42.0f);
+        if (radius <= 0) {
+            radius = org.telegram.messenger.AndroidUtilities.dp(21);
+        }
+        this.avatarDrawable.setRoundRadius(radius);
+        this.avatarDrawable.setInfo(org.telegram.messenger.UserConfig.getInstance(this.currentAccount).getClientUserId());
+        this.avatarDrawable.setAvatarType(1);
+        if (Theme.avatarDrawables != null && Theme.avatarDrawables.length > 25 && Theme.avatarDrawables[25] != null) {
+            this.avatarDrawable.setCustomIcon(Theme.avatarDrawables[25]);
+        }
+        if (this.avatarImageView != null) {
+            this.avatarImageView.setAnimatedEmojiDrawable(null);
+            this.avatarImageView.getImageReceiver().clearImage();
+            this.avatarImageView.setRoundRadius(radius);
+            this.avatarImageView.setImage((org.telegram.messenger.ImageLocation) null, (String) null, this.avatarDrawable, (Object) null);
         }
     }
 

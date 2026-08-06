@@ -513,6 +513,7 @@ public class ChatActivity extends BaseFragment implements
 	// [Alexgram: Customizable Message Menu] - Start
 	private final static int nkbtn_invert = 2120;
 	private final static int nkbtn_custom_reply = 2121;
+	private final static int nkbtn_go_to_message = 2140;
 	// [Alexgram: Customizable Message Menu] - End
 
 	public int shareAlertDebugMode = DEBUG_SHARE_ALERT_MODE_NORMAL;
@@ -829,13 +830,16 @@ public class ChatActivity extends BaseFragment implements
 	public static final int MODE_QUICK_REPLIES = 5;
 	public static final int MODE_EDIT_BUSINESS_LINK = 6;
 	public static final int MODE_SEARCH = 7;
+	public static final int MODE_FEED = 7;
 	public static final int MODE_SUGGESTIONS = 8;
 
 	public static final int SEARCH_THIS_CHAT = 0;
 	public static final int SEARCH_MY_MESSAGES = 1;
 	public static final int SEARCH_PUBLIC_POSTS = 2;
 	public static final int SEARCH_CHANNEL_POSTS = 3;
+	public static final int SEARCH_FEED = 4;
 	private int searchType;
+	public boolean hasMainTabs;
 
 	public TL_account.TL_businessChatLink businessLink = null;
 
@@ -3137,9 +3141,12 @@ public class ChatActivity extends BaseFragment implements
 			forceEmptyHistory();
 		} else if (chatMode == MODE_SEARCH) {
 			searchType = arguments.getInt("searchType", 0);
+			hasMainTabs = arguments.getBoolean("hasMainTabs", false);
 			searchingHashtag = arguments.getString("searchHashtag", null);
 			searchingQuery = searchingHashtag;
-			if (searchType == 0 || searchingHashtag == null) {
+			if (isFeedSearch()) {
+				// Feed Search Mode - Valid
+			} else if (searchType == 0 || searchingHashtag == null) {
 				return false;
 			}
 		} else if (isMultiChat()) {
@@ -3568,7 +3575,9 @@ public class ChatActivity extends BaseFragment implements
 		firstMessagesLoaded = true;
 		final Runnable load = () -> {
 			waitingForLoad.add(lastLoadIndex);
-			if (chatMode == MODE_SEARCH) {
+			if (isFeedSearch() || chatMode == MODE_SEARCH && searchingHashtag == null) {
+				loadMoreSearchResults();
+			} else if (startLoadFromDate != 0 && searchingHashtag != null) {
 				HashtagSearchController.getInstance(currentAccount).searchHashtag(searchingHashtag, classGuid, searchType, lastLoadIndex++);
 			} else if (startLoadFromDate != 0) {
 				getMessagesController().loadMessages(dialog_id, mergeDialogId, false, 30, 0, startLoadFromDate, true, 0, classGuid, 4, 0, chatMode, threadMessageId, replyMaxReadId, lastLoadIndex++, isTopic);
@@ -8225,7 +8234,14 @@ public class ChatActivity extends BaseFragment implements
 				int lastVisibleItem = messagesSearchLayoutManager.findLastVisibleItemPosition();
 				int visibleItemCount = lastVisibleItem == RecyclerView.NO_POSITION ? 0 : lastVisibleItem;
 				if (visibleItemCount > 0 && lastVisibleItem > messagesSearchAdapter.loadedCount - 5) {
-					if (chatMode == MODE_SEARCH) {
+					if (isFeedSearch()) {
+						if (!loading) {
+							com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.getInstance(currentAccount);
+							if (!feedController.getStore().isEndReached()) {
+								loadMoreSearchResults();
+							}
+						}
+					} else if (chatMode == MODE_SEARCH) {
 						if (!loading && !endReached[0]) {
 							loading = true;
 							waitingForLoad.add(lastLoadIndex);
@@ -9586,7 +9602,7 @@ public class ChatActivity extends BaseFragment implements
 			.setRadius(dp(18))
 			.setPadding(dp(7)));
 
-		if (chatMode == MODE_SEARCH) {
+		if (chatMode == MODE_SEARCH && !isFeedSearch()) {
 			messagesSearchListContainer.setVisibility(View.VISIBLE);
 			messagesSearchListContainer.setAlpha(1.0f);
 			messagesSearchListContainer.setTag(1);
@@ -12918,7 +12934,9 @@ public class ChatActivity extends BaseFragment implements
 		}
 
 		final float paddingBottom;
-		if (isInsideContainer) {
+		if (isFeedSearch()) {
+			paddingBottom = (hasMainTabs && !xyz.nextalone.nagram.NaConfig.INSTANCE.getHideBottomNavigationBar().Bool() ? dp(tw.nekomimi.nekogram.helpers.MainTabsHelper.getMainTabsHeightWithMargins()) : 0) + windowInsetsStateHolder.getAnimatedMaxBottomInset() + dp(8);
+		} else if (isInsideContainer) {
 			paddingBottom = AndroidUtilities.navigationBarHeight;
 		} else {
 			paddingBottom = blurredViewBottomOffset + dp(9 + 7)
@@ -14777,6 +14795,24 @@ public class ChatActivity extends BaseFragment implements
 			checkLoadCount = 25;
 		} else {
 			checkLoadCount = 5;
+		}
+
+		if (isFeedSearch()) {
+			com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.getInstance(currentAccount);
+			boolean endReached = feedController.getStore().isEndReached();
+			int scrollSpace = totalItemCount - firstVisibleItemFinal - visibleItemCountFinal;
+			android.util.Log.d("FeedPagination", "checkScrollForLoad: totalItems=" + totalItemCount + " firstVisible=" + firstVisibleItemFinal + " visibleCount=" + visibleItemCountFinal + " scrollSpace=" + scrollSpace + " checkLoadCount=" + checkLoadCount + " loading=" + loading + " endReached=" + endReached);
+			if (scrollSpace <= checkLoadCount && !loading) {
+				if (!endReached) {
+					android.util.Log.d("FeedPagination", "checkScrollForLoad: TRIGGERING loadMoreSearchResults");
+					loadMoreSearchResults();
+				} else {
+					android.util.Log.d("FeedPagination", "checkScrollForLoad: SKIPPED - endReached=true");
+				}
+			} else if (loading) {
+				android.util.Log.d("FeedPagination", "checkScrollForLoad: SKIPPED - loading=true");
+			}
+			return;
 		}
 
 		if (chatMode == MODE_SEARCH) {
@@ -21720,6 +21756,10 @@ public class ChatActivity extends BaseFragment implements
 			int index = waitingForLoad.indexOf(queryLoadIndex);
 			long currentUserId = getUserConfig().getClientUserId();
 			int mode = (Integer) args[14];
+			if (isFeedSearch()) {
+				ArrayList<org.telegram.messenger.MessageObject> incomingArr = (ArrayList<org.telegram.messenger.MessageObject>) args[2];
+				android.util.Log.d("FeedPagination", "messagesDidLoad [FEED]: guid=" + guid + " queryLoadIndex=" + queryLoadIndex + " index_in_waitingForLoad=" + index + " waitingForLoad=" + waitingForLoad + " mode=" + mode + " incomingCount=" + incomingArr.size() + " loading=" + loading);
+			}
 			boolean isCache = (Boolean) args[3];
 			boolean postponedScroll = postponedScrollToLastMessageQueryIndex > 0 && queryLoadIndex == postponedScrollToLastMessageQueryIndex;
 			boolean fakePostponedScroll = this.fakePostponedScroll;
@@ -21775,6 +21815,9 @@ public class ChatActivity extends BaseFragment implements
 			}
 
 			if (index == -1) {
+				if (isFeedSearch()) {
+					android.util.Log.d("FeedPagination", "messagesDidLoad [FEED]: IGNORED - loadIndex " + queryLoadIndex + " not in waitingForLoad=" + waitingForLoad);
+				}
 				if (chatMode == MODE_SCHEDULED && mode == MODE_SCHEDULED && !isCache) {
 					waitingForReplyMessageLoad = true;
 					waitingForLoad.add(lastLoadIndex);
@@ -22319,7 +22362,7 @@ public class ChatActivity extends BaseFragment implements
 						obj.setIsRead();
 					}
 				}
-				if (messagesDict[loadIndex].indexOfKey(messageId) >= 0) {
+				if (!isFeedSearch() && messagesDict[loadIndex].indexOfKey(messageId) >= 0) {
 					continue;
 				}
 				if (obj.messageOwner instanceof TLRPC.TL_messageEmpty) {
@@ -29335,6 +29378,16 @@ public class ChatActivity extends BaseFragment implements
 			} else {
 				topViewWasVisible = 2;
 			}
+		} else if (isFeedSearch()) {
+			bottomViewsVisibilityController.setViewVisible(MESSAGE_SEARCH_CONTAINER, false, false);
+			showBottomOverlayProgress(false, false);
+			if (bottomChannelButtonsLayout != null) {
+				bottomChannelButtonsLayout.setVisibility(View.GONE);
+			}
+			if (chatActivityEnterView != null) {
+				chatActivityEnterView.setVisibility(View.GONE);
+			}
+			invalidateChatListViewTopPadding();
 		} else if (chatMode == MODE_SEARCH) {
 			createSearchContainer();
 			if (searchContainer == null) {
@@ -29380,6 +29433,9 @@ public class ChatActivity extends BaseFragment implements
 				}
 			}
 			if (isInsideContainer || forceNoBottom || shouldHideBottomFor3ButtonNav() || hideBottomForGesture) {
+				bottomChannelButtonsLayout.setVisibility(View.GONE);
+				chatActivityEnterView.setVisibility(View.GONE);
+			} else if (isFeedSearch()) {
 				bottomChannelButtonsLayout.setVisibility(View.GONE);
 				chatActivityEnterView.setVisibility(View.GONE);
 			} else if (isReport()) {
@@ -29447,7 +29503,7 @@ public class ChatActivity extends BaseFragment implements
 		bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_GIFT, !showSuggestButton && showGiftButton && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
 		bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_GIGA_GROUP_INFO, showGigaGroupButton && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
 
-		if (hideBottomForGesture) {
+		if (hideBottomForGesture || isFeedSearch()) {
 			bottomOverlayChatText.setText("");
 			chatInputViewsContainer.setVisibility(View.GONE);
 			chatInputViewsContainer.setBackgroundWithFadeDrawable(null);
@@ -47279,6 +47335,28 @@ public class ChatActivity extends BaseFragment implements
 				break;
 
 			}
+			case nkbtn_go_to_message: {
+				if (selectedObject == null)
+					return;
+				// Feed messages have remapped IDs — use getRealId() for the real Telegram message ID
+				// and messageOwner.dialog_id for the real channel/chat ID
+				long dialogId = selectedObject.messageOwner.dialog_id != 0
+						? selectedObject.messageOwner.dialog_id
+						: selectedObject.getDialogId();
+				int realMsgId = selectedObject.getRealId();
+				Bundle args = new Bundle();
+				if (dialogId < 0) {
+					args.putLong("chat_id", -dialogId);
+				} else {
+					args.putLong("user_id", dialogId);
+				}
+				args.putInt("message_id", realMsgId);
+				if (!getMessagesController().checkCanOpenChat(args, ChatActivity.this))
+					return;
+				presentFragment(new ChatActivity(args));
+				break;
+
+			}
 			case nkbtn_copy_link_in_pm: {
 				try {
 					String link_message = "tg://openmessage?user_id=" + currentUser.id + "&message_id=" + selectedObject.messageOwner.id;
@@ -49118,6 +49196,10 @@ public class ChatActivity extends BaseFragment implements
 					options.add(nkbtn_view_in_chat);
 					icons.add(R.drawable.msg_viewreplies);
 					items.add(LocaleController.getString(R.string.ViewInChat));
+				} else if (isFeedSearch()) {
+					options.add(nkbtn_go_to_message);
+					icons.add(R.drawable.msg_viewreplies);
+					items.add(LocaleController.getString(R.string.GoToMessage));
 				}
 				if (!selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && ChatObject.isChannel(currentChat) && !ChatObject.isMonoForum(currentChat) && selectedObject.getDialogId() != mergeDialogId && !selectedObject.isAyuDeleted()) {
 					allowCopyLink = true;
@@ -49681,6 +49763,10 @@ public class ChatActivity extends BaseFragment implements
 					options.add(nkbtn_view_in_chat);
 					icons.add(R.drawable.msg_viewreplies);
 					items.add(LocaleController.getString(R.string.ViewInChat));
+				} else if (isFeedSearch()) {
+					options.add(nkbtn_go_to_message);
+					icons.add(R.drawable.msg_viewreplies);
+					items.add(LocaleController.getString(R.string.GoToMessage));
 				}
 				if (selectedObject != null && selectedObject.messageOwner != null && selectedObject.messageOwner.action == null && currentChat != null && currentChat.forum && !isTopic && selectedObject.messageOwner != null && selectedObject.messageOwner.reply_to != null && selectedObject.messageOwner.reply_to.forum_topic) {
 					items.add(LocaleController.getString(R.string.ViewInTopic));
@@ -51717,5 +51803,507 @@ public class ChatActivity extends BaseFragment implements
 		loading = false;
 		checkDispatchHideSkeletons(false);
 	}
-	// [Alexgram: Special Forward Multi-Chat Hooks] - End
+	// [Alexgram: Feed Mode Integration] - Start
+	public com.exteragram.messenger.feed.FeedChatIntegration feedIntegration;
+
+	public boolean isFeedSearch() {
+		return this.chatMode == 7 && this.searchType == 4;
+	}
+
+	public com.exteragram.messenger.feed.FeedChatIntegration feedIntegration() {
+		if (this.feedIntegration == null) {
+			this.feedIntegration = new com.exteragram.messenger.feed.FeedChatIntegration(this.currentAccount, new com.exteragram.messenger.feed.FeedChatIntegration.Host() {
+				@Override
+				public ArrayList<MessageObject> getMessages() {
+					return ChatActivity.this.messages;
+				}
+
+				@Override
+				public boolean isListReady() {
+					return ChatActivity.this.isFeedSearch() && ChatActivity.this.chatAdapter != null;
+				}
+
+				@Override
+				public void notifyMessageRemoved(int index) {
+					if (ChatActivity.this.chatAdapter != null) {
+						ChatActivity.this.chatAdapter.notifyItemRemoved(ChatActivity.this.chatAdapter.messagesStartRow + index);
+					}
+				}
+
+				@Override
+				public void notifyMessageInserted(int index) {
+					if (ChatActivity.this.chatAdapter != null) {
+						ChatActivity.this.chatAdapter.notifyItemInserted(ChatActivity.this.chatAdapter.messagesStartRow + index);
+					}
+				}
+
+				@Override
+				public void notifyAllMessagesChanged() {
+					if (ChatActivity.this.chatAdapter != null) {
+						ChatActivity.this.chatAdapter.notifyDataSetChanged();
+					}
+				}
+
+				@Override
+				public void scrollToMessage(int index, int offset) {
+					if (ChatActivity.this.chatLayoutManager == null || ChatActivity.this.chatAdapter == null) {
+						return;
+					}
+					ChatActivity.this.chatLayoutManager.scrollToPositionWithOffset(ChatActivity.this.chatAdapter.messagesStartRow + index, offset, false);
+				}
+
+				@Override
+				public void scrollToMessageAnimated(int index, int offset) {
+					if (ChatActivity.this.chatLayoutManager == null || ChatActivity.this.chatAdapter == null || ChatActivity.this.chatListView == null || ChatActivity.this.chatScrollHelper == null || ChatActivity.this.chatListView.isFastScrollAnimationRunning() || index < 0 || index >= ChatActivity.this.messages.size()) {
+						return;
+					}
+					ChatActivity.this.chatAdapter.updateRowsSafe();
+					ChatActivity.this.chatScrollHelper.setScrollDirection(0);
+					ChatActivity.this.chatScrollHelperCallback.scrollTo = ChatActivity.this.messages.get(index);
+					ChatActivity.this.chatScrollHelperCallback.lastBottom = false;
+					ChatActivity.this.chatScrollHelperCallback.lastItemOffset = offset;
+					ChatActivity.this.chatScrollHelperCallback.lastPadding = (int) ChatActivity.this.chatListViewPaddingTop;
+					RecyclerAnimationScrollHelper recyclerAnimationScrollHelper = ChatActivity.this.chatScrollHelper;
+					ChatScrollCallback chatScrollCallback = ChatActivity.this.chatScrollHelperCallback;
+					int i3 = ChatActivity.this.chatAdapter.messagesStartRow + index;
+					chatScrollCallback.position = i3;
+					ChatActivity.this.chatScrollHelperCallback.offset = offset;
+					ChatActivity.this.chatScrollHelperCallback.bottom = false;
+					recyclerAnimationScrollHelper.scrollToPosition(i3, offset, false, true);
+				}
+
+				@Override
+				public int getLastVisibleMessageIndex() {
+					if (ChatActivity.this.chatLayoutManager == null || ChatActivity.this.chatAdapter == null) {
+						return Integer.MIN_VALUE;
+					}
+					int pos = ChatActivity.this.chatLayoutManager.findLastVisibleItemPosition();
+					if (pos == -1) return Integer.MIN_VALUE;
+					return pos - ChatActivity.this.chatAdapter.messagesStartRow;
+				}
+
+				@Override
+				public int getNewestVisibleMessageIndex() {
+					if (ChatActivity.this.chatLayoutManager != null && ChatActivity.this.chatAdapter != null) {
+						int first = ChatActivity.this.chatLayoutManager.findFirstVisibleItemPosition();
+						int last = ChatActivity.this.chatLayoutManager.findLastVisibleItemPosition();
+						if (first != -1 && last != -1) {
+							return Math.min(first, last) - ChatActivity.this.chatAdapter.messagesStartRow;
+						}
+					}
+					return Integer.MIN_VALUE;
+				}
+
+				@Override
+				public boolean canScrollToNewer() {
+					return ChatActivity.this.chatListView != null && ChatActivity.this.chatListView.canScrollVertically(1);
+				}
+
+				@Override
+				public int getDistanceToNewerPx() {
+					if (ChatActivity.this.chatListView == null) {
+						return Integer.MAX_VALUE;
+					}
+					if (ChatActivity.this.chatListView.canScrollVertically(1)) {
+						return (ChatActivity.this.chatListView.computeVerticalScrollRange() - ChatActivity.this.chatListView.computeVerticalScrollExtent()) - ChatActivity.this.chatListView.computeVerticalScrollOffset();
+					}
+					return 0;
+				}
+
+				@Override
+				public boolean isListScrollIdle() {
+					return ChatActivity.this.chatListView != null && ChatActivity.this.chatListView.getScrollState() == 0;
+				}
+
+				@Override
+				public boolean isScrollAnimationRunning() {
+					return ChatActivity.this.chatListView != null && ChatActivity.this.chatListView.isFastScrollAnimationRunning();
+				}
+
+				@Override
+				public void setPagedownCount(int count) {
+					if (ChatActivity.this.sideControlsButtonsLayout != null) {
+						ChatActivity.this.sideControlsButtonsLayout.setButtonCount(ChatActivitySideControlsButtonsLayout.BUTTON_PAGE_DOWN, count, true);
+					}
+				}
+
+				@Override
+				public void setPagedownButtonVisible(boolean visible) {
+					if (visible != ChatActivity.this.canShowPagedownButton) {
+						ChatActivity.this.canShowPagedownButton = visible;
+						ChatActivity.this.updatePagedownButtonVisibility(true);
+					}
+				}
+
+				@Override
+				public boolean isPagedownButtonVisible() {
+					return ChatActivity.this.sideControlsButtonsLayout != null && ChatActivity.this.sideControlsButtonsLayout.isButtonVisible(ChatActivitySideControlsButtonsLayout.BUTTON_PAGE_DOWN);
+				}
+
+				@Override
+				public void invalidateVisiblePart() {
+					ChatActivity.this.invalidateMessagesVisiblePart();
+				}
+
+				@Override
+				public int nextStableId() {
+					int i = ChatActivity.lastStableId;
+					ChatActivity.lastStableId = i + 1;
+					return i;
+				}
+
+				@Override
+				public boolean isFirstLoadComplete() {
+					return ChatActivity.this.firstMessagesLoaded;
+				}
+
+				@Override
+				public void reloadFeed() {
+					ChatActivity.this.reloadFeed();
+				}
+
+				@Override
+				public void requestOlderFeedPage() {
+					com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.getInstance(ChatActivity.this.currentAccount);
+					if (ChatActivity.this.loading || feedController.getStore().isEndReached()) {
+						return;
+					}
+					int i = ChatActivity.this.lastLoadIndex;
+					ChatActivity.this.loading = true;
+					ChatActivity.this.waitingForLoad.add(Integer.valueOf(i));
+					boolean zLoadMore = feedController.loadMore(ChatActivity.this.classGuid, i);
+					if (zLoadMore) {
+						ChatActivity.this.lastLoadIndex++;
+					} else {
+						ChatActivity.this.waitingForLoad.remove(Integer.valueOf(i));
+						ChatActivity.this.loading = false;
+					}
+				}
+
+				@Override
+				public com.exteragram.messenger.feed.FeedChatIntegration.ScrollAnchor captureScrollAnchor() {
+					MessageObject messageObject;
+					if (ChatActivity.this.chatListView != null && ChatActivity.this.chatAdapter != null) {
+						for (int i = 0; i < ChatActivity.this.chatListView.getChildCount(); i++) {
+							View childAt = ChatActivity.this.chatListView.getChildAt(i);
+							if (childAt instanceof ChatMessageCell) {
+								messageObject = ((ChatMessageCell) childAt).getMessageObject();
+							} else {
+								messageObject = childAt instanceof ChatActionCell ? ((ChatActionCell) childAt).getMessageObject() : null;
+							}
+							if (com.exteragram.messenger.feed.FeedMessageUtils.isPostRow(messageObject)) {
+								return new com.exteragram.messenger.feed.FeedChatIntegration.ScrollAnchor(messageObject, ChatActivity.this.getScrollingOffsetForView(childAt));
+							}
+						}
+					}
+					return null;
+				}
+
+				@Override
+				public void restoreScrollAnchor(com.exteragram.messenger.feed.FeedChatIntegration.ScrollAnchor scrollAnchor) {
+					int iIndexOf;
+					if (scrollAnchor == null || ChatActivity.this.chatLayoutManager == null || ChatActivity.this.chatAdapter == null || (iIndexOf = ChatActivity.this.messages.indexOf(scrollAnchor.row)) < 0) {
+						return;
+					}
+					ChatActivity.this.chatLayoutManager.scrollToPositionWithOffset(ChatActivity.this.chatAdapter.messagesStartRow + iIndexOf, scrollAnchor.offsetTop);
+				}
+
+				@Override
+				public void materializeRow(MessageObject messageObject) {
+					if (ChatActivity.this.messagesDict[0].indexOfKey(messageObject.getId()) >= 0) {
+						return;
+					}
+					if (messageObject.stableId == 0) {
+						int i = ChatActivity.lastStableId;
+						ChatActivity.lastStableId = i + 1;
+						messageObject.stableId = i;
+					}
+					ChatActivity.this.messagesDict[0].put(messageObject.getId(), messageObject);
+					ArrayList<MessageObject> arrayList = ChatActivity.this.messagesByDays.get(messageObject.dateKey);
+					if (arrayList == null) {
+						arrayList = new ArrayList<>();
+						ChatActivity.this.messagesByDays.put(messageObject.dateKey, arrayList);
+						ChatActivity.this.messagesByDaysSorted.put(messageObject.dateKeyInt, arrayList);
+					}
+					arrayList.add(messageObject);
+					if (messageObject.hasValidGroupId()) {
+						MessageObject.GroupedMessages groupedMessages = ChatActivity.this.groupedMessagesMap.get(messageObject.getGroupId());
+						if (groupedMessages == null) {
+							groupedMessages = new MessageObject.GroupedMessages();
+							groupedMessages.groupId = messageObject.getGroupId();
+							ChatActivity.this.groupedMessagesMap.put(groupedMessages.groupId, groupedMessages);
+						}
+						if (!groupedMessages.messages.contains(messageObject)) {
+							groupedMessages.messages.add(0, messageObject);
+							groupedMessages.calculate();
+						}
+					}
+					ChatActivity.this.getMessagesController().getTranslateController().checkTranslation(messageObject, false);
+				}
+
+				@Override
+				public void deleteRows(ArrayList<Integer> arrayList) {
+					ChatActivity.this.processFeedDeletedMessages(arrayList, 0L, false, false);
+				}
+
+				@Override
+				public int stableIdForDateHeader(int i) {
+					return ChatActivity.this.getStableIdForDateObject(i);
+				}
+
+				@Override
+				public void onFeedListChanged() {
+					if (ChatActivity.this.chatAdapter != null) {
+						ChatActivity.this.chatAdapter.updateRowsSafe();
+					}
+					if (ChatActivity.this.messagesSearchAdapter != null) {
+						ChatActivity.this.messagesSearchAdapter.notifyDataSetChanged();
+					}
+					ChatActivity.this.updateSearchListEmptyView();
+				}
+
+				@Override
+				public void showEmptyFeedState() {
+					ChatActivity.this.showMessagesSearchListView(true);
+				}
+
+				@Override
+				public void showEmptyFeedProgress() {
+					if (ChatActivity.this.hashtagSearchEmptyView != null) {
+						ChatActivity.this.hashtagSearchEmptyView.showProgress(true);
+					}
+				}
+
+				@Override
+				public BaseFragment getFragment() {
+					return ChatActivity.this;
+				}
+			}, !this.isInsideContainer);
+		}
+		return this.feedIntegration;
+	}
+
+	private void processFeedDeletedMessages(ArrayList<Integer> arrayList, long j, boolean z, boolean z2) {
+		if (arrayList.isEmpty()) {
+			return;
+		}
+		processDeletedMessages(arrayList, j, z, z2);
+		cleanupInvisibleFeedDeletedMessages(arrayList);
+		feedIntegration().onMessagesDeleted();
+		feedIntegration().refreshAds();
+		if (messagesSearchAdapter != null) {
+			messagesSearchAdapter.notifyDataSetChanged();
+		}
+	}
+
+	private void cleanupInvisibleFeedDeletedMessages(ArrayList<Integer> arrayList) {
+		MessageObject.GroupedMessages groupedMessages;
+		for (int i = 0; i < arrayList.size(); i++) {
+			int iIntValue = arrayList.get(i);
+			MessageObject messageObject = messagesDict[0].get(iIntValue);
+			if (messageObject != null && messages.indexOf(messageObject) < 0) {
+				messagesDict[0].remove(iIntValue);
+				repliesMessagesDict.remove(iIntValue);
+				updateReplyMessageOwners(iIntValue, null);
+				ArrayList<MessageObject> arrayList2 = messagesByDays.get(messageObject.dateKey);
+				if (arrayList2 != null) {
+					arrayList2.remove(messageObject);
+					if (arrayList2.isEmpty()) {
+						messagesByDays.remove(messageObject.dateKey);
+						messagesByDaysSorted.remove(messageObject.dateKeyInt);
+					}
+				}
+				if (messageObject.hasValidGroupId() && (groupedMessages = groupedMessagesMap.get(messageObject.getGroupId())) != null) {
+					groupedMessages.messages.remove(messageObject);
+					if (groupedMessages.messages.isEmpty()) {
+						groupedMessagesMap.remove(messageObject.getGroupId());
+					} else {
+						groupedMessages.calculate();
+					}
+				}
+			}
+		}
+	}
+
+	public void reattachCurrentFeedVideoTexture() {
+	}
+
+	public void setFeedChannelsChangedCallback(Runnable runnable) {
+		if (runnable == null && this.feedIntegration == null) {
+			return;
+		}
+		feedIntegration().setChannelsChangedCallback(runnable);
+	}
+
+	public void setFeedViewportActive(boolean z) {
+		feedIntegration().setViewportActive(z);
+	}
+
+	public void saveFeedScrollPosition() {
+		if (!isFeedSearch() || this.isInsideContainer || this.feedIntegration == null) {
+			return;
+		}
+		this.feedIntegration.saveDrawerScrollPosition();
+	}
+
+	public void reloadFeed() {
+		if (isFeedSearch()) {
+			com.exteragram.messenger.feed.FeedChatIntegration feedChatIntegration = this.feedIntegration;
+			if (feedChatIntegration != null) {
+				feedChatIntegration.resetUiState();
+			}
+			showMessagesSearchListView(false);
+			clearChatData(true);
+			startMessageAppearTransitionMs = 0;
+			this.firstMessagesLoaded = false;
+			com.exteragram.messenger.feed.FeedController.getInstance(this.currentAccount).clear();
+			if (messagesSearchAdapter != null) {
+				messagesSearchAdapter.notifyDataSetChanged();
+			}
+			if (messagesSearchListView != null) {
+				messagesSearchListView.requestLayout();
+				if (messagesSearchListView.getLayoutManager() != null) {
+					messagesSearchListView.getLayoutManager().scrollToPosition(0);
+				}
+			}
+			updateSearchListEmptyView();
+			if (hashtagSearchEmptyView != null) {
+				hashtagSearchEmptyView.showProgress(true);
+			}
+			firstLoadMessages();
+		}
+	}
+
+	private int feedLoadRetryCount;
+	private final Runnable loadNextNewerFeedPage = () -> loadNewerFeed(false);
+	private final Runnable retryFailedFeedLoad = () -> reloadFeed();
+
+	public void loadMoreSearchResults() {
+		boolean zIsFeedSearch = isFeedSearch();
+		int i = this.currentAccount;
+		if (zIsFeedSearch) {
+			com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.getInstance(i);
+			boolean zIsEmpty = this.messages.isEmpty();
+			int i2 = this.classGuid;
+			if (zIsEmpty) {
+				int i3 = this.lastLoadIndex;
+				this.lastLoadIndex = i3 + 1;
+				this.waitingForLoad.add(i3);
+				android.util.Log.d("FeedPagination", "loadMoreSearchResults: INITIAL load - loadIndex=" + i3 + " guid=" + i2);
+				if (feedController.loadInitial(i2, i3)) {
+					AndroidUtilities.cancelRunOnUIThread(this.loadNextNewerFeedPage);
+					AndroidUtilities.runOnUIThread(this.loadNextNewerFeedPage);
+					return;
+				}
+				android.util.Log.d("FeedPagination", "loadMoreSearchResults: loadInitial returned false - removing loadIndex=" + i3);
+				this.waitingForLoad.remove(Integer.valueOf(i3));
+				return;
+			}
+			if (this.loading) {
+				android.util.Log.d("FeedPagination", "loadMoreSearchResults: SKIPPED - ChatActivity.loading=true, waitingForLoad=" + this.waitingForLoad.size() + " lastLoadIndex=" + this.lastLoadIndex);
+				return;
+			}
+			int i3 = this.lastLoadIndex;
+			this.loading = true;
+			this.waitingForLoad.add(i3);
+			android.util.Log.d("FeedPagination", "loadMoreSearchResults: calling loadMore - loadIndex=" + i3 + " guid=" + i2 + " messages.size=" + this.messages.size());
+			if (feedController.loadMore(i2, i3)) {
+				this.lastLoadIndex++;
+				android.util.Log.d("FeedPagination", "loadMoreSearchResults: loadMore accepted, lastLoadIndex now=" + this.lastLoadIndex);
+				return;
+			} else {
+				android.util.Log.d("FeedPagination", "loadMoreSearchResults: loadMore REJECTED - clearing state");
+				this.waitingForLoad.remove(Integer.valueOf(i3));
+				this.loading = false;
+				return;
+			}
+		}
+		org.telegram.messenger.HashtagSearchController hashtagSearchController = org.telegram.messenger.HashtagSearchController.getInstance(i);
+		String str = this.searchingHashtag;
+		int i4 = this.classGuid;
+		int i5 = this.searchType;
+		int i6 = this.lastLoadIndex;
+		this.lastLoadIndex = i6 + 1;
+		hashtagSearchController.searchHashtag(str, i4, i5, i6);
+	}
+
+	public void loadNewerFeed(boolean z) {
+		if (isFeedSearch()) {
+			com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.getInstance(this.currentAccount);
+			if (feedController.getMessages().isEmpty()) {
+				if (feedController.isLoading()) {
+					return;
+				}
+				reloadFeed();
+				return;
+			}
+			int i = this.lastLoadIndex;
+			this.waitingForLoad.add(Integer.valueOf(i));
+			if (feedController.loadNewer(this.classGuid, i)) {
+				if (z) {
+					feedIntegration().onPreserveScrollLoadStarted(i);
+				}
+				this.lastLoadIndex++;
+				return;
+			}
+			this.waitingForLoad.remove(Integer.valueOf(i));
+		}
+	}
+
+	public void markFeedAsRead() {
+		if (isFeedSearch()) {
+			feedIntegration().markAllRead();
+		}
+	}
+
+	public void refreshFeedUnreadDivider() {
+		if (isFeedSearch()) {
+			com.exteragram.messenger.feed.FeedController.getInstance(this.currentAccount).refreshReadState(() -> {
+				if (isFeedSearch()) {
+					feedIntegration().onReadStateRefreshed();
+				}
+			});
+		}
+	}
+
+	public void onFeedChannelsChanged(boolean z) {
+		if (isFeedSearch()) {
+			if (z) {
+				reloadFeed();
+			} else {
+				reconcileFeedList();
+			}
+		}
+	}
+
+	public void applyFeedConfigChange() {
+		if (isFeedSearch()) {
+			com.exteragram.messenger.feed.FeedController.getInstance(this.currentAccount).applyConfigChange(res -> {
+				if (this.isFinished || !isFeedSearch()) {
+					return;
+				}
+				if (res) {
+					reloadFeed();
+				} else {
+					reconcileFeedList();
+					this.loadNextNewerFeedPage.run();
+				}
+			});
+		}
+	}
+
+	public void reconcileFeedList() {
+		if (!isFeedSearch() || this.chatAdapter == null) {
+			return;
+		}
+		feedIntegration().reconcileWithStore();
+	}
+
+	public void hideFeedChannelWithUndo(long dialogId, CharSequence name) {
+		feedIntegration().hideChannelWithUndo(dialogId, name);
+	}
+
+	public void setGlassSourceInvalidationCallback(Runnable runnable) {
+	}
+	// [Alexgram: Feed Mode Integration] - End
 }

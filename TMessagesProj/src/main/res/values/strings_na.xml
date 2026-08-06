@@ -210,4 +210,22 @@
     <string name="SessionImportSuccess">Successfully processed session backup for %1$s!</string>
     <string name="SessionImportError">Failed to import session backup: Invalid or corrupted file format.</string>
     <!-- [Alexgram: Session Management] - End -->
+    <!-- [Alexgram: Feed Feature] - Start -->
+    <string name="Feed">Feed</string>
+    <string name="GoToMessage">Go to Message</string>
+    <string name="FeedSettings">Feed Settings</string>
+    <string name="FeedBottomTab">Feed Bottom Tab</string>
+    <string name="FeedBottomTabInfo">Show Feed tab in the bottom navigation bar.</string>
+    <string name="FeedUnreadCounter">Unread Counter</string>
+    <string name="FeedIncludeArchived">Include Archived Channels</string>
+    <string name="FeedIncludeArchivedInfo">Include messages from archived channels in the Feed.</string>
+    <string name="FeedShownChannels">Shown Channels</string>
+    <string name="FeedHiddenChannels">Hidden Channels</string>
+    <string name="FeedChannelsInfo">Uncheck channels you don\'t want to see in your Feed.</string>
+    <string name="FeedMarkAllRead">Mark All as Read</string>
+    <string name="FeedMarkAllReadConfirm">Are you sure you want to mark all posts in the Feed as read?</string>
+    <string name="FeedMarkAllReadDone">All posts marked as read</string>
+    <string name="FeedChannelHidden">Channel %1$s hidden</string>
+    <string name="FeedHideChannel">Hide from Feed</string>
+    <!-- [Alexgram: Feed Feature] - End -->
 </resources>

@@ -413,9 +413,10 @@ public class ConnectionsManager extends BaseController {
         // --- Ghost Mode ---
 
         try {
-            NativeByteBuffer buffer = new NativeByteBuffer(object.getObjectSize());
-            object.serializeToStream(buffer);
-            object.freeResources();
+            TLObject objToSerialize = com.exteragram.messenger.feed.FeedRequestNormalizer.normalize(this.currentAccount, object);
+            NativeByteBuffer buffer = new NativeByteBuffer(objToSerialize.getObjectSize());
+            objToSerialize.serializeToStream(buffer);
+            objToSerialize.freeResources();
 
             long startRequestTime = 0;
             if (BuildVars.DEBUG_PRIVATE_VERSION && BuildVars.LOGS_ENABLED || (connectionType & ConnectionTypeDownload) != 0) {

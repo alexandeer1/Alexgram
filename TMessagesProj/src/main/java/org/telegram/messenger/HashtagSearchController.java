@@ -119,8 +119,8 @@ public class HashtagSearchController {
             return myMessagesSearch;
         } else if (searchType == ChatActivity.SEARCH_PUBLIC_POSTS) {
             return channelPostsSearch;
-        } else if (searchType == ChatActivity.SEARCH_CHANNEL_POSTS) {
-            return localPostsSearch;
+        } else if (searchType == ChatActivity.SEARCH_CHANNEL_POSTS || searchType == 4) {
+            return channelPostsSearch;
         }
         throw new RuntimeException("Unknown search type");
     }

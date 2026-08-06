@@ -140,6 +140,10 @@ public class MessagesStorage extends BaseController {
 
     private final LongSparseIntArray dialogIsForumTyped = new LongSparseIntArray();
 
+    private int resolveFeedMessageId(long dialogId, int messageId) {
+        com.exteragram.messenger.feed.FeedController controller = com.exteragram.messenger.feed.FeedController.peekInstance(this.currentAccount);
+        return controller == null ? messageId : controller.resolveRealMessageId(dialogId, messageId);
+    }
 
     public static MessagesStorage getInstance(int num) {
         MessagesStorage localInstance = Instance[num];

@@ -161,6 +161,11 @@ public class NotificationCenter {
     // [Alexgram: Main Tabs Hiding Search Bar] - Start
     public static final int mainTabsLayoutChanged = totalEvents++;
     // [Alexgram: Main Tabs Hiding Search Bar] - End
+    // [Alexgram: Feed Notifications] - Start
+    public static final int feedNeedReload = totalEvents++;
+    public static final int feedTabVisibleToggled = totalEvents++;
+    public static final int feedUnreadCountUpdated = totalEvents++;
+    // [Alexgram: Feed Notifications] - End
     public static final int messageTranslating = totalEvents++;
     public static final int dialogIsTranslatable = totalEvents++;
     public static final int dialogTranslate = totalEvents++;

@@ -67,6 +67,12 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             new ConfigCellTextCheckIcon(null, "PillStack", getString(R.string.PillStackPills), R.drawable.ic_ab_search, false, () ->
                     presentFragment(new com.exteragram.messenger.pillstack.ui.PillStackPreferencesActivity()))
     );
+    // [Alexgram: Feed Settings] - Start
+    private final AbstractConfigCell feedSettingsRow = cellGroup.appendCell(
+            new ConfigCellTextCheckIcon(null, "FeedSettings", getString(R.string.FeedSettings), R.drawable.msg_channel, false, () ->
+                    presentFragment(new com.exteragram.messenger.feed.ui.FeedChannelsActivity()))
+    );
+    // [Alexgram: Feed Settings] - End
     // [Alexgram: Fonts] - Start
     private final AbstractConfigCell fontsRow = cellGroup.appendCell(
             new ConfigCellTextCheckIcon(null, "Fonts", getString(R.string.Fonts), R.drawable.msg_theme, false, () ->
