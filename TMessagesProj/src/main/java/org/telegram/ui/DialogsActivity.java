@@ -12433,7 +12433,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public boolean isCommunity() {
         return communityId != 0;
     }
-    }
 
     public int getType() {
         return initialDialogsType;

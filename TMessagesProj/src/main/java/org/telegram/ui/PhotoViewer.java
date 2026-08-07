@@ -24571,6 +24571,7 @@ private boolean captureCurrentVideoFrameToClipboard() {
         Bitmap bitmap = centerImage != null ? centerImage.getBitmap() : null;
         boolean enabled = !centerImageIsVideo && AndroidUtil.hasGainmap(bitmap);
         setWindowHdrColorMode(enabled);
+    }
 
 private class PhotoViewerWindowView extends FrameLayout {
 

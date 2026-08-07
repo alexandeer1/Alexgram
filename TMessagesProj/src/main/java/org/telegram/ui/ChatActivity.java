@@ -8,6 +8,8 @@
 
 package org.telegram.ui;
 
+import org.telegram.ui.Components.chat.layouts.ChatActivityFadeView;
+
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.lerp;
 import static org.telegram.messenger.LocaleController.formatPluralStringComma;
@@ -446,6 +448,8 @@ public class ChatActivity extends BaseFragment implements
 		FactorAnimator.Target
 {
 
+	protected ChatActivityFadeView chatActivityFadeView;
+	protected HintView2 guestBotHintView;
 	private MessageMenuStatus lastMessageMenuStatus = new MessageMenuStatus(false, false, false, false, false, false, false, false, false);
 	private final static boolean PULL_DOWN_BACK_FRAGMENT = false;
 	private final static boolean DISABLE_PROGRESS_VIEW = true;
@@ -819,7 +823,7 @@ public class ChatActivity extends BaseFragment implements
 	private int hintMessageType;
 	private MessageObject hint2MessageObject;
 
-	private FrameLayout messagesSearchListContainer;
+	private ChatActivitySearchContainer messagesSearchListContainer;
 	public RecyclerListView messagesSearchListView;
 	private MessagesSearchAdapter messagesSearchAdapter;
 	private AnimatorSet messagesSearchListViewAnimation;
@@ -9622,6 +9626,18 @@ public class ChatActivity extends BaseFragment implements
 		}
 		// [Alexgram: AI Reply] - End
 
+		if (isMultiChat()) {
+			ActionBarMenu abMenu = actionBar.createMenu();
+			if (abMenu != null) {
+				abMenu.clearItems();
+				multiChatCreateMenuItems(abMenu);
+			}
+			multiChatOnCreateView();
+		}
+
+		return fragmentView;
+	}
+
     private boolean lastImeVisible;
     private int insetSystemLeft;
     private int insetSystemRight;
@@ -9648,38 +9664,18 @@ public class ChatActivity extends BaseFragment implements
         checkUi_messagesSearchListPadding();
         invalidateClipRectForBackgroundAndChatList();
 
+        final boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+        if (lastImeVisible != keyboardVisible) {
+            lastImeVisible = keyboardVisible;
+            contentView.notifyHeightChanged();
+        }
 
-		if (isMultiChat()) {
-			ActionBarMenu abMenu = actionBar.createMenu();
-			if (abMenu != null) {
-				abMenu.clearItems();
-				multiChatCreateMenuItems(abMenu);
-			}
-			multiChatOnCreateView();
-		}
+        if (searchViewPager != null) {
+            ViewCompat.dispatchApplyWindowInsets(searchViewPager, insets);
+        }
 
-		return fragmentView;
-	}
-
-	private boolean lastImeVisible;
-
-	@NonNull
-	private WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
-		windowInsetsStateHolder.setInsets(insets);
-		checkUi_chatListViewPaddings();
-
-		final boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
-		if (lastImeVisible != keyboardVisible) {
-			lastImeVisible = keyboardVisible;
-			contentView.notifyHeightChanged();
-		}
-
-		if (searchViewPager != null) {
-			ViewCompat.dispatchApplyWindowInsets(searchViewPager, insets);
-		}
-
-		return WindowInsetsCompat.CONSUMED;
-	}
+        return WindowInsetsCompat.CONSUMED;
+    }
 
 	private boolean lastInAppInputVisible;
 	private void checkInsets() {
@@ -16551,7 +16547,7 @@ public class ChatActivity extends BaseFragment implements
 					}
 					forwardMessages(messagesToForward, messagePreviewParams.hideForwardSendersName, messagePreviewParams.hideCaption, notify, scheduleDate != 0 && scheduleDate != 0x7ffffffe ? scheduleDate + 1 : scheduleDate, payStars);
 //                }
-            }
+            }*/
             if (forwardingPreviewView == null) {
                 messagePreviewParams = null;
             }
@@ -19752,7 +19748,7 @@ public class ChatActivity extends BaseFragment implements
                 parentChatActivity.contentView.updateBlurContent();
             }*/
         }
-    };
+    }
 
     private void updateSecretStatus() {
         if (bottomOverlay == null) {
@@ -20398,7 +20394,7 @@ public class ChatActivity extends BaseFragment implements
         updateSelectedMessageReactions();
     }
 
-    private void updateSelectedMessageReactions() {
+    public void updateSelectedMessageReactions() {
         if (getDialogId() == getUserConfig().getClientUserId()) {
             ArrayList<MessageObject> messageObjects = new ArrayList<>();
             for (int a = 0; a < selectedMessagesIds.length; ++a) {
@@ -20478,7 +20474,7 @@ public class ChatActivity extends BaseFragment implements
                 return;
             }
             if (selectedMessagesCountTextView != null && (selectedMessagesIds[0].size() != 0 || selectedMessagesIds[1].size() != 0)) {
-                selectedMessagesCountTextView.setText(LocaleController.formatPluralString("MessagesSelected", selectedMessagesIds[0].size() + selectedMessagesIds[1].size()), true);
+                selectedMessagesCountTextView.setNumber(selectedMessagesIds[0].size() + selectedMessagesIds[1].size(), true);
             }
         } else {
             int size = selectedMessagesIds[0].size() + selectedMessagesIds[1].size();
@@ -35110,13 +35106,13 @@ public class ChatActivity extends BaseFragment implements
 				if (selectedObject.messageOwner.ttl == 0x7FFFFFFF) {
 					selectedObject.messageOwner.ttl = 1;
 				}
-				sendSecretMessageRead(selectedObject, true, true);
+				sendSecretMessageRead(selectedObject, true);
 
 				var prefs = new AyuSavePreferences(selectedObject.messageOwner, currentAccount);
 				prefs.setDialogId(selectedObject.getDialogId());
 				AyuMessagesController.getInstance().onMessageDeleted(prefs);
 
-				Utilities.globalQueue.postRunnable(() -> sendSecretMediaDelete(selectedObject, true), 1000);
+				Utilities.globalQueue.postRunnable(() -> sendSecretMediaDelete(selectedObject), 1000);
 				BotWebViewVibrationEffect.SELECTION_CHANGE.vibrate();
 				break;
 			case AyuConstants.OPTION_TTL_SAVE:
@@ -49728,7 +49724,7 @@ public class ChatActivity extends BaseFragment implements
         if (chatMode == MODE_SEARCH) {
             HashtagSearchController.getInstance(currentAccount).jumpToMessage(classGuid, hashtagSearchSelectedIndex + (searchUp ? 1 : -1), searchType);
         } else {
-            getMediaDataController().searchMessagesInChat(null, dialog_id, mergeDialogId, classGuid, searchUp ? (reversed ? 2 : 1) : (reversed ? 1 : 2), threadMessageId, searchingUserMessages, searchingChatMessages, searchingReaction);
+            getMediaDataController().searchMessagesInChat(null, dialog_id, mergeDialogId, classGuid, searchUp ? (reversed ? 2 : 1) : (reversed ? 1 : 2), threadMessageId, searchingUserMessages, searchingChatMessages, searchingReaction, searchingType);
             showMessagesSearchListView(false);
         }
     }
@@ -50726,5 +50722,116 @@ public class ChatActivity extends BaseFragment implements
 	public void setGlassSourceInvalidationCallback(Runnable runnable) {
 	}
 	// [Alexgram: Feed Mode Integration] - End
+
+	public static class MessageMenuStatus {
+		public boolean allowReply;
+		public boolean allowReplyPm;
+		public boolean allowEdit;
+		public boolean allowDelete;
+		public boolean allowForward;
+		public boolean allowCopy;
+		public boolean allowCopyPhoto;
+		public boolean allowCopyLink;
+		public boolean allowCopyLinkPm;
+
+		public MessageMenuStatus(boolean allowReply, boolean allowReplyPm, boolean allowEdit, boolean allowDelete, boolean allowForward, boolean allowCopy, boolean allowCopyPhoto, boolean allowCopyLink, boolean allowCopyLinkPm) {
+			this.allowReply = allowReply;
+			this.allowReplyPm = allowReplyPm;
+			this.allowEdit = allowEdit;
+			this.allowDelete = allowDelete;
+			this.allowForward = allowForward;
+			this.allowCopy = allowCopy;
+			this.allowCopyPhoto = allowCopyPhoto;
+			this.allowCopyLink = allowCopyLink;
+			this.allowCopyLinkPm = allowCopyLinkPm;
+		}
+	}
+
+	public static final int MESSAGE_TYPE_INVALID = 0;
+	public static final int MESSAGE_TYPE_SERVICE = 1;
+	public static final int MESSAGE_TYPE_MEDIA = 2;
+	public static final int MESSAGE_TYPE_SEND_ERROR_TEXT = 3;
+	public static final int MESSAGE_TYPE_SEND_ERROR_MEDIA = 4;
+	public static final int MESSAGE_TYPE_FONT = 5;
+	public static final int MESSAGE_TYPE_STICKER_PACK_NOT_INSTALLED = 6;
+
+	public boolean isTitleCentered() {
+		return false;
+	}
+
+	public boolean handleTranslateDuringAutoTrans(Object message) {
+		return false;
+	}
+
+	public boolean isBlockedUser(long dialogId) {
+		return false;
+	}
+
+	public void checkUi_topPanelPositions() {
+	}
+
+	public boolean hasTextSelection() {
+		return false;
+	}
+
+	public void tryAutoReplyWithLatestPendingMessage(boolean value) {
+	}
+
+	public void showLocalEditMessageDialog(MessageObject message) {
+	}
+
+	public void showLocalEditorDialog(MessageObject message) {
+	}
+
+	public ChatMessageCell.ChatMessageCellDelegate multiChatGetChatMessageDelegate() {
+		return null;
+	}
+
+	public void showAiReplyDialog() {
+	}
+
+	public void showSummarizeDialog() {
+	}
+
+	public float getHashtagTabsShownT() {
+		return 0f;
+	}
+
+	public void setLoaded() {}
+
+	public boolean isMultiChat() {
+		return false;
+	}
+
+	protected boolean isMultiChatWithInput() {
+		return false;
+	}
+
+	protected boolean multiChatListOnItemClick(View view, int position) {
+		return false;
+	}
+
+	protected void multiChatCreateMenuItems(ActionBarMenu menu) {}
+	protected boolean multiChatCreateActionModeIcons(ActionBarMenu menu) { return false; }
+	protected void multiChatOnCreateView() {}
+	protected boolean multiChatOnFragmentCreate() { return false; }
+	protected void multiChatMessagesFirstLoad(int count) {}
+	protected boolean multiChatOnMenuItemClicked(int id) { return false; }
+	protected void multiChatOnMessageSend(CharSequence charSequence, boolean notify, int scheduleDate, int scheduleRepeatPeriod, long topicId) {}
+	protected void multiChatOnPause() {}
+	protected void multiChatOnResume() {}
+	protected void multiChatOnTextChanged(CharSequence charSequence, boolean isSpecial, boolean force) {}
+	protected void multiChatOnTransitionClose() {}
+	protected void multiChatOnTransitionOpen() {}
+	protected void multiChatSearchButton(boolean active) {}
+	protected void multiChatSearchLoadMore() {}
+	protected void multiChatSearchOnItemClick(int position) {}
+	protected void multiChatSetNewWallpaper() {}
+	protected boolean multiChatShowBarView2() { return false; }
+	protected void multiChatUpdateTitle() {}
+	protected void multiChatUpdateUpDownButtonVisibility() {}
+
+	protected void requestAnimeAssistantReply(String prompt, List<AIAssistanceHelper.HistoryItem> history, ChatAnimeAssistantView.AssistantRequestCallback callback) {}
+	protected void executeAnimeAssistantAction(String action, String argument, ChatAnimeAssistantView.AssistantRequestCallback callback) {}
 }
 

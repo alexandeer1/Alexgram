@@ -8,6 +8,8 @@
 
 package org.telegram.ui.ActionBar;
 
+import androidx.core.view.DisplayCutoutCompat;
+
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
 import static org.telegram.messenger.AndroidUtilities.lerp;
@@ -105,11 +107,13 @@ public class DrawerLayoutContainer extends FrameLayout {
     private boolean keyboardVisibility;
     private int imeHeight;
 
-    private static final boolean USE_SPRING_ANIMATION = false;
-    private final FloatPropertyCompat<DrawerLayoutContainer> DRAWER_POSITION_PROPERTY = new FloatPropertyCompat<DrawerLayoutContainer>("drawerPosition") {
+    private final boolean USE_SPRING_ANIMATION = NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING;
+    private SpringAnimation currentSpringAnimation;
+
+    public final static FloatPropertyCompat<DrawerLayoutContainer> DRAWER_POSITION_PROPERTY = new FloatPropertyCompat<DrawerLayoutContainer>("drawerPosition") {
         @Override
         public float getValue(DrawerLayoutContainer object) {
-            return object.drawerPosition;
+            return object.getDrawerPosition();
         }
 
         @Override
@@ -148,7 +152,7 @@ public class DrawerLayoutContainer extends FrameLayout {
             drawerLayoutContainer.setWillNotDraw(insets.getSystemWindowInsetTop() <= 0 && getBackground() == null);
 
             if (Build.VERSION.SDK_INT >= 28) {
-                DisplayCutout cutout = insets.getDisplayCutout();
+                DisplayCutoutCompat cutout = insets.getDisplayCutout();
                 hasCutout = cutout != null && !cutout.getBoundingRects().isEmpty();
             }
             invalidate();
@@ -380,10 +384,10 @@ public class DrawerLayoutContainer extends FrameLayout {
             allowDrawContent = value;
             invalidate();
         }
-=======
+    }
+
     public void setActionBarLayout(ActionBarLayout actionBarLayout) {
         this.actionBarLayout = actionBarLayout;
->>>>>>> aac1efcb83 (update to 12.9.1 (6976))
     }
 
     public boolean isDrawCurrentPreviewFragmentAbove() {
@@ -663,31 +667,10 @@ public class DrawerLayoutContainer extends FrameLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
-//        canvas.save();
-//        if (BuildVars.DEBUG_PRIVATE_VERSION && Build.VERSION.SDK_INT >= 31) {
-//            canvas.drawColor(0xFF000000);
-//            final WindowInsets insets = getRootWindowInsets();
-//            if (insets != null) {
-//                AndroidUtilities.rectTmp.set(0, 0, getWidth(), getHeight());
-//                final RoundedCorner topLeft = insets.getRoundedCorner(android.view.RoundedCorner.POSITION_TOP_LEFT);
-//                final RoundedCorner topRight = insets.getRoundedCorner(android.view.RoundedCorner.POSITION_TOP_RIGHT);
-//                final RoundedCorner bottomRight = insets.getRoundedCorner(android.view.RoundedCorner.POSITION_BOTTOM_RIGHT);
-//                final RoundedCorner bottomLeft = insets.getRoundedCorner(RoundedCorner.POSITION_BOTTOM_LEFT);
-//                radii[0] = radii[1] = topLeft == null ? 0 : topLeft.getRadius();
-//                radii[2] = radii[3] = topRight == null ? 0 : topRight.getRadius();
-//                radii[4] = radii[5] = bottomRight == null ? 0 : bottomRight.getRadius();
-//                radii[6] = radii[7] = bottomLeft == null ? 0 : bottomLeft.getRadius();
-//
-//                clipPath.rewind();
-//                clipPath.addRoundRect(AndroidUtilities.rectTmp, radii, Path.Direction.CW);
-//                canvas.clipPath(clipPath);
-//
-//                paint.setColor(Theme.getColor(Theme.key_windowBackgroundGray));
-//                canvas.drawRect(0, getHeight() - AndroidUtilities.navigationBarHeight, getWidth(), getHeight(), paint);
-//            }
-//        }
+        if (actionBarLayout != null && actionBarLayout.getParent() == this) {
+            actionBarLayout.parentDraw(this, canvas);
+        }
         super.dispatchDraw(canvas);
-//        canvas.restore();
         if (drawCurrentPreviewFragmentAbove && parentActionBarLayout != null) {
             if (previewBlurDrawable != null) {
                 previewBlurDrawable.setAlpha((int) (parentActionBarLayout.getCurrentPreviewFragmentAlpha() * 255));
@@ -746,14 +729,7 @@ public class DrawerLayoutContainer extends FrameLayout {
         }
         return result;
     }
-    @Override
-    protected void dispatchDraw(@NonNull Canvas canvas) {
-        if (actionBarLayout != null && actionBarLayout.getParent() == this) {
-            actionBarLayout.parentDraw(this, canvas);
-        }
 
-        super.dispatchDraw(canvas);
-    }
 
     @Override
     public boolean hasOverlappingRendering() {
@@ -863,7 +839,6 @@ public class DrawerLayoutContainer extends FrameLayout {
         if (canApplyInsets) {
             ViewCompat.dispatchApplyWindowInsets(child, insets);
         }
-        }
     }
 
     @NonNull
@@ -891,22 +866,4 @@ public class DrawerLayoutContainer extends FrameLayout {
         return WindowInsetsCompat.CONSUMED;
     }
 
-    private final boolean USE_SPRING_ANIMATION = NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING;
-    private SpringAnimation currentSpringAnimation;
-
-    private float getSpringStiffness(boolean fast) {
-        return fast ? 1000f : 750f;
-    }
-
-    public final static FloatPropertyCompat<DrawerLayoutContainer> DRAWER_POSITION_PROPERTY = new FloatPropertyCompat<>("drawerPosition") {
-        @Override
-        public float getValue(DrawerLayoutContainer object) {
-            return object.getDrawerPosition();
-        }
-
-        @Override
-        public void setValue(DrawerLayoutContainer object, float value) {
-            object.setDrawerPosition(value);
-        }
-    };
 }
