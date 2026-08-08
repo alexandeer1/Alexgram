@@ -57,6 +57,7 @@ import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.AvatarCornerHelper;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
@@ -208,6 +209,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     private ChatAvatarContainer chatAvatarContainer;
 
+    public boolean isGlassMode() {
+        return glassMode;
+    }
+
     public void setGlassOnlyBack() {
         glassOnlyBack = true;
     }
@@ -231,11 +236,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         glassDrawable = factory.create(this)
             .setColorProvider(colorProvider)
             .setPadding(dp(6));
-        if (isForum) {
-            glassDrawable.setRadius(dp(18.33f), dp(23), dp(23), dp(18.33f));
-        } else {
-            glassDrawable.setRadius(dp(23));
-        }
+        updateGlassRadius();
 
 
         glassDrawableBack = factory.create(this)
@@ -864,6 +865,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
         actionModeVisible = true;
         checkMenuItemsWidth();
+        checkAvatarContainerWidth(animated);
         if (animated) {
             ArrayList<Animator> animators = new ArrayList<>();
             animators.add(ObjectAnimator.ofFloat(actionMode, View.ALPHA, 0.0f, 1.0f));
@@ -916,15 +918,14 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             actionModeAnimation = new AnimatorSet();
             actionModeAnimation.playTogether(animators);
-            if (backgroundUpdateListener != null) {
-                ValueAnimator alphaUpdate = ValueAnimator.ofFloat(0, 1);
-                alphaUpdate.addUpdateListener(anm -> {
-                    if (backgroundUpdateListener != null) {
-                        backgroundUpdateListener.run();
-                    }
-                });
-                actionModeAnimation.playTogether(alphaUpdate);
-            }
+            ValueAnimator alphaUpdate = ValueAnimator.ofFloat(0, 1);
+            alphaUpdate.addUpdateListener(anm -> {
+                invalidate();
+                if (backgroundUpdateListener != null) {
+                    backgroundUpdateListener.run();
+                }
+            });
+            actionModeAnimation.playTogether(alphaUpdate);
             actionModeAnimation.setDuration(200);
             actionModeAnimation.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -1044,6 +1045,8 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
         actionMode.hideAllPopupMenus();
         actionModeVisible = false;
+        checkMenuItemsWidth();
+        checkAvatarContainerWidth(true);
         ArrayList<Animator> animators = new ArrayList<>();
         animators.add(ObjectAnimator.ofFloat(actionMode, View.ALPHA, 0.0f));
         if (actionModeHidingViews != null) {
@@ -1091,15 +1094,14 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
         actionModeAnimation = new AnimatorSet();
         actionModeAnimation.playTogether(animators);
-        if (backgroundUpdateListener != null) {
             ValueAnimator alphaUpdate = ValueAnimator.ofFloat(0, 1);
             alphaUpdate.addUpdateListener(anm -> {
+                invalidate();
                 if (backgroundUpdateListener != null) {
                     backgroundUpdateListener.run();
                 }
             });
             actionModeAnimation.playTogether(alphaUpdate);
-        }
         actionModeAnimation.setDuration(200);
         actionModeAnimation.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -1263,10 +1265,8 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         alphaUpdate.addUpdateListener(anm -> {
             searchFieldVisibleAlpha = (float) anm.getAnimatedValue();
 
-            if (glassDrawable != null && glassModeIsForum) {
-                final float r1 = dp(23);
-                final float r2 = lerp(dp(18.33f), dp(23), searchFieldVisibleAlpha);
-                glassDrawable.setRadius(r2, r1, r1, r2);
+            if (glassDrawable != null) {
+                updateGlassRadius();
                 invalidate();
             }
 
@@ -2230,6 +2230,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             animatorAvatarContainerWidth.forceFactor(width);
         }
         animatorAvatarContainerHasAvatar.setValue(hasAvatar, animated);
+        invalidate();
     }
 
     private final FactorAnimator animatorAvatarContainerWidth = new FactorAnimator(0, this, CubicBezierInterpolator.EASE_OUT_QUINT, 380);
@@ -2296,7 +2297,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             final int widthDefault = rightDefault - leftDefault;
             final int left, right;
             if (chatAvatarContainer != null) {
-                final int width = lerp(Math.min(widthDefault, (int) animatorAvatarContainerWidth.getFactor() + p * 2), widthDefault, Math.max(searchFactor, actionModeFactor));
+                final int targetActionModeWidth = Math.min(widthDefault, dp(120));
+                final int expandedWidth = lerp(widthDefault, targetActionModeWidth, actionModeFactor);
+                final int width = lerp(Math.min(widthDefault, (int) animatorAvatarContainerWidth.getFactor() + p * 2), expandedWidth, Math.max(searchFactor, actionModeFactor));
                 left = (rightDefault + leftDefault - width) / 2;
                 right = left + width;
                 chatAvatarContainer.setTranslationX(left
@@ -2308,6 +2311,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                 right = rightDefault;
             }
 
+            updateGlassRadius();
             glassDrawable.setBounds(left, t, right, b);
             glassDrawable.draw(canvas);
         }
@@ -2337,6 +2341,16 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
 
         super.dispatchDraw(canvas);
+    }
+
+    public void updateGlassRadius() {
+        if (glassDrawable == null) {
+            return;
+        }
+        final float rRight = dp(23);
+        final float targetLeft = AvatarCornerHelper.getAvatarRoundRadius(46.0f, glassModeIsForum);
+        final float rLeft = lerp(targetLeft, dp(23), searchFieldVisibleAlpha);
+        glassDrawable.setRadius(rLeft, rRight, rRight, rLeft);
     }
 
     public void setForceSkipTouches(boolean forceSkipTouches) {

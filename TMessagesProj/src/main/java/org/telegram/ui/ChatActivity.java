@@ -11014,7 +11014,12 @@ public class ChatActivity extends BaseFragment implements
 		selectedMessagesCountTextView.setTypeface(AndroidUtilities.bold());
 		selectedMessagesCountTextView.setTextColor(getThemedColor(Theme.key_actionBarActionModeDefaultIcon));
 		selectedMessagesCountTextView.setOnTouchListener((v, event) -> true);
-		actionMode.addView(selectedMessagesCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, 65, 0, 0, 0));
+		if (actionBar != null && actionBar.isGlassMode()) {
+			selectedMessagesCountTextView.setCenterAlign(true);
+			actionMode.addView(selectedMessagesCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, 0, 0, 0, 0));
+		} else {
+			actionMode.addView(selectedMessagesCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, 65, 0, 0, 0));
+		}
 
 		DisplayMetrics displayMetrics = new DisplayMetrics();
 		getParentActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);

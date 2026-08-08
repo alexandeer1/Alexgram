@@ -837,15 +837,18 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         }
         int padding = isCentered() ? dp(isPreviewMode() ? 35 : 10) : 0;
         final int width = MeasureSpec.getSize(widthMeasureSpec);
+        int screenWidth = actionBar != null && actionBar.getMeasuredWidth() > 0 ? actionBar.getMeasuredWidth() : AndroidUtilities.displaySize.x;
+        int maxGlassTextWidth = screenWidth - dp(185);
         final int availableWidth = width - dp(((avatarImageView.getVisibility() == VISIBLE || isCentered()) ? 54 : 0) + 16);
-        final int textMaxWidth = Math.max(dp(72), availableWidth - padding);
+        final int textMaxWidth = Math.max(dp(72), glassMode ? Math.min(availableWidth - padding, maxGlassTextWidth) : availableWidth - padding);
 
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(dp(avatarSizeInDp) - 2, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(avatarSizeInDp) - 2, MeasureSpec.EXACTLY));
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textMaxWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(dp(24 + 8), MeasureSpec.AT_MOST));
         if (subtitleTextView != null) {
             subtitleTextView.measure(MeasureSpec.makeMeasureSpec(textMaxWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.AT_MOST));
         } else if (animatedSubtitleTextView != null) {
-            animatedSubtitleTextView.measure(MeasureSpec.makeMeasureSpec(textMaxWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.AT_MOST));
+            animatedSubtitleTextView.setMaxWidth(textMaxWidth);
+            animatedSubtitleTextView.measure(MeasureSpec.makeMeasureSpec(textMaxWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.AT_MOST));
         }
         if (communityItem != null) {
             communityItem.measure(MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY));
@@ -1959,16 +1962,29 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     public int getVisualWidth() {
         float width = 0;
 
-        if (titleTextView != null) {
+        if (titleTextView != null && titleTextView.getVisibility() != GONE) {
             width = Math.max(width, titleTextView.getExactWidthIncludeDrawables());
         }
-        if (subtitleTextView != null) {
+        if (subtitleTextView != null && subtitleTextView.getVisibility() != GONE) {
             width = Math.max(width, subtitleTextView.getExactWidthIncludeDrawables());
         }
+        if (animatedSubtitleTextView != null && animatedSubtitleTextView.getVisibility() != GONE) {
+            float subWidth = 0;
+            if (animatedSubtitleTextView.getDrawable() != null) {
+                subWidth = Math.max(subWidth, Math.max(animatedSubtitleTextView.getDrawable().getCurrentWidth(), animatedSubtitleTextView.getDrawable().getAnimateToWidth()));
+            }
+            if (animatedSubtitleTextView.getText() != null) {
+                subWidth = Math.max(subWidth, animatedSubtitleTextView.getPaint().measureText(animatedSubtitleTextView.getText().toString()));
+            }
+            if (subWidth <= 0) {
+                subWidth = animatedSubtitleTextView.getMeasuredWidth();
+            }
+            width = Math.max(width, subWidth);
+        }
         if (hasVisibleAvatar()) {
-            width += dp(52 + 12);
+            width += dp(glassMode ? 76 : 64);
         } else {
-            width += dp(30);
+            width += dp(glassMode ? 40 : 30);
         }
         return (int) width;
     }
