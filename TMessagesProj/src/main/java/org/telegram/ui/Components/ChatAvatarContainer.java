@@ -940,21 +940,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int avatarLeft = 1 + leftPadding;
         int avatarRight = 1 + leftPadding + avatarImageView.getMeasuredWidth();
 
-        if (isCentered()) {
-            // DECISIVE FIX: Anchor to the absolute right of the entire ActionBar
-            int parentWidth = right - left;
-            if (parentFragment != null && parentFragment.getActionBar() != null) {
-                parentWidth = parentFragment.getActionBar().getMeasuredWidth();
-            }
-            int[] loc = new int[2];
-            getLocationInWindow(loc);
-            int xInWindow = loc[0];
-            
-            // Anchor 2dp from the absolute right edge of the screen/header
-            avatarRight = parentWidth - xInWindow - dp(2); 
-            avatarLeft = avatarRight - avatarImageView.getMeasuredWidth();
-        }
-
         avatarImageView.layout(avatarLeft, viewTop + 1, avatarRight, viewTop + 1 + avatarImageView.getMeasuredHeight());
 
         int l = leftPadding + (avatarImageView.getVisibility() == VISIBLE && !isCentered() ? dp(glassMode ? 49.66f : 55) : dp(glassMode ? 13 : 1)) + (isCentered() ? 0 : rightAvatarPadding);

@@ -12840,7 +12840,9 @@ public class ChatActivity extends BaseFragment implements
 			pinnedViewH = Math.max(pinnedViewH, hashtagSearchTabs.getCurrentHeight());
 		}
 		float oldPadding = chatListViewPaddingTop;
-		chatListViewPaddingTop = dp(4) + contentPaddingTop + (paddingTopHeight = topPanelViewH + pinnedViewH)
+		int actionBarHeight = (actionBar != null && actionBar.getVisibility() == View.VISIBLE) ? Math.max(ActionBar.getCurrentActionBarHeight() + (actionBar.getOccupyStatusBar() ? AndroidUtilities.statusBarHeight : 0), actionBar.getMeasuredHeight()) : 0;
+		int effectiveContentPaddingTop = contentPaddingTop > 0 ? contentPaddingTop : actionBarHeight;
+		chatListViewPaddingTop = dp(4) + effectiveContentPaddingTop + (paddingTopHeight = topPanelViewH + pinnedViewH)
 			+ getTopicTabsSideSize(TopicsTabsView.Position.TOP);
 		chatListViewPaddingTop += blurredViewTopOffset;
 		chatListViewPaddingVisibleOffset = 0;
@@ -40647,6 +40649,7 @@ public class ChatActivity extends BaseFragment implements
 		@Override
 		public void onSearchCollapse() {
 			searching = false;
+			animatorSearchFieldVisibility.setValue(false, false);
 			updatePagedownButtonVisibility(true);
 			updateSearchUpDownButtonVisibility(true);
 			if (searchCalendarButton != null) {
@@ -40798,6 +40801,7 @@ public class ChatActivity extends BaseFragment implements
 		@Override
 		public void onSearchExpand() {
 			searching = true;
+			animatorSearchFieldVisibility.setValue(true, false);
 			updatePagedownButtonVisibility(true);
 			updateSearchUpDownButtonVisibility(true);
 			if ((threadMessageId != 0 && chatMode != MODE_SAVED || UserObject.isReplyUser(currentUser)) && !preventReopenSearchWithText) {
@@ -40837,6 +40841,7 @@ public class ChatActivity extends BaseFragment implements
 
 		 public void setSearchAnimationProgress(float progress) {
 			searchAnimationProgress = progress;
+			animatorSearchFieldVisibility.forceValue(progress > 0, progress);
 			if (whiteActionBar) {
 				int color1 = getThemedColor(Theme.key_actionBarDefaultIcon);
 				actionBar.setItemsColor(ColorUtils.blendARGB(color1, getThemedColor(Theme.key_actionBarActionModeDefaultIcon), searchAnimationProgress), false);
