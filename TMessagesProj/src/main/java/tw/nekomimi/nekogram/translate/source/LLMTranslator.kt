@@ -1,19 +1,19 @@
 package tw.nekomimi.nekogram.translate.source
 
-import android.util.Log
+import org.telegram.messenger.FileLog
+import org.telegram.messenger.BuildVars
 import kotlinx.coroutines.ThreadContextElement
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import org.telegram.messenger.BuildVars
 import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.tgnet.TLRPC
 import org.telegram.ui.Components.TranslateAlert2
 import tw.nekomimi.nekogram.llm.LlmConfig
 import tw.nekomimi.nekogram.llm.net.OpenAICompatClient
-import tw.nekomimi.nekogram.llm.utils.LlmModelUtil
+import tw.nekomimi.nekogram.llm.utils.ModelUtil
 import tw.nekomimi.nekogram.translate.HTMLKeeper
 import tw.nekomimi.nekogram.translate.Translator
 import tw.nekomimi.nekogram.translate.code2Locale
@@ -171,7 +171,7 @@ object LLMTranslator : Translator {
     private fun doLLMTranslate(to: String, query: String): String {
         val apiKey = getNextApiKey() ?: throw UnsupportedOperationException(getString(R.string.ApiKeyNotSet))
         val apiKeyForLog = apiKey.takeLast(2)
-        if (BuildVars.LOGS_ENABLED) Log.d("LLMTranslator", "createPost: Bearer $apiKeyForLog")
+        FileLog.d("createPost: Bearer $apiKeyForLog")
 
         val llmProviderPreset = NaConfig.llmProviderPreset.Int()
         val apiUrl = LlmConfig.getEffectiveBaseUrl(llmProviderPreset)
@@ -192,7 +192,7 @@ object LLMTranslator : Translator {
             ?.let { buildContextPrompt(it) }
 
         val messages = JSONArray().apply {
-            if (LlmModelUtil.isGPT5(model)) {
+            if (ModelUtil.isGPT5(model)) {
                 put(JSONObject().apply {
                     put("role", "developer")
                     put("content", "# Juice: 0 !important")
@@ -213,17 +213,17 @@ object LLMTranslator : Translator {
                 put("content", userPrompt)
             })
         }
-        if (BuildVars.LOGS_ENABLED) Log.d("LLMTranslator", "Requesting LLM API with model: $model, messages: $messages")
+        FileLog.d("Requesting LLM API with model: $model, messages: $messages")
 
         val requestJson = JSONObject().apply {
             put("model", model)
             put("messages", messages)
-            if (LlmModelUtil.supportsTemperature(model)) {
+            if (ModelUtil.supportsTemperature(model)) {
                 put("temperature", NaConfig.llmTemperature.Float())
             }
-            if (LlmModelUtil.isReasoning(model)) {
-                put("reasoning_effort", LlmModelUtil.getReasoningEffort(model))
-            } else if (LlmModelUtil.isCerebrasGlm(apiUrl, model)) {
+            if (ModelUtil.isReasoning(model)) {
+                put("reasoning_effort", ModelUtil.getReasoningEffort(model))
+            } else if (ModelUtil.isCerebrasGlm(apiUrl, model)) {
                 put("disable_reasoning", true)
             }
         }.toString()
@@ -242,7 +242,7 @@ object LLMTranslator : Translator {
         }
 
         return response.data()
-            ?.let { LlmModelUtil.sanitizeResponse(model, it) }
+            ?.let { ModelUtil.sanitizeResponse(model, it) }
             ?.takeIf { it.isNotEmpty() }
             ?: throw IOException("LLM API returned empty content")
     }

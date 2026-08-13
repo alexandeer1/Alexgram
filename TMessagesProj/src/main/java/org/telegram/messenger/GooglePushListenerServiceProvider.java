@@ -35,13 +35,11 @@ public class GooglePushListenerServiceProvider implements PushListenerController
     public void onRequestPushToken() {
         String currentPushString = SharedConfig.pushString;
         if (!TextUtils.isEmpty(currentPushString)) {
-            if (BuildVars.DEBUG_PRIVATE_VERSION && BuildVars.LOGS_ENABLED) {
+            if (BuildVars.DEBUG_PRIVATE_VERSION) {
                 FileLog.d("FCM regId = " + currentPushString);
             }
         } else {
-            if (BuildVars.LOGS_ENABLED) {
-                FileLog.d("FCM Registration not found.");
-            }
+            FileLog.d("FCM Registration not found.");
         }
         Utilities.globalQueue.postRunnable(() -> {
             try {
@@ -51,9 +49,7 @@ public class GooglePushListenerServiceProvider implements PushListenerController
                         .addOnCompleteListener(task -> {
                             SharedConfig.pushStringGetTimeEnd = SystemClock.elapsedRealtime();
                             if (!task.isSuccessful()) {
-                                if (BuildVars.LOGS_ENABLED) {
-                                    FileLog.d("Failed to get regid");
-                                }
+                                FileLog.d("Failed to get regid");
                                 SharedConfig.pushStringStatus = "__FIREBASE_FAILED__";
                                 PushListenerController.sendRegistrationToServer(getPushType(), null);
                                 return;
