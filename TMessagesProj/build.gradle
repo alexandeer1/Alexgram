@@ -278,6 +278,7 @@ dependencies {
 
     // kotlin
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:2.1.10'
     // utilities
     implementation 'org.osmdroid:osmdroid-android:6.1.20'
     // network
@@ -299,6 +300,7 @@ dependencies {
     def hilt_version = "2.59.2"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     ksp "com.google.dagger:hilt-compiler:$hilt_version"
+    ksp "org.jetbrains.kotlin:kotlin-reflect:2.1.10"
 
     def compose_bom = platform('androidx.compose:compose-bom:2025.02.00')
     implementation compose_bom

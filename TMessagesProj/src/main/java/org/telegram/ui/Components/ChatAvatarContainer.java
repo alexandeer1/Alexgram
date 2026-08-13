@@ -554,7 +554,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     protected void dispatchDraw(Canvas canvas) {
         canvas.save();
         final float s = bounce.getScale(.02f);
-        canvas.scale(s, s, getWidth() / 2f, getHeight() / 2f);
+        canvas.scale(s, s, getWidth() / 2f, getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
 
         if (NaConfig.getVoiceChangerEffectValue() != 0) {
             canvas.drawCircle(titleTextView.getRight() + dp(4), titleTextView.getTop() + dp(12), dp(3), voiceChangerPaint);
@@ -566,6 +566,13 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
+        final boolean unscaleAvatar = glassMode && isCentered() && (child == avatarImageView || child == timeItem || child == communityItem);
+        if (unscaleAvatar) {
+            final float scale = bounce.getScale(.02f);
+            canvas.save();
+            canvas.scale(1f / scale, 1f / scale, getWidth() / 2f, getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
+        }
+        final boolean b;
         if (!isFeedAvatar && child == avatarImageView) {
             final boolean hasTimer = timeItem != null && timeItem.getVisibility() == VISIBLE;
             final boolean hasCommunity = communityItem != null && communityItem.getVisibility() == VISIBLE;
@@ -573,7 +580,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 AndroidUtilities.rectTmp.set(child.getX(), child.getY(), child.getX() + child.getWidth(), child.getY() + child.getHeight());
                 AndroidUtilities.rectTmp.inset(-dp(3), -dp(3));
                 canvas.saveLayer(AndroidUtilities.rectTmp, null);
-                final boolean b = super.drawChild(canvas, child, drawingTime);
+                b = super.drawChild(canvas, child, drawingTime);
                 if (hasTimer) {
                     final float cx = timeItem.getX() + timeItem.getWidth() / 2f;
                     final float cy = timeItem.getY() + timeItem.getHeight() / 2f;
@@ -587,10 +594,16 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                     canvas.drawCircle(cx, cy, r, Theme.PAINT_CLEAR);
                 }
                 canvas.restore();
-                return b;
+            } else {
+                b = super.drawChild(canvas, child, drawingTime);
             }
+        } else {
+            b = super.drawChild(canvas, child, drawingTime);
         }
-        return super.drawChild(canvas, child, drawingTime);
+        if (unscaleAvatar) {
+            canvas.restore();
+        }
+        return b;
     }
 
     public boolean ignoreTouches;
@@ -601,7 +614,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
 
     protected boolean isCentered() {
-        return NaConfig.INSTANCE.getCenterActionBarTitle().Bool();
+        return false;
     }
 
     protected boolean isPreviewMode() {
@@ -805,7 +818,10 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
 
     public void setOccupyStatusBar(boolean value) {
-        occupyStatusBar = value;
+        if (occupyStatusBar != value) {
+            occupyStatusBar = value;
+            requestLayout();
+        }
     }
 
     public void setTitleColors(int title, int subtitle) {
@@ -936,16 +952,18 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        final boolean occupy = (actionBar != null ? actionBar.getOccupyStatusBar() : occupyStatusBar) && !isPreviewMode();
         int actionBarHeight = ActionBar.getCurrentActionBarHeight();
-        int viewTop = (actionBarHeight - avatarImageView.getMeasuredHeight() - 2) / 2 + (Build.VERSION.SDK_INT >= 21 && occupyStatusBar ? AndroidUtilities.statusBarHeight : 0);
+        int viewTop = (actionBarHeight - avatarImageView.getMeasuredHeight() - 2) / 2 + (Build.VERSION.SDK_INT >= 21 && occupy ? AndroidUtilities.statusBarHeight : 0);
         final int subtitleTop = viewTop + dp(glassMode ? 23.66f : 24);
 
         int avatarLeft = 1 + leftPadding;
-        int avatarRight = 1 + leftPadding + avatarImageView.getMeasuredWidth();
+        if (isCentered()) {
+            avatarLeft = getWidth() + dp(3);
+        }
+        avatarImageView.layout(avatarLeft, viewTop + 1, avatarLeft + avatarImageView.getMeasuredWidth(), viewTop + 1 + avatarImageView.getMeasuredHeight());
 
-        avatarImageView.layout(avatarLeft, viewTop + 1, avatarRight, viewTop + 1 + avatarImageView.getMeasuredHeight());
-
-        int l = leftPadding + (avatarImageView.getVisibility() == VISIBLE && !isCentered() ? dp(glassMode ? 49.66f : 55) : dp(glassMode ? 13 : 1)) + (isCentered() ? 0 : rightAvatarPadding);
+        int l = leftPadding + (avatarImageView.getVisibility() == VISIBLE && !isCentered() ? dp(glassMode ? 49.66f : 55) : (isCentered() ? 0 : dp(glassMode ? 13 : 1))) + (isCentered() ? 0 : rightAvatarPadding);
 
         if (isPreviewMode() && isCentered()) {
             l += dp(AndroidUtilities.isTablet() ? 80 : 72) / 2;
@@ -966,26 +984,21 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             }
         }
         if (communityItem != null) {
+            final int communityItemLeft = isCentered() ? avatarLeft + dp(28) : leftPadding + dp(29f);
             communityItem.layout(
-                leftPadding + dp(29f),
+                communityItemLeft,
                 viewTop + dp(27.33f),
-                leftPadding + dp(29f) + communityItem.getMeasuredWidth(),
+                communityItemLeft + communityItem.getMeasuredWidth(),
                 viewTop + dp(27.33f) + communityItem.getMeasuredHeight());
         }
         if (timeItem != null) {
-            int timeItemLeft = (int) (leftPadding + dp(19.333f));
-            int timeItemRight = timeItemLeft + timeItem.getMeasuredWidth();
-            int timeItemTop = viewTop - dp(8);
-            int timeItemBottom = timeItemTop + timeItem.getMeasuredHeight();
-
-            if (isCentered()) {
-                timeItemLeft = getWidth() - leftPadding - dp(25);
-                timeItemRight = timeItemLeft + timeItem.getMeasuredWidth();
-                timeItemTop = viewTop + dp(15);
-                timeItemBottom = timeItemTop + timeItem.getMeasuredHeight();
-            }
-
-            timeItem.layout(timeItemLeft, timeItemTop, timeItemRight, timeItemBottom);
+            final int timeItemLeft = isCentered() ? avatarLeft + dp(18.333f) : leftPadding + dp(19.333f);
+            timeItem.layout(
+                timeItemLeft,
+                viewTop - dp(8),
+                timeItemLeft + timeItem.getMeasuredWidth(),
+                viewTop - dp(8) + timeItem.getMeasuredHeight()
+            );
         }
         if (starBgItem != null) {
             starBgItem.layout(leftPadding + dp(28), viewTop + dp(24), leftPadding + dp(28) + starBgItem.getMeasuredWidth(), viewTop + dp(24) + starBgItem.getMeasuredHeight());
@@ -1023,7 +1036,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     public void setCommunityItemVisible(boolean visible) {
         if (communityItem != null) {
-            communityItem.setVisibility(visible && !avatarImageIsHidden ? VISIBLE : GONE);
+            communityItem.setVisibility(visible && !avatarImageIsHidden && !isCentered() ? VISIBLE : GONE);
         }
     }
 
@@ -1947,6 +1960,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     public void setActionBar(ActionBar actionBar) {
         this.actionBar = actionBar;
+        if (actionBar != null) {
+            setOccupyStatusBar(actionBar.getOccupyStatusBar() && !isPreviewMode());
+        }
     }
 
     private void checkActionBar(boolean animated) {
@@ -1967,6 +1983,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         }
         if (subtitleTextView != null && subtitleTextView.getVisibility() != GONE) {
             width = Math.max(width, subtitleTextView.getExactWidthIncludeDrawables());
+            if (subtitleTextView.getText() != null) {
+                width = Math.max(width, subtitleTextView.getTextPaint().measureText(subtitleTextView.getText().toString()) + subtitleTextView.getSideDrawablesSize());
+            }
+            if (lastSubtitle != null) {
+                width = Math.max(width, subtitleTextView.getPaint().measureText(lastSubtitle.toString()) + subtitleTextView.getSideDrawablesSize());
+            }
         }
         if (animatedSubtitleTextView != null && animatedSubtitleTextView.getVisibility() != GONE) {
             float subWidth = 0;

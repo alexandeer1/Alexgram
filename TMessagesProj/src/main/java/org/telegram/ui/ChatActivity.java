@@ -4675,12 +4675,10 @@ public class ChatActivity extends BaseFragment implements
 		avatarContainer.premiumIconHiddable = true;
 		avatarContainer.allowDrawStories = dialog_id < 0 && !isTopic;
 		avatarContainer.setClipChildren(false);
-		actionBar.setChatAvatarContainer(avatarContainer);
+		// actionBar.setChatAvatarContainer(avatarContainer);
 		AndroidUtilities.updateViewVisibilityAnimated(avatarContainer, true, 1f, false);
 		updateTopicTitleIcon();
-		if (inPreviewMode || inBubbleMode || isInsideContainer) {
-			avatarContainer.setOccupyStatusBar(false);
-		}
+		avatarContainer.setOccupyStatusBar(actionBar.getOccupyStatusBar() && !inPreviewMode && !inBubbleMode && !isInsideContainer);
 		if (isReport()) {
 			actionBar.setTitle(reportTitle);
 			actionBar.setSubtitle(getString(R.string.ReportSelectMessages));
@@ -4734,11 +4732,12 @@ public class ChatActivity extends BaseFragment implements
 			});
 			getConnectionsManager().bindRequestToGuid(req, classGuid);
 		} else {
-			actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !inPreviewMode ? 56 : (chatMode == MODE_PINNED ? 10 : 0), 0, 40, 0));
+			actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !inPreviewMode ? 52 : 0, 0, 52, 0));
+			actionBar.createMenu().bringToFront();
 		}
 
 		ActionBarMenu menu = actionBar.createMenu();
-		menu.setCenteredTitle(isTitleCentered());
+		menu.setCenteredTitle(isTitleCentered() && chatMode != MODE_QUICK_REPLIES);
 
 		if (isThreadChat() && threadMessageId != 0 && !isTopic) {
 			viewInChatItem = menu.addItem(nkbtn_view_in_chat, R.drawable.msg_viewreplies);
@@ -43715,8 +43714,8 @@ public class ChatActivity extends BaseFragment implements
 						locFile = new File(path);
 					}
 				}
-				if (locFile == null || !locFile.isFile()) {
-					AlertUtil.showToast("FILE_NOT_FOUND");
+				if (com.exteragram.messenger.icons.IconManager.INSTANCE.isIconPack(message)) {
+					com.exteragram.messenger.icons.IconManager.INSTANCE.handleIconPack(ChatActivity.this, message);
 					return;
 				}
 				if (message.getDocumentName().toLowerCase().endsWith("attheme")) {
@@ -50766,7 +50765,23 @@ public class ChatActivity extends BaseFragment implements
 	public static final int MESSAGE_TYPE_STICKER_PACK_NOT_INSTALLED = 6;
 
 	public boolean isTitleCentered() {
-		return false;
+		return canShowCenteredTitle(this);
+	}
+
+	private boolean canShowCenteredTitle(ChatActivity parentFragment) {
+		if (!NaConfig.INSTANCE.getCenterActionBarTitle().Bool()) {
+			return false;
+		}
+		if (NaConfig.INSTANCE.getCenterActionBarTitleType().Int() == 2) {
+			return false;
+		}
+		if (parentFragment == null) {
+			return false;
+		}
+		if (parentFragment.isThreadChat() && !parentFragment.isTopic || parentFragment.isReport()) {
+			return false;
+		}
+		return parentFragment.getChatMode() != MODE_SEARCH && parentFragment.getChatMode() != MODE_SAVED;
 	}
 
 	public boolean handleTranslateDuringAutoTrans(Object message) {

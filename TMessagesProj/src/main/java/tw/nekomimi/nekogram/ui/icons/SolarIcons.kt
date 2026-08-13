@@ -423,6 +423,13 @@ class SolarIcons {
             solarIcons.add(R.drawable.filter_setup to R.drawable.filter_setup_solar)
         }
 
+        @JvmField
+        val map: android.util.SparseIntArray = android.util.SparseIntArray().apply {
+            for (pair in solarIcons) {
+                put(pair.first, pair.second)
+            }
+        }
+
         fun getConversion(icon: Int): Int {
             for (pair in solarIcons) {
                 if (pair.first == icon) {

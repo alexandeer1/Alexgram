@@ -76,6 +76,18 @@ public class ApplicationLoader extends Application {
     public static volatile Handler applicationHandler;
     public static final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    private static android.content.res.AssetManager iconsAsset;
+    private static tw.nekomimi.nekogram.ui.icons.IconsResources customResources;
+
+    @Override
+    public android.content.res.Resources getResources() {
+        if (customResources == null || iconsAsset != super.getResources().getAssets()) {
+            customResources = new tw.nekomimi.nekogram.ui.icons.IconsResources(super.getResources());
+            iconsAsset = super.getResources().getAssets();
+        }
+        return customResources;
+    }
+
     private static ConnectivityManager connectivityManager;
     private static volatile boolean applicationInited = false;
     private static volatile  ConnectivityManager.NetworkCallback networkCallback;

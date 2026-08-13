@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.Nullable;
 
+import com.exteragram.messenger.icons.IconManager;
+
 import xyz.nextalone.nagram.NaConfig;
 
 @SuppressLint("UseCompatLoadingForDrawables")
@@ -13,30 +15,60 @@ public class IconsResources extends Resources {
 
     public static final int ICON_REPLACE_SOLAR = 1;
     public static final int ICON_REPLACE_REMIX = 2;
+
     public IconsResources(Resources resources) {
         super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
     }
 
     @Override
     public Drawable getDrawable(int id) throws NotFoundException {
-        return super.getDrawable(getConversion(id), null);
+        return getDrawable(id, null);
     }
 
     @Override
     public Drawable getDrawable(int id, @Nullable Theme theme) throws NotFoundException {
-        return super.getDrawable(getConversion(id), theme);
-    }
-
-    @Nullable
-    @Override
-    public Drawable getDrawableForDensity(int id, int density, @Nullable Theme theme) {
-        return super.getDrawableForDensity(getConversion(id), density, theme);
+        return getDrawableForDensity(id, 0, theme);
     }
 
     @Nullable
     @Override
     public Drawable getDrawableForDensity(int id, int density) throws NotFoundException {
-        return super.getDrawableForDensity(getConversion(id), density, null);
+        return getDrawableForDensity(id, density, null);
+    }
+
+    @Nullable
+    @Override
+    public Drawable getDrawableForDensity(int id, int density, @Nullable Theme theme) {
+        Drawable custom = IconManager.INSTANCE.getDrawable(id, density, theme);
+        if (custom != null) {
+            return custom;
+        }
+
+        int conv = getConversion(id);
+        if (conv != id) {
+            try {
+                return super.getDrawableForDensity(conv, density, theme);
+            } catch (Exception unused) {
+            }
+        }
+
+        return super.getDrawableForDensity(id, density, theme);
+    }
+
+    @Nullable
+    public Drawable getOriginalDrawable(int id, @Nullable Theme theme) {
+        int conv = getConversion(id);
+        if (conv != id) {
+            try {
+                return super.getDrawableForDensity(conv, 0, theme);
+            } catch (Exception unused) {
+            }
+        }
+        try {
+            return super.getDrawableForDensity(id, 0, theme);
+        } catch (Exception unused) {
+            return null;
+        }
     }
 
     public static int getConversion(int icon) {

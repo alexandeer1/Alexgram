@@ -85,6 +85,12 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     presentFragment(new tw.nekomimi.nekogram.settings.BubbleStyleSettingsActivity()))
     );
     // [Alexgram: Bubble Style Customization] - End
+    // [Alexgram: Icon Packs Customization] - Start
+    private final AbstractConfigCell iconPacksRow = cellGroup.appendCell(
+            new ConfigCellTextCheckIcon(null, "IconPacks", getString(R.string.IconPacks), R.drawable.msg_theme, false, () ->
+                    presentFragment(new com.exteragram.messenger.icons.ui.IconPacksActivity()))
+    );
+    // [Alexgram: Icon Packs Customization] - End
     // [Alexgram: Launch Animation] - Start
     private final AbstractConfigCell launchAnimationStyleRow = cellGroup.appendCell(
             new ConfigCellSelectBox(
@@ -100,6 +106,14 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             )
     );
     // [Alexgram: Launch Animation] - End
+    // [Alexgram: Center ActionBar Title] - Start
+    private final AbstractConfigCell centerActionBarTitleRow = cellGroup.appendCell(new ConfigCellSelectBox(null, NaConfig.INSTANCE.getCenterActionBarTitleType(), new String[]{
+            getString(R.string.CenterActionBarTitleOff),
+            getString(R.string.CenterActionBarTitleOn),
+            getString(R.string.SettingsOnly),
+            getString(R.string.ChatsOnly)
+    }, null));
+    // [Alexgram: Center ActionBar Title] - End
     private final AbstractConfigCell showQuickEditIconRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.showQuickEditIconInChatList, LocaleController.getString("ShowQuickEditIconDesc", R.string.ShowQuickEditIconDesc), LocaleController.getString("ShowQuickEditIcon", R.string.ShowQuickEditIcon)));
     private final AbstractConfigCell quickEditIconOnlyOwnRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.quickEditIconOnlyForOwnMessages, LocaleController.getString("QuickEditIconOnlyOwnDesc", R.string.QuickEditIconOnlyOwnDesc), LocaleController.getString("QuickEditIconOnlyOwn", R.string.QuickEditIconOnlyOwn)));
     private final AbstractConfigCell forceMusicSpeedControlRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.forceMusicSpeedControl, LocaleController.getString("ExperimentalMusicSpeedControlAbout", R.string.ExperimentalMusicSpeedControlAbout), LocaleController.getString("ExperimentalMusicSpeedControl", R.string.ExperimentalMusicSpeedControl)));
@@ -163,6 +177,9 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
     // [Alexgram: Friends Activities] - End
 
     public NekoCustomizationSettingsActivity() {
+        if (!NaConfig.INSTANCE.getCenterActionBarTitle().Bool()) {
+            NaConfig.INSTANCE.getCenterActionBarTitleType().setConfigInt(0);
+        }
         if (!NekoConfig.showQuickEditIconInChatList.Bool()) {
             cellGroup.rows.remove(quickEditIconOnlyOwnRow);
         }
@@ -245,6 +262,13 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     getParentLayout().rebuildAllFragmentViews(false, false);
                 }
             } else if (key.equals(NekoConfig.showSenderNameOnMedia.getKey())) {
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
+            } else if (key.equals(NaConfig.INSTANCE.getCenterActionBarTitleType().getKey())) {
+                int value = (int) newValue;
+                NaConfig.INSTANCE.getCenterActionBarTitle().setConfigBool(value != 0);
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
                 if (getParentLayout() != null) {
                     getParentLayout().rebuildAllFragmentViews(false, false);

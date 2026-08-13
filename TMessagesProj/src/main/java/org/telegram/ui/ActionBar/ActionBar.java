@@ -219,6 +219,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     public void setChatAvatarContainer(ChatAvatarContainer chatAvatarContainer) {
         this.chatAvatarContainer = chatAvatarContainer;
+        if (chatAvatarContainer != null) {
+            chatAvatarContainer.setActionBar(this);
+            checkAvatarContainerWidth(false);
+        }
     }
 
     public void setupGlass(BlurredBackgroundDrawableViewFactory factory, BlurredBackgroundColorProvider colorProvider) {
@@ -2258,7 +2262,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     private boolean isAnimationsAllowed;
 
     public void checkMenuItemsWidth() {
-        final int defaultMenuWidth = Math.max(0, menu != null ? (int) menu.getItemsWidth() - dp(1) - dp(1) : 0);
+        int defaultMenuWidth = Math.max(0, menu != null ? (int) menu.getItemsWidth() - dp(1) - dp(1) : 0);
+        if (!isSearchFieldVisible && chatAvatarContainer == null && menu != null && menu.isCenteredTitle()) {
+            defaultMenuWidth = Math.max(defaultMenuWidth, dp(46));
+        }
         final int actionMenuWidth = Math.max(0, actionMode != null ? actionMode.getItemsWidth() - dp(1) - dp(1) : 0);
         final int width = (actionModeVisible ? actionMenuWidth : defaultMenuWidth);
 
