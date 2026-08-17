@@ -1,0 +1,32 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Prism Refraction: Triangular Optical Glass Prism & Dispersion Rays -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M24,8 L40,38 L8,38 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M4,24 L16,24" />
+    <!-- Refracted spectrum rays -->
+    <path
+        android:strokeColor="#FF4081"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M28,24 L44,18" />
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M29,26 L44,24" />
+    <path
+        android:strokeColor="#FFEB3B"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M30,28 L44,30" />
+</vector>

@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- 1920 Silent Cinema: Projector Reel & Film Frame Notch -->
+    <path
+        android:fillColor="#8D6E63"
+        android:pathData="M8,10 L40,10 L40,38 L8,38 Z M12,14 L36,14 L36,34 L12,34 Z" />
+    <path
+        android:fillColor="#D7CCC8"
+        android:pathData="M16,18 L32,18 L32,30 L16,30 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M20,16 L20,32 M28,16 L28,32" />
+</vector>

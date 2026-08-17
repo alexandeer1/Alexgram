@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Starlight Sparkle: 4-Point Anamorphic Starburst Diamond -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,4 L26,20 L42,24 L26,28 L24,44 L22,28 L6,24 L22,20 Z" />
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M34,10 L35,15 L40,16 L35,17 L34,22 L33,17 L28,16 L33,15 Z" />
+</vector>

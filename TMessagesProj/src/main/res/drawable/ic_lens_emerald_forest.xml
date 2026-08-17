@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Emerald Forest: Nordic Evergreen Pine Tree -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 L33,18 L28,18 L36,29 L30,29 L38,38 L10,38 L18,29 L12,29 L20,18 L15,18 Z" />
+    <path
+        android:fillColor="#1B5E20"
+        android:pathData="M22,38 L26,38 L26,42 L22,42 Z" />
+</vector>

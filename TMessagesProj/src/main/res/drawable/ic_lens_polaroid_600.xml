@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Polaroid 600: Classic Instant Photo Frame with Rainbow Stripe -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,8 L38,8 L38,40 L10,40 Z M14,12 L34,12 L34,30 L14,30 Z" />
+    <path
+        android:fillColor="#FF5722"
+        android:pathData="M14,33 L20,33 L20,36 L14,36 Z" />
+    <path
+        android:fillColor="#FFEB3B"
+        android:pathData="M21,33 L27,33 L27,36 L21,36 Z" />
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M28,33 L34,33 L34,36 L28,36 Z" />
+</vector>

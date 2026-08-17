@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Heatwave Mirage: Sinuous Heat Distortion & Rising Sun -->
+    <path
+        android:fillColor="#FF6D00"
+        android:pathData="M24,10 C17,10 12,15 12,22 L36,22 C36,15 31,10 24,10 Z" />
+    <path
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:pathData="M8,26 C12,23 16,29 20,26 C24,23 28,29 32,26 C36,23 40,29 44,26" />
+    <path
+        android:strokeColor="#FFAB00"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:pathData="M6,34 C10,31 14,37 18,34 C22,31 26,37 30,34 C34,31 38,37 42,34" />
+</vector>

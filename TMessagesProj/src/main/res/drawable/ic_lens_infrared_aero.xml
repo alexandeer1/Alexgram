@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Infrared Aerochrome: Botanical Leaf with Radiant Aura -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 C14,6 8,16 8,28 C8,36 14,42 24,42 C34,42 40,36 40,28 C40,16 34,6 24,6 Z" />
+    <path
+        android:fillColor="#FF1744"
+        android:pathData="M24,12 C18,12 14,19 14,28 C14,33 18,37 24,37 C30,37 34,33 34,28 C34,19 30,12 24,12 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,14 L24,35"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5" />
+</vector>

@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Dark Academia: Vintage Book & Bookmark Ribbon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,10 L36,10 C38.2,10 40,11.8 40,14 L40,38 C40,38 38,36 34,36 L12,36 C9.8,36 8,34.2 8,32 L8,14 C8,11.8 9.8,10 12,10 Z" />
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M14,14 L34,14 L34,32 L14,32 Z" />
+    <path
+        android:fillColor="#D7CCC8"
+        android:pathData="M22,10 L26,10 L26,24 L24,22 L22,24 Z" />
+</vector>

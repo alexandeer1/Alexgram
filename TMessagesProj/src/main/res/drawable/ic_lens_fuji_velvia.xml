@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Fuji Velvia: Mountain Peak & Rising Sun Landscape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,10 A6,6 0 1,0 30,16 A6,6 0 0,0 24,10 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,38 L18,22 L26,32 L32,24 L42,38 Z" />
+</vector>

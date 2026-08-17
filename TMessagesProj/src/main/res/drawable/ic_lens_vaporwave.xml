@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Vaporwave: 80s Wireframe Grid & Neon Sun Horizon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,24 A10,10 0 0,1 34,24 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M6,26 L42,26 M8,31 L40,31 M11,36 L37,36 M15,41 L33,41" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.8"
+        android:pathData="M24,26 L24,41 M18,26 L12,41 M30,26 L36,41" />
+</vector>

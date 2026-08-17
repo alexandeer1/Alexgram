@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Night Vision: Tactical Night Scope Dual Lenses & Reticle -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M16,24 A7,7 0 1,0 30,24 A7,7 0 0,0 16,24 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M32,24 A7,7 0 1,0 46,24 A7,7 0 0,0 32,24 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M23,12 L23,17 M23,31 L23,36 M11,24 L16,24 M30,24 L39,24" />
+</vector>

@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Vintage 90s: 35mm Analog Film Strip Frame with Sprockets -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,11 C8,9.3 9.3,8 11,8 L37,8 C38.7,8 40,9.3 40,11 L40,37 C40,38.7 38.7,40 37,40 L11,40 C9.3,40 8,38.7 8,37 Z" />
+    <path
+        android:fillColor="#795548"
+        android:pathData="M14,15 L34,15 L34,33 L14,33 Z" />
+    <!-- Film sprockets -->
+    <path
+        android:fillColor="#795548"
+        android:pathData="M11,10 L13,10 L13,12 L11,12 Z M17,10 L19,10 L19,12 L17,12 Z M23,10 L25,10 L25,12 L23,12 Z M29,10 L31,10 L31,12 L29,12 Z M35,10 L37,10 L37,12 L35,12 Z M11,36 L13,36 L13,38 L11,38 Z M17,36 L19,36 L19,38 L17,38 Z M23,36 L25,36 L25,38 L23,38 Z M29,36 L31,36 L31,38 L29,38 Z M35,36 L37,36 L37,38 L35,38 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M18,24 L22,20 L27,25 L30,22 L33,26" />
+</vector>

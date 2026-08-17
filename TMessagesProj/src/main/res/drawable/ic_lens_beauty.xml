@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Beauty Glow: Central 4-point star and delicate sparkles -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 C24,16 16,24 6,24 C16,24 24,32 24,42 C24,32 32,24 42,24 C32,24 24,16 24,6 Z" />
+    <path
+        android:fillColor="#FFE4E1"
+        android:pathData="M37,7 C37,11 34,14 30,14 C34,14 37,17 37,21 C37,17 40,14 44,14 C40,14 37,11 37,7 Z" />
+    <path
+        android:fillColor="#FFE4E1"
+        android:pathData="M11,31 C11,34 9,36 6,36 C9,36 11,38 11,41 C11,38 13,36 16,36 C13,36 11,34 11,31 Z" />
+</vector>

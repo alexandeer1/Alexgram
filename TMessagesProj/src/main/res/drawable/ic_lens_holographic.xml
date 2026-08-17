@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Holographic: Iridescent 3D Crystal Gem -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M14,14 L34,14 L42,24 L24,40 L6,24 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.8"
+        android:pathData="M6,24 L42,24 M14,14 L24,40 M34,14 L24,40 M14,14 L24,24 M34,14 L24,24" />
+</vector>

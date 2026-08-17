@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Dreamy Bloom: Glowing Soft Cloud with Ethereal Sparkles -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,22 C33.4,16.4 28.7,12 23,12 C18.6,12 14.8,14.6 13.2,18.4 C8.5,19.2 5,23.2 5,28 C5,33.5 9.5,38 15,38 L33,38 C37.4,38 41,34.4 41,30 C41,25.8 37.8,22.4 34,22 Z" />
+    <path
+        android:fillColor="#F48FB1"
+        android:pathData="M37,8 C37,11 35,13 32,13 C35,13 37,15 37,18 C37,15 39,13 42,13 C39,13 37,11 37,8 Z" />
+</vector>

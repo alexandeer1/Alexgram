@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Neon Wireframe: Outrun 80s Perspective Grid -->
+    <path
+        android:strokeColor="#FF007F"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M4,24 L44,24" />
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M6,40 L42,40 M10,34 L38,34 M15,29 L33,29" />
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M24,24 L24,42 M24,24 L10,42 M24,24 L38,42 M24,24 L2,42 M24,24 L46,42" />
+    <path
+        android:fillColor="#FFD600"
+        android:pathData="M24,12 C18,12 14,16 14,24 L34,24 C34,16 30,12 24,12 Z" />
+</vector>

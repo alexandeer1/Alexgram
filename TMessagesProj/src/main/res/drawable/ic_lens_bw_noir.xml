@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- BW Noir: Classic Film Noir Venetian Blind Shadow & Moon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 A18,18 0 1,0 42,24 A18,18 0 0,0 24,6 Z" />
+    <path
+        android:fillColor="#212121"
+        android:pathData="M6,13 L42,13 L42,16 L6,16 Z M6,20 L42,20 L42,23 L6,23 Z M6,27 L42,27 L42,30 L6,30 Z M6,34 L42,34 L42,37 L6,37 Z" />
+</vector>

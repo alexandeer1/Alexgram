@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Portra 400: Kodak Film Camera Body & Lens Ring -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,14 L14,14 L17,10 L31,10 L34,14 L38,14 C39.6,14 41,15.4 41,17 L41,35 C41,36.6 39.6,38 38,38 L10,38 C8.4,38 7,36.6 7,35 L7,17 C7,15.4 8.4,14 10,14 Z" />
+    <path
+        android:fillColor="#D84315"
+        android:pathData="M24,18 A8,8 0 1,0 32,26 A8,8 0 0,0 24,18 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,22 A4,4 0 1,0 28,26 A4,4 0 0,0 24,22 Z" />
+</vector>

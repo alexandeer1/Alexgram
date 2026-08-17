@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Duotone Neon: Interlocking Neon Rings -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M19,24 A10,10 0 1,0 29,24 A10,10 0 0,0 19,24 Z" />
+    <path
+        android:strokeColor="#FFAB00"
+        android:strokeWidth="3"
+        android:pathData="M29,24 A10,10 0 1,0 39,24 A10,10 0 0,0 29,24 Z" />
+</vector>

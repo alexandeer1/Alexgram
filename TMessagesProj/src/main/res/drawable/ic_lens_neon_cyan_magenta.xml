@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Neon Cyan Magenta: Intersecting Vaporwave Waves -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M6,20 C14,12 20,28 28,20 C34,14 38,18 42,20 L42,24 C38,22 34,18 28,24 C20,32 14,16 6,24 Z" />
+    <path
+        android:fillColor="#FF007F"
+        android:pathData="M6,28 C14,20 20,36 28,28 C34,22 38,26 42,28 L42,32 C38,30 34,26 28,32 C20,40 14,24 6,32 Z" />
+</vector>

@@ -115,6 +115,9 @@ import org.telegram.ui.Cells.PhotoAttachCameraCell;
 import org.telegram.ui.Cells.PhotoAttachPermissionCell;
 import org.telegram.ui.Cells.PhotoAttachPhotoCell;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.Components.CameraFilters.CameraFilterOverlayView;
+import org.telegram.ui.Components.CameraFilters.CameraFilterProcessor;
+import org.telegram.ui.Components.CameraFilters.CameraFilterType;
 import org.telegram.ui.Components.blur3.capture.IBlur3Capture;
 import org.telegram.ui.Components.blur3.capture.IBlur3Hash;
 import org.telegram.ui.LaunchActivity;
@@ -184,6 +187,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
     private Runnable videoRecordRunnable;
     private DecelerateInterpolator interpolator = new DecelerateInterpolator(1.5f);
     private FrameLayout cameraPanel;
+    private CameraFilterOverlayView cameraFilterOverlayView;
     private ShutterButton shutterButton;
     private ZoomControlView zoomControlView;
     private AnimatorSet zoomControlAnimation;
@@ -1264,6 +1268,70 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             showZoomControls(true, true);
         });
 
+        cameraFilterOverlayView = new CameraFilterOverlayView(context);
+        cameraFilterOverlayView.setDelegate(new CameraFilterOverlayView.FilterOverlayDelegate() {
+            @Override
+            public void onFilterChanged(int filterType, float intensity) {
+                if (cameraView != null) {
+                    cameraView.setFilter(filterType, intensity);
+                }
+            }
+
+            @Override
+            public void onCarouselVisibilityChanged(boolean visible) {
+                if (shutterButton != null) {
+                    shutterButton.animate().alpha(visible ? 0.0f : 1.0f).setDuration(200).start();
+                    shutterButton.setEnabled(!visible);
+                }
+                if (switchCameraButton != null) {
+                    switchCameraButton.animate().alpha(visible ? 0.0f : 1.0f).setDuration(200).start();
+                    switchCameraButton.setEnabled(!visible);
+                }
+                for (int a = 0; a < 2; a++) {
+                    if (flashModeButton[a] != null && flashModeButton[a].getVisibility() == View.VISIBLE) {
+                        flashModeButton[a].animate().alpha(visible ? 0.0f : 1.0f).setDuration(200).start();
+                        flashModeButton[a].setEnabled(!visible);
+                    }
+                }
+                if (tooltipTextView != null) {
+                    tooltipTextView.animate().alpha(visible ? 0.0f : 1.0f).setDuration(200).start();
+                }
+                if (zoomControlView != null) {
+                    if (visible) {
+                        showZoomControls(false, false);
+                        zoomControlView.setVisibility(View.GONE);
+                    } else {
+                        zoomControlView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onShutterClick() {
+                if (shutterButton != null && shutterButton.getDelegate() != null) {
+                    shutterButton.getDelegate().shutterReleased();
+                }
+            }
+
+            @Override
+            public boolean onShutterLongClick() {
+                if (shutterButton != null && shutterButton.getDelegate() != null) {
+                    return shutterButton.getDelegate().shutterLongPressed();
+                }
+                return false;
+            }
+
+            @Override
+            public void onShutterRelease() {
+                if (shutterButton != null && shutterButton.getDelegate() != null) {
+                    shutterButton.getDelegate().shutterReleased();
+                }
+            }
+        });
+        cameraFilterOverlayView.setVisibility(View.GONE);
+        cameraFilterOverlayView.setAlpha(0.0f);
+        container.addView(cameraFilterOverlayView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
         shutterButton = new ShutterButton(context);
         cameraPanel.addView(shutterButton, LayoutHelper.createFrame(84, 84, Gravity.CENTER));
         shutterButton.setDelegate(new ShutterButton.ShutterButtonDelegate() {
@@ -1377,7 +1445,14 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     if (cameraFile == null || parentAlert.destroyed) {
                         return;
                     }
-//                    Pair<Integer, Integer> orientation = AndroidUtilities.getImageOrientation(cameraFile);
+                    int currentFilter = cameraFilterOverlayView != null ? cameraFilterOverlayView.getCurrentFilterType() : (cameraView != null ? cameraView.getFilterType() : CameraFilterType.ORIGINAL);
+                    float currentIntensity = cameraFilterOverlayView != null ? cameraFilterOverlayView.getCurrentIntensity() : (cameraView != null ? cameraView.getFilterIntensity() : 1.0f);
+                    int finalOrientation = orientation == -1 ? 0 : orientation;
+                    if (currentFilter != CameraFilterType.ORIGINAL) {
+                        if (CameraFilterProcessor.applyFilterToFile(cameraFile, currentFilter, currentIntensity, finalOrientation)) {
+                            finalOrientation = 0;
+                        }
+                    }
                     mediaFromExternalCamera = false;
                     int width = 0, height = 0;
                     try {
@@ -1387,8 +1462,11 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                         width = options.outWidth;
                         height = options.outHeight;
                     } catch (Exception ignore) {}
-                    MediaController.PhotoEntry photoEntry = new MediaController.PhotoEntry(0, lastImageId--, 0, cameraFile.getAbsolutePath(), orientation == -1 ? 0 : orientation, false, width, height, 0);
+                    MediaController.PhotoEntry photoEntry = new MediaController.PhotoEntry(0, lastImageId--, 0, cameraFile.getAbsolutePath(), finalOrientation, false, width, height, 0);
                     photoEntry.canDeleteAfter = true;
+                    if (cameraFilterOverlayView != null) {
+                        cameraFilterOverlayView.toggleCarousel(false, false);
+                    }
                     openPhotoViewer(photoEntry, sameTakePictureOrientation, false);
                 });
                 cameraView.startTakePictureAnimation(true);
@@ -2312,6 +2390,9 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
     }
 
     private void showZoomControls(boolean show, boolean animated) {
+        if (show && cameraFilterOverlayView != null && cameraFilterOverlayView.isCarouselVisible()) {
+            return;
+        }
         if (zoomControlView.getTag() != null && show || zoomControlView.getTag() == null && !show) {
             if (show) {
                 if (zoomControlHideRunnable != null) {
@@ -2516,6 +2597,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             ArrayList<Animator> animators = new ArrayList<>();
             animators.add(ObjectAnimator.ofFloat(this, "cameraOpenProgress", 0.0f, 1.0f));
             animators.add(ObjectAnimator.ofFloat(cameraPanel, View.ALPHA, 1.0f));
+            if (cameraFilterOverlayView != null) {
+                cameraFilterOverlayView.setVisibility(View.VISIBLE);
+                animators.add(ObjectAnimator.ofFloat(cameraFilterOverlayView, View.ALPHA, 1.0f));
+            }
             animators.add(ObjectAnimator.ofFloat(counterTextView, View.ALPHA, 1.0f));
             animators.add(ObjectAnimator.ofFloat(cameraPhotoRecyclerView, View.ALPHA, 1.0f));
             for (int a = 0; a < 2; a++) {
@@ -2552,6 +2637,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         } else {
             setCameraOpenProgress(1.0f);
             cameraPanel.setAlpha(1.0f);
+            if (cameraFilterOverlayView != null) {
+                cameraFilterOverlayView.setVisibility(View.VISIBLE);
+                cameraFilterOverlayView.setAlpha(1.0f);
+            }
             counterTextView.setAlpha(1.0f);
             cameraPhotoRecyclerView.setAlpha(1.0f);
             for (int a = 0; a < 2; a++) {
@@ -2871,6 +2960,9 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             ArrayList<Animator> animators = new ArrayList<>();
             animators.add(ObjectAnimator.ofFloat(this, "cameraOpenProgress", 0.0f));
             animators.add(ObjectAnimator.ofFloat(cameraPanel, View.ALPHA, 0.0f));
+            if (cameraFilterOverlayView != null) {
+                animators.add(ObjectAnimator.ofFloat(cameraFilterOverlayView, View.ALPHA, 0.0f));
+            }
             animators.add(ObjectAnimator.ofFloat(zoomControlView, View.ALPHA, 0.0f));
             animators.add(ObjectAnimator.ofFloat(counterTextView, View.ALPHA, 0.0f));
             animators.add(ObjectAnimator.ofFloat(cameraPhotoRecyclerView, View.ALPHA, 0.0f));
@@ -2906,6 +2998,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     if (cameraPanel != null) {
                         cameraPanel.setVisibility(View.GONE);
                     }
+                    if (cameraFilterOverlayView != null) {
+                        cameraFilterOverlayView.setVisibility(View.GONE);
+                        cameraFilterOverlayView.reset();
+                    }
                     if (zoomControlView != null) {
                         zoomControlView.setVisibility(View.GONE);
                         zoomControlView.setTag(null);
@@ -2928,6 +3024,11 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
             setCameraOpenProgress(0);
             cameraPanel.setAlpha(0);
             cameraPanel.setVisibility(View.GONE);
+            if (cameraFilterOverlayView != null) {
+                cameraFilterOverlayView.setAlpha(0f);
+                cameraFilterOverlayView.setVisibility(View.GONE);
+                cameraFilterOverlayView.reset();
+            }
             zoomControlView.setAlpha(0);
             zoomControlView.setTag(null);
             zoomControlView.setVisibility(View.GONE);
@@ -4243,6 +4344,11 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                 int cx = left + width - dp(88);
                 view.layout(cx, 0, cx + view.getMeasuredWidth(), view.getMeasuredHeight());
             }
+            return true;
+        } else if (view == cameraFilterOverlayView) {
+            int bottomOffset = (cameraPhotoRecyclerView != null && cameraPhotoRecyclerView.getVisibility() == View.VISIBLE ? dp(96) : 0) + navbar;
+            cameraFilterOverlayView.setBottomOffset(bottomOffset);
+            cameraFilterOverlayView.layout(0, 0, width, height);
             return true;
         }
         return false;

@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Cinema Teal: Hollywood Movie Director Clapperboard -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,18 L40,18 L40,38 C40,39.1 39.1,40 38,40 L10,40 C8.9,40 8,39.1 8,38 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,10 C8,8.9 8.9,8 10,8 L38,8 C39.1,8 40,8.9 40,10 L40,16 L8,16 Z" />
+    <!-- Clapper diagonal stripes -->
+    <path
+        android:fillColor="#00897B"
+        android:pathData="M14,8 L18,8 L12,16 L8,16 Z M24,8 L28,8 L22,16 L18,16 Z M34,8 L38,8 L32,16 L28,16 Z" />
+</vector>

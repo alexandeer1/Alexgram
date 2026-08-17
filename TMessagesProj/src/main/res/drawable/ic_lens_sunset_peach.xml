@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Sunset Peach: Sweet Peach Fruit with Leaf -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,14 C17,14 11,20 11,27 C11,35 22,41 24,42 C26,41 37,35 37,27 C37,20 31,14 24,14 Z" />
+    <path
+        android:fillColor="#FF7043"
+        android:pathData="M24,14 C21,20 22,28 24,38 C26,28 27,20 24,14 Z" />
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M24,14 C24,8 30,6 34,6 C34,10 30,14 24,14 Z" />
+</vector>

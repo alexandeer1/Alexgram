@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Honey Warmth: Honeycomb & Golden Drop -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,8 L36,15 L36,29 L24,36 L12,29 L12,15 Z M24,12 L15,17 L15,27 L24,32 L33,27 L33,17 Z" />
+    <path
+        android:fillColor="#FFB300"
+        android:pathData="M24,18 C24,18 20,24 20,26 C20,28.2 21.8,30 24,30 C26.2,30 28,28.2 28,26 C28,24 24,18 24,18 Z" />
+</vector>

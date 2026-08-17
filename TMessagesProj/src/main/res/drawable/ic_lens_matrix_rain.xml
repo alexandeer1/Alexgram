@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Matrix Rain: Cascading Digital Glyph Streams -->
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M12,8 L14,8 L14,14 L12,14 Z M12,18 L14,18 L14,28 L12,28 Z M12,32 L14,32 L14,40 L12,40 Z" />
+    <path
+        android:fillColor="#76FF03"
+        android:pathData="M23,6 L25,6 L25,18 L23,18 Z M23,22 L25,22 L25,36 L23,36 Z" />
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M34,12 L36,12 L36,24 L34,24 Z M34,28 L36,28 L36,42 L34,42 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M23,38 L25,38 L25,42 L23,42 Z" />
+</vector>

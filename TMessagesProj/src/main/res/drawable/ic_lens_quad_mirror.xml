@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Quad Mirror: 4-Quadrant Cross Reflection -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M24,4 L24,44 M4,24 L44,24" />
+    <path
+        android:fillColor="#FF4081"
+        android:pathData="M12,12 L20,12 L20,20 L12,20 Z M28,12 L36,12 L36,20 L28,20 Z M12,28 L20,28 L20,36 L12,36 Z M28,28 L36,28 L36,36 L28,36 Z" />
+</vector>

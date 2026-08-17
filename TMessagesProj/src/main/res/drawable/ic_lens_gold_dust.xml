@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Gold Dust: Sparkling Luxury Shimmer Stars -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M24,8 L27,19 L38,22 L27,25 L24,36 L21,25 L10,22 L21,19 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,10 L15.5,14 L19.5,15.5 L15.5,17 L14,21 L12.5,17 L8.5,15.5 L12.5,14 Z M34,27 L35.5,31 L39.5,32.5 L35.5,34 L34,38 L32.5,34 L28.5,32.5 L32.5,31 Z" />
+</vector>
