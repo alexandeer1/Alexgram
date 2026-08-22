@@ -185,11 +185,13 @@
     <!-- [Alexgram: Session Management] - Start -->
     <string name="SessionManagementHeader">Session Management</string>
     <string name="SessionManagementTitle">Account Session Manager</string>
-    <string name="SessionManagementDesc">Manage logged-in sessions, active devices, and session backup export/import.</string>
+    <string name="SessionManagementDesc">Manage logged-in sessions, active devices, Pyrogram/Telethon sessions, and backup export/import.</string>
     <string name="ExportSessionsTitle">Export Account Sessions</string>
-    <string name="ExportSessionsDesc">Export active account sessions and configuration backup to JSON file.</string>
+    <string name="ExportSessionsDesc">Export active account sessions to Pyrogram String, Pyrogram .session file, Telethon, or Full JSON Backup.</string>
     <string name="ImportSessionTitle">Import Account Session</string>
-    <string name="ImportSessionDesc">Import session configuration file (.json or .session) from storage.</string>
+    <string name="ImportSessionDesc">Import Pyrogram string session, Pyrogram .session file, Telethon string, or JSON backup file.</string>
+    <string name="ImportSessionStringTitle">Import Session String</string>
+    <string name="ImportSessionStringDesc">Paste a Pyrogram (v1/v2) or Telethon session string to log in directly.</string>
     <string name="TelegramActiveDevices">Telegram Active Devices</string>
     <string name="TelegramActiveDevicesDesc">View active devices and manage sessions registered with Telegram servers.</string>
     <string name="WebSessionsTitleNa">Web Sessions</string>
@@ -209,6 +211,32 @@
     <string name="SessionExportError">Failed to export session backup.</string>
     <string name="SessionImportSuccess">Successfully processed session backup for %1$s!</string>
     <string name="SessionImportError">Failed to import session backup: Invalid or corrupted file format.</string>
+    <string name="ExportPyrogramString">Copy Pyrogram String Session</string>
+    <string name="ExportPyrogramFile">Export Pyrogram .session File</string>
+    <string name="ExportTelethonString">Copy Telethon String Session</string>
+    <string name="PasteSessionStringHint">Paste Pyrogram (v1/v2) or Telethon session string here...</string>
+    <string name="SessionCopied">Pyrogram session string copied to clipboard!</string>
+    <string name="TelethonSessionCopied">Telethon session string copied to clipboard!</string>
+    <string name="ExportTypeTitle">Choose Export Format</string>
+    <string name="ExportPyrogramStringOpt">Pyrogram Session String (v2 - Latest)</string>
+    <string name="ExportPyrogramFileOpt">Pyrogram SQLite (.session) File</string>
+    <string name="ExportTelethonStringOpt">Telethon Session String</string>
+    <string name="ExportAlexgramBackupOpt">Alexgram Full Session Backup (.session)</string>
+    <string name="PasteClipboard">Paste Clipboard</string>
+    <string name="ImportSessionButton">Import Session</string>
+    <string name="SessionImportSuccessDesc">Session imported successfully!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Max active accounts limit reached. Please remove an account first.</string>
+    <string name="SessionPasswordRequired">Password required for encrypted session backup.</string>
+    <string name="SessionFileEmpty">Selected session file is empty.</string>
+    <string name="SessionNoAccountsInBackup">No valid account sessions found in backup file.</string>
+    <string name="SessionStreamError">Could not open file stream.</string>
+    <string name="SessionAlreadyActive">Already on this account</string>
+    <string name="InvalidSessionString">Invalid Pyrogram or Telethon session string format.</string>
+    <string name="FailedExtractAuthKey">Failed to extract session auth key.</string>
+    <string name="CopyAgain">Copy Again</string>
+    <string name="ShareSessionString">Share Session String</string>
+    <string name="PyrogramSessionStringV2">Pyrogram Session String (v2)</string>
+    <string name="TelethonSessionStringTitle">Telethon Session String</string>
     <!-- [Alexgram: Session Management] - End -->
     <!-- [Alexgram: Feed Feature] - Start -->
     <string name="Feed">Feed</string>
