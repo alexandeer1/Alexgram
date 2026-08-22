@@ -237,6 +237,7 @@
     <string name="ShareSessionString">Share Session String</string>
     <string name="PyrogramSessionStringV2">Pyrogram Session String (v2)</string>
     <string name="TelethonSessionStringTitle">Telethon Session String</string>
+    <string name="NoAccounts">No active accounts found.</string>
     <!-- [Alexgram: Session Management] - End -->
     <!-- [Alexgram: Feed Feature] - Start -->
     <string name="Feed">Feed</string>
