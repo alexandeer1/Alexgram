@@ -2071,7 +2071,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                 copyForwardDialogId = did;
                 try {
                     MessageObject targetReplyMsg = (first.replyMessageObject != null && first.replyMessageObject.getDialogId() == did) ? first.replyMessageObject : null;
-                    prepareSendingMedia(AccountInstance.getInstance(currentAccount), infos, did, targetReplyMsg, null, null, null, finalForceDocument, true, null, null, true, 0, 0, 0, false, null, null, 0, 0, false, payStars, monoForumPeerId, suggestionParams);
+                    prepareSendingMedia(AccountInstance.getInstance(currentAccount), infos, did, targetReplyMsg, null, null, null, finalForceDocument, true, null, true, 0, 0, 0, false, null, null, 0L, false, payStars, monoForumPeerId, suggestionParams);
                 } finally {
                     isCopyForwarding = false;
                     copyForwardDialogId = 0;
@@ -2144,7 +2144,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                         isCopyForwarding = true;
                         copyForwardDialogId = did;
                         try {
-                            prepareSendingPhoto(AccountInstance.getInstance(currentAccount), finalPath, null, null, did, targetReplyMsg, null, null, null, messageObject.messageOwner.entities, null, null, messageObject.messageOwner.media.ttl_seconds, null, messageObject.videoEditedInfo, true, 0, 0, 0, false, messageObject.messageOwner.message, null, 0, 0, payStars, monoForumPeerId, suggestionParams);
+                            prepareSendingPhoto(AccountInstance.getInstance(currentAccount), finalPath, null, null, did, targetReplyMsg, null, null, null, messageObject.messageOwner.entities, null, null, messageObject.messageOwner.media.ttl_seconds, null, messageObject.videoEditedInfo, true, 0, 0, 0, false, messageObject.messageOwner.message, null, 0L, payStars, monoForumPeerId, suggestionParams);
                         } finally {
                             isCopyForwarding = false;
                             copyForwardDialogId = 0;
@@ -2168,7 +2168,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                             isCopyForwarding = true;
                             copyForwardDialogId = did;
                             try {
-                                prepareSendingVideo(AccountInstance.getInstance(currentAccount), finalPath, messageObject.videoEditedInfo, null, null, did, targetReplyMsg, null, null, null, messageObject.messageOwner.entities, messageObject.messageOwner.media.ttl_seconds, null, true, 0, 0, false, false, messageObject.messageOwner.message, null, 0, 0, payStars, monoForumPeerId, suggestionParams);
+                                prepareSendingVideo(AccountInstance.getInstance(currentAccount), finalPath, messageObject.videoEditedInfo, null, null, did, targetReplyMsg, null, null, null, messageObject.messageOwner.entities, messageObject.messageOwner.media.ttl_seconds, null, true, 0, 0, false, false, messageObject.messageOwner.message, null, 0L, payStars, monoForumPeerId, suggestionParams);
                             } finally {
                                 isCopyForwarding = false;
                                 copyForwardDialogId = 0;
@@ -2182,7 +2182,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                             isCopyForwarding = true;
                             copyForwardDialogId = did;
                             try {
-                                prepareSendingDocuments(AccountInstance.getInstance(currentAccount), paths, paths, null, messageObject.messageOwner.message, messageObject.messageOwner.entities, finalDocument.mime_type, did, targetReplyMsg, null, null, null, null, true, 0, 0, null, null, 0, 0, false, payStars, monoForumPeerId, suggestionParams);
+                                prepareSendingDocuments(AccountInstance.getInstance(currentAccount), paths, paths, null, messageObject.messageOwner.message, messageObject.messageOwner.entities, finalDocument.mime_type, did, targetReplyMsg, null, null, null, null, true, 0, 0, null, null, 0L, false, payStars, monoForumPeerId, suggestionParams);
                             } finally {
                                 isCopyForwarding = false;
                                 copyForwardDialogId = 0;
@@ -12823,6 +12823,14 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             params.hasMediaSpoilers = hasMediaSpoilers;
             return params;
         }
+    }
+
+    public void sendStakeDice(long peer, TLRPC.TL_messageMediaDice dice, MessageObject replyToTopMsg, MessageObject replyToMsg, long stake, ChatActivity.ReplyQuote quote) {
+        if (dice == null) return;
+        SendMessageParams params = SendMessageParams.of(dice.emoticon, null, null, null, null, null, null, null, null, null, peer, null, replyToMsg, replyToTopMsg, null, false, null, null, null, null, true, 0, 0, 0, null, null, false);
+        params.replyQuote = quote;
+        params.dice_stake = stake;
+        sendMessage(params);
     }
 
     public TLRPC.Message getMessageFromUpdate(TLRPC.Update u) {

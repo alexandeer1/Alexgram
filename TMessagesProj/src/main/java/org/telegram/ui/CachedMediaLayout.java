@@ -315,8 +315,7 @@ public class CachedMediaLayout extends FrameLayout implements NestedSizeNotifier
                                                     notify,
                                                     scheduleDate,
                                                     0,
-                                                    null,
-                                                    0
+                                                    null
                                                 );
                                             } else if (itemInner.file.type == 1) { // TYPE_VIDEOS
                                                 SendMessagesHelper.prepareSendingVideo(
@@ -340,9 +339,8 @@ public class CachedMediaLayout extends FrameLayout implements NestedSizeNotifier
                                                     false,
                                                     null,
                                                     null,
-                                                    0,
-                                                    0,
-                                                    0
+                                                    0L,
+                                                    0L
                                                 );
                                             } else {
                                                 ArrayList<String> paths = new ArrayList<>();
@@ -364,10 +362,9 @@ public class CachedMediaLayout extends FrameLayout implements NestedSizeNotifier
                                                     scheduleDate,
                                                     null,
                                                     null,
-                                                    0,
-                                                    0,
+                                                    0L,
                                                     false,
-                                                    0
+                                                    0L
                                                 );
                                             }
                                         }

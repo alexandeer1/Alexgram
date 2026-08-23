@@ -223,38 +223,46 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     ));
     private final AbstractConfigCell messageMenuRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "MessageMenu", null, R.drawable.msg_list, false, () ->
             showDialog(showMessageMenuConfigAlert(this, R.string.MessageMenu, new ArrayList<>() {{
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuReply", getString(R.string.Reply), R.drawable.menu_reply));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowReplyInPrivate(), getString(R.string.ReplyInPrivate), R.drawable.msg_reply_private));
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuCopy", getString(R.string.Copy), R.drawable.msg_copy));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyLink(), getString(R.string.CopyLink), R.drawable.msg_link));
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuForward", getString(R.string.Forward), R.drawable.msg_forward));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowNoQuoteForward(), getString(R.string.NoQuoteForward), R.drawable.msg_forward_noquote));
+                if (NaConfig.INSTANCE.getSpecialForward().Bool()) {
+                    add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getSpecialForward(), getString(R.string.SpecialForward), R.drawable.nk_special_forward));
+                }
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuEdit", getString(R.string.Edit), R.drawable.msg_edit));
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuDelete", getString(R.string.Delete), R.drawable.msg_delete));
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuPin", getString(R.string.PinMessage), R.drawable.msg_pin));
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuSaveToGallery", getString(R.string.SaveToGallery), R.drawable.msg_gallery));
+                add(new ConfigCellTextCheckIcon(null, "MessageMenuShare", getString(R.string.ShareFile), R.drawable.msg_shareout));
+                add(new ConfigCellTextCheckIcon(NekoConfig.showTranslate, getString(R.string.Translate), R.drawable.msg_translate));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowTranslateMessageLLM(), getString(R.string.TranslateMessageLLM), R.drawable.magic_stick_solar));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showAddToSavedMessages, getString(R.string.AddToSavedMessages), R.drawable.msg_saved));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowAddToBookmark(), getString(R.string.AddBookmark), R.drawable.msg_fave));
+                add(new ConfigCellTextCheckIcon(null, "showSaveToTemplates", getString(R.string.chat_templates), R.drawable.fork_templates));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showRepeat, getString(R.string.Repeat), R.drawable.msg_repeat));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowRepeatAsCopy(), getString(R.string.RepeatAsCopy), R.drawable.msg_repeat));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowRepeatAsCopy(), getString(R.string.RepeatAsCopy), R.drawable.round_repeat_24));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showViewHistory, getString(R.string.ViewHistory), R.drawable.menu_recent));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showMessageDetails, getString(R.string.MessageDetails), R.drawable.msg_info));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowAddToBookmark(), getString(R.string.AddBookmark), R.drawable.msg_fave));
-                add(new ConfigCellTextCheckIcon(NekoConfig.showTranslate, getString(R.string.Translate), R.drawable.msg_translate));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyFrame(), getString(R.string.CopyVideoFrame), R.drawable.msg_copy_video_frame));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyPhoto(), getString(R.string.CopyPhoto), R.drawable.msg_copy_photo));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyAsSticker(), getString(R.string.CopyPhotoAsSticker), R.drawable.msg_copy_sticker));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowAddToStickers(), getString(R.string.AddToStickers), R.drawable.msg_sticker));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowAddToFavorites(), getString(R.string.AddToFavorites), R.drawable.msg_fave));
+                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowSetReminder(), getString(R.string.SetReminder), R.drawable.msg_calendar2));
+                add(new ConfigCellTextCheckIcon(NekoConfig.showDeleteDownloadedFile, getString(R.string.DeleteDownloadedFile), R.drawable.msg_clear));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showMessageHide, getString(R.string.Hide), R.drawable.msg_disable));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showReport, getString(R.string.ReportChat), R.drawable.msg_report));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showShareMessages, getString(R.string.ShareMessages), R.drawable.msg_shareout));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowReactions(), getString(R.string.Reactions), R.drawable.msg_reactions2));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowReplyInPrivate(), getString(R.string.ReplyInPrivate), R.drawable.menu_reply));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyLink(), getString(R.string.CopyLink), R.drawable.msg_link));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyFrame(), getString(R.string.CopyVideoFrame), R.drawable.msg_copy_photo));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyPhoto(), getString(R.string.CopyPhoto), R.drawable.msg_copy_photo));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowCopyAsSticker(), getString(R.string.CopyPhotoAsSticker), R.drawable.msg_copy_photo));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowAddToStickers(), getString(R.string.AddToStickers), R.drawable.msg_sticker));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowAddToFavorites(), getString(R.string.AddToFavorites), R.drawable.msg_fave));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowNoQuoteForward(), getString(R.string.NoQuoteForward), R.drawable.msg_forward_noquote));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowSetReminder(), getString(R.string.SetReminder), R.drawable.msg_calendar2));
-                add(new ConfigCellTextCheckIcon(NekoConfig.showDeleteDownloadedFile, getString(R.string.DeleteDownloadedFile), R.drawable.msg_clear));
-                add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getShowTranslateMessageLLM(), getString(R.string.TranslateMessageLLM), R.drawable.magic_stick_solar));
-                add(new ConfigCellTextCheckIcon(NekoConfig.showAdminActions, getString(R.string.EditAdminRights), R.drawable.profile_admin));
+                add(new ConfigCellTextCheckIcon(NekoConfig.showAdminActions, getString(R.string.EditAdminRights), R.drawable.msg_admins));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showChangePermissions, getString(R.string.ChangePermissions), R.drawable.msg_permissions));
                 if (NaConfig.INSTANCE.getEnableAIReply().Bool()) {
                     add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getEnableAIReply(), getString(R.string.enableAIReply), R.drawable.ic_ai_reply_na));
                 }
                 if (NaConfig.INSTANCE.getEnableSummarizeChat().Bool()) {
                     add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getEnableSummarizeChat(), getString(R.string.enableSummarizeChat), R.drawable.ic_ai_summarize_na));
-                }
-                if (NaConfig.INSTANCE.getSpecialForward().Bool()) {
-                    add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getSpecialForward(), getString(R.string.SpecialForward), R.drawable.nk_special_forward));
                 }
             }}))
     ));

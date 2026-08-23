@@ -39,10 +39,10 @@ import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.DispatchQueuePoolBackground;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageReceiver;
-import org.telegram.messenger.ResLottieMeta;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.utils.BitmapsCache;
 import org.telegram.messenger.utils.Choreographer60FpsContent;
+import org.telegram.messenger.ResLottieMeta;
 import org.telegram.ui.BubbleActivity;
 import org.telegram.ui.LaunchActivity;
 

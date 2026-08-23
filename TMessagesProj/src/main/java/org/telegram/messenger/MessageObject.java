@@ -3854,6 +3854,7 @@ public class MessageObject {
         if (textLayoutBlocks != null) {
             textLayoutBlocks.clear();
         }
+        setType();
         generateLayout(null);
     }
 

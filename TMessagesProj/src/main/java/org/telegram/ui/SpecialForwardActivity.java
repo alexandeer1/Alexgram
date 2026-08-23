@@ -1722,7 +1722,7 @@ public class SpecialForwardActivity extends ChatActivity {
                             final boolean finalForceDocument = forceDocument;
                             final ArrayList<SendMessagesHelper.SendingMediaInfo> finalInfos = infos;
                             AndroidUtilities.runOnUIThread(() -> {
-                                SendMessagesHelper.prepareSendingMedia(getAccountInstance(), finalInfos, peer, null, null, null, null, finalForceDocument, true, null, true, 0, 0, 0, false, null, null, 0, 0L, false, 0L, 0L, null);
+                                SendMessagesHelper.prepareSendingMedia(getAccountInstance(), finalInfos, peer, null, null, null, null, finalForceDocument, true, null, true, 0, 0, 0, false, null, null, 0L, false, 0L, 0L, null);
                             });
                         }
                     } else {
@@ -1738,9 +1738,9 @@ public class SpecialForwardActivity extends ChatActivity {
                         String caption = keepCaption && message.messageOwner.message != null ? message.messageOwner.message : "";
                         ArrayList<TLRPC.MessageEntity> entities = keepCaption ? message.messageOwner.entities : null;
                         if (message.localMediaIsVideo) {
-                            SendMessagesHelper.prepareSendingVideo(getAccountInstance(), path, message.videoEditedInfo, null, null, peer, null, null, null, null, entities, 0, null, true, 0, 0, false, false, caption, null, 0, 0L, 0L);
+                            SendMessagesHelper.prepareSendingVideo(getAccountInstance(), path, message.videoEditedInfo, null, null, peer, null, null, null, null, entities, 0, null, true, 0, 0, false, false, caption, null, 0L, 0L);
                         } else {
-                            SendMessagesHelper.prepareSendingPhoto(getAccountInstance(), path, null, null, peer, null, null, null, null, entities, null, null, 0, null, message.videoEditedInfo, true, 0, 0, false, caption, null, 0, 0L, 0L);
+                            SendMessagesHelper.prepareSendingPhoto(getAccountInstance(), path, null, null, peer, null, null, null, null, entities, null, null, 0, null, message.videoEditedInfo, true, 0, 0, false, caption, null, 0L, 0L);
                         }
                     } else {
                         SendMessagesHelper.getInstance(currentAccount).processForwardFromMyName(message, peer, 0, 0, null);
@@ -1779,7 +1779,7 @@ public class SpecialForwardActivity extends ChatActivity {
                     if (!TextUtils.isEmpty(attachPath) && !attachPath.startsWith("http")) {
                         ArrayList<String> paths = new ArrayList<>();
                         paths.add(attachPath);
-                        SendMessagesHelper.prepareSendingDocuments(getAccountInstance(), paths, paths, null, caption, entities, null, peer, null, null, null, null, null, false, 0, 0, null, null, 0, 0, false, 0, 0, null, null, null, null, false);
+                        SendMessagesHelper.prepareSendingDocuments(getAccountInstance(), paths, paths, null, caption, entities, null, peer, null, null, null, null, null, false, 0, 0, null, null, 0L, false, 0L, 0L, null);
                     } else {
                         ArrayList<MessageObject> singleList = new ArrayList<>();
                         singleList.add(msg);

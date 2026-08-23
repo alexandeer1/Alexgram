@@ -1103,9 +1103,9 @@ public class TranslateController extends BaseController {
         if (message.messageOwner.reply_markup instanceof TLRPC.TL_replyInlineMarkup) {
             TLRPC.TL_replyInlineMarkup inlineMarkup = (TLRPC.TL_replyInlineMarkup) message.messageOwner.reply_markup;
             for (int i = 0; i < inlineMarkup.rows.size(); i++) {
-                TLRPC.TL_keyboardButtonRow row = inlineMarkup.rows.get(i);
+                org.telegram.tgnet.tl.TL_keyboard.KeyboardInlineButtonRow row = inlineMarkup.rows.get(i);
                 for (int j = 0; j < row.buttons.size(); j++) {
-                    TLRPC.KeyboardButton button = row.buttons.get(j);
+                    org.telegram.tgnet.tl.TL_keyboard.KeyboardInlineButton button = row.buttons.get(j);
                     if (!TextUtils.isEmpty(button.text)) {
                         buttonsToTranslate.add(button.text);
                     }

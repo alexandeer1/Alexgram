@@ -12450,7 +12450,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     button.selectorDrawable.setState(StateSet.NOTHING);
                 }
                 button.setPressed(false);
-                if (delegate.didLongPressBotButton(this, button.button)) {
+                if (delegate != null) {
+                    delegate.didLongPressBotButton(this, button.button);
                     return true;
                 }
             }

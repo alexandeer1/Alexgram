@@ -126,7 +126,7 @@ public final class PluginUtils {
                         (MessageObject) replyToTopMsg,
                         null,
                         (ChatActivity.ReplyQuote) replyQuote,
-                        null, true, 0, null, null, 0, false);
+                        null, true, 0, null, null, false);
             } catch (Throwable t) {
                 FileLog.e(t);
             }

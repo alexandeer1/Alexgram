@@ -108,6 +108,7 @@ object RichMessageTransHelper {
         }
     }
 
+    @JvmStatic
     fun hasActiveTranslation(messageObject: MessageObject?): Boolean {
         val language = getTranslatedLanguage(messageObject) ?: return false
         return hasFullCache(messageObject?.messageOwner?.rich_message, language)

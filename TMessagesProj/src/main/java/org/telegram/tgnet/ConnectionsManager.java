@@ -903,7 +903,7 @@ public class ConnectionsManager extends BaseController {
 
                 if (NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_NAX || NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_CUSTOM_DOH) {
                     FileLog.d("start custom dns txt task");
-                    DnsTxtLoadTask task = new DnsTxtLoadTask(currentAccount);
+                    GoogleDnsLoadTask task = new GoogleDnsLoadTask(currentAccount);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
                     currentTask = task;
                     return;

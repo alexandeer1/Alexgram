@@ -1,36 +1,15 @@
 import java.nio.file.Paths
 import org.gradle.internal.os.OperatingSystem
 
-<<<<<<< HEAD
 plugins {
     id 'com.android.application'
+    id 'org.telegram.lottie-meta'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
     id 'com.google.dagger.hilt.android'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.chaquo.python'
-=======
-apply plugin: 'com.android.library'
-apply plugin: 'org.telegram.lottie-meta'
-apply plugin: 'idea'
-
-idea {
-    module {
-        excludeDirs += [
-            file('jni/third_party'),
-            file('jni/ffmpeg'),
-            file('jni/tlottie'),
-            file('jni/boringssl'),
-            file('jni/sqlite')
-        ]
-    }
-}
-
-repositories {
-    mavenCentral()
-    google()
->>>>>>> 4e1a61eca6 (update to 12.10.0 (7031))
 }
 
 def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
@@ -311,7 +290,9 @@ dependencies {
     // add for emoji
     implementation 'com.jaredrummler:truetypeparser-light:1.0.0'
     // add for UnifiedPush
-    implementation 'org.unifiedpush.android:connector:3.2.0'
+    implementation ('org.unifiedpush.android:connector:3.2.0') {
+        exclude group: 'com.google.crypto.tink', module: 'tink'
+    }
     // add for save deleted messages
     implementation 'androidx.room:room-runtime:2.8.4'
     annotationProcessor 'androidx.room:room-compiler:2.8.4'
@@ -352,24 +333,10 @@ dependencies {
     implementation 'top.canyie.pine:xposed:0.2.0'
 }
 
-<<<<<<< HEAD
 def getPythonPath() {
     def envPath = System.getenv("PYTHON_PATH")
     if (envPath != null && !envPath.isEmpty()) {
         return envPath
-=======
-android {
-    compileSdkVersion 35
-    buildToolsVersion '35.0.0'
-    ndkVersion "27.2.12479018"
-
-    sourceSets.main.jniLibs.srcDirs = ['./jni/']
-
-    externalNativeBuild {
-        cmake {
-            path 'jni/CMakeLists.txt'
-        }
->>>>>>> 4e1a61eca6 (update to 12.10.0 (7031))
     }
     def localWinPath = "${System.getProperty('user.home')}/AppData/Local/Programs/Python/Python313/python.exe"
     if (new File(localWinPath).exists()) {

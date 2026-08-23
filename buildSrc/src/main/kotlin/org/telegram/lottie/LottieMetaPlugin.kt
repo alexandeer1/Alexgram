@@ -20,17 +20,11 @@ class LottieMetaPlugin : Plugin<Project> {
                 packageName.set(ext.packageName.orElse(variant.namespace))
                 rPackage.set(variant.namespace)
 
-                // res is a *layered* source directory set: Collection<Collection<Directory>>.
-                // Flatten the layers and keep only Lottie JSON under any raw* qualifier folder.
-                variant.sources.res?.all?.let { layers ->
-                    rawResources.from(
-                        layers.map { collections ->
-                            collections.flatten().map { dir ->
-                                dir.asFileTree.matching { include("raw*/**/*.json") }
-                            }
-                        }
-                    )
+                val resTree = project.fileTree("src/main/res") {
+                    include("raw*/**/*.json")
+                    include("raw/*.json")
                 }
+                rawResources.from(resTree)
             }
 
             variant.sources.java?.addGeneratedSourceDirectory(task, LottieMetaTask::outputDir)
