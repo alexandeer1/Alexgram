@@ -100,9 +100,10 @@ def normalize_message(text: str) -> str:
 
 
 def get_ai_summary() -> str:
-    ai_summary = os.environ.get("AI_SUMMARY", "")
-    if ai_summary:
-        return "\n\n<blockquote expandable>" + normalize_message(ai_summary) + "</blockquote>"
+    ai_summary = normalize_message(os.environ.get("AI_SUMMARY", "")).strip()
+    commit_message = (os.environ.get("COMMIT_MESSAGE") or "").strip()
+    if ai_summary and ai_summary != commit_message:
+        return f"\n\n<blockquote expandable>{ai_summary}</blockquote>"
     return ""
 
 

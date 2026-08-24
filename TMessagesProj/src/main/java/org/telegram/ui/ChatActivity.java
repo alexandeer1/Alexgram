@@ -5729,6 +5729,7 @@ public class ChatActivity extends BaseFragment implements
                         MessageObject message = slidingView.getMessageObject();
                         final boolean allowReplyOnOpenTopic = canSendMessageToTopic(message);
                         if (
+                            isFeedSearch() ||
                             bottomChannelButtonsLayout != null && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE && !(bottomOverlayChatWaitsReply && allowReplyOnOpenTopic || message.wasJustSent) ||
                             currentChat != null && (
                                 !tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !isThreadChat() ||
@@ -5736,6 +5737,9 @@ public class ChatActivity extends BaseFragment implements
                                 !ChatObject.canSendMessages(currentChat)
                             )
                         ) {
+                            if (isFeedSearch()) {
+                                message = com.exteragram.messenger.feed.FeedMessageUtils.getForwardingMessageObject(currentAccount, true, message);
+                            }
                             if (message.getGroupId() != 0) {
                                 MessageObject.GroupedMessages group = getGroup(message.getGroupId());
                                 if (group != null && group.captionMessage != null) {
@@ -24567,12 +24571,18 @@ public class ChatActivity extends BaseFragment implements
             if (messagePreviewParams != null) {
                 messagePreviewParams.checkEdits(messageObjects);
             }
-            if (did != dialog_id && did != mergeDialogId) {
+            if (did != dialog_id && did != mergeDialogId && !isFeedSearch()) {
                 return;
             }
             int loadIndex = did == dialog_id ? 0 : 1;
             doOnIdle(() -> {
-                replaceMessageObjects(messageObjects, loadIndex, false);
+                if (isFeedSearch()) {
+                    for (int m = 0; m < messageObjects.size(); m++) {
+                        updateMessageTranslation(messageObjects.get(m), false);
+                    }
+                } else {
+                    replaceMessageObjects(messageObjects, loadIndex, false);
+                }
             });
         } else if (id == NotificationCenter.notificationsSettingsUpdated) {
             updateTitleIcons();
@@ -25555,7 +25565,7 @@ public class ChatActivity extends BaseFragment implements
         } else if (id == NotificationCenter.messageTranslated) {
             final MessageObject messageObject = (MessageObject) args[0];
             final boolean summary = args.length > 1 && (boolean) args[1];
-            if (getDialogId() != messageObject.getDialogId()) {
+            if (getDialogId() != messageObject.getDialogId() && !isFeedSearch()) {
                 return;
             }
             updateMessageTranslation(messageObject, summary);
@@ -25564,7 +25574,7 @@ public class ChatActivity extends BaseFragment implements
             }
         } else if (id == NotificationCenter.messageTranslating) {
             MessageObject messageObject = (MessageObject) args[0];
-            if (getDialogId() != messageObject.getDialogId()) {
+            if (getDialogId() != messageObject.getDialogId() && !isFeedSearch()) {
                 return;
             }
             if (chatListView == null || chatAdapter == null) {
@@ -25919,13 +25929,28 @@ public class ChatActivity extends BaseFragment implements
         boolean updated = false;
         ArrayList<Integer> lazyUpdaterList = new ArrayList<>();
         for (MessageObject pinnedMessageObject : pinnedMessageObjects.values()) {
-            if (pinnedMessageObject != null && pinnedMessageObject.getId() == messageObject.getId()) {
+            if (pinnedMessageObject != null && (pinnedMessageObject.getId() == messageObject.getId() || (isFeedSearch() && pinnedMessageObject.getRealId() == messageObject.getRealId() && pinnedMessageObject.getDialogId() == messageObject.getDialogId()))) {
                 pinnedMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                 pinnedMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
+                pinnedMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                pinnedMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
+                pinnedMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                 if (pinnedMessageObject.updateTranslation(true)) {
                     lazyUpdaterList.add(pinnedMessageObject.getId());
                     updatePinnedMessageView(true, 1);
                     updated = true;
+                }
+            }
+        }
+        if (isFeedSearch()) {
+            com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.peekInstance(currentAccount);
+            if (feedController != null) {
+                MessageObject cached = feedController.getMessage(messageObject.getDialogId(), messageObject.getRealId());
+                if (cached != null && cached != messageObject) {
+                    com.exteragram.messenger.feed.FeedMessageUtils.copyTranslationState(messageObject, cached);
+                    cached.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                    cached.messageOwner.translated = messageObject.messageOwner.translated;
+                    cached.updateTranslation(false);
                 }
             }
         }
@@ -25942,12 +25967,18 @@ public class ChatActivity extends BaseFragment implements
                     continue;
                 }
                 boolean update = lazyUpdaterList.contains(cellMessageObject.getId());
-                if (cellMessageObject.getId() == messageObject.getId()) {
+                boolean isTarget = cellMessageObject == messageObject
+                        || cellMessageObject.getId() == messageObject.getId()
+                        || (isFeedSearch() && cellMessageObject.getRealId() == messageObject.getRealId() && cellMessageObject.getDialogId() == messageObject.getDialogId());
+                if (isTarget) {
                     cellMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                     cellMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
                     cellMessageObject.messageOwner.summaryText = messageObject.messageOwner.summaryText;
                     cellMessageObject.messageOwner.translatedSummaryText = messageObject.messageOwner.translatedSummaryText;
                     cellMessageObject.messageOwner.translatedSummaryLanguage = messageObject.messageOwner.translatedSummaryLanguage;
+                    cellMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                    cellMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
+                    cellMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                     if (cellMessageObject.updateTranslation(false)) {
                         update = true;
                         ArrayList<Integer> dependentMessages = replyMessageOwners.get(cellMessageObject.getId());
@@ -25967,11 +25998,14 @@ public class ChatActivity extends BaseFragment implements
                     }
                     groupChecked.add(group.groupId);
                 }
-                if (cellMessageObject.replyMessageObject != null && cellMessageObject.replyMessageObject.getId() == messageObject.getId() && cellMessageObject.replyMessageObject.getDialogId() == messageObject.getDialogId()) {
+                if (cellMessageObject.replyMessageObject != null && (cellMessageObject.replyMessageObject.getId() == messageObject.getId() || (isFeedSearch() && cellMessageObject.replyMessageObject.getRealId() == messageObject.getRealId())) && cellMessageObject.replyMessageObject.getDialogId() == messageObject.getDialogId()) {
                     cellMessageObject.replyMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
                     cellMessageObject.replyMessageObject.messageOwner.translatedSummaryText = messageObject.messageOwner.translatedSummaryText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedSummaryLanguage = messageObject.messageOwner.translatedSummaryLanguage;
+                    cellMessageObject.replyMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                    cellMessageObject.replyMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
+                    cellMessageObject.replyMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                     if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
                         lazyUpdaterList.add(cellMessageObject.replyMessageObject.getId());
                         update = true;
@@ -35626,8 +35660,12 @@ public class ChatActivity extends BaseFragment implements
                 // [Alexgram: Allow Forwarding/Copying] - End
                     return;
                 }
-                if (selectedObject != null && currentChat != null && (!tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !ChatObject.isMonoForum(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat))) {
+                boolean replyInOtherChat = isFeedSearch() || (selectedObject != null && currentChat != null && (!tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !ChatObject.isMonoForum(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat)));
+                if (replyInOtherChat) {
                     MessageObject messageObject = selectedObject;
+                    if (isFeedSearch()) {
+                        messageObject = com.exteragram.messenger.feed.FeedMessageUtils.getForwardingMessageObject(currentAccount, true, messageObject);
+                    }
                     if (messageObject.getGroupId() != 0) {
                         MessageObject.GroupedMessages group = getGroup(messageObject.getGroupId());
                         if (group != null) {
