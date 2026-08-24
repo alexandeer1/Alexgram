@@ -41,6 +41,8 @@ public class IconSplashView extends FrameLayout {
         int size = AndroidUtilities.dp(120);
         LayoutParams params = new LayoutParams(size, size, Gravity.CENTER);
         addView(imageView, params);
+
+        setOnClickListener(v -> finish());
     }
 
     @Override

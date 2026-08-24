@@ -33370,32 +33370,10 @@ public class ChatActivity extends BaseFragment implements
                 icons.addAll(textIcons);
                 options.clear();
                 options.addAll(textOptions);
-
-                if (GroupedIconsView.useGroupedIcons() && gridOptions.isEmpty()) {
-                    boolean canDeleteVal = selectedObject != null && selectedObject.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat);
-                    boolean textEmptyVal = selectedObject == null || selectedObject.messageOwner == null || TextUtils.isEmpty(selectedObject.messageOwner.message);
-                    boolean hasCaptionVal = selectedObject != null && !TextUtils.isEmpty(getMessageCaption(selectedObject, selectedObjectGroup));
-                    boolean willBeInGroupedIcons = !canDeleteVal || (textEmptyVal && !hasCaptionVal);
-                    if (willBeInGroupedIcons) {
-                        for (int i = 0; i < options.size(); i++) {
-                            int opt = options.get(i);
-                            if (opt == OPTION_COPY_PHOTO || opt == OPTION_COPY_PHOTO_AS_STICKER) {
-                                String optKey = getConfigKeyForOption(opt);
-                                int optMode = tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity.getMessageMenuMode(optKey, false);
-                                if (optMode != 1) { // Only remove if mode is NOT Text (1)
-                                    items.remove(i);
-                                    options.remove(i);
-                                    icons.remove(i);
-                                    i--;
-                                }
-                            }
-                        }
-                    }
-                }
                 // [Alexgram: Customizable Message Menu] - End
 
                 scrimPopupWindowItems = new ActionBarMenuSubItem[items.size()];
-                final boolean hasBottomIcons = GroupedIconsView.useGroupedIcons() || !gridOptions.isEmpty();
+                final boolean hasBottomIcons = !gridOptions.isEmpty();
                 for (int a = 0, N = items.size(); a < N; a++) {
                     ActionBarMenuSubItem cell = new ActionBarMenuSubItem(getParentActivity(), a == 0, a == N - 1 && !hasBottomIcons, themeDelegate);
                     cell.setMinimumWidth(AndroidUtilities.dp(200));
@@ -33802,13 +33780,6 @@ public class ChatActivity extends BaseFragment implements
                             currentRow.addView(cell, new android.widget.LinearLayout.LayoutParams(0, LayoutHelper.WRAP_CONTENT, 1.0f));
                         }
                     }
-                }
-
-                if (GroupedIconsView.useGroupedIcons() && gridOptions.isEmpty()) {
-                    popupLayout.addView(new ActionBarPopupWindow.GapView(contentView.getContext(), themeDelegate), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
-
-                    var groupedIconsView = new GroupedIconsView(getContext(), ChatActivity.this, selectedObject, this.lastMessageMenuStatus.allowReply, this.lastMessageMenuStatus.allowReplyPm, this.lastMessageMenuStatus.allowEdit, this.lastMessageMenuStatus.allowDelete, this.lastMessageMenuStatus.allowForward, this.lastMessageMenuStatus.allowCopy, this.lastMessageMenuStatus.allowCopyPhoto, this.lastMessageMenuStatus.allowCopyLink, this.lastMessageMenuStatus.allowCopyLinkPm);
-                    popupLayout.addView(groupedIconsView.linearLayout);
                 }
 
                 if (selectedObject != null && selectedObject.isEphemeral() && chatMode != MODE_WELCOME_MESSAGES && !showWelcomeMessageRevertOption(selectedObject)) {
@@ -49035,27 +49006,21 @@ public class ChatActivity extends BaseFragment implements
 
             if ((selectedObject.type == MessageObject.TYPE_TEXT || selectedObject.isAnimatedEmoji() || selectedObject.isAnimatedEmojiStickers() || getMessageCaption(selectedObject, selectedObjectGroup) != null) && !noforwardsOrPaidMedia && !message.isExpiredStory()) {
                 allowCopy = true;
-                if (!GroupedIconsView.useGroupedIcons()) {
-                    items.add(getString(R.string.Copy));
-                    options.add(OPTION_COPY);
-                    icons.add(R.drawable.msg_copy);
-                }
+                items.add(getString(R.string.Copy));
+                options.add(OPTION_COPY);
+                icons.add(R.drawable.msg_copy);
             }
             allowDelete = true;
-            if (!GroupedIconsView.useGroupedIcons()) {
-                items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
-                options.add(OPTION_DELETE);
-                icons.add(deleteIconRes);
-            }
+            items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
+            options.add(OPTION_DELETE);
+            icons.add(deleteIconRes);
         } else if (type == 1) {
             if (currentChat != null) {
                 if ((allowChatActions || isEphemeralFromBot) && (primaryMessage == null || !primaryMessage.isWelcomeMessage()) && !isInsideContainer && chatMode != MODE_WELCOME_MESSAGES) {
                     allowReply = true;
-                    if (!GroupedIconsView.useGroupedIcons()) {
-                        items.add(LocaleController.getString(R.string.Reply));
-                        options.add(OPTION_REPLY);
-                        icons.add(R.drawable.menu_reply);
-                    }
+                    items.add(LocaleController.getString(R.string.Reply));
+                    options.add(OPTION_REPLY);
+                    icons.add(R.drawable.menu_reply);
                 }
                 if (!isThreadChat() && chatMode != MODE_SCHEDULED && primaryMessage != null && primaryMessage.hasReplies() && currentChat.megagroup && primaryMessage.canViewThread()) {
                     items.add(LocaleController.formatPluralString("ViewReplies", primaryMessage.getRepliesCount()));
@@ -51237,10 +51202,11 @@ public class ChatActivity extends BaseFragment implements
     public static final int MESSAGE_TYPE_INVALID = 0;
     public static final int MESSAGE_TYPE_SERVICE = 1;
     public static final int MESSAGE_TYPE_MEDIA = 2;
-    public static final int MESSAGE_TYPE_SEND_ERROR_TEXT = 3;
-    public static final int MESSAGE_TYPE_SEND_ERROR_MEDIA = 4;
+    public static final int MESSAGE_TYPE_TEXT = 3;
+    public static final int MESSAGE_TYPE_SEND_ERROR_TEXT = 20;
+    public static final int MESSAGE_TYPE_SEND_ERROR_MEDIA = 0;
     public static final int MESSAGE_TYPE_FONT = 5;
-    public static final int MESSAGE_TYPE_STICKER_PACK_NOT_INSTALLED = 6;
+    public static final int MESSAGE_TYPE_STICKER_PACK_NOT_INSTALLED = 7;
 
     public boolean isTitleCentered() {
         return canShowCenteredTitle(this);

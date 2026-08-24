@@ -204,16 +204,23 @@ androidComponents {
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
             String gramName = 'Alexgram'
-            String suffix = ""
+            String abi = 'universal'
             if (!nativeTarget.isBlank()) {
-                suffix = "-${nativeTarget.replace(',', '-')}"
+                if (nativeTarget.contains(',')) {
+                    abi = 'universal'
+                } else {
+                    abi = nativeTarget.trim()
+                }
             }
-            String first = String.format('%s-v%s(%s)%s', gramName, verName, verCode, suffix)
+            String commitPart = commitId?.take(7) ? "-${commitId.take(7)}" : ""
+            String codePart = "(${verCode})"
+            String first = String.format('%s-v%s-%s%s%s', gramName, APP_VERSION_NAME, abi, commitPart, codePart)
             output.outputFileName.set(
                 output.outputFileName.get()
                     .replace('TMessagesProj', first)
                     .replace('-release', '')
                     .replace('-staging', '')
+                    .replace('-debug', '')
             )
         }
     }

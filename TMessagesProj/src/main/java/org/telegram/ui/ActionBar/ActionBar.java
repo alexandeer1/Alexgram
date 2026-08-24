@@ -68,6 +68,7 @@ import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.ChatAvatarContainer;
 import org.telegram.ui.Components.CubicBezierInterpolator;
+import org.telegram.ui.Components.NumberTextView;
 import org.telegram.ui.Components.EllipsizeSpanAnimator;
 import org.telegram.ui.Components.FireworksEffect;
 import org.telegram.ui.Components.LayoutHelper;
@@ -903,7 +904,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (actionModeExtraView != null) {
                 animators.add(ObjectAnimator.ofFloat(actionModeExtraView, View.TRANSLATION_Y, 0));
             }
-            if (actionModeColor == 0) {
+            if (actionModeColor == 0 || glassMode) {
                 if (!isSearchFieldVisible) {
                     if (titleTextView[0] != null) {
                         animators.add(ObjectAnimator.ofFloat(titleTextView[0], View.ALPHA, 0));
@@ -2320,7 +2321,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             final int widthDefault = rightDefault - leftDefault;
             final int left, right;
             if (chatAvatarContainer != null) {
-                final int targetActionModeWidth = Math.min(widthDefault, dp(120));
+                final int targetActionModeWidth = Math.min(widthDefault, dp(58));
                 final int expandedWidth = lerp(widthDefault, targetActionModeWidth, actionModeFactor);
                 final int width = lerp(Math.min(widthDefault, (int) animatorAvatarContainerWidth.getFactor() + p * 2), expandedWidth, Math.max(searchFactor, actionModeFactor));
                 left = (rightDefault + leftDefault - width) / 2;
@@ -2330,8 +2331,29 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     - chatAvatarContainer.getLeftPadding()
                     + p + dp(3));
             } else {
-                left = leftDefault;
-                right = rightDefault;
+                if (actionModeFactor > 0) {
+                    final int targetActionModeWidth = Math.min(widthDefault, dp(58));
+                    final int width = lerp(widthDefault, targetActionModeWidth, actionModeFactor);
+                    left = (rightDefault + leftDefault - width) / 2;
+                    right = left + width;
+                } else {
+                    left = leftDefault;
+                    right = rightDefault;
+                }
+            }
+
+            if (actionMode != null && actionModeFactor > 0) {
+                for (int i = 0; i < actionMode.getChildCount(); i++) {
+                    View child = actionMode.getChildAt(i);
+                    if (child instanceof NumberTextView) {
+                        NumberTextView ntv = (NumberTextView) child;
+                        ntv.setCenterAlign(true);
+                        float targetCenterX = (left + right) / 2f;
+                        float currentCenterX = actionMode.getX() + child.getLeft() + child.getWidth() / 2f;
+                        child.setTranslationX(targetCenterX - currentCenterX);
+                        break;
+                    }
+                }
             }
 
             updateGlassRadius();

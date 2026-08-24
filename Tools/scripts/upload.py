@@ -1,7 +1,9 @@
 import contextlib
+import html
 import json
 import mimetypes
 import os
+import re
 import time
 import uuid
 from pathlib import Path
@@ -41,15 +43,54 @@ def find_apk(abi: str) -> Path | None:
         if not artifact_dir.is_dir():
             continue
         for apk in artifact_dir.glob("*.apk"):
-            if abi in apk.name:
+            if abi in apk.name.lower():
                 return apk
     return None
+
+
+def get_variant_info(file_path: Path | None) -> str:
+    if not file_path:
+        return ""
+    name = file_path.name.lower()
+    if "universal" in name:
+        return "Universal"
+    elif "arm64-v8a" in name:
+        return "ARM64 (arm64-v8a)"
+    elif "armeabi-v7a" in name:
+        return "ARMv7 (armeabi-v7a)"
+    elif "x86_64" in name:
+        return "x86_64"
+    elif "x86" in name:
+        return "x86"
+    return ""
+
+
+def get_version_info(file_path: Path | None) -> str:
+    if file_path:
+        match = re.search(r"-v(\d+\.\d+(?:\.\d+)?(?:-[A-Za-z0-9.]+)*?)", file_path.name)
+        if match:
+            v = match.group(1).split("-")[0]
+            if v:
+                return v
+    # Fallback to reading gradle.properties
+    gradle_props = Path("gradle.properties")
+    if gradle_props.exists():
+        with contextlib.suppress(Exception):
+            for line in gradle_props.read_text(encoding="utf-8").splitlines():
+                if line.startswith("APP_VERSION_NAME="):
+                    return line.split("=", 1)[1].strip()
+    return ""
 
 
 def get_commit_info() -> tuple[str, str, str]:
     commit_id_raw = os.environ.get("COMMIT_ID") or "unknown"
     commit_id = commit_id_raw[:7]
-    commit_url = os.environ.get("COMMIT_URL") or "https://github.com/alexandeer1/Alexgram/commits"
+    commit_url = os.environ.get("COMMIT_URL")
+    if not commit_url or not commit_url.startswith("http"):
+        if commit_id and commit_id != "unknown":
+            commit_url = f"https://github.com/alexandeer1/Alexgram/commit/{commit_id_raw}"
+        else:
+            commit_url = "https://github.com/alexandeer1/Alexgram/commits"
     commit_message = os.environ.get("COMMIT_MESSAGE") or "unknown"
     return commit_id, commit_url, commit_message
 
@@ -65,30 +106,67 @@ def get_ai_summary() -> str:
     return ""
 
 
-def get_caption() -> str:
+def get_caption(file_path: Path | None = None) -> str:
     commit_id, commit_url, commit_message = get_commit_info()
-    preface = "Test version." if test_version else "Release version."
-    caption = (
-        f"{preface}\n\n"
-        f"Commit Message:\n<blockquote expandable>{commit_message}</blockquote>\n\n"
-        f"See commit details [{commit_id}]({commit_url})"
-    )
+    workflow = (os.environ.get("GITHUB_WORKFLOW") or "").lower()
+
+    if not test_version or "release" in workflow:
+        title = "Alexgram Release"
+        icon = "🚀"
+    elif "canary" in workflow:
+        title = "Alexgram Canary"
+        icon = "🧪"
+    elif "staging" in workflow:
+        title = "Alexgram Staging"
+        icon = "⚡"
+    else:
+        title = "Alexgram Test Build"
+        icon = "🧪"
+
+    variant = get_variant_info(file_path)
+    version = get_version_info(file_path)
+
+    version_badge = f" • <code>v{html.escape(version)}</code>" if version else ""
+    variant_line = f"\n📦 <b>Variant:</b> <code>{html.escape(variant)}</code>" if variant else ""
+
+    header = f"{icon} <b>{title}</b>{version_badge}{variant_line}\n\n📝 <b>Commit:</b>\n"
+    footer = f"\n\n🔍 <a href=\"{html.escape(commit_url, quote=True)}\"><b>Commit Details:</b> <code>{html.escape(commit_id)}</code></a>"
+
     ai_summary = get_ai_summary()
-    full_caption = caption + ai_summary
-    if len(full_caption) <= 1024:
-        return full_caption
-    if len(caption) > 1024:
-        caption = caption[:1020] + "..."
-    if len(caption + ai_summary) > 1024:
-        return caption
-    return caption + ai_summary
+
+    # Calculate available space within Telegram's 1024 char caption limit
+    reserved_len = len(header) + len("<blockquote expandable></blockquote>") + len(footer) + len(ai_summary)
+    max_msg_len = max(50, 1024 - reserved_len)
+
+    msg_escaped = html.escape(commit_message.strip())
+    if len(msg_escaped) > max_msg_len:
+        msg_escaped = msg_escaped[: max_msg_len - 3].rstrip() + "..."
+
+    body = f"<blockquote expandable>{msg_escaped}</blockquote>"
+    full_caption = header + body + footer + ai_summary
+
+    if len(full_caption) > 1024:
+        full_caption = header + body + footer
+        if len(full_caption) > 1024:
+            available = max(20, 1024 - len(header) - len(footer) - 35)
+            msg_escaped = msg_escaped[:available].rstrip() + "..."
+            full_caption = header + f"<blockquote expandable>{msg_escaped}</blockquote>" + footer
+
+    return full_caption
 
 
 def get_metadata() -> str:
-    commit_id = "<code>" + (os.environ.get("COMMIT_ID") or "unknown")[:7] + "</code>"
-    commit_message = "<code>" + (os.environ.get("COMMIT_MESSAGE") or "unknown") + "</code>"
-    build_timestamp = "<code>" + (os.environ.get("BUILD_TIMESTAMP") or "-1") + "</code>"
-    return build_timestamp + " " + commit_id + "\n" + commit_message
+    commit_id, _, commit_message = get_commit_info()
+    build_timestamp = os.environ.get("BUILD_TIMESTAMP") or "-1"
+
+    commit_id_esc = html.escape(commit_id)
+    commit_msg_esc = html.escape(commit_message)
+    ts_esc = html.escape(build_timestamp)
+
+    return (
+        f"⏱ <b>Build:</b> <code>{ts_esc}</code> • <b>Commit:</b> <code>{commit_id_esc}</code>\n"
+        f"📝 <code>{commit_msg_esc}</code>"
+    )
 
 
 def get_workflow_url() -> str:
@@ -101,13 +179,13 @@ def get_workflow_url() -> str:
 
 
 def get_large_file_notice(file_path: Path) -> str:
-    caption = get_caption()
+    caption = get_caption(file_path)
     workflow_url = get_workflow_url()
     notice = (
         "\n\n<blockquote expandable>"
         "APK was too large for direct Telegram Bot API upload from CI. "
-        f"File: {file_path.name}. "
-        f"Open workflow artifacts here: {workflow_url}"
+        f"File: {html.escape(file_path.name)}. "
+        f"Open workflow artifacts here: <a href=\"{html.escape(workflow_url, quote=True)}\">Workflow Runs</a>"
         "</blockquote>"
     )
     full_text = caption + notice
@@ -122,28 +200,25 @@ def get_documents() -> list[dict[str, str | Path]]:
         apk_path = Path(apk_path_env)
         if apk_path.is_dir():
             documents = []
-            for apk in apk_path.rglob("*.apk"):
-                documents.append({"path": apk, "caption": ""})
-            if documents:
-                documents[-1]["caption"] = get_caption()
-                return documents
+            for apk in sorted(apk_path.rglob("*.apk")):
+                documents.append({"path": apk, "caption": get_caption(apk)})
+            return documents
         elif apk_path.is_file():
-            return [{"path": apk_path, "caption": get_caption()}]
+            return [{"path": apk_path, "caption": get_caption(apk_path)}]
 
     documents: list[dict[str, str | Path]] = []
-    for abi in ["armeabi-v7a", "arm64-v8a"]:
+    for abi in ["universal", "arm64-v8a", "armeabi-v7a", "x86_64", "x86"]:
         apk = find_apk(abi)
         if apk is not None:
-            documents.append({"path": apk, "caption": ""})
+            documents.append({"path": apk, "caption": get_caption(apk)})
     if not documents:
-        for apk in artifacts_path.rglob("*.apk"):
-            documents.append({"path": apk, "caption": ""})
+        for apk in sorted(artifacts_path.rglob("*.apk")):
+            documents.append({"path": apk, "caption": get_caption(apk)})
     if not documents:
         documents.append({
             "path": Path("TMessagesProj/src/main/ic_launcher_nagram_block_round-playstore.png"),
-            "caption": "",
+            "caption": get_caption(),
         })
-    documents[-1]["caption"] = get_caption()
     return documents
 
 

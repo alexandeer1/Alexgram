@@ -42,6 +42,8 @@ public class TelegramSplashView extends FrameLayout {
         LayoutParams params = new LayoutParams(size, size, Gravity.CENTER);
         addView(imageView, params);
 
+        setOnClickListener(v -> finish());
+
         if (drawable instanceof AnimatedVectorDrawable) {
             AnimatedVectorDrawable avd = (AnimatedVectorDrawable) drawable;
             
