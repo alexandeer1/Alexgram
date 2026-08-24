@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">背景執行</string>
+    <string name="RunInBackgroundInfo">保持程式在背景執行以確保通知可靠。</string>
+    <string name="NagramXPushService">Alexgram 推送服務</string>
     <string name="N_Config">A-設定</string>
     <string name="CombineMessage">合併訊息</string>
     <string name="TextStyle">文字樣式</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">顯示訊息 ID</string>
     <string name="ShowRPCError">顯示 RPC 錯誤</string>
     <string name="ShowPremiumStickersAnimation">顯示 Premium 貼圖動畫</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">繽紛</string>
     <string name="AppIconDarkGreen">深翠</string>
     <string name="AppIconNeon">霓虹</string>
     <string name="AppIconNiello">黑金</string>
     <string name="AppIconBlue">幾何</string>
+    <string name="AppIconColored">Alexgram 彩色</string>
+    <string name="AppIconDark">Alexgram 深色</string>
+    <string name="AppIconGreen">Alexgram 綠色</string>
+    <string name="AppIconPink">Alexgram 粉色</string>
+    <string name="AppIconRoseBlue">Alexgram 藍粉色</string>
+    <string name="AppIconWhite">Alexgram 白色</string>
     <string name="AppIconDarkBlue">幾何藍</string>
     <string name="AppIconBlurBlue">輕盈</string>
     <string name="InputMessageId">輸入訊息 ID</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">自訂已編輯訊息標記</string>
     <string name="NotificationIcon">通知圖示樣式</string>
     <string name="Official">官方</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">萬聖節</string>
     <string name="ShowOnlineStatus">顯示使用者線上狀態</string>
     <string name="ShowOnlineStatusNotice">在群組內時在使用者頭像的右下角顯示線上狀態。</string>
@@ -65,7 +76,11 @@
     <string name="ShowQuickReplyInBotCommands">在與機器人聊天時顯示快速回覆按鈕</string>
     <string name="PushServiceType">推播服務類型</string>
     <string name="PushServiceTypeInApp">Alexgram</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">使用常駐通知</string>
+    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">MP4 影片作為檔案傳送時可預覽</string>
     <string name="StickersChooseShortNameForStickerPack">為您的貼圖包選擇一個簡短的名稱</string>
     <string name="StickersCopyStickerSet">複製整個貼圖包</string>
@@ -86,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">不區分大小寫</string>
     <string name="RegexFiltersAdd">新增過濾器</string>
     <string name="RegexFiltersEdit">編輯過濾器</string>
-    <string name="RegexFiltersAddDescription">您可以使用網站 &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; 來測試您的正規表示式。您也可以使用純文字，但請不要忘記使用轉義符號。</string>
+    <string name="RegexFiltersAddDescription">您可以使用網站 &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; 來測試您的正規表示式。您也可以使用純文字，但請不要忘記使用轉義符號。</string>
     <string name="RegexFiltersAddError">正規表示式語法錯誤</string>
     <string name="ShowTimeHint">點擊時間顯示詳細資訊</string>
     <string name="SearchHashtagDefaultPageChannel">在頻道中點擊標籤時預設的搜尋頁面</string>
     <string name="SearchHashtagDefaultPageChat">在聊天中點擊標籤時預設的搜尋頁面</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">傳送訊息 Pangu 化</string>
     <string name="PanguInfo">使文字更具可讀性。在 CJK（中文、日文、韓文）、半形英文、數字和符號字元之間的間隔中自動插入空格。</string>
     <string name="SendWithPangu">使用 Pangu 傳送</string>
@@ -104,22 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">軟解優先</string>
     <string name="VideoPlayerDecoderHardware">僅硬解</string>
     <string name="VideoPlayerDecoderPreferHW">硬解優先</string>
-    <string name="RunInBackground">背景執行</string>
-    <string name="RunInBackgroundInfo">保持程式在背景執行以確保通知可靠。</string>
-    <string name="NagramXPushService">Alexgram 推送服務</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram 彩色</string>
-    <string name="AppIconDark">Alexgram 深色</string>
-    <string name="AppIconGreen">Alexgram 綠色</string>
-    <string name="AppIconPink">Alexgram 粉色</string>
-    <string name="AppIconRoseBlue">Alexgram 藍粉色</string>
-    <string name="AppIconWhite">Alexgram 白色</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">影片桌面</string>
     <string name="ExportChat">匯出聊天</string>
     <string name="ImportChat">匯入聊天</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">從主列表中隱藏敏感聊天。解鎖後長按標題欄即可訪問。</string>
     <string name="HideContacts">隱藏聯絡人</string>
     <string name="RestartRequired">需要重啟以應用更改</string>
-    <string name="MaxActiveAccounts">最大活躍帳號數</string>
-    <string name="LimitReachedAccountsNa">抱歉，您最多只能新增 **%1$d** 個帳號。您可以在 **A-設定 &gt; 一般** 中將此限制提高（最多100個）。</string>
-    <string name="MaxActiveAccountsWarning">您目前有 %1$d 個活躍帳號。將限制設定為 %2$d 將阻止您新增帳號，直到您退出部分帳號。</string>
     <string name="SplitChat">分螢幕聊天</string>
     <string name="SplitChatClose">關閉分螢幕</string>
     <string name="SplitChatSelectChat">選擇一個要同時開啟的聊天</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">在 Spoiler 遮罩下顯示已封鎖/被小黑屋使用者的訊息，而不是直接隱藏它們。</string>
     <string name="RegexFiltersSpoilerMatchOnly">僅對符合的規則運算式進行遮罩</string>
     <string name="RegexFiltersSpoilerColor">遮罩粒子顏色</string>
+    <string name="AccountsSettings">帳號管理</string>
+    <string name="AccountLimitsHeader">帳號數量限制</string>
+    <string name="StartupPerformanceHeader">啟動效能</string>
+    <string name="MaxAccountCount">最大帳號數量</string>
+    <string name="MaxActiveAccounts">最大活躍帳號數</string>
+    <string name="StartupActiveAccounts">啟動時啟用的帳號數</string>
+    <string name="StartupActiveAccountsInfo">控制應用程式開啟時初始化的帳號數量。數值越小，啟動越快且更省電。切換到其他帳號時將按需載入。</string>
+    <string name="LimitReachedAccountsNa">抱歉，您最多只能新增 **%1$d** 個帳號。您可以在 **A-Settings → 帳號管理** 中增加此限制（最高 100）。</string>
+    <string name="MaxActiveAccountsWarning">您目前有 %1$d 個活躍帳號。將限制設定為 %2$d 將阻止您新增帳號，直到您登出部分帳號。</string>
+    <string name="HiddenAccountsTitle">隱藏帳號</string>
+    <string name="HiddenAccountsDesc">點擊鎖圖示即可隱藏帳號。在解鎖此密碼保險箱之前，隱藏帳號不會出現在切換清單中。</string>
+    <string name="HiddenAccountsHeader">隱藏帳號</string>
+    <string name="HiddenAccountsChangePIN">修改 PIN 碼</string>
+    <string name="HiddenAccountsRemovePIN">移除 PIN 碼並取消隱藏所有帳號</string>
+    <string name="HiddenAccountsRemovePINConfirm">此操作將永久移除 PIN 碼並使所有隱藏帳號重新可見。確定要繼續嗎？</string>
+    <string name="HiddenAccountsAutoLock">進入背景時鎖定</string>
+    <string name="HiddenAccountsAutoLockDesc">啟用後，當應用程式進入背景時，密碼保險箱將自動重新鎖定。</string>
+    <string name="HiddenAccountsSection">帳號清單</string>
+    <string name="HiddenAccountsPINManagement">PIN 碼管理</string>
+    <string name="HideHomeSearchField">隱藏搜尋列</string>
+    <string name="HideHomeSearchFieldDesc">在對話清單中隱藏搜尋列。您仍可透過點擊右上角的搜尋圖示進行搜尋。</string>
+    <string name="MainTabsShowSearchButton">在底欄顯示搜尋圖示</string>
+    <string name="MainTabsShowSearchButtonDesc">在底部導覽列的主標籤頁旁顯示搜尋圖示。</string>
+    <string name="SessionManagementHeader">工作階段管理</string>
+    <string name="SessionManagementTitle">帳號工作階段管理員</string>
+    <string name="SessionManagementDesc">管理已登入的工作階段、活躍裝置、Pyrogram/Telethon 工作階段以及備份匯出/匯入。</string>
+    <string name="ExportSessionsTitle">匯出工作階段</string>
+    <string name="ExportSessionsDesc">將活躍帳號工作階段匯出為 Pyrogram String、Pyrogram .session 檔案、Telethon 或完整 JSON 備份。</string>
+    <string name="ImportSessionTitle">匯入帳號工作階段</string>
+    <string name="ImportSessionDesc">匯入 Pyrogram 字串工作階段、Pyrogram .session 檔案、Telethon 字串或 JSON 備份檔案。</string>
+    <string name="ImportSessionStringTitle">匯入字串工作階段</string>
+    <string name="ImportSessionStringDesc">貼上 Pyrogram (v1/v2) 或 Telethon 工作階段字串以直接登入。</string>
+    <string name="TelegramActiveDevices">Telegram 活躍裝置</string>
+    <string name="TelegramActiveDevicesDesc">檢視活躍裝置並管理在 Telegram 伺服器上註冊的工作階段。</string>
+    <string name="WebSessionsTitleNa">Web 工作階段</string>
+    <string name="WebSessionsDesc">管理已授權的網站與 Web 應用程式工作階段。</string>
+    <string name="ScanSessionQRCode">掃描工作階段 QR 碼</string>
+    <string name="ScanSessionQRCodeDesc">透過掃描 QR 碼授權其他電腦端或 Web 端客戶端。</string>
+    <string name="SessionEncryptExport">密碼保護備份</string>
+    <string name="SessionEncryptExportDesc">使用密碼加密匯出的工作階段備份檔案。</string>
+    <string name="ActiveSessionsSection">活躍帳號工作階段</string>
+    <string name="SessionBackupSection">備份與還原</string>
+    <string name="SessionToolsSection">工作階段工具與裝置</string>
+    <string name="SessionDetailsTitle">工作階段詳細資訊</string>
+    <string name="SwitchToAccount">切換至此帳號</string>
+    <string name="TerminateAllOtherSessions">終止所有其他工作階段</string>
+    <string name="TerminateAllOtherSessionsConfirm">確定要終止所有其他活躍的 Telegram 工作階段嗎？</string>
+    <string name="SessionExportSuccess">工作階段備份已成功匯出至下載資料夾！</string>
+    <string name="SessionExportError">匯出工作階段備份失敗。</string>
+    <string name="SessionImportSuccess">已成功匯入 %1$s 的工作階段備份！</string>
+    <string name="SessionImportError">匯入工作階段備份失敗：無效或損毀的檔案格式。</string>
+    <string name="ExportPyrogramString">複製 Pyrogram 字串工作階段</string>
+    <string name="ExportPyrogramFile">匯出 Pyrogram .session 檔案</string>
+    <string name="ExportTelethonString">複製 Telethon 字串工作階段</string>
+    <string name="PasteSessionStringHint">在此貼上 Pyrogram (v1/v2) 或 Telethon 工作階段字串...</string>
+    <string name="SessionCopied">Pyrogram 工作階段字串已複製到剪貼簿！</string>
+    <string name="TelethonSessionCopied">Telethon 工作階段字串已複製到剪貼簿！</string>
+    <string name="ExportTypeTitle">選擇匯出格式</string>
+    <string name="ExportPyrogramStringOpt">Pyrogram 字串工作階段 (v2 - 最新)</string>
+    <string name="ExportPyrogramFileOpt">Pyrogram SQLite (.session) 檔案</string>
+    <string name="ExportTelethonStringOpt">Telethon 字串工作階段</string>
+    <string name="ExportAlexgramBackupOpt">Alexgram 完整工作階段備份 (.session)</string>
+    <string name="PasteClipboard">從剪貼簿貼上</string>
+    <string name="ImportSessionButton">匯入工作階段</string>
+    <string name="SessionImportSuccessDesc">工作階段匯入成功！\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">已達到最大活躍帳號限制，請先移除一個帳號。</string>
+    <string name="SessionPasswordRequired">加密工作階段備份需要輸入密碼。</string>
+    <string name="SessionFileEmpty">所選的工作階段檔案為空。</string>
+    <string name="SessionNoAccountsInBackup">備份檔案中未找到有效的工作階段。</string>
+    <string name="SessionStreamError">無法開啟檔案串流。</string>
+    <string name="SessionAlreadyActive">已登入該帳號</string>
+    <string name="InvalidSessionString">無效的 Pyrogram 或 Telethon 工作階段字串格式。</string>
+    <string name="FailedExtractAuthKey">擷取工作階段授權金鑰失敗。</string>
+    <string name="CopyAgain">再次複製</string>
+    <string name="ShareSessionString">分享工作階段字串</string>
+    <string name="PyrogramSessionStringV2">Pyrogram 工作階段字串 (v2)</string>
+    <string name="TelethonSessionStringTitle">Telethon 工作階段字串</string>
+    <string name="NoAccounts">未找到活躍帳號。</string>
+    <string name="Feed">頻道動態</string>
+    <string name="GoToMessage">查看訊息</string>
+    <string name="FeedSettings">動態設定</string>
+    <string name="FeedBottomTab">底欄動態標籤頁</string>
+    <string name="FeedBottomTabInfo">在底部導覽列中顯示「頻道動態」標籤頁。</string>
+    <string name="FeedUnreadCounter">未讀計數器</string>
+    <string name="FeedIncludeArchived">包含已封存頻道</string>
+    <string name="FeedIncludeArchivedInfo">在動態中包含已封存頻道的訊息。</string>
+    <string name="FeedShownChannels">顯示的頻道</string>
+    <string name="FeedHiddenChannels">已隱藏的頻道</string>
+    <string name="FeedChannelsInfo">取消勾選您不想在動態中看到的頻道。</string>
+    <string name="FeedMarkAllRead">全部標記為已讀</string>
+    <string name="FeedMarkAllReadConfirm">確定要將動態中的所有訊息標記為已讀嗎？</string>
+    <string name="FeedMarkAllReadDone">所有訊息均已標記為已讀</string>
+    <string name="FeedChannelHidden">頻道 %1$s 已隱藏</string>
+    <string name="FeedHideChannel">從動態中隱藏</string>
 </resources>

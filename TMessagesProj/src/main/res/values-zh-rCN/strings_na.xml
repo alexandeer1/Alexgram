@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">后台运行</string>
+    <string name="RunInBackgroundInfo">保持程序在后台运行以确保通知可靠。</string>
+    <string name="NagramXPushService">Alexgram 推送服务</string>
     <string name="N_Config">A-设置</string>
     <string name="CombineMessage">合并消息</string>
     <string name="TextStyle">文本样式</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">显示消息 ID</string>
     <string name="ShowRPCError">显示 RPC 错误</string>
     <string name="ShowPremiumStickersAnimation">显示 Premium 贴纸动画</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">缤纷</string>
     <string name="AppIconDarkGreen">深翠</string>
     <string name="AppIconNeon">霓虹</string>
     <string name="AppIconNiello">黑金</string>
     <string name="AppIconBlue">几何</string>
+    <string name="AppIconColored">Alexgram 彩色</string>
+    <string name="AppIconDark">Alexgram 深色</string>
+    <string name="AppIconGreen">Alexgram 绿色</string>
+    <string name="AppIconPink">Alexgram 粉色</string>
+    <string name="AppIconRoseBlue">Alexgram 蓝粉色</string>
+    <string name="AppIconWhite">Alexgram 白色</string>
     <string name="AppIconDarkBlue">几何蓝</string>
     <string name="AppIconBlurBlue">轻盈</string>
     <string name="InputMessageId">输入消息 ID</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">自定义已编辑消息标记</string>
     <string name="NotificationIcon">通知图标样式</string>
     <string name="Official">官方</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">万圣节</string>
     <string name="ShowOnlineStatus">显示用户在线状态</string>
     <string name="ShowOnlineStatusNotice">在群组聊天时用户头像的右下角显示在线状态。</string>
@@ -65,6 +76,9 @@
     <string name="ShowQuickReplyInBotCommands">在输入框中显示快速回复按钮</string>
     <string name="PushServiceType">推送服务类型</string>
     <string name="PushServiceTypeInApp">内置</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">显示常驻通知</string>
     <string name="PushServiceTypeUnifiedGateway">Unified Push 网关</string>
     <string name="SendMp4DocumentAsVideo">MP4 视频作为文件发送时可预览</string>
@@ -87,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">不区分大小写</string>
     <string name="RegexFiltersAdd">添加过滤器</string>
     <string name="RegexFiltersEdit">编辑过滤器</string>
-    <string name="RegexFiltersAddDescription">您可以使用网站 &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; 来测试您的正则表达式。您也可以使用纯文本，但请不要忘记使用转义符号。</string>
+    <string name="RegexFiltersAddDescription">您可以使用网站 &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; 来测试您的正则表达式。您也可以使用纯文本，但请不要忘记使用转义符号。</string>
     <string name="RegexFiltersAddError">正则表达式语法错误</string>
     <string name="ShowTimeHint">点击时间显示详细信息</string>
     <string name="SearchHashtagDefaultPageChannel">在频道中点击标签时默认的搜索页面</string>
     <string name="SearchHashtagDefaultPageChat">在聊天中点击标签时默认的搜索页面</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">发送消息 Pangu 化</string>
     <string name="PanguInfo">使文字更具可读性。在 CJK（中文、日文、韩文）、半角英文、数字和符号字符之间的间隔中自动插入空格。</string>
     <string name="SendWithPangu">使用 Pangu 发送</string>
@@ -105,21 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">软解优先</string>
     <string name="VideoPlayerDecoderHardware">仅硬解</string>
     <string name="VideoPlayerDecoderPreferHW">硬解优先</string>
-    <string name="RunInBackground">后台运行</string>
-    <string name="RunInBackgroundInfo">保持程序在后台运行以确保通知可靠。</string>
-    <string name="NagramXPushService">Alexgram 推送服务</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram 彩色</string>
-    <string name="AppIconDark">Alexgram 深色</string>
-    <string name="AppIconGreen">Alexgram 绿色</string>
-    <string name="AppIconPink">Alexgram 粉色</string>
-    <string name="AppIconRoseBlue">Alexgram 蓝粉色</string>
-    <string name="AppIconWhite">Alexgram 白色</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">视频桌面</string>
     <string name="ExportChat">导出聊天</string>
     <string name="ImportChat">导入聊天</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">从主列表中隐藏敏感聊天。解锁后长按标题栏即可访问。</string>
     <string name="HideContacts">隐藏联系人</string>
     <string name="RestartRequired">需要重启以应用更改</string>
-    <string name="MaxActiveAccounts">最大活跃账号数</string>
-    <string name="LimitReachedAccountsNa">抱歉，您最多只能添加 **%1$d** 个账号。您可以在 **A-设置 &gt; 通用** 中将此限制提高（最多100个）。</string>
-    <string name="MaxActiveAccountsWarning">您当前有 %1$d 个活跃账号。将限制设置为 %2$d 将阻止您添加新账号，直到您退出部分账号。</string>
     <string name="SplitChat">分屏聊天</string>
     <string name="SplitChatClose">关闭分屏</string>
     <string name="SplitChatSelectChat">选择一个要同时打开的聊天</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">在 Spoiler 遮罩下显示已屏蔽/被小黑屋用户的消息，而不是直接隐藏它们。</string>
     <string name="RegexFiltersSpoilerMatchOnly">仅对匹配的正则表达式进行遮罩</string>
     <string name="RegexFiltersSpoilerColor">遮罩粒子颜色</string>
+    <string name="AccountsSettings">账号管理</string>
+    <string name="AccountLimitsHeader">账号数量限制</string>
+    <string name="StartupPerformanceHeader">启动性能</string>
+    <string name="MaxAccountCount">最大账号数量</string>
+    <string name="MaxActiveAccounts">最大活跃账号数</string>
+    <string name="StartupActiveAccounts">启动时激活的账号数</string>
+    <string name="StartupActiveAccountsInfo">控制应用打开时初始化的账号数量。数值越小，启动越快且更省电。切换到其他账号时将按需加载。</string>
+    <string name="LimitReachedAccountsNa">抱歉，您最多只能添加 **%1$d** 个账号。您可以在 **A-Settings → 账号管理** 中增加此限制（最高 100）。</string>
+    <string name="MaxActiveAccountsWarning">您当前有 %1$d 个活跃账号。将限制设置为 %2$d 将阻止您添加新账号，直到您退出某些账号。</string>
+    <string name="HiddenAccountsTitle">隐藏账号</string>
+    <string name="HiddenAccountsDesc">点击锁图标即可隐藏账号。在解锁此密码保险箱之前，隐藏账号不会出现在账号切换器中。</string>
+    <string name="HiddenAccountsHeader">隐藏账号</string>
+    <string name="HiddenAccountsChangePIN">修改 PIN 码</string>
+    <string name="HiddenAccountsRemovePIN">移除 PIN 码并取消隐藏所有账号</string>
+    <string name="HiddenAccountsRemovePINConfirm">此操作将永久移除 PIN 码并使所有隐藏账号重新可见。确定要继续吗？</string>
+    <string name="HiddenAccountsAutoLock">进入后台时锁定</string>
+    <string name="HiddenAccountsAutoLockDesc">启用后，当应用进入后台时，密码保险箱将自动重新锁定。</string>
+    <string name="HiddenAccountsSection">账号列表</string>
+    <string name="HiddenAccountsPINManagement">PIN 码管理</string>
+    <string name="HideHomeSearchField">隐藏搜索栏</string>
+    <string name="HideHomeSearchFieldDesc">在聊天列表中隐藏搜索栏。您仍可通过点击右上角的搜索图标进行搜索。</string>
+    <string name="MainTabsShowSearchButton">在底部栏显示搜索图标</string>
+    <string name="MainTabsShowSearchButtonDesc">在底部导航栏的主标签页旁显示搜索图标。</string>
+    <string name="SessionManagementHeader">会话管理</string>
+    <string name="SessionManagementTitle">账号会话管理器</string>
+    <string name="SessionManagementDesc">管理已登录的会话、活跃设备、Pyrogram/Telethon 会话以及备份导出/导入。</string>
+    <string name="ExportSessionsTitle">导出会话</string>
+    <string name="ExportSessionsDesc">将活跃账号会话导出为 Pyrogram String、Pyrogram .session 文件、Telethon 或完整 JSON 备份。</string>
+    <string name="ImportSessionTitle">导入账号会话</string>
+    <string name="ImportSessionDesc">导入 Pyrogram 字符串会话、Pyrogram .session 文件、Telethon 字符串或 JSON 备份文件。</string>
+    <string name="ImportSessionStringTitle">导入字符串会话</string>
+    <string name="ImportSessionStringDesc">粘贴 Pyrogram (v1/v2) 或 Telethon 会话字符串以直接登录。</string>
+    <string name="TelegramActiveDevices">Telegram 活跃设备</string>
+    <string name="TelegramActiveDevicesDesc">查看活跃设备并管理在 Telegram 服务器上注册的会话。</string>
+    <string name="WebSessionsTitleNa">Web 会话</string>
+    <string name="WebSessionsDesc">管理已授权的网站和 Web 应用程序会话。</string>
+    <string name="ScanSessionQRCode">扫描会话二维码</string>
+    <string name="ScanSessionQRCodeDesc">通过扫描二维码授权其他桌面端或 Web 端客户端。</string>
+    <string name="SessionEncryptExport">密码保护备份</string>
+    <string name="SessionEncryptExportDesc">使用密码加密导出的会话备份文件。</string>
+    <string name="ActiveSessionsSection">活跃账号会话</string>
+    <string name="SessionBackupSection">备份与恢复</string>
+    <string name="SessionToolsSection">会话工具与设备</string>
+    <string name="SessionDetailsTitle">会话详情</string>
+    <string name="SwitchToAccount">切换到此账号</string>
+    <string name="TerminateAllOtherSessions">终止所有其他会话</string>
+    <string name="TerminateAllOtherSessionsConfirm">确定要终止所有其他活跃的 Telegram 会话吗？</string>
+    <string name="SessionExportSuccess">会话备份已成功导出到下载目录！</string>
+    <string name="SessionExportError">导出会话备份失败。</string>
+    <string name="SessionImportSuccess">已成功导入 %1$s 的会话备份！</string>
+    <string name="SessionImportError">导入会话备份失败：无效或损坏的文件格式。</string>
+    <string name="ExportPyrogramString">复制 Pyrogram 字符串会话</string>
+    <string name="ExportPyrogramFile">导出 Pyrogram .session 文件</string>
+    <string name="ExportTelethonString">复制 Telethon 字符串会话</string>
+    <string name="PasteSessionStringHint">在此处粘贴 Pyrogram (v1/v2) 或 Telethon 会话字符串...</string>
+    <string name="SessionCopied">Pyrogram 会话字符串已复制到剪贴板！</string>
+    <string name="TelethonSessionCopied">Telethon 会话字符串已复制到剪贴板！</string>
+    <string name="ExportTypeTitle">选择导出格式</string>
+    <string name="ExportPyrogramStringOpt">Pyrogram 字符串会话 (v2 - 最新)</string>
+    <string name="ExportPyrogramFileOpt">Pyrogram SQLite (.session) 文件</string>
+    <string name="ExportTelethonStringOpt">Telethon 字符串会话</string>
+    <string name="ExportAlexgramBackupOpt">Alexgram 完整会话备份 (.session)</string>
+    <string name="PasteClipboard">从剪贴板粘贴</string>
+    <string name="ImportSessionButton">导入会话</string>
+    <string name="SessionImportSuccessDesc">会话导入成功！\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">已达到最大活跃账号限制，请先移除一个账号。</string>
+    <string name="SessionPasswordRequired">加密会话备份需要输入密码。</string>
+    <string name="SessionFileEmpty">所选的会话文件为空。</string>
+    <string name="SessionNoAccountsInBackup">备份文件中未找到有效的账号会话。</string>
+    <string name="SessionStreamError">无法打开文件流。</string>
+    <string name="SessionAlreadyActive">已登录该账号</string>
+    <string name="InvalidSessionString">无效的 Pyrogram 或 Telethon 会话字符串格式。</string>
+    <string name="FailedExtractAuthKey">提取会话认证密钥失败。</string>
+    <string name="CopyAgain">再次复制</string>
+    <string name="ShareSessionString">分享会话字符串</string>
+    <string name="PyrogramSessionStringV2">Pyrogram 会话字符串 (v2)</string>
+    <string name="TelethonSessionStringTitle">Telethon 会话字符串</string>
+    <string name="NoAccounts">未找到活跃账号。</string>
+    <string name="Feed">频道动态</string>
+    <string name="GoToMessage">查看消息</string>
+    <string name="FeedSettings">动态设置</string>
+    <string name="FeedBottomTab">底栏动态标签页</string>
+    <string name="FeedBottomTabInfo">在底部导航栏中显示「频道动态」标签页。</string>
+    <string name="FeedUnreadCounter">未读计数器</string>
+    <string name="FeedIncludeArchived">包含已归档频道</string>
+    <string name="FeedIncludeArchivedInfo">在动态中包含已归档频道的消息。</string>
+    <string name="FeedShownChannels">显示的频道</string>
+    <string name="FeedHiddenChannels">已隐藏的频道</string>
+    <string name="FeedChannelsInfo">取消勾选您不想在动态中看到的频道。</string>
+    <string name="FeedMarkAllRead">全部标记为已读</string>
+    <string name="FeedMarkAllReadConfirm">确定要将动态中的所有消息标记为已读吗？</string>
+    <string name="FeedMarkAllReadDone">所有消息均已标记为已读</string>
+    <string name="FeedChannelHidden">频道 %1$s 已隐藏</string>
+    <string name="FeedHideChannel">从动态中隐藏</string>
 </resources>

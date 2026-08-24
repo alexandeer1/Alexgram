@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="NekoSettings">А-Налаштування</string>
     <string name="IPv6">Віддавати перевагу IPv6</string>
@@ -149,6 +149,7 @@
     <string name="EmojiSetApplied">Набір емодзі застосовано.</string>
     <string name="EmojiSetAppliedInfo">%1$s тепер ваш набір емодзі.</string>
     <string name="EmojiSetAlreadyApplied">Набір емодзі вже застосовано.</string>
+    <string name="ProviderTelegramAPI">Telegram API</string>
     <string name="RecentChats">Нещодавні чати</string>
     <string name="ClearRecentChats">Очистити недавні чати</string>
     <string name="ClearRecentChatAlert">Ви хочете очистити останні чати?</string>
@@ -168,6 +169,7 @@
     <string name="CopyCallback">Копіювати дані зворотного виклику</string>
     <string name="CopyInlineQuery">Копіювати вбудований запит</string>
     <string name="CopyID">Копіювати ID</string>
+    <string name="NekoX">NekoX</string>
     <string name="Locked">Заблоковано</string>
     <string name="AccDescrChatAttachEnterMenu">Меню відправки</string>
     <string name="ChatAttachEnterMenuRecordVideo">Записати відео</string>
@@ -185,6 +187,7 @@
     <string name="LinkedChannelChat">Зв\'язаний канал</string>
     <string name="ChangeTranslateProvider">Змінити провайдера</string>
     <string name="ProviderYandexTranslate">Яндекс Перекладач</string>
+    <string name="GoogleCloudTransKey">Google Cloud Translate Key</string>
     <string name="GoogleCloudTransKeyNotice">Встановіть ключ Google Cloud Translation, щоб викликати хмарне API перекладу замість імітації надсилання форми у веб-версію (швидше, стабільніше й заощаджує трафік).</string>
     <string name="TransToLang">Цільова мова</string>
     <string name="TransInputToLang">Перекладати з</string>
@@ -256,6 +259,8 @@
     <string name="ConfirmSettings">Підтвердження</string>
     <string name="InteractionSettings">Взаємодія</string>
     <string name="localPremium">Локальний Premium</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">Реакції</string>
     <string name="UpgradeGroup">Оновити групу</string>
     <string name="AccDescrShowKeyboard">Показати клавіатуру</string>
@@ -270,13 +275,14 @@
     <string name="EmojiUseDefault">Використовувати системні емодзі</string>
     <string name="Chat">Чати</string>
     <string name="Appearance">Зовнішній вигляд</string>
-    <!-- [Alexgram: Important Announcement] -->
+    <string name="StarFallInChat">Starfall Chat Decoration</string>
+    <string name="StarFallInChatDescription">Animated falling stars in the chat background</string>
     <string name="GetImportantAnnouncementFromAlexgram">Отримати важливі оголошення від Alexgram</string>
-    <!-- [Alexgram: Birthday Wish] - Start -->
     <string name="BirthdayTitle">З днем народження,\n%1$s! 🎉</string>
     <string name="BirthdayMessage">Цей день повністю твій! ✨ Ще один рік з енергією головного героя. Бажаємо року чистого зростання, нескінченних перемог і повної відсутності негативу. Іди та перемагай! 🚀🎂</string>
     <string name="BirthdayMakeWish">Загадати бажання 🌟</string>
     <string name="BirthdayWishSent">Бажання відправлено до зірок! 🌌✨</string>
-    <!-- [Alexgram: Birthday Wish] - End -->
+    <string name="SelectRangeSharedMedia">Select Range in Shared Media</string>
+    <string name="SelectRangeSharedMediaAbout">Enable double checkmark button to select all media items between the first and last selected items.</string>
+    <string name="SelectTwoItemsToSelectRange">Please select at least two items to select a range.</string>
 </resources>
-

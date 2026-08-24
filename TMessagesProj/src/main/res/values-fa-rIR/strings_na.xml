@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">اجرا در پس‌زمینه</string>
+    <string name="RunInBackgroundInfo">برای اطمینان از دریافت اعلان‌ها، برنامه را در پس‌زمینه در حال اجرا نگه دارید.</string>
+    <string name="NagramXPushService">سرویس اعلان الکس‌گرام</string>
     <string name="N_Config">تنظیمات-A</string>
     <string name="CombineMessage">ترکیب پیام‌ها</string>
     <string name="TextStyle">حالت متن</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">نمایش شناسه پیام</string>
     <string name="ShowRPCError">گزارش خطاهای PRC</string>
     <string name="ShowPremiumStickersAnimation">نمایش انیمیشن استیکرهای پریمیوم</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">رنگارنگ</string>
     <string name="AppIconDarkGreen">سبز تیره</string>
     <string name="AppIconNeon">نئون</string>
     <string name="AppIconNiello">Niello</string>
     <string name="AppIconBlue">آبی</string>
+    <string name="AppIconColored">الکس‌گرام رنگی</string>
+    <string name="AppIconDark">الکس‌گرام تیره</string>
+    <string name="AppIconGreen">الکس‌گرام سبز</string>
+    <string name="AppIconPink">الکس‌گرام صورتی</string>
+    <string name="AppIconRoseBlue">الکس‌گرام رزآبی</string>
+    <string name="AppIconWhite">الکس‌گرام سفید</string>
     <string name="AppIconDarkBlue">آبی تیره</string>
     <string name="AppIconBlurBlue">آبی مات</string>
     <string name="InputMessageId">شناسه پیام را وارد کنید</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">آیکون پیام ویرایش شده سفارشی</string>
     <string name="NotificationIcon">ﺁﻳﮑﻮﻥ ﺍﻋﻼﻥ‌ها</string>
     <string name="Official">رسمی</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">هالوين</string>
     <string name="ShowOnlineStatus">نمایش وضعیت آنلاین</string>
     <string name="ShowOnlineStatusNotice">نمایش وضعیت آنلاین بودن افراد دیگر در کنار عکس پروفایلشان در گروه‌ها.</string>
@@ -65,7 +76,11 @@
     <string name="ShowQuickReplyInBotCommands">نمایش پاسخ سریع در دستورهای ربات</string>
     <string name="PushServiceType">نوع سرویس اعلان</string>
     <string name="PushServiceTypeInApp">درون‌برنامه‌ای</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">نمایش اعلان مداوم</string>
+    <string name="PushServiceTypeUnifiedGateway">درگاه Unified Push</string>
     <string name="SendMp4DocumentAsVideo">ارسال اسناد MP4 به‌صورت ویدئو</string>
     <string name="StickersChooseShortNameForStickerPack">یک نام کوتاه برای بسته خود انتخاب کنید.</string>
     <string name="StickersCopyStickerSet">کپی مجموعه استیکر</string>
@@ -79,15 +94,19 @@
     <string name="UnblockDeletedWarn">آیا مطمئن هستید که می‌خواهید **تمام کاربران حذف شده** را از مسدودی خارج کنید؟</string>
     <string name="RegexFilters">فیلترهای پیام با استفاده از Regex</string>
     <string name="RegexFiltersHeader">فیلتر ها</string>
+    <string name="RegexFiltersSharedHeader">فیلترهای مشترک</string>
+    <string name="RegexFiltersSubMenuDescription">می‌توانید فیلترهای مشترک را برای این گفتگو غیرفعال کنید.</string>
+    <string name="RegexFiltersChatHeader">فیلترهای گفتگو</string>
     <string name="RegexFiltersEnableInChats">فعال‌کردن فیلترها در چت‌های خصوصی</string>
     <string name="RegexFiltersCaseInsensitive">عدم توجه به بزرگ یا کوچک بودن حروف</string>
     <string name="RegexFiltersAdd">افزودن فیلتر</string>
     <string name="RegexFiltersEdit">ویرایش فیلتر</string>
-    <string name="RegexFiltersAddDescription">شما می‌توانید از سایت &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; برای تست کامل عبارت منظم (regular expression) خود استفاده کنید. همچنین می‌توانید از متن ساده (plain text) استفاده کنید، اما مواظب بازگردانی پرانتز ها باشید.</string>
+    <string name="RegexFiltersAddDescription">شما می‌توانید از سایت &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; برای تست کامل عبارت منظم (regular expression) خود استفاده کنید. همچنین می‌توانید از متن ساده (plain text) استفاده کنید، اما مواظب بازگردانی پرانتز ها باشید.</string>
     <string name="RegexFiltersAddError">خطای نحوی سینتکس عبارت منظم</string>
     <string name="ShowTimeHint">برای نمایش جزئیات روی زمان پیام کلیک کنید</string>
     <string name="SearchHashtagDefaultPageChannel">صفحه جستجوی پیش‌فرض هشتگ‌ها در کانال‌ها</string>
     <string name="SearchHashtagDefaultPageChat">صفحه جستجوی پیش‌فرض هشتگ‌ها در چت‌ها</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">فعالسازی Pangu هنگام ارسال</string>
     <string name="PanguInfo">فاصله متن Paranoid برای خوانایی خوب، برای درج خودکار فضای خالی بین CJK (چینی، ژاپنی، کره‌ای)، انگلیسی نیمه عرض، رقم و کاراکترهای نماد.</string>
     <string name="SendWithPangu">ارسال با Pangu</string>
@@ -101,25 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">ترجیح دادن SW</string>
     <string name="VideoPlayerDecoderHardware">فقط HW</string>
     <string name="VideoPlayerDecoderPreferHW">ترجیح دادن HW</string>
-    <string name="RunInBackground">اجرا در پس‌زمینه</string>
-    <string name="RunInBackgroundInfo">برای اطمینان از دریافت اعلان‌ها، برنامه را در پس‌زمینه در حال اجرا نگه دارید.</string>
-    <string name="NagramXPushService">سرویس اعلان الکس‌گرام</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">الکس‌گرام رنگی</string>
-    <string name="AppIconDark">الکس‌گرام تیره</string>
-    <string name="AppIconGreen">الکس‌گرام سبز</string>
-    <string name="AppIconPink">الکس‌گرام صورتی</string>
-    <string name="AppIconRoseBlue">الکس‌گرام رزآبی</string>
-    <string name="AppIconWhite">الکس‌گرام سفید</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="PushServiceTypeUnifiedGateway">درگاه Unified Push</string>
-    <string name="RegexFiltersSharedHeader">فیلترهای مشترک</string>
-    <string name="RegexFiltersSubMenuDescription">می‌توانید فیلترهای مشترک را برای این گفتگو غیرفعال کنید.</string>
-    <string name="RegexFiltersChatHeader">فیلترهای گفتگو</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">والپیپر زنده ویدیویی</string>
     <string name="ExportChat">خروجی گرفتن از گفتگو</string>
     <string name="ImportChat">وارد کردن گفتگو</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">گفتگوهای حساس را از لیست اصلی پنهان کنید. با نگه داشتن نوار عنوان و پس از باز کردن قفل با گذرواژه یا بیومتریک، به آن‌ها دسترسی پیدا کنید.</string>
     <string name="HideContacts">پنهان کردن مخاطبین</string>
     <string name="RestartRequired">برای اعمال تغییرات، راه‌اندازی مجدد لازم است</string>
-    <string name="MaxActiveAccounts">حداکثر تعداد حساب‌های فعال</string>
-    <string name="LimitReachedAccountsNa">متأسفیم، نمی‌توانید بیش از **%1$d** حساب اضافه کنید. می‌توانید این محدودیت را (تا ۱۰۰) در **تنظیمات-A &gt; عمومی** افزایش دهید.</string>
-    <string name="MaxActiveAccountsWarning">در حال حاضر %1$d حساب فعال دارید. تنظیم محدودیت به %2$d مانع اضافه کردن حساب جدید می‌شود تا زمانی که از برخی خارج شوید.</string>
     <string name="SplitChat">تقسیم صفحه گفتگو</string>
     <string name="SplitChatClose">بستن تقسیم صفحه</string>
     <string name="SplitChatSelectChat">گفتگویی را برای باز شدن در کنار هم انتخاب کنید</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">نمایش پیام‌های کاربران مسدود شده یا مسدود سایه در زیر یک ماسک اسپویلر به جای پنهان کردن کامل آن‌ها.</string>
     <string name="RegexFiltersSpoilerMatchOnly">فقط ماسک کردن عبارات باقاعده مطابقت یافته</string>
     <string name="RegexFiltersSpoilerColor">رنگ ذرات ماسک</string>
+    <string name="AccountsSettings">حساب‌ها</string>
+    <string name="AccountLimitsHeader">محدودیت‌های حساب</string>
+    <string name="StartupPerformanceHeader">عملکرد هنگام راه‌اندازی</string>
+    <string name="MaxAccountCount">حداکثر تعداد حساب‌ها</string>
+    <string name="MaxActiveAccounts">حداکثر حساب‌های فعال</string>
+    <string name="StartupActiveAccounts">حساب‌های فعال در آغاز برنامه</string>
+    <string name="StartupActiveAccountsInfo">تعداد حساب‌هایی که هنگام باز شدن برنامه فعال می‌شوند را کنترل می‌کند. مقادیر کمتر سرعت راه‌اندازی را افزایش داده و در مصرف باتری صرفه‌جویی می‌کند. سایر حساب‌ها هنگام رفتن به آنها بارگیری می‌شوند.</string>
+    <string name="LimitReachedAccountsNa">متأسفانه نمی‌توانید بیش از **%1$d** حساب اضافه کنید. می‌توانید این محدودیت را (تا ۱۰۰) در **تنظیمات Alexgram ← حساب‌ها** افزایش دهید.</string>
+    <string name="MaxActiveAccountsWarning">شما در حال حاضر %1$d حساب فعال دارید. تنظیم محدودیت روی %2$d مانع از افزودن حساب‌های جدید می‌شود تا زمانی که از برخی خارج شوید.</string>
+    <string name="HiddenAccountsTitle">حساب‌های مخفی</string>
+    <string name="HiddenAccountsDesc">برای مخفی کردن حساب، روی نماد قفل ضربه بزنید. حساب‌های مخفی در بخش تعویض حساب ظاهر نمی‌شوند تا زمانی که این صندوقچه را باز کنید.</string>
+    <string name="HiddenAccountsHeader">حساب‌های مخفی</string>
+    <string name="HiddenAccountsChangePIN">تغییر کد PIN</string>
+    <string name="HiddenAccountsRemovePIN">حذف PIN و نمایان کردن همه</string>
+    <string name="HiddenAccountsRemovePINConfirm">این کار کد PIN را برای همیشه حذف کرده و همه حساب‌های مخفی را دوباره نمایان می‌کند. آیا مطمئن هستید؟</string>
+    <string name="HiddenAccountsAutoLock">قفل در پس‌زمینه</string>
+    <string name="HiddenAccountsAutoLockDesc">در صورت فعال بودن، هنگام رفتن برنامه به پس‌زمینه، صندوقچه به‌طور خودکار دوباره قفل می‌شود.</string>
+    <string name="HiddenAccountsSection">حساب‌ها</string>
+    <string name="HiddenAccountsPINManagement">مدیریت کد PIN</string>
+    <string name="HideHomeSearchField">مخفی کردن نوار جستجو</string>
+    <string name="HideHomeSearchFieldDesc">نوار جستجو را در فهرست گفتگوها مخفی می‌کند. همچنان می‌توانید با لمس آیکون جستجو در بالا سمت راست جستجو کنید.</string>
+    <string name="MainTabsShowSearchButton">نمایش آیکون جستجو در نوار پایین</string>
+    <string name="MainTabsShowSearchButtonDesc">نمایش آیکون جستجو در نوار پایین کنار برگه‌های اصلی ناوبری.</string>
+    <string name="SessionManagementHeader">مدیریت نشست‌ها</string>
+    <string name="SessionManagementTitle">مدیریت نشست‌های حساب</string>
+    <string name="SessionManagementDesc">مدیریت نشست‌های فعال، دستگاه‌های متصل، نشست‌های Pyrogram/Telethon و استخراج/درون‌ریزی نسخه پشتیبان.</string>
+    <string name="ExportSessionsTitle">استخراج نشست‌های حساب</string>
+    <string name="ExportSessionsDesc">استخراج نشست‌های فعال به رشته Pyrogram، فایل .session پایروگرام، رشته Telethon یا فایل پشتیبان کامل JSON.</string>
+    <string name="ImportSessionTitle">درون‌ریزی نشست حساب</string>
+    <string name="ImportSessionDesc">درون‌ریزی رشته نشست Pyrogram، فایل .session پایروگرام، رشته Telethon یا فایل پشتیبان JSON.</string>
+    <string name="ImportSessionStringTitle">درون‌ریزی رشته نشست</string>
+    <string name="ImportSessionStringDesc">رشته نشست Pyrogram (v1/v2) یا Telethon را برای ورود مستقیم جای‌گذاری کنید.</string>
+    <string name="TelegramActiveDevices">دستگاه‌های فعال تلگرام</string>
+    <string name="TelegramActiveDevicesDesc">مشاهده دستگاه‌های فعال و مدیریت نشست‌های ثبت‌شده در سرورهای تلگرام.</string>
+    <string name="WebSessionsTitleNa">نشست‌های وب</string>
+    <string name="WebSessionsDesc">مدیریت وب‌سایت‌های مجاز و نشست‌های برنامه‌های وب.</string>
+    <string name="ScanSessionQRCode">اسکن کد QR نشست</string>
+    <string name="ScanSessionQRCodeDesc">مجوزدهی به سایر نسخه‌های دسکتاپ یا وب با اسکن کد QR.</string>
+    <string name="SessionEncryptExport">محافظت از نسخه پشتیبان با رمز عبور</string>
+    <string name="SessionEncryptExportDesc">رمزگذاری فایل‌های پشتیبان نشست استخراج‌شده با رمز عبور.</string>
+    <string name="ActiveSessionsSection">نشست‌های فعال حساب</string>
+    <string name="SessionBackupSection">پشتیبان‌گیری و بازیابی</string>
+    <string name="SessionToolsSection">ابزارهای نشست و دستگاه‌ها</string>
+    <string name="SessionDetailsTitle">جزئیات نشست</string>
+    <string name="SwitchToAccount">تغییر به حساب</string>
+    <string name="TerminateAllOtherSessions">پایان دادن به سایر نشست‌ها</string>
+    <string name="TerminateAllOtherSessionsConfirm">آیا مطمئن هستید که می‌خواهید همه نشست‌های فعال دیگر تلگرام را خاتمه دهید؟</string>
+    <string name="SessionExportSuccess">نسخه پشتیبان نشست با موفقیت در پوشه بارگیری‌ها ذخیره شد!</string>
+    <string name="SessionExportError">استخراج نسخه پشتیبان نشست ناموفق بود.</string>
+    <string name="SessionImportSuccess">نسخه پشتیبان نشست برای %1$s با موفقیت درون‌ریزی شد!</string>
+    <string name="SessionImportError">خطا در درون‌ریزی نسخه پشتیبان: قالب فایل نامعتبر یا خراب است.</string>
+    <string name="ExportPyrogramString">کپی رشته نشست Pyrogram</string>
+    <string name="ExportPyrogramFile">استخراج فایل Pyrogram .session</string>
+    <string name="ExportTelethonString">کپی رشته نشست Telethon</string>
+    <string name="PasteSessionStringHint">رشته نشست Pyrogram (v1/v2) یا Telethon را در اینجا جای‌گذاری کنید...</string>
+    <string name="SessionCopied">رشته نشست Pyrogram در حافظه موقت کپی شد!</string>
+    <string name="TelethonSessionCopied">رشته نشست Telethon در حافظه موقت کپی شد!</string>
+    <string name="ExportTypeTitle">انتخاب قالب استخراج</string>
+    <string name="ExportPyrogramStringOpt">رشته نشست Pyrogram (نسخه ۲ - جدیدترین)</string>
+    <string name="ExportPyrogramFileOpt">فایل Pyrogram SQLite (.session)</string>
+    <string name="ExportTelethonStringOpt">رشته نشست Telethon</string>
+    <string name="ExportAlexgramBackupOpt">پشتیبان کامل نشست Alexgram (.session)</string>
+    <string name="PasteClipboard">جای‌گذاری از کلیپ‌بورد</string>
+    <string name="ImportSessionButton">درون‌ریزی نشست</string>
+    <string name="SessionImportSuccessDesc">نشست با موفقیت درون‌ریزی شد!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">به حداکثر ظرفیت حساب‌های فعال رسیده‌اید. لطفاً ابتدا یک حساب را حذف کنید.</string>
+    <string name="SessionPasswordRequired">برای نسخه پشتیبان رمزگذاری‌شده رمز عبور لازم است.</string>
+    <string name="SessionFileEmpty">فایل نشست انتخاب‌شده خالی است.</string>
+    <string name="SessionNoAccountsInBackup">هیچ نشست حساب معتبری در فایل پشتیبان یافت نشد.</string>
+    <string name="SessionStreamError">امکان باز کردن جریان فایل وجود نداشت.</string>
+    <string name="SessionAlreadyActive">در حال حاضر در این حساب هستید</string>
+    <string name="InvalidSessionString">قالب رشته نشست Pyrogram یا Telethon نامعتبر است.</string>
+    <string name="FailedExtractAuthKey">استخراج کلید احراز هویت نشست ناموفق بود.</string>
+    <string name="CopyAgain">کپی مجدد</string>
+    <string name="ShareSessionString">اشتراک‌گذاری رشته نشست</string>
+    <string name="PyrogramSessionStringV2">رشته نشست Pyrogram (v2)</string>
+    <string name="TelethonSessionStringTitle">رشته نشست Telethon</string>
+    <string name="NoAccounts">هیچ حساب فعالی یافت نشد.</string>
+    <string name="Feed">فید کانال‌ها</string>
+    <string name="GoToMessage">رفتن به پیام</string>
+    <string name="FeedSettings">تنظیمات فید</string>
+    <string name="FeedBottomTab">برگه فید در نوار پایین</string>
+    <string name="FeedBottomTabInfo">نمایش برگه فید در نوار ناوبری پایین.</string>
+    <string name="FeedUnreadCounter">شمارنده خوانده‌نشده‌ها</string>
+    <string name="FeedIncludeArchived">شامل کانال‌های بایگانی‌شده</string>
+    <string name="FeedIncludeArchivedInfo">شامل پیام‌های کانال‌های بایگانی‌شده در فید.</string>
+    <string name="FeedShownChannels">کانال‌های نمایش داده شده</string>
+    <string name="FeedHiddenChannels">کانال‌های مخفی شده</string>
+    <string name="FeedChannelsInfo">کانال‌هایی که نمی‌خواهید در فید خود ببینید را لغو انتخاب کنید.</string>
+    <string name="FeedMarkAllRead">علامت‌گذاری همه به عنوان خوانده‌شده</string>
+    <string name="FeedMarkAllReadConfirm">آیا مطمئن هستید که می‌خواهید همه پست‌های فید را به عنوان خوانده‌شده علامت‌گذاری کنید؟</string>
+    <string name="FeedMarkAllReadDone">همه پست‌ها به عنوان خوانده‌شده علامت‌گذاری شدند</string>
+    <string name="FeedChannelHidden">کانال %1$s مخفی شد</string>
+    <string name="FeedHideChannel">مخفی کردن از فید</string>
 </resources>

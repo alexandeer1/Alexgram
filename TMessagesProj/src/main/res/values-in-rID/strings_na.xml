@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">Jalankan di Latar Belakang</string>
+    <string name="RunInBackgroundInfo">Tetap jalankan aplikasi di latar belakang untuk memastikan notifikasi handal.</string>
+    <string name="NagramXPushService">Layanan Push Alexgram</string>
     <string name="N_Config">Konfig-A</string>
     <string name="CombineMessage">Gabungkan Pesan</string>
     <string name="TextStyle">Gaya Teks</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">Tampilkan ID Pesan</string>
     <string name="ShowRPCError">Beritahu Kesalahan RPC</string>
     <string name="ShowPremiumStickersAnimation">Tampilkan Animasi Stiker Premium</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Berwarna</string>
     <string name="AppIconDarkGreen">Hijau Gelap</string>
     <string name="AppIconNeon">Neon</string>
     <string name="AppIconNiello">Niello</string>
     <string name="AppIconBlue">Biru</string>
+    <string name="AppIconColored">Alexgram Berwarna</string>
+    <string name="AppIconDark">Alexgram Gelap</string>
+    <string name="AppIconGreen">Alexgram Hijau</string>
+    <string name="AppIconPink">Alexgram Merah Muda</string>
+    <string name="AppIconRoseBlue">Alexgram RoseBlue</string>
+    <string name="AppIconWhite">Alexgram Putih</string>
     <string name="AppIconDarkBlue">Biru Gelap</string>
     <string name="AppIconBlurBlue">Biru Buram</string>
     <string name="InputMessageId">Masukkan ID Pesan</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">Tanda Disunting Khusus</string>
     <string name="NotificationIcon">Ikon Pemberitahuan</string>
     <string name="Official">Resmi</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">HalloWeen</string>
     <string name="ShowOnlineStatus">Tampilkan Status Online</string>
     <string name="ShowOnlineStatusNotice">Tampilkan status online orang lain di sebelah foto profil mereka di grup.</string>
@@ -65,6 +76,9 @@
     <string name="ShowQuickReplyInBotCommands">Tampilkan Balasan Cepat di Perintah Bot</string>
     <string name="PushServiceType">Jenis Layanan Dorong</string>
     <string name="PushServiceTypeInApp">Dalam Aplikasi</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Tampilkan Pemberitahuan Anggota</string>
     <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">Kirim Dokumen MP4 sebagai Video</string>
@@ -87,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Ekspresi yang tidak peka huruf besar/kecil</string>
     <string name="RegexFiltersAdd">Tambahkan penyaring</string>
     <string name="RegexFiltersEdit">Sunting penyaring</string>
-    <string name="RegexFiltersAddDescription">Anda dapat menggudakan situs &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; untuk menguji ekspresi reguler Anda secara menyeluruh. Anda juga dapat menggunakan teks biasa, tetapi jangan lupa untuk menghilangkan tanda kurung.</string>
+    <string name="RegexFiltersAddDescription">Anda dapat menggudakan situs &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; untuk menguji ekspresi reguler Anda secara menyeluruh. Anda juga dapat menggunakan teks biasa, tetapi jangan lupa untuk menghilangkan tanda kurung.</string>
     <string name="RegexFiltersAddError">Kesalahan sintaks regex</string>
     <string name="ShowTimeHint">Ketuk Waktu untuk Rincian</string>
     <string name="SearchHashtagDefaultPageChannel">Halaman Pencarian Hashtag Default di Saluran</string>
     <string name="SearchHashtagDefaultPageChat">Halaman Pencarian Hashtag Default di Obrolan</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Aktifkan Pangu saat Mengirim</string>
     <string name="PanguInfo">Pengaturan jarak teks yang optimal untuk keterbacaan yang baik, dengan secara otomatis menyisipkan spasi kosong di antara karakter CJK (Mandarin, Jepang, Korea), karakter Inggris separuh lebar, digit, dan karakter simbol.</string>
     <string name="SendWithPangu">Kirim dengan Pangu</string>
@@ -105,21 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">Lebih suka SW</string>
     <string name="VideoPlayerDecoderHardware">Hanya HW</string>
     <string name="VideoPlayerDecoderPreferHW">Lebih suka HW</string>
-    <string name="RunInBackground">Jalankan di Latar Belakang</string>
-    <string name="RunInBackgroundInfo">Tetap jalankan aplikasi di latar belakang untuk memastikan notifikasi handal.</string>
-    <string name="NagramXPushService">Layanan Push Alexgram</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram Berwarna</string>
-    <string name="AppIconDark">Alexgram Gelap</string>
-    <string name="AppIconGreen">Alexgram Hijau</string>
-    <string name="AppIconPink">Alexgram Merah Muda</string>
-    <string name="AppIconRoseBlue">Alexgram RoseBlue</string>
-    <string name="AppIconWhite">Alexgram Putih</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">Wallpaper Video Langsung</string>
     <string name="ExportChat">Ekspor Obrolan</string>
     <string name="ImportChat">Impor Obrolan</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">Sembunyikan obrolan sensitif dari daftar utama. Akses dengan menahan bilah Judul setelah membuka kunci dengan sandi atau biometrik.</string>
     <string name="HideContacts">Sembunyikan Kontak</string>
     <string name="RestartRequired">Diperlukan mulai ulang untuk menerapkan perubahan</string>
-    <string name="MaxActiveAccounts">Jumlah Maksimum Akun Aktif</string>
-    <string name="LimitReachedAccountsNa">Maaf, Anda tidak dapat menambahkan lebih dari **%1$d** akun. Anda dapat meningkatkan batas ini (hingga 100) di **A-Pengaturan &gt; Umum**.</string>
-    <string name="MaxActiveAccountsWarning">Anda saat ini memiliki %1$d akun aktif. Menetapkan batas ke %2$d akan mencegah Anda menambahkan akun baru hingga Anda keluar dari beberapa akun.</string>
     <string name="SplitChat">Bagi Layar Obrolan</string>
     <string name="SplitChatClose">Tutup Layar Obrolan</string>
     <string name="SplitChatSelectChat">Pilih obrolan untuk dibuka berdampingan</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">Tampilkan pesan dari pengguna yang diblokir/shadow-banned di balik masker spoiler alih-alih menyembunyikannya.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Hanya samarkan regex yang cocok</string>
     <string name="RegexFiltersSpoilerColor">Warna partikel masker</string>
+    <string name="AccountsSettings">Akun</string>
+    <string name="AccountLimitsHeader">Batas Akun</string>
+    <string name="StartupPerformanceHeader">Performa Saat Membuka</string>
+    <string name="MaxAccountCount">Jumlah Maksimum Akun</string>
+    <string name="MaxActiveAccounts">Maksimum Akun Aktif</string>
+    <string name="StartupActiveAccounts">Akun Aktif Saat Mulai</string>
+    <string name="StartupActiveAccountsInfo">Mengontrol berapa banyak akun yang diinisialisasi saat aplikasi dibuka. Nilai lebih rendah mempercepat pembukaan dan menghemat baterai. Akun lain dimuat saat Anda beralih ke akun tersebut.</string>
+    <string name="LimitReachedAccountsNa">Maaf, Anda tidak dapat menambahkan lebih dari **%1$d** akun. Anda dapat meningkatkan batas ini (hingga 100) di **A-Settings → Akun**.</string>
+    <string name="MaxActiveAccountsWarning">Saat ini Anda memiliki %1$d akun aktif. Menyetel batas ke %2$d akan mencegah Anda menambahkan akun baru sampai Anda keluar dari beberapa akun.</string>
+    <string name="HiddenAccountsTitle">Akun Tersembunyi</string>
+    <string name="HiddenAccountsDesc">Ketuk ikon gembok untuk menyembunyikan akun. Akun tersembunyi tidak akan muncul di pengalih sampai Anda membuka brankas ini.</string>
+    <string name="HiddenAccountsHeader">Akun Tersembunyi</string>
+    <string name="HiddenAccountsChangePIN">Ubah PIN</string>
+    <string name="HiddenAccountsRemovePIN">Hapus PIN &amp; Tampilkan Semua</string>
+    <string name="HiddenAccountsRemovePINConfirm">Ini akan menghapus PIN secara permanen dan membuat semua akun tersembunyi terlihat kembali. Anda yakin?</string>
+    <string name="HiddenAccountsAutoLock">Kunci di Latar Belakang</string>
+    <string name="HiddenAccountsAutoLockDesc">Jika diaktifkan, brankas akan terkunci otomatis saat aplikasi beralih ke latar belakang.</string>
+    <string name="HiddenAccountsSection">Akun</string>
+    <string name="HiddenAccountsPINManagement">Manajemen PIN</string>
+    <string name="HideHomeSearchField">Sembunyikan Bilah Pencarian</string>
+    <string name="HideHomeSearchFieldDesc">Sembunyikan bilah pencarian di daftar obrolan. Anda masih dapat mencari dengan mengetuk ikon pencarian di kanan atas.</string>
+    <string name="MainTabsShowSearchButton">Tampilkan Ikon Pencarian di Bilah Bawah</string>
+    <string name="MainTabsShowSearchButtonDesc">Tampilkan ikon pencarian di bilah bawah di samping tab navigasi utama.</string>
+    <string name="SessionManagementHeader">Manajemen Sesi</string>
+    <string name="SessionManagementTitle">Manajer Sesi Akun</string>
+    <string name="SessionManagementDesc">Kelola sesi aktif, perangkat yang terhubung, sesi Pyrogram/Telethon, dan ekspor/impor cadangan.</string>
+    <string name="ExportSessionsTitle">Ekspor Sesi Akun</string>
+    <string name="ExportSessionsDesc">Ekspor sesi aktif ke String Pyrogram, file .session Pyrogram, string Telethon, atau Cadangan JSON Lengkap.</string>
+    <string name="ImportSessionTitle">Impor Sesi Akun</string>
+    <string name="ImportSessionDesc">Impor string sesi Pyrogram, file .session Pyrogram, string Telethon, atau file cadangan JSON.</string>
+    <string name="ImportSessionStringTitle">Impor String Sesi</string>
+    <string name="ImportSessionStringDesc">Tempel string sesi Pyrogram (v1/v2) atau Telethon untuk masuk langsung.</string>
+    <string name="TelegramActiveDevices">Perangkat Aktif Telegram</string>
+    <string name="TelegramActiveDevicesDesc">Lihat perangkat aktif dan kelola sesi yang terdaftar di server Telegram.</string>
+    <string name="WebSessionsTitleNa">Sesi Web</string>
+    <string name="WebSessionsDesc">Kelola situs web resmi dan sesi aplikasi web.</string>
+    <string name="ScanSessionQRCode">Pindai Kode QR Sesi</string>
+    <string name="ScanSessionQRCodeDesc">Otorisasi klien desktop atau web lain dengan memindai kode QR-nya.</string>
+    <string name="SessionEncryptExport">Lindungi Cadangan dengan Kata Sandi</string>
+    <string name="SessionEncryptExportDesc">Enkripsi file cadangan sesi yang diekspor dengan kata sandi.</string>
+    <string name="ActiveSessionsSection">Sesi Akun Aktif</string>
+    <string name="SessionBackupSection">Cadangkan &amp; Pulihkan</string>
+    <string name="SessionToolsSection">Alat Sesi &amp; Perangkat</string>
+    <string name="SessionDetailsTitle">Detail Sesi</string>
+    <string name="SwitchToAccount">Beralih ke Akun</string>
+    <string name="TerminateAllOtherSessions">Hentikan Semua Sesi Lain</string>
+    <string name="TerminateAllOtherSessionsConfirm">Apakah Anda yakin ingin menghentikan semua sesi Telegram aktif lainnya?</string>
+    <string name="SessionExportSuccess">Cadangan sesi berhasil diekspor ke Unduhan!</string>
+    <string name="SessionExportError">Gagal mengekspor cadangan sesi.</string>
+    <string name="SessionImportSuccess">Cadangan sesi berhasil diproses untuk %1$s!</string>
+    <string name="SessionImportError">Gagal mengimpor cadangan sesi: Format file tidak valid atau rusak.</string>
+    <string name="ExportPyrogramString">Salin String Sesi Pyrogram</string>
+    <string name="ExportPyrogramFile">Ekspor File Pyrogram .session</string>
+    <string name="ExportTelethonString">Salin String Sesi Telethon</string>
+    <string name="PasteSessionStringHint">Tempel string sesi Pyrogram (v1/v2) atau Telethon di sini...</string>
+    <string name="SessionCopied">String sesi Pyrogram disalin ke papan klip!</string>
+    <string name="TelethonSessionCopied">String sesi Telethon disalin ke papan klip!</string>
+    <string name="ExportTypeTitle">Pilih Format Ekspor</string>
+    <string name="ExportPyrogramStringOpt">String Sesi Pyrogram (v2 - Terbaru)</string>
+    <string name="ExportPyrogramFileOpt">File SQLite Pyrogram (.session)</string>
+    <string name="ExportTelethonStringOpt">String Sesi Telethon</string>
+    <string name="ExportAlexgramBackupOpt">Cadangan Lengkap Alexgram (.session)</string>
+    <string name="PasteClipboard">Tempel Papan Klip</string>
+    <string name="ImportSessionButton">Impor Sesi</string>
+    <string name="SessionImportSuccessDesc">Sesi berhasil diimpor!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Batas maksimum akun aktif tercapai. Harap hapus akun terlebih dahulu.</string>
+    <string name="SessionPasswordRequired">Kata sandi diperlukan untuk cadangan terenkripsi.</string>
+    <string name="SessionFileEmpty">File sesi yang dipilih kosong.</string>
+    <string name="SessionNoAccountsInBackup">Tidak ada sesi akun valid yang ditemukan dalam file cadangan.</string>
+    <string name="SessionStreamError">Tidak dapat membuka aliran file.</string>
+    <string name="SessionAlreadyActive">Sudah berada di akun ini</string>
+    <string name="InvalidSessionString">Format string sesi Pyrogram atau Telethon tidak valid.</string>
+    <string name="FailedExtractAuthKey">Gagal mengekstrak kunci autentikasi sesi.</string>
+    <string name="CopyAgain">Salin Lagi</string>
+    <string name="ShareSessionString">Bagikan String Sesi</string>
+    <string name="PyrogramSessionStringV2">String Sesi Pyrogram (v2)</string>
+    <string name="TelethonSessionStringTitle">String Sesi Telethon</string>
+    <string name="NoAccounts">Tidak ada akun aktif yang ditemukan.</string>
+    <string name="Feed">Feed</string>
+    <string name="GoToMessage">Buka Pesan</string>
+    <string name="FeedSettings">Pengaturan Feed</string>
+    <string name="FeedBottomTab">Tab Feed di Bilah Bawah</string>
+    <string name="FeedBottomTabInfo">Tampilkan tab Feed di bilah navigasi bawah.</string>
+    <string name="FeedUnreadCounter">Penghitung Belum Dibaca</string>
+    <string name="FeedIncludeArchived">Sertakan Saluran Diarsipkan</string>
+    <string name="FeedIncludeArchivedInfo">Sertakan pesan dari saluran yang diarsipkan di Feed.</string>
+    <string name="FeedShownChannels">Saluran yang Ditampilkan</string>
+    <string name="FeedHiddenChannels">Saluran Tersembunyi</string>
+    <string name="FeedChannelsInfo">Hapus centang saluran yang tidak ingin Anda lihat di Feed Anda.</string>
+    <string name="FeedMarkAllRead">Tandai Semua Telah Dibaca</string>
+    <string name="FeedMarkAllReadConfirm">Apakah Anda yakin ingin menandai semua postingan di Feed sebagai telah dibaca?</string>
+    <string name="FeedMarkAllReadDone">Semua postingan ditandai sebagai telah dibaca</string>
+    <string name="FeedChannelHidden">Saluran %1$s disembunyikan</string>
+    <string name="FeedHideChannel">Sembunyikan dari Feed</string>
 </resources>

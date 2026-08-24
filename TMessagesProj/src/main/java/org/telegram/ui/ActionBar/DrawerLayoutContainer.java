@@ -106,8 +106,9 @@ public class DrawerLayoutContainer extends FrameLayout {
     private float startY;
     private boolean keyboardVisibility;
     private int imeHeight;
-
-    private final boolean USE_SPRING_ANIMATION = NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING;
+    private boolean isUseSpringAnimation() {
+        return NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING;
+    }
     private SpringAnimation currentSpringAnimation;
 
     public final static FloatPropertyCompat<DrawerLayoutContainer> DRAWER_POSITION_PROPERTY = new FloatPropertyCompat<DrawerLayoutContainer>("drawerPosition") {
@@ -224,7 +225,7 @@ public class DrawerLayoutContainer extends FrameLayout {
         }
         cancelCurrentAnimation();
 
-        if (USE_SPRING_ANIMATION) {
+        if (isUseSpringAnimation()) {
             currentSpringAnimation = new SpringAnimation(this, DRAWER_POSITION_PROPERTY)
                     .setSpring(new SpringForce()
                             .setStiffness(getSpringStiffness(fast))
@@ -262,7 +263,7 @@ public class DrawerLayoutContainer extends FrameLayout {
         }
         cancelCurrentAnimation();
 
-        if (USE_SPRING_ANIMATION) {
+        if (isUseSpringAnimation()) {
             currentSpringAnimation = new SpringAnimation(this, DRAWER_POSITION_PROPERTY)
                     .setSpring(new SpringForce()
                             .setStiffness(getSpringStiffness(fast))

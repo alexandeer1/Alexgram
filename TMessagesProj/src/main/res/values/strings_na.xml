@@ -22,7 +22,7 @@
     <string name="ShowMessageID">Show Message ID</string>
     <string name="ShowRPCError">Toast RPC Errors</string>
     <string name="ShowPremiumStickersAnimation">Show Premium Stickers Animation</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Colorful</string>
     <string name="AppIconDarkGreen">Dark Green</string>
     <string name="AppIconNeon">Alexgram Neon</string>
@@ -48,7 +48,7 @@
     <string name="CustomEditedMessage">Custom Edited Mark</string>
     <string name="NotificationIcon">Notification Icon</string>
     <string name="Official">Official</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">HalloWeen</string>
     <string name="ShowOnlineStatus">Show Online Status</string>
     <string name="ShowOnlineStatusNotice">Show the online status of other people next to their profile photo in groups.</string>
@@ -76,9 +76,9 @@
     <string name="ShowQuickReplyInBotCommands">Show Quick Reply in Bot Commands</string>
     <string name="PushServiceType">Push Service Type</string>
     <string name="PushServiceTypeInApp">In-App</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Show Resident Notifications</string>
     <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">Send MP4 Document as Video</string>
@@ -101,12 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Case insensitive expressions</string>
     <string name="RegexFiltersAdd">Add filter</string>
     <string name="RegexFiltersEdit">Edit filter</string>
-    <string name="RegexFiltersAddDescription">You can use site <![CDATA[<a href="https://regex101.com">regex101.com</a>]]> to fully test your regular expression. You can also use plain text, but don\'t forget to escape brackets.</string>
+    <string name="RegexFiltersAddDescription">You can use site &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; to fully test your regular expression. You can also use plain text, but don\'t forget to escape brackets.</string>
     <string name="RegexFiltersAddError">Regex syntax error</string>
     <string name="ShowTimeHint">Tap Time for Details</string>
     <string name="SearchHashtagDefaultPageChannel">Default Hashtag Search Page in Channels</string>
     <string name="SearchHashtagDefaultPageChat">Default Hashtag Search Page in Chats</string>
-    <string name="Pangu" translatable="false">Pangu</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Enable Pangu on Sending</string>
     <string name="PanguInfo">Paranoid text spacing for good readability, to automatically insert whitespace between CJK (Chinese, Japanese, Korean), half-width English, digit and symbol characters.</string>
     <string name="SendWithPangu">Send with Pangu</string>
@@ -152,7 +152,6 @@
     <string name="MaskBlockedUserMessagesAbout">Show messages from blocked/shadow-banned users behind a spoiler mask instead of hiding them.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Only mask matched regex</string>
     <string name="RegexFiltersSpoilerColor">Mask particle color</string>
-    <!-- [Alexgram: Accounts Settings] - Start -->
     <string name="AccountsSettings">Accounts</string>
     <string name="AccountLimitsHeader">Account Limits</string>
     <string name="StartupPerformanceHeader">Startup Performance</string>
@@ -162,8 +161,6 @@
     <string name="StartupActiveAccountsInfo">Controls how many accounts are fully initialized when the app opens. Lower values mean faster launch and less battery use. Other accounts load on demand when you switch to them.</string>
     <string name="LimitReachedAccountsNa">Sorry, you can\'t add more than **%1$d** accounts. You can increase this limit (up to 100) in **A-Settings → Accounts**.</string>
     <string name="MaxActiveAccountsWarning">You currently have %1$d active accounts. Setting the limit to %2$d will prevent you from adding new accounts until you log out of some.</string>
-    <!-- [Alexgram: Accounts Settings] - End -->
-    <!-- [Alexgram: Hidden Accounts] - Start -->
     <string name="HiddenAccountsTitle">Hidden Accounts</string>
     <string name="HiddenAccountsDesc">Toggle the lock icon to hide an account. Hidden accounts won\'t appear in the switcher until you unlock this vault.</string>
     <string name="HiddenAccountsHeader">Hidden Accounts</string>
@@ -174,15 +171,10 @@
     <string name="HiddenAccountsAutoLockDesc">When enabled, the vault re-locks automatically when the app goes to background.</string>
     <string name="HiddenAccountsSection">Accounts</string>
     <string name="HiddenAccountsPINManagement">PIN Management</string>
-    <!-- [Alexgram: Hide Search Bar] - Start -->
     <string name="HideHomeSearchField">Hide Search Bar</string>
     <string name="HideHomeSearchFieldDesc">Hide the search bar in the chat list. You can still search by clicking the search icon on the top right.</string>
-    <!-- [Alexgram: Hide Search Bar] - End -->
-    <!-- [Alexgram: Main Tabs Hiding Search Bar] - Start -->
     <string name="MainTabsShowSearchButton">Show Search Icon in Bottom Bar</string>
     <string name="MainTabsShowSearchButtonDesc">Display a search icon in the bottom bar next to the main navigation tabs.</string>
-    <!-- [Alexgram: Main Tabs Hiding Search Bar] - End -->
-    <!-- [Alexgram: Session Management] - Start -->
     <string name="SessionManagementHeader">Session Management</string>
     <string name="SessionManagementTitle">Account Session Manager</string>
     <string name="SessionManagementDesc">Manage logged-in sessions, active devices, Pyrogram/Telethon sessions, and backup export/import.</string>
@@ -238,8 +230,6 @@
     <string name="PyrogramSessionStringV2">Pyrogram Session String (v2)</string>
     <string name="TelethonSessionStringTitle">Telethon Session String</string>
     <string name="NoAccounts">No active accounts found.</string>
-    <!-- [Alexgram: Session Management] - End -->
-    <!-- [Alexgram: Feed Feature] - Start -->
     <string name="Feed">Feed</string>
     <string name="GoToMessage">Go to Message</string>
     <string name="FeedSettings">Feed Settings</string>
@@ -256,5 +246,4 @@
     <string name="FeedMarkAllReadDone">All posts marked as read</string>
     <string name="FeedChannelHidden">Channel %1$s hidden</string>
     <string name="FeedHideChannel">Hide from Feed</string>
-    <!-- [Alexgram: Feed Feature] - End -->
 </resources>

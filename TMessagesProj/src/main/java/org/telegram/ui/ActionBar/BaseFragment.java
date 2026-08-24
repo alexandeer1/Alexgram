@@ -318,13 +318,13 @@ public abstract class BaseFragment {
     }
 
     public boolean isActionBarCrossfadeEnabled() {
-        if (NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING) {
-            if (getLastStoryViewer() != null && getLastStoryViewer().attachedToParent()) {
-                return false;
-            }
-            return actionBar != null && !actionBar.isActionModeShowed();
+        if (NaConfig.INSTANCE.getBackAnimationStyle().Int() != ActionBarLayout.BACK_ANIMATION_SPRING || !NaConfig.INSTANCE.getSpringAnimationCrossfade().Bool()) {
+            return false;
         }
-        return actionBar != null;
+        if (getLastStoryViewer() != null && getLastStoryViewer().attachedToParent()) {
+            return false;
+        }
+        return actionBar != null && !actionBar.isActionModeShowed();
     }
 
     public INavigationLayout.BackButtonState getBackButtonState() {
