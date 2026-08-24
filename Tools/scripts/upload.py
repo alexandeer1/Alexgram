@@ -28,7 +28,7 @@ MAX_FLOOD_WAIT_SECONDS = int(os.environ.get("TG_MAX_FLOOD_WAIT") or "1800")
 
 artifacts_path = Path("artifacts")
 test_version = any(arg.lower() == "test" for arg in argv[1:])
-metadata_chat_id = argv[2] if len(argv) > 2 and argv[2] else None
+metadata_chat_id = argv[4] if len(argv) > 4 and argv[4] and argv[4] != DEFAULT_CHAT_ID else None
 
 
 class TelegramUploadError(RuntimeError):
@@ -109,8 +109,15 @@ def get_ai_summary() -> str:
 def get_caption(file_path: Path | None = None) -> str:
     commit_id, commit_url, commit_message = get_commit_info()
     workflow = (os.environ.get("GITHUB_WORKFLOW") or "").lower()
+    tier = (os.environ.get("APP_TIER") or "").lower()
 
-    if not test_version or "release" in workflow:
+    if tier == "nightly" or "nightly" in workflow:
+        title = "Alexgram Nightly"
+        icon = "🌙"
+    elif tier == "beta" or "beta" in workflow:
+        title = "Alexgram Beta"
+        icon = "🧪"
+    elif not test_version or "release" in workflow or tier == "release":
         title = "Alexgram Release"
         icon = "🚀"
     elif "canary" in workflow:
@@ -453,8 +460,8 @@ def send_metadata(chat_id: str) -> None:
 def main() -> None:
     send_to_channel(DEFAULT_CHAT_ID)
 
-    with contextlib.suppress(Exception):
-        if metadata_chat_id:
+    if metadata_chat_id and metadata_chat_id != DEFAULT_CHAT_ID:
+        with contextlib.suppress(Exception):
             send_metadata(metadata_chat_id)
 
 

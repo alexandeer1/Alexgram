@@ -253,6 +253,7 @@
     <string name="CopySticker">Copy Sticker</string>
     <string name="CheckUpdate">Check for Updates</string>
     <string name="AutoCheckUpdateOFF">OFF</string>
+    <string name="AutoCheckUpdateON">ON</string>
     <string name="AutoCheckUpdateSwitch">Update Channel</string>
     <string name="AutoCheckUpdateRelease">Release</string>
     <string name="AutoCheckUpdateBeta">Beta</string>

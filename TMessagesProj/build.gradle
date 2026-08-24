@@ -20,6 +20,20 @@ def verCode = buildTimestamp != '0' ? buildTimestamp.toLong().intdiv(1000).toInt
 def officialVer = APP_VERSION_NAME
 def officialCode = APP_VERSION_CODE
 
+def appTier = (System.getenv('APP_TIER') ?: (project.hasProperty('appTier') ? project.property('appTier') : 'release')).toLowerCase(Locale.ROOT)
+def appPkgSuffix = ''
+def appNameOverride = 'Alexgram'
+def appGramName = 'Alexgram'
+if (appTier == 'beta') {
+    appPkgSuffix = '.beta'
+    appNameOverride = 'Alexgram Beta'
+    appGramName = 'Alexgram-Beta'
+} else if (appTier == 'nightly') {
+    appPkgSuffix = '.nightly'
+    appNameOverride = 'Alexgram Nightly'
+    appGramName = 'Alexgram-Nightly'
+}
+
 def keystorePwd = null
 def alias = null
 def pwd = null
@@ -70,8 +84,6 @@ android {
         }
     }
 
-    defaultConfig.applicationId = APP_PACKAGE
-
     packaging {
         jniLibs {
             useLegacyPackaging = true
@@ -94,6 +106,13 @@ android {
     }
 
     defaultConfig {
+        applicationId APP_PACKAGE + appPkgSuffix
+        manifestPlaceholders = [
+            appName: appNameOverride,
+            accountType: (APP_PACKAGE + appPkgSuffix)
+        ]
+        resValue 'string', 'account_type', (APP_PACKAGE + appPkgSuffix)
+
         ndk {
             if (!nativeTarget.isBlank()) {
                 abiFilters.addAll(nativeTarget.split(',').collect { it.trim() })
@@ -115,6 +134,7 @@ android {
         buildConfigField 'String', 'APP_HASH', '"' + appHash + '"'
         buildConfigField 'long', 'BUILD_TIMESTAMP', buildTimestamp + 'L'
         buildConfigField 'boolean', 'DEBUG_PRIVATE_VERSION', 'false'
+        buildConfigField 'String', 'APP_TIER', '"' + appTier + '"'
 
         externalNativeBuild {
             cmake {
@@ -138,6 +158,8 @@ android {
 
         buildFeatures {
             compose = true
+            resValues = true
+            buildConfig = true
         }
     }
 
@@ -203,7 +225,7 @@ android {
 androidComponents {
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
-            String gramName = 'Alexgram'
+            String gramName = appGramName
             String abi = 'universal'
             if (!nativeTarget.isBlank()) {
                 if (nativeTarget.contains(',')) {
