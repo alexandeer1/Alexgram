@@ -3349,7 +3349,10 @@ public class ChatActivity extends BaseFragment implements
             .add(NotificationCenter.invalidateMotionBackground)
             .add(NotificationCenter.didSetNewWallpapper)
             .add(NotificationCenter.didApplyNewTheme)
-            .add(NotificationCenter.goingToPreviewTheme);
+            .add(NotificationCenter.goingToPreviewTheme)
+            // [Alexgram: Text Style Settings] - Start
+            .add(NotificationCenter.reloadInterface);
+            // [Alexgram: Text Style Settings] - End
 
         if (chatMode == MODE_EDIT_BUSINESS_LINK) {
             observersGroup.add(NotificationCenter.businessLinksUpdated);
@@ -4704,7 +4707,7 @@ public class ChatActivity extends BaseFragment implements
 
 
             @Override
-            protected boolean isCentered() {
+            public boolean isCentered() {
                 return isTitleCentered();
             }
 
@@ -11769,50 +11772,102 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean filledEditTextItemMenu = false;
+    // [Alexgram: Text Style Settings] - Start
     private void checkEditTextItemMenu() {
         if (filledEditTextItemMenu || editTextItem == null) {
             return;
         }
 
         ActionBarMenuItem item = editTextItem.createView();
-        item.addSubItem(text_spoiler, LocaleController.getString(R.string.Spoiler));
+
+        // Build a lookup table: key -> (itemId, charSequence title)
+        // Add ALL items initially; visibility will be set by refreshTextStyleMenu()
+        SpannableStringBuilder sb;
+
+        // translate
+        item.addSubItem(text_transalte, LocaleController.getString(R.string.TranslateMessage));
+
+        // bold
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.Bold));
+        sb.setSpan(new TypefaceSpan(AndroidUtilities.bold()), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_bold, sb);
+
+        // italic
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.Italic));
+        sb.setSpan(new TypefaceSpan(AndroidUtilities.getTypeface("fonts/ritalic.ttf")), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_italic, sb);
+
+        // mono
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.Mono));
+        sb.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_mono, sb);
+
+        // code
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.MonoCode));
+        sb.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_code, sb);
+
+        // strike
+        if (currentEncryptedChat == null || AndroidUtilities.getPeerLayerVersion(currentEncryptedChat.layer) >= 101) {
+            sb = new SpannableStringBuilder(LocaleController.getString(R.string.Strike));
+            TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
+            run.flags |= TextStyleSpan.FLAG_STYLE_STRIKE;
+            sb.setSpan(new TextStyleSpan(run), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.addSubItem(text_strike, sb);
+
+            // underline
+            sb = new SpannableStringBuilder(LocaleController.getString(R.string.Underline));
+            run = new TextStyleSpan.TextStyleRun();
+            run.flags |= TextStyleSpan.FLAG_STYLE_UNDERLINE;
+            sb.setSpan(new TextStyleSpan(run), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.addSubItem(text_underline, sb);
+        }
+
+        // quote (only in normal chat mode)
         if (chatMode == 0) {
             item.addSubItem(text_quote, LocaleController.getString(R.string.Quote));
         }
-        SpannableStringBuilder stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Bold));
-        stringBuilder.setSpan(new TypefaceSpan(AndroidUtilities.bold()), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_bold, stringBuilder);
-        stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Italic));
-        stringBuilder.setSpan(new TypefaceSpan(AndroidUtilities.getTypeface("fonts/ritalic.ttf")), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_italic, stringBuilder);
-        stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Mono));
-        stringBuilder.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_mono, stringBuilder);
-        stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.MonoCode));
-        stringBuilder.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_code, stringBuilder);
-        if (currentEncryptedChat == null || AndroidUtilities.getPeerLayerVersion(currentEncryptedChat.layer) >= 101) {
-            stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Strike));
-            TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
-            run.flags |= TextStyleSpan.FLAG_STYLE_STRIKE;
-            stringBuilder.setSpan(new TextStyleSpan(run), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            item.addSubItem(text_strike, stringBuilder);
 
-            stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Underline));
-            run = new TextStyleSpan.TextStyleRun();
-            run.flags |= TextStyleSpan.FLAG_STYLE_UNDERLINE;
-            stringBuilder.setSpan(new TextStyleSpan(run), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            item.addSubItem(text_underline, stringBuilder);
-        }
+        // spoiler
+        item.addSubItem(text_spoiler, LocaleController.getString(R.string.Spoiler));
+
+        // link
         item.addSubItem(text_link, LocaleController.getString(R.string.CreateLink));
-        item.addSubItem(text_mention, LocaleController.getString(R.string.CreateMention)); // NekoX
+
+        // mention
+        item.addSubItem(text_mention, LocaleController.getString(R.string.CreateMention));
+
+        // date
         if (currentEncryptedChat == null) {
             item.addSubItem(text_date, LocaleController.getString(R.string.FormattedDate));
         }
+
+        // regular
         item.addSubItem(text_regular, LocaleController.getString(R.string.Regular));
 
         filledEditTextItemMenu = true;
+        refreshTextStyleMenu();
     }
+
+    /** Apply NaConfig show/hide settings for each text-style menu item. */
+    private void refreshTextStyleMenu() {
+        if (!filledEditTextItemMenu || editTextItem == null || editTextItem.getView() == null) return;
+        ActionBarMenuItem item = editTextItem.getView();
+        item.setSubItemVisibility(text_transalte,  NaConfig.INSTANCE.getShowTextTranslate().Bool());
+        item.setSubItemVisibility(text_bold,        NaConfig.INSTANCE.getShowTextBold().Bool());
+        item.setSubItemVisibility(text_italic,      NaConfig.INSTANCE.getShowTextItalic().Bool());
+        item.setSubItemVisibility(text_mono,        NaConfig.INSTANCE.getShowTextMono().Bool());
+        item.setSubItemVisibility(text_code,        NaConfig.INSTANCE.getShowTextMonoCode().Bool());
+        item.setSubItemVisibility(text_strike,      NaConfig.INSTANCE.getShowTextStrikethrough().Bool());
+        item.setSubItemVisibility(text_underline,   NaConfig.INSTANCE.getShowTextUnderline().Bool());
+        item.setSubItemVisibility(text_quote,       NaConfig.INSTANCE.getShowTextQuote().Bool() && chatMode == 0);
+        item.setSubItemVisibility(text_spoiler,     NaConfig.INSTANCE.getShowTextSpoiler().Bool());
+        item.setSubItemVisibility(text_link,        NaConfig.INSTANCE.getShowTextCreateLink().Bool());
+        item.setSubItemVisibility(text_mention,     NaConfig.INSTANCE.getShowTextCreateMention().Bool());
+        item.setSubItemVisibility(text_date,        NaConfig.INSTANCE.getShowTextCreateDate().Bool() && currentEncryptedChat == null);
+        item.setSubItemVisibility(text_regular,     NaConfig.INSTANCE.getShowTextRegular().Bool());
+    }
+    // [Alexgram: Text Style Settings] - End
 
     private void updatePagedownButtonsPosition() {
         updatePagedownButtonsPosition(shouldHideBottomForGesture());
@@ -21617,6 +21672,12 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void didReceivedNotification(int id, int account, final Object... args) {
+        // [Alexgram: Text Style Settings] - Start
+        if (id == NotificationCenter.reloadInterface) {
+            refreshTextStyleMenu();
+            return;
+        }
+        // [Alexgram: Text Style Settings] - End
         if (id == NotificationCenter.messagesDidLoad) {
             int guid = (Integer) args[10];
             if (guid != classGuid) {
