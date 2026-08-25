@@ -712,9 +712,6 @@ public abstract class AyuMessageUtils {
     }
 
     public static File decryptAndSaveMedia(String fileName, File encryptedFile, MessageObject messageObject) {
-        if (!NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool()) {
-            return null;
-        }
         File AttachmentsDir = AyuMessagesController.attachmentsPath;
         if (!AttachmentsDir.exists() && !AttachmentsDir.mkdirs()) {
             return null;
@@ -745,6 +742,9 @@ public abstract class AyuMessageUtils {
         }
         // decrypt and save
         File keyFile = new File(FileLoader.getInternalCacheDir(), encryptedFile.getName() + ".key");
+        if (!keyFile.exists() && encryptedFile.getName().endsWith(".enc")) {
+            keyFile = new File(FileLoader.getInternalCacheDir(), encryptedFile.getName().substring(0, encryptedFile.getName().length() - 4) + ".key");
+        }
         if (!keyFile.exists()) {
             FileLog.d("Key file not found: " + keyFile.getAbsolutePath());
             return null;

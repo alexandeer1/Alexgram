@@ -16798,6 +16798,9 @@ public class ChatActivity extends BaseFragment implements
         if (messageObject == null || messageObject.isOut() || !messageObject.isSecretMedia() || messageObject.messageOwner.destroyTime != 0 || messageObject.messageOwner.ttl <= 0) {
             return null;
         }
+        if (!tw.nekomimi.nekogram.NekoConfig.sendReadMessagePackets.Bool() || xyz.nextalone.nagram.NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool()) {
+            return null;
+        }
         if (readNow) {
             final boolean delete = messageObject.messageOwner.ttl != 0x7FFFFFFF;
             final int ttl = messageObject.messageOwner.ttl == 0x7FFFFFFF ? 0 : messageObject.messageOwner.ttl;
@@ -16825,6 +16828,9 @@ public class ChatActivity extends BaseFragment implements
 
     private Runnable sendSecretMediaDelete(MessageObject messageObject) {
         if (messageObject == null || messageObject.isOut() || !messageObject.isSecretMedia() || messageObject.messageOwner.ttl != 0x7FFFFFFF) {
+            return null;
+        }
+        if (!tw.nekomimi.nekogram.NekoConfig.sendReadMessagePackets.Bool() || xyz.nextalone.nagram.NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool()) {
             return null;
         }
         final long taskId = getMessagesController().createDeleteShowOnceTask(dialog_id, messageObject.getId());
@@ -22208,7 +22214,7 @@ public class ChatActivity extends BaseFragment implements
                         }
 
                         Pair<Integer, Integer> minMaxRes = getMessagesStorage().getMinAndMaxForDialog(dialogId);
-                        if (dialog != null && DialogObject.isUserDialog(dialogId) && (startId == endId && endId == dialog.top_message) && messArr.size() <= 1) { // empty user dialog, so load as much as we can
+                        if (dialog != null && DialogObject.isUserDialog(dialogId) && (startId == endId && endId == dialog.top_message) && messArr.size() <= 1 && endReached[loadIndex]) { // empty user dialog, so load as much as we can
                             startId = minVal;
                             endId = maxVal;
                         } else if (isChannelComment) { // deleted messages loading in comments
@@ -22216,18 +22222,15 @@ public class ChatActivity extends BaseFragment implements
                             endId = threadMaxOutboxReadId == 0 ? minVal : threadMaxOutboxReadId;
                         } else if (dialog != null && (dialog.top_message == endId || (minMaxRes.second == endId && dialog.top_message <= minMaxRes.second)) || topic != null && topic.top_message == endId) { // allows loading messages that are under bottom messages
                             endId = maxVal; // startId is the smallest in the current batch
-                        } else if (messArr.size() == 1 && messArr.get(0).messageOwner instanceof TLRPC.TL_messageService) { // TL_messageService
-                            startId = minVal;
-                            endId = AyuUtils.getMinRealId(messages);
-                        } else if (messArr.size() < count && !isCache && (load_type == 2 || load_type == 1) && !messArr.isEmpty()) { // allows loading messages that are uppermore than the dialog
+                        } else if (endReached[loadIndex]) {
                             startId = minVal;
                             endId = Math.min(msg1, msg2);
                         }
                     } else {
-                        if (!messages.isEmpty() && load_type != 1) { // for loading uppermore
+                        if (!messages.isEmpty() && load_type != 1 && endReached[loadIndex]) { // for loading uppermore
                             startId = minVal;
                             endId = AyuUtils.getMinRealId(messages);
-                        } else if (DialogObject.isUserDialog(dialogId)) { // empty(new) user dialog, so load as much as we can
+                        } else if (DialogObject.isUserDialog(dialogId) && endReached[loadIndex]) { // empty(new) user dialog, so load as much as we can
                             startId = minVal;
                             endId = maxVal;
                         }
@@ -22266,11 +22269,26 @@ public class ChatActivity extends BaseFragment implements
                 }
 
                 if (!isChannelComment && !isInScheduleMode() && chatMode != MODE_PINNED && (startId != minVal || endId != minVal)) {
-                    boolean needToReset = messArr.size() == count;
                     int limit = 200;
-                    AyuHistoryHook.doHookAsync(currentAccount, startId, endId, dialogId, limit, topicId, load_type, isChannelComment, threadMessageId, isTopic);
-                    if (needToReset) {
-                        count = messArr.size();
+                    ArrayList<MessageObject> deletedObjects = AyuHistoryHook.getDeletedMessagesSync(currentAccount, startId, endId, dialogId, limit, topicId, load_type, isChannelComment, threadMessageId, isTopic);
+                    if (deletedObjects != null && !deletedObjects.isEmpty()) {
+                        SparseArray<MessageObject> existingMap = new SparseArray<>(messArr.size() + deletedObjects.size());
+                        for (int i = 0; i < messArr.size(); i++) {
+                            MessageObject m = messArr.get(i);
+                            existingMap.put(m.getId(), m);
+                        }
+                        for (int i = 0; i < deletedObjects.size(); i++) {
+                            MessageObject d = deletedObjects.get(i);
+                            if (existingMap.indexOfKey(d.getId()) < 0 && (loadIndex >= messagesDict.length || messagesDict[loadIndex].indexOfKey(d.getId()) < 0)) {
+                                messArr.add(d);
+                                existingMap.put(d.getId(), d);
+                            }
+                        }
+                        Comparator<MessageObject> comparator = AyuHistoryHook::doHook_compareMessages;
+                        if (load_type == 1) {
+                            comparator = comparator.reversed();
+                        }
+                        messArr.sort(comparator);
                     }
                 }
             }
@@ -32557,14 +32575,14 @@ public class ChatActivity extends BaseFragment implements
             }
 
             if (!isAyuDeleted) {
-                if (message.messageOwner.ttl > 0 || message.isVoiceOnce() || message.isRoundOnce()) {
+                if (message.isSecretMedia() || (message.messageOwner != null && (message.messageOwner.ttl > 0 || (message.messageOwner.media != null && message.messageOwner.media.ttl_seconds > 0))) || message.isVoiceOnce() || message.isRoundOnce()) {
                     boolean isExpiredVideo = AyuMessageUtils.isExpiredDocument(message);
                     boolean isExpiredPhoto = AyuMessageUtils.isExpiredPhoto(message);
-                    if (!isExpiredPhoto && message.isPhoto()) {
+                    if (!isExpiredPhoto && (message.isPhoto() || (message.messageOwner != null && message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto))) {
                         items.add(0, getString(R.string.SaveToGallery));
                         options.add(0, AyuConstants.OPTION_TTL_SAVE);
                         icons.add(0, R.drawable.msg_gallery);
-                    } else if (message.isVideo() || message.isRoundOnce() || message.isVoiceOnce()) {
+                    } else if (message.isVideo() || message.isRoundOnce() || message.isVoiceOnce() || (message.messageOwner != null && message.messageOwner.media instanceof TLRPC.TL_messageMediaDocument)) {
                         items.add(0, getString(R.string.SaveToDownloads));
                         options.add(0, AyuConstants.OPTION_TTL_SAVE);
                         icons.add(0, R.drawable.msg_download);
@@ -35289,37 +35307,102 @@ public class ChatActivity extends BaseFragment implements
                     }
                     // TTL media with encryption, see SecretMediaViewer.openMedia
                     if (document != null) {
-                        if (ttlMessage.messageOwner.attachPath != null) {
-                            fileToSave = new File(ttlMessage.messageOwner.attachPath);
-                            if (!fileToSave.exists()) {
-                                fileToSave = null;
+                        if (ttlMessage.messageOwner != null && ttlMessage.messageOwner.attachPath != null) {
+                            File attachFile = new File(ttlMessage.messageOwner.attachPath);
+                            if (attachFile.exists()) {
+                                fileToSave = attachFile;
+                            }
+                        }
+                        if (fileToSave == null && ttlMessage.messageOwner != null) {
+                            File msgFile = FileLoader.getInstance(currentAccount).getPathToMessage(ttlMessage.messageOwner);
+                            if (msgFile != null && msgFile.exists()) {
+                                fileToSave = msgFile;
+                            } else if (msgFile != null) {
+                                File encryptedFile = new File(msgFile.getAbsolutePath() + ".enc");
+                                if (encryptedFile.exists()) {
+                                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(msgFile.getName(), encryptedFile, ttlMessage);
+                                    if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
+                                        fileToSave = decryptedFile;
+                                    }
+                                }
                             }
                         }
                         if (fileToSave == null) {
-                            fileToSave = FileLoader.getInstance(currentAccount).getPathToMessage(ttlMessage.messageOwner);
-                            File encryptedFile = new File(fileToSave.getAbsolutePath() + ".enc");
-                            if (encryptedFile.exists()) {
-                                File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(fileToSave.getName(), encryptedFile, ttlMessage);
-                                if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
-                                    fileToSave = decryptedFile;
+                            File attachFile = FileLoader.getInstance(currentAccount).getPathToAttach(document, true);
+                            if (attachFile != null && attachFile.exists()) {
+                                fileToSave = attachFile;
+                            } else if (attachFile != null) {
+                                File encryptedFile = new File(attachFile.getAbsolutePath() + ".enc");
+                                if (encryptedFile.exists()) {
+                                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(attachFile.getName(), encryptedFile, ttlMessage);
+                                    if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
+                                        fileToSave = decryptedFile;
+                                    }
+                                }
+                            }
+                        }
+                        if (fileToSave == null) {
+                            File attachFile = FileLoader.getInstance(currentAccount).getPathToAttach(document);
+                            if (attachFile != null && attachFile.exists()) {
+                                fileToSave = attachFile;
+                            } else if (attachFile != null) {
+                                File encryptedFile = new File(attachFile.getAbsolutePath() + ".enc");
+                                if (encryptedFile.exists()) {
+                                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(attachFile.getName(), encryptedFile, ttlMessage);
+                                    if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
+                                        fileToSave = decryptedFile;
+                                    }
                                 }
                             }
                         }
                     } else {
-                        TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(ttlMessage.photoThumbs, AndroidUtilities.getPhotoSize());
+                        ArrayList<TLRPC.PhotoSize> sizes = ttlMessage.photoThumbs != null && !ttlMessage.photoThumbs.isEmpty() ? ttlMessage.photoThumbs : (ttlMessage.messageOwner != null && ttlMessage.messageOwner.media != null && ttlMessage.messageOwner.media.photo != null ? ttlMessage.messageOwner.media.photo.sizes : null);
+                        TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(sizes, AndroidUtilities.getPhotoSize());
                         if (sizeFull != null) {
-                            fileToSave = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, true);
-                            if (fileToSave == null || !fileToSave.exists()) {
-                                File encryptedPhotoFile = new File(fileToSave.getAbsolutePath() + ".enc");
+                            File attachFile = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, true);
+                            if (attachFile != null && attachFile.exists()) {
+                                fileToSave = attachFile;
+                            } else if (attachFile != null) {
+                                File encryptedPhotoFile = new File(attachFile.getAbsolutePath() + ".enc");
                                 if (encryptedPhotoFile.exists()) {
-                                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(fileToSave.getName(), encryptedPhotoFile, ttlMessage);
+                                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(attachFile.getName(), encryptedPhotoFile, ttlMessage);
                                     if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
                                         fileToSave = decryptedFile;
-                                    } else {
-                                        fileToSave = null;
                                     }
-                                } else {
-                                    fileToSave = null;
+                                }
+                            }
+                            if (fileToSave == null) {
+                                attachFile = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, false);
+                                if (attachFile != null && attachFile.exists()) {
+                                    fileToSave = attachFile;
+                                } else if (attachFile != null) {
+                                    File encryptedPhotoFile = new File(attachFile.getAbsolutePath() + ".enc");
+                                    if (encryptedPhotoFile.exists()) {
+                                        File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(attachFile.getName(), encryptedPhotoFile, ttlMessage);
+                                        if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
+                                            fileToSave = decryptedFile;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (fileToSave == null && ttlMessage.messageOwner != null && ttlMessage.messageOwner.attachPath != null) {
+                            File attachPathFile = new File(ttlMessage.messageOwner.attachPath);
+                            if (attachPathFile.exists()) {
+                                fileToSave = attachPathFile;
+                            }
+                        }
+                        if (fileToSave == null && ttlMessage.messageOwner != null) {
+                            File msgFile = FileLoader.getInstance(currentAccount).getPathToMessage(ttlMessage.messageOwner);
+                            if (msgFile != null && msgFile.exists()) {
+                                fileToSave = msgFile;
+                            } else if (msgFile != null) {
+                                File encMsgFile = new File(msgFile.getAbsolutePath() + ".enc");
+                                if (encMsgFile.exists()) {
+                                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(msgFile.getName(), encMsgFile, ttlMessage);
+                                    if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
+                                        fileToSave = decryptedFile;
+                                    }
                                 }
                             }
                         }

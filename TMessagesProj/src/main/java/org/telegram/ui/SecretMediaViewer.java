@@ -109,6 +109,9 @@ import org.telegram.ui.Components.VideoPlayerSeekBar;
 import org.telegram.ui.Stories.DarkThemeResourceProvider;
 import org.telegram.ui.Stories.recorder.HintView2;
 
+import org.telegram.messenger.MediaController;
+import org.telegram.ui.Components.BulletinFactory;
+import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -346,6 +349,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
     private View navigationBar;
     private ImageReceiver centerImage = new ImageReceiver();
     private SecretDeleteTimer secretDeleteTimer;
+    private ImageView saveButton;
     private HintView2 secretHint;
     private boolean isVisible;
     private long currentDialogId;
@@ -795,6 +799,11 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                     int y = (ActionBar.getCurrentActionBarHeight() - secretDeleteTimer.getMeasuredHeight()) / 2 + AndroidUtilities.statusBarHeight;
                     secretDeleteTimer.layout(secretDeleteTimer.getLeft(), y, secretDeleteTimer.getRight(), y + secretDeleteTimer.getMeasuredHeight());
                 }
+                if (saveButton != null) {
+                    int y = (ActionBar.getCurrentActionBarHeight() - saveButton.getMeasuredHeight()) / 2 + AndroidUtilities.statusBarHeight;
+                    int r = getMeasuredWidth() - dp(56);
+                    saveButton.layout(r - saveButton.getMeasuredWidth(), y, r, y + saveButton.getMeasuredHeight());
+                }
                 if (secretHint != null && secretDeleteTimer != null) {
                     int y = (ActionBar.getCurrentActionBarHeight() - secretDeleteTimer.getMeasuredHeight()) / 2 + AndroidUtilities.statusBarHeight + secretDeleteTimer.getMeasuredHeight() - dp(10);
                     secretHint.layout(secretHint.getLeft(), y, secretHint.getRight(), y + secretHint.getMeasuredHeight());
@@ -861,6 +870,9 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                 super.setAlpha(alpha);
                 secretHint.setAlpha(alpha);
                 secretDeleteTimer.setAlpha(alpha);
+                if (saveButton != null) {
+                    saveButton.setAlpha(alpha);
+                }
             }
         };
         actionBar.setTitleColor(0xffffffff);
@@ -870,7 +882,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         actionBar.setItemsBackgroundColor(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR, false);
         actionBar.setItemsColor(Color.WHITE, false);
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitleRightMargin(dp(70));
+        actionBar.setTitleRightMargin(dp(110));
         containerView.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
@@ -887,7 +899,16 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         containerView.addView(secretHint, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 80, Gravity.TOP | Gravity.RIGHT, 0, 48, 0, 0));
 
         secretDeleteTimer = new SecretDeleteTimer(activity);
-        containerView.addView(secretDeleteTimer, LayoutHelper.createFrame(119, 48, Gravity.TOP | Gravity.RIGHT, 0, 0, 0, 0));
+        containerView.addView(secretDeleteTimer, LayoutHelper.createFrame(56, 48, Gravity.TOP | Gravity.RIGHT, 0, 0, 0, 0));
+
+        saveButton = new ImageView(activity);
+        saveButton.setImageResource(R.drawable.msg_download);
+        saveButton.setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN));
+        saveButton.setScaleType(ImageView.ScaleType.CENTER);
+        saveButton.setBackground(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR, 1));
+        saveButton.setContentDescription(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
+        saveButton.setOnClickListener(v -> saveCurrentMedia());
+        containerView.addView(saveButton, LayoutHelper.createFrame(48, 48, Gravity.TOP | Gravity.RIGHT, 0, 0, 56, 0));
 
         final VideoPlayerSeekBar.SeekBarDelegate seekBarDelegate = new VideoPlayerSeekBar.SeekBarDelegate() {
             @Override
@@ -1528,6 +1549,8 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
                         File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(file.getName(), encryptedFile, messageObject);
                         if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
                             file = decryptedFile;
+                            messageObject.messageOwner.attachPath = decryptedFile.getAbsolutePath();
+                            messageObject.attachPathExists = true;
                         } else {
                             file = encryptedFile;
                         }
@@ -1548,19 +1571,26 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, AndroidUtilities.getPhotoSize());
             centerImage.setImage(ImageLocation.getForObject(sizeFull, messageObject.photoThumbsObject), null, currentThumb != null ? new BitmapDrawable(currentThumb.bitmap) : null, -1, null, messageObject, 2);
             // save deleted: try to decrypt and save photo to attachments path for persistence
-            File photoFile = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, true);
-            File encryptedPhotoFile = new File(photoFile.getAbsolutePath() + ".enc");
-            if (encryptedPhotoFile.exists()) {
-                File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(photoFile.getName(), encryptedPhotoFile, messageObject);
-                if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
-                    centerImage.setImage(decryptedFile.getAbsolutePath(), null, currentThumb != null ? new BitmapDrawable(currentThumb.bitmap) : null, "jpg", 0);
-                }
+            File savedFile = !TextUtils.isEmpty(messageObject.messageOwner.attachPath) ? new File(messageObject.messageOwner.attachPath) : null;
+            if (savedFile != null && savedFile.exists() && savedFile.length() > 0) {
+                centerImage.setImage(savedFile.getAbsolutePath(), null, currentThumb != null ? new BitmapDrawable(currentThumb.bitmap) : null, "jpg", 0);
             } else {
-                String filePath = MessageHelper.getPathToMessage(messageObject);
-                if (!TextUtils.isEmpty(filePath)) {
-                    photoFile = new File(filePath);
-                    if (photoFile.exists() && photoFile.length() > 0) {
-                        centerImage.setImage(photoFile.getAbsolutePath(), null, currentThumb != null ? new BitmapDrawable(currentThumb.bitmap) : null, "jpg", 0);
+                File photoFile = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, true);
+                File encryptedPhotoFile = new File(photoFile.getAbsolutePath() + ".enc");
+                if (encryptedPhotoFile.exists()) {
+                    File decryptedFile = AyuMessageUtils.decryptAndSaveMedia(photoFile.getName(), encryptedPhotoFile, messageObject);
+                    if (decryptedFile != null && decryptedFile.exists() && decryptedFile.length() > 0) {
+                        centerImage.setImage(decryptedFile.getAbsolutePath(), null, currentThumb != null ? new BitmapDrawable(currentThumb.bitmap) : null, "jpg", 0);
+                        messageObject.messageOwner.attachPath = decryptedFile.getAbsolutePath();
+                        messageObject.attachPathExists = true;
+                    }
+                } else {
+                    String filePath = MessageHelper.getPathToMessage(messageObject);
+                    if (!TextUtils.isEmpty(filePath)) {
+                        photoFile = new File(filePath);
+                        if (photoFile.exists() && photoFile.length() > 0) {
+                            centerImage.setImage(photoFile.getAbsolutePath(), null, currentThumb != null ? new BitmapDrawable(currentThumb.bitmap) : null, "jpg", 0);
+                        }
                     }
                 }
             }
@@ -1620,6 +1650,7 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
         imageMoveAnimation = new AnimatorSet();
         imageMoveAnimation.playTogether(
                 ObjectAnimator.ofFloat(actionBar, View.ALPHA, 0, 1.0f),
+                ObjectAnimator.ofFloat(saveButton, View.ALPHA, 0, 1.0f),
                 ObjectAnimator.ofFloat(captionScrollView, View.ALPHA, 0, 1f),
                 ObjectAnimator.ofFloat(secretHint, View.ALPHA, 0, 1.0f),
                 ObjectAnimator.ofInt(photoBackgroundDrawable, AnimationProperties.COLOR_DRAWABLE_ALPHA, 0, 255),
@@ -2772,6 +2803,72 @@ public class SecretMediaViewer implements NotificationCenter.NotificationCenterD
             captionTextViewSwitcher.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             captionTextViewSwitcher.getCurrentView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
             captionTextViewSwitcher.getNextView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        }
+    }
+
+    private void saveCurrentMedia() {
+        if (currentMessageObject == null || parentActivity == null) {
+            return;
+        }
+        File fileToSave = null;
+        if (currentMessageObject.messageOwner != null && !TextUtils.isEmpty(currentMessageObject.messageOwner.attachPath)) {
+            File attachFile = new File(currentMessageObject.messageOwner.attachPath);
+            if (attachFile.exists()) {
+                fileToSave = attachFile;
+            }
+        }
+        if (fileToSave == null && currentMessageObject.messageOwner != null) {
+            File msgFile = FileLoader.getInstance(currentAccount).getPathToMessage(currentMessageObject.messageOwner);
+            if (msgFile != null && msgFile.exists()) {
+                fileToSave = msgFile;
+            } else if (msgFile != null) {
+                File encryptedFile = new File(msgFile.getAbsolutePath() + ".enc");
+                if (encryptedFile.exists()) {
+                    fileToSave = AyuMessageUtils.decryptAndSaveMedia(msgFile.getName(), encryptedFile, currentMessageObject);
+                }
+            }
+        }
+        if (fileToSave == null && currentMessageObject.photoThumbs != null) {
+            TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(currentMessageObject.photoThumbs, AndroidUtilities.getPhotoSize());
+            if (sizeFull != null) {
+                File photoFile = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, true);
+                if (photoFile != null && photoFile.exists() && photoFile.length() > 0) {
+                    fileToSave = photoFile;
+                } else if (photoFile != null) {
+                    File encryptedPhotoFile = new File(photoFile.getAbsolutePath() + ".enc");
+                    if (encryptedPhotoFile.exists()) {
+                        fileToSave = AyuMessageUtils.decryptAndSaveMedia(photoFile.getName(), encryptedPhotoFile, currentMessageObject);
+                    }
+                }
+                if (fileToSave == null) {
+                    photoFile = FileLoader.getInstance(currentAccount).getPathToAttach(sizeFull, false);
+                    if (photoFile != null && photoFile.exists() && photoFile.length() > 0) {
+                        fileToSave = photoFile;
+                    } else if (photoFile != null) {
+                        File encryptedPhotoFile = new File(photoFile.getAbsolutePath() + ".enc");
+                        if (encryptedPhotoFile.exists()) {
+                            fileToSave = AyuMessageUtils.decryptAndSaveMedia(photoFile.getName(), encryptedPhotoFile, currentMessageObject);
+                        }
+                    }
+                }
+            }
+        }
+        if (fileToSave == null) {
+            String filePath = MessageHelper.getPathToMessage(currentMessageObject);
+            if (!TextUtils.isEmpty(filePath)) {
+                File f = new File(filePath);
+                if (f.exists() && f.length() > 0) {
+                    fileToSave = f;
+                }
+            }
+        }
+        if (fileToSave != null && fileToSave.exists()) {
+            MediaController.saveFile(fileToSave.getAbsolutePath(), parentActivity, isVideo ? 2 : 0, null, null);
+            try {
+                BulletinFactory.of(containerView, new DarkThemeResourceProvider()).createDownloadBulletin(isVideo ? BulletinFactory.FileType.VIDEO_TO_DOWNLOADS : BulletinFactory.FileType.PHOTO, new DarkThemeResourceProvider()).show();
+            } catch (Exception e) {
+                Toast.makeText(parentActivity, LocaleController.getString("SaveToGallery", R.string.SaveToGallery), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
