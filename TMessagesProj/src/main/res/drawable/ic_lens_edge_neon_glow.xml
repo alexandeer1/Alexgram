@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Edge Neon Glow: Cybernetic Laser Contour Wireframe -->
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:pathData="M14,14 L34,14 L34,34 L14,34 Z" />
+    <path
+        android:strokeColor="#FF007F"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M20,8 L28,8 L28,40 L20,40 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22,22 L26,22 L26,26 L22,26 Z" />
+</vector>

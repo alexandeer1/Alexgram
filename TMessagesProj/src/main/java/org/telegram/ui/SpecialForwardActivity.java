@@ -1722,7 +1722,7 @@ public class SpecialForwardActivity extends ChatActivity {
                             final boolean finalForceDocument = forceDocument;
                             final ArrayList<SendMessagesHelper.SendingMediaInfo> finalInfos = infos;
                             AndroidUtilities.runOnUIThread(() -> {
-                                SendMessagesHelper.prepareSendingMedia(getAccountInstance(), finalInfos, peer, null, null, null, null, finalForceDocument, true, null, true, 0, 0, 0, false, null, null, 0, 0L, false, 0L, 0L, null);
+                                SendMessagesHelper.prepareSendingMedia(getAccountInstance(), finalInfos, peer, null, null, null, null, finalForceDocument, true, null, true, 0, 0, 0, false, null, null, 0L, false, 0L, 0L, null);
                             });
                         }
                     } else {
@@ -1738,9 +1738,9 @@ public class SpecialForwardActivity extends ChatActivity {
                         String caption = keepCaption && message.messageOwner.message != null ? message.messageOwner.message : "";
                         ArrayList<TLRPC.MessageEntity> entities = keepCaption ? message.messageOwner.entities : null;
                         if (message.localMediaIsVideo) {
-                            SendMessagesHelper.prepareSendingVideo(getAccountInstance(), path, message.videoEditedInfo, null, null, peer, null, null, null, null, entities, 0, null, true, 0, 0, false, false, caption, null, 0, 0L, 0L);
+                            SendMessagesHelper.prepareSendingVideo(getAccountInstance(), path, message.videoEditedInfo, null, null, peer, null, null, null, null, entities, 0, null, true, 0, 0, false, false, caption, null, 0L, 0L);
                         } else {
-                            SendMessagesHelper.prepareSendingPhoto(getAccountInstance(), path, null, null, peer, null, null, null, null, entities, null, null, 0, null, message.videoEditedInfo, true, 0, 0, false, caption, null, 0, 0L, 0L);
+                            SendMessagesHelper.prepareSendingPhoto(getAccountInstance(), path, null, null, peer, null, null, null, null, entities, null, null, 0, null, message.videoEditedInfo, true, 0, 0, false, caption, null, 0L, 0L);
                         }
                     } else {
                         SendMessagesHelper.getInstance(currentAccount).processForwardFromMyName(message, peer, 0, 0, null);
@@ -1779,7 +1779,7 @@ public class SpecialForwardActivity extends ChatActivity {
                     if (!TextUtils.isEmpty(attachPath) && !attachPath.startsWith("http")) {
                         ArrayList<String> paths = new ArrayList<>();
                         paths.add(attachPath);
-                        SendMessagesHelper.prepareSendingDocuments(getAccountInstance(), paths, paths, null, caption, entities, null, peer, null, null, null, null, null, false, 0, 0, null, null, 0, 0, false, 0, 0, null, null, null, null, false);
+                        SendMessagesHelper.prepareSendingDocuments(getAccountInstance(), paths, paths, null, caption, entities, null, peer, null, null, null, null, null, false, 0, 0, null, null, 0L, false, 0L, 0L, null);
                     } else {
                         ArrayList<MessageObject> singleList = new ArrayList<>();
                         singleList.add(msg);
@@ -1802,6 +1802,8 @@ public class SpecialForwardActivity extends ChatActivity {
         private ArrayList<TLRPC.Dialog> allDialogs;
         private final ArrayList<TLRPC.Dialog> filteredDialogs = new ArrayList<>();
         private final LongSparseArray<TLRPC.Dialog> selectedDialogs = new LongSparseArray<>();
+        private org.telegram.ui.Adapters.SearchAdapterHelper searchAdapterHelper;
+        private int lastSearchId = 0;
         
         private final ArrayList<CategoryTab> tabs = new ArrayList<>();
         private int activeCategoryIndex = 0;
@@ -1901,11 +1903,31 @@ public class SpecialForwardActivity extends ChatActivity {
                     tabFilter.title = filter.name;
                     tabFilter.emoticon = filter.emoticon;
                     tabFilter.filter = filter;
-                    tabFilter.iconRes = R.drawable.msg_folders;
+                    if (tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(filter)) {
+                        tw.nekomimi.nekogram.tabs.TabsByTypeEntry entry = tw.nekomimi.nekogram.tabs.TabsByTypeManager.getTabFromFilter(filter);
+                        tabFilter.iconRes = entry != null ? entry.iconResId : R.drawable.msg_folders;
+                    } else {
+                        tabFilter.iconRes = R.drawable.msg_folders;
+                    }
                     tabs.add(tabFilter);
                 }
             }
             
+            searchAdapterHelper = new org.telegram.ui.Adapters.SearchAdapterHelper(false);
+            searchAdapterHelper.setDelegate(new org.telegram.ui.Adapters.SearchAdapterHelper.SearchAdapterHelperDelegate() {
+                @Override
+                public void onDataSetChanged(int searchId) {
+                    if (searchId == lastSearchId) {
+                        filterDialogs();
+                    }
+                }
+
+                @Override
+                public boolean canApplySearchResults(int searchId) {
+                    return searchId == lastSearchId;
+                }
+            });
+
             allDialogs = new ArrayList<>(org.telegram.messenger.MessagesController.getInstance(currentAccount).getAllDialogs());
             filterDialogs();
             
@@ -1954,6 +1976,12 @@ public class SpecialForwardActivity extends ChatActivity {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 public void afterTextChanged(android.text.Editable s) {
                     searchQuery = s.toString().trim().toLowerCase();
+                    if (!TextUtils.isEmpty(searchQuery)) {
+                        lastSearchId++;
+                        searchAdapterHelper.queryServerSearch(searchQuery, true, true, true, true, false, 0, false, 0, lastSearchId);
+                    } else {
+                        searchAdapterHelper.queryServerSearch(null, true, true, true, true, false, 0, false, 0, 0);
+                    }
                     filterDialogs();
                 }
             });
@@ -2031,24 +2059,32 @@ public class SpecialForwardActivity extends ChatActivity {
                 pillLayout.setPadding(AndroidUtilities.dp(12), AndroidUtilities.dp(6), AndroidUtilities.dp(12), AndroidUtilities.dp(6));
                 
                 // Emoticon or Icon
-                if (!TextUtils.isEmpty(tab.emoticon)) {
-                    TextView emojiView = new TextView(context);
-                    emojiView.setText(tab.emoticon);
-                    emojiView.setTextSize(14);
-                    pillLayout.addView(emojiView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
-                } else if (tab.iconRes != 0) {
-                    ImageView tabIcon = new ImageView(context);
-                    tabIcon.setImageResource(tab.iconRes);
-                    tabIcon.setColorFilter(new android.graphics.PorterDuffColorFilter(idx == activeCategoryIndex ? selectedColor : unselectedColor, android.graphics.PorterDuff.Mode.SRC_IN));
-                    pillLayout.addView(tabIcon, LayoutHelper.createLinear(16, 16, Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
+                int tabTitleType = tw.nekomimi.nekogram.NekoConfig.tabsTitleType.Int();
+                boolean showIcon = tabTitleType != tw.nekomimi.nekogram.NekoXConfig.TITLE_TYPE_TEXT;
+                boolean showText = tabTitleType != tw.nekomimi.nekogram.NekoXConfig.TITLE_TYPE_ICON;
+
+                if (showIcon) {
+                    if (!TextUtils.isEmpty(tab.emoticon)) {
+                        TextView emojiView = new TextView(context);
+                        emojiView.setText(tab.emoticon);
+                        emojiView.setTextSize(14);
+                        pillLayout.addView(emojiView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, showText ? 6 : 0, 0));
+                    } else if (tab.iconRes != 0) {
+                        ImageView tabIcon = new ImageView(context);
+                        tabIcon.setImageResource(tab.iconRes);
+                        tabIcon.setColorFilter(new android.graphics.PorterDuffColorFilter(idx == activeCategoryIndex ? selectedColor : unselectedColor, android.graphics.PorterDuff.Mode.SRC_IN));
+                        pillLayout.addView(tabIcon, LayoutHelper.createLinear(16, 16, Gravity.CENTER_VERTICAL, 0, 0, showText ? 6 : 0, 0));
+                    }
                 }
                 
-                TextView titleView = new TextView(context);
-                titleView.setText(tab.title);
-                titleView.setTextSize(13);
-                titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-                titleView.setTextColor(idx == activeCategoryIndex ? selectedColor : unselectedColor);
-                pillLayout.addView(titleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
+                if (showText) {
+                    TextView titleView = new TextView(context);
+                    titleView.setText(tab.title);
+                    titleView.setTextSize(13);
+                    titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+                    titleView.setTextColor(idx == activeCategoryIndex ? selectedColor : unselectedColor);
+                    pillLayout.addView(titleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
+                }
                 
                 android.graphics.drawable.GradientDrawable tabBg = new android.graphics.drawable.GradientDrawable();
                 tabBg.setCornerRadius(AndroidUtilities.dp(16));
@@ -2217,7 +2253,16 @@ public class SpecialForwardActivity extends ChatActivity {
                 return;
             }
             
-            for (TLRPC.Dialog dialog : allDialogs) {
+            ArrayList<TLRPC.Dialog> dialogList = new ArrayList<>();
+            org.telegram.messenger.MessagesController messagesController = org.telegram.messenger.MessagesController.getInstance(currentAccount);
+            for (int a = 0; a < messagesController.dialogs_dict.size(); a++) {
+                TLRPC.Dialog d = messagesController.dialogs_dict.valueAt(a);
+                if (d != null) {
+                    dialogList.add(d);
+                }
+            }
+
+            for (TLRPC.Dialog dialog : dialogList) {
                 long dialogId = dialog.id;
                 
                 if (!TextUtils.isEmpty(searchQuery)) {
@@ -2259,11 +2304,60 @@ public class SpecialForwardActivity extends ChatActivity {
                     if (!DialogObject.isUserDialog(dialogId)) continue;
                     TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(dialogId);
                     if (user == null || !user.bot) continue;
-                } else if (activeTab.id > 0 && activeTab.filter != null) { // Custom folder
+                } else if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) { // Custom folder & Tabs by type
                     if (!activeTab.filter.includesDialog(org.telegram.messenger.AccountInstance.getInstance(currentAccount), dialogId, dialog)) continue;
                 }
                 
                 filteredDialogs.add(dialog);
+            }
+
+            // Add explicitly folder-included chats (alwaysShow & pinnedDialogs) that might not be in dialogs_dict/allDialogs
+            if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) {
+                ArrayList<Long> folderIds = new ArrayList<>(activeTab.filter.alwaysShow);
+                for (int a = 0; a < activeTab.filter.pinnedDialogs.size(); a++) {
+                    long did = activeTab.filter.pinnedDialogs.keyAt(a);
+                    if (!folderIds.contains(did)) {
+                        folderIds.add(did);
+                    }
+                }
+                
+                for (int a = 0; a < folderIds.size(); a++) {
+                    long did = folderIds.get(a);
+                    
+                    if (!TextUtils.isEmpty(searchQuery)) {
+                        String title = "";
+                        if (DialogObject.isUserDialog(did)) {
+                            TLRPC.User user = messagesController.getUser(did);
+                            if (user != null) {
+                                title = (user.first_name + " " + user.last_name).toLowerCase();
+                            }
+                        } else {
+                            TLRPC.Chat chat = messagesController.getChat(-did);
+                            if (chat != null) {
+                                title = chat.title.toLowerCase();
+                            }
+                        }
+                        if (!title.contains(searchQuery)) {
+                            continue;
+                        }
+                    }
+                    
+                    boolean exists = false;
+                    for (TLRPC.Dialog d : filteredDialogs) {
+                        if (d.id == did) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
+                        TLRPC.Dialog fakeDialog = messagesController.dialogs_dict.get(did);
+                        if (fakeDialog == null) {
+                            fakeDialog = new TLRPC.TL_dialog();
+                            fakeDialog.id = did;
+                        }
+                        filteredDialogs.add(fakeDialog);
+                    }
+                }
             }
             
             // Also search in contacts if searching
@@ -2287,6 +2381,110 @@ public class SpecialForwardActivity extends ChatActivity {
                                 fakeDialog.id = user.id;
                                 filteredDialogs.add(fakeDialog);
                             }
+                        }
+                    }
+                }
+
+                ArrayList<org.telegram.tgnet.TLObject> localServerResults = searchAdapterHelper.getLocalServerSearch();
+                for (int a = 0; a < localServerResults.size(); a++) {
+                    org.telegram.tgnet.TLObject obj = localServerResults.get(a);
+                    long id = 0;
+                    if (obj instanceof TLRPC.User) {
+                        id = ((TLRPC.User) obj).id;
+                    } else if (obj instanceof TLRPC.Chat) {
+                        id = -((TLRPC.Chat) obj).id;
+                    }
+                    if (id != 0) {
+                        if (activeTab.id == -1) {
+                            continue;
+                        } else if (activeTab.id == -2) {
+                            if (!DialogObject.isUserDialog(id)) continue;
+                            TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(id);
+                            if (user == null || user.bot) continue;
+                        } else if (activeTab.id == -3) {
+                            if (!DialogObject.isUserDialog(id)) continue;
+                            if (!org.telegram.messenger.ContactsController.getInstance(currentAccount).isContact(id)) continue;
+                        } else if (activeTab.id == -4) {
+                            if (!DialogObject.isChatDialog(id)) continue;
+                            TLRPC.Chat chat = org.telegram.messenger.MessagesController.getInstance(currentAccount).getChat(-id);
+                            if (chat == null || (ChatObject.isChannel(chat) && !chat.megagroup)) continue;
+                        } else if (activeTab.id == -5) {
+                            if (!DialogObject.isChatDialog(id)) continue;
+                            TLRPC.Chat chat = org.telegram.messenger.MessagesController.getInstance(currentAccount).getChat(-id);
+                            if (chat == null || !ChatObject.isChannel(chat) || chat.megagroup) continue;
+                        } else if (activeTab.id == -6) {
+                            if (!DialogObject.isUserDialog(id)) continue;
+                            TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(id);
+                            if (user == null || !user.bot) continue;
+                        } else if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) {
+                            TLRPC.Dialog tempDialog = new TLRPC.TL_dialog();
+                            tempDialog.id = id;
+                            if (!activeTab.filter.includesDialog(org.telegram.messenger.AccountInstance.getInstance(currentAccount), id, tempDialog)) continue;
+                        }
+
+                        boolean exists = false;
+                        for (int b = 0; b < filteredDialogs.size(); b++) {
+                            if (filteredDialogs.get(b).id == id) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            TLRPC.Dialog fakeDialog = new TLRPC.TL_dialog();
+                            fakeDialog.id = id;
+                            filteredDialogs.add(fakeDialog);
+                        }
+                    }
+                }
+
+                ArrayList<org.telegram.tgnet.TLObject> globalResults = searchAdapterHelper.getGlobalSearch();
+                for (int a = 0; a < globalResults.size(); a++) {
+                    org.telegram.tgnet.TLObject obj = globalResults.get(a);
+                    long id = 0;
+                    if (obj instanceof TLRPC.User) {
+                        id = ((TLRPC.User) obj).id;
+                    } else if (obj instanceof TLRPC.Chat) {
+                        id = -((TLRPC.Chat) obj).id;
+                    }
+                    if (id != 0) {
+                        if (activeTab.id == -1) {
+                            continue;
+                        } else if (activeTab.id == -2) {
+                            if (!DialogObject.isUserDialog(id)) continue;
+                            TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(id);
+                            if (user == null || user.bot) continue;
+                        } else if (activeTab.id == -3) {
+                            if (!DialogObject.isUserDialog(id)) continue;
+                            if (!org.telegram.messenger.ContactsController.getInstance(currentAccount).isContact(id)) continue;
+                        } else if (activeTab.id == -4) {
+                            if (!DialogObject.isChatDialog(id)) continue;
+                            TLRPC.Chat chat = org.telegram.messenger.MessagesController.getInstance(currentAccount).getChat(-id);
+                            if (chat == null || (ChatObject.isChannel(chat) && !chat.megagroup)) continue;
+                        } else if (activeTab.id == -5) {
+                            if (!DialogObject.isChatDialog(id)) continue;
+                            TLRPC.Chat chat = org.telegram.messenger.MessagesController.getInstance(currentAccount).getChat(-id);
+                            if (chat == null || !ChatObject.isChannel(chat) || chat.megagroup) continue;
+                        } else if (activeTab.id == -6) {
+                            if (!DialogObject.isUserDialog(id)) continue;
+                            TLRPC.User user = org.telegram.messenger.MessagesController.getInstance(currentAccount).getUser(id);
+                            if (user == null || !user.bot) continue;
+                        } else if ((activeTab.id > 0 || tw.nekomimi.nekogram.tabs.TabsByTypeManager.isVirtualFilter(activeTab.filter)) && activeTab.filter != null) {
+                            TLRPC.Dialog tempDialog = new TLRPC.TL_dialog();
+                            tempDialog.id = id;
+                            if (!activeTab.filter.includesDialog(org.telegram.messenger.AccountInstance.getInstance(currentAccount), id, tempDialog)) continue;
+                        }
+
+                        boolean exists = false;
+                        for (int b = 0; b < filteredDialogs.size(); b++) {
+                            if (filteredDialogs.get(b).id == id) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            TLRPC.Dialog fakeDialog = new TLRPC.TL_dialog();
+                            fakeDialog.id = id;
+                            filteredDialogs.add(fakeDialog);
                         }
                     }
                 }
@@ -2402,6 +2600,9 @@ public class SpecialForwardActivity extends ChatActivity {
         public void dismiss() {
             super.dismiss();
             org.telegram.messenger.NotificationCenter.getInstance(currentAccount).removeObserver(this, org.telegram.messenger.NotificationCenter.dialogsNeedReload);
+            if (searchAdapterHelper != null) {
+                searchAdapterHelper.queryServerSearch(null, true, true, true, true, false, 0, false, 0, 0);
+            }
         }
     }
 }

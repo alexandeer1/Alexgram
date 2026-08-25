@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Kaleidoscope: 6-fold Radial Star Mandala -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 L28,18 L40,18 L30,26 L34,38 L24,30 L14,38 L18,26 L8,18 L20,18 Z" />
+    <path
+        android:fillColor="#FF4081"
+        android:pathData="M24,14 L26,21 L33,21 L28,26 L30,33 L24,28 L18,33 L20,26 L15,21 L22,21 Z" />
+</vector>

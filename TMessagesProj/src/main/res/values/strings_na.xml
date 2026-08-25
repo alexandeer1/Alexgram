@@ -22,7 +22,7 @@
     <string name="ShowMessageID">Show Message ID</string>
     <string name="ShowRPCError">Toast RPC Errors</string>
     <string name="ShowPremiumStickersAnimation">Show Premium Stickers Animation</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Colorful</string>
     <string name="AppIconDarkGreen">Dark Green</string>
     <string name="AppIconNeon">Alexgram Neon</string>
@@ -48,7 +48,7 @@
     <string name="CustomEditedMessage">Custom Edited Mark</string>
     <string name="NotificationIcon">Notification Icon</string>
     <string name="Official">Official</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">HalloWeen</string>
     <string name="ShowOnlineStatus">Show Online Status</string>
     <string name="ShowOnlineStatusNotice">Show the online status of other people next to their profile photo in groups.</string>
@@ -76,9 +76,9 @@
     <string name="ShowQuickReplyInBotCommands">Show Quick Reply in Bot Commands</string>
     <string name="PushServiceType">Push Service Type</string>
     <string name="PushServiceTypeInApp">In-App</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Show Resident Notifications</string>
     <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">Send MP4 Document as Video</string>
@@ -101,12 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Case insensitive expressions</string>
     <string name="RegexFiltersAdd">Add filter</string>
     <string name="RegexFiltersEdit">Edit filter</string>
-    <string name="RegexFiltersAddDescription">You can use site <![CDATA[<a href="https://regex101.com">regex101.com</a>]]> to fully test your regular expression. You can also use plain text, but don\'t forget to escape brackets.</string>
+    <string name="RegexFiltersAddDescription">You can use site &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; to fully test your regular expression. You can also use plain text, but don\'t forget to escape brackets.</string>
     <string name="RegexFiltersAddError">Regex syntax error</string>
     <string name="ShowTimeHint">Tap Time for Details</string>
     <string name="SearchHashtagDefaultPageChannel">Default Hashtag Search Page in Channels</string>
     <string name="SearchHashtagDefaultPageChat">Default Hashtag Search Page in Chats</string>
-    <string name="Pangu" translatable="false">Pangu</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Enable Pangu on Sending</string>
     <string name="PanguInfo">Paranoid text spacing for good readability, to automatically insert whitespace between CJK (Chinese, Japanese, Korean), half-width English, digit and symbol characters.</string>
     <string name="SendWithPangu">Send with Pangu</string>
@@ -152,9 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">Show messages from blocked/shadow-banned users behind a spoiler mask instead of hiding them.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Only mask matched regex</string>
     <string name="RegexFiltersSpoilerColor">Mask particle color</string>
-    <!-- [Alexgram: Max Active Accounts] - Start -->
-    <string name="MaxActiveAccounts">Max Number of Active Accounts</string>
-    <string name="LimitReachedAccountsNa">Sorry, you can\'t add more than **%1$d** accounts. You can increase this limit (up to 100) in **A-Settings &gt; General**.</string>
+    <string name="AccountsSettings">Accounts</string>
+    <string name="AccountLimitsHeader">Account Limits</string>
+    <string name="StartupPerformanceHeader">Startup Performance</string>
+    <string name="MaxAccountCount">Max Number of Accounts</string>
+    <string name="MaxActiveAccounts">Max Active Accounts</string>
+    <string name="StartupActiveAccounts">Accounts Active on Startup</string>
+    <string name="StartupActiveAccountsInfo">Controls how many accounts are fully initialized when the app opens. Lower values mean faster launch and less battery use. Other accounts load on demand when you switch to them.</string>
+    <string name="LimitReachedAccountsNa">Sorry, you can\'t add more than **%1$d** accounts. You can increase this limit (up to 100) in **A-Settings → Accounts**.</string>
     <string name="MaxActiveAccountsWarning">You currently have %1$d active accounts. Setting the limit to %2$d will prevent you from adding new accounts until you log out of some.</string>
-    <!-- [Alexgram: Max Active Accounts] - End -->
+    <string name="HiddenAccountsTitle">Hidden Accounts</string>
+    <string name="HiddenAccountsDesc">Toggle the lock icon to hide an account. Hidden accounts won\'t appear in the switcher until you unlock this vault.</string>
+    <string name="HiddenAccountsHeader">Hidden Accounts</string>
+    <string name="HiddenAccountsChangePIN">Change PIN</string>
+    <string name="HiddenAccountsRemovePIN">Remove PIN &amp; Unhide All</string>
+    <string name="HiddenAccountsRemovePINConfirm">This will permanently remove the PIN and make all hidden accounts visible again. Are you sure?</string>
+    <string name="HiddenAccountsAutoLock">Lock on Background</string>
+    <string name="HiddenAccountsAutoLockDesc">When enabled, the vault re-locks automatically when the app goes to background.</string>
+    <string name="HiddenAccountsSection">Accounts</string>
+    <string name="HiddenAccountsPINManagement">PIN Management</string>
+    <string name="HideHomeSearchField">Hide Search Bar</string>
+    <string name="HideHomeSearchFieldDesc">Hide the search bar in the chat list. You can still search by clicking the search icon on the top right.</string>
+    <string name="MainTabsShowSearchButton">Show Search Icon in Bottom Bar</string>
+    <string name="MainTabsShowSearchButtonDesc">Display a search icon in the bottom bar next to the main navigation tabs.</string>
+    <string name="SessionManagementHeader">Session Management</string>
+    <string name="SessionManagementTitle">Account Session Manager</string>
+    <string name="SessionManagementDesc">Manage logged-in sessions, active devices, Pyrogram/Telethon sessions, and backup export/import.</string>
+    <string name="ExportSessionsTitle">Export Account Sessions</string>
+    <string name="ExportSessionsDesc">Export active account sessions to Pyrogram String, Pyrogram .session file, Telethon, or Full JSON Backup.</string>
+    <string name="ImportSessionTitle">Import Account Session</string>
+    <string name="ImportSessionDesc">Import Pyrogram string session, Pyrogram .session file, Telethon string, or JSON backup file.</string>
+    <string name="ImportSessionStringTitle">Import Session String</string>
+    <string name="ImportSessionStringDesc">Paste a Pyrogram (v1/v2) or Telethon session string to log in directly.</string>
+    <string name="TelegramActiveDevices">Telegram Active Devices</string>
+    <string name="TelegramActiveDevicesDesc">View active devices and manage sessions registered with Telegram servers.</string>
+    <string name="WebSessionsTitleNa">Web Sessions</string>
+    <string name="WebSessionsDesc">Manage authorized websites and web application sessions.</string>
+    <string name="ScanSessionQRCode">Scan Session QR Code</string>
+    <string name="ScanSessionQRCodeDesc">Authorize another desktop or web client by scanning its QR code.</string>
+    <string name="SessionEncryptExport">Password Protect Backup</string>
+    <string name="SessionEncryptExportDesc">Encrypt exported session backup files with a password.</string>
+    <string name="ActiveSessionsSection">Active Account Sessions</string>
+    <string name="SessionBackupSection">Backup &amp; Restore</string>
+    <string name="SessionToolsSection">Session Tools &amp; Devices</string>
+    <string name="SessionDetailsTitle">Session Details</string>
+    <string name="SwitchToAccount">Switch to Account</string>
+    <string name="TerminateAllOtherSessions">Terminate All Other Sessions</string>
+    <string name="TerminateAllOtherSessionsConfirm">Are you sure you want to terminate all other active Telegram sessions?</string>
+    <string name="SessionExportSuccess">Session backup exported successfully to Downloads!</string>
+    <string name="SessionExportError">Failed to export session backup.</string>
+    <string name="SessionImportSuccess">Successfully processed session backup for %1$s!</string>
+    <string name="SessionImportError">Failed to import session backup: Invalid or corrupted file format.</string>
+    <string name="ExportPyrogramString">Copy Pyrogram String Session</string>
+    <string name="ExportPyrogramFile">Export Pyrogram .session File</string>
+    <string name="ExportTelethonString">Copy Telethon String Session</string>
+    <string name="PasteSessionStringHint">Paste Pyrogram (v1/v2) or Telethon session string here...</string>
+    <string name="SessionCopied">Pyrogram session string copied to clipboard!</string>
+    <string name="TelethonSessionCopied">Telethon session string copied to clipboard!</string>
+    <string name="ExportTypeTitle">Choose Export Format</string>
+    <string name="ExportPyrogramStringOpt">Pyrogram Session String (v2 - Latest)</string>
+    <string name="ExportPyrogramFileOpt">Pyrogram SQLite (.session) File</string>
+    <string name="ExportTelethonStringOpt">Telethon Session String</string>
+    <string name="ExportAlexgramBackupOpt">Alexgram Full Session Backup (.session)</string>
+    <string name="PasteClipboard">Paste Clipboard</string>
+    <string name="ImportSessionButton">Import Session</string>
+    <string name="SessionImportSuccessDesc">Session imported successfully!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Max active accounts limit reached. Please remove an account first.</string>
+    <string name="SessionPasswordRequired">Password required for encrypted session backup.</string>
+    <string name="SessionFileEmpty">Selected session file is empty.</string>
+    <string name="SessionNoAccountsInBackup">No valid account sessions found in backup file.</string>
+    <string name="SessionStreamError">Could not open file stream.</string>
+    <string name="SessionAlreadyActive">Already on this account</string>
+    <string name="InvalidSessionString">Invalid Pyrogram or Telethon session string format.</string>
+    <string name="FailedExtractAuthKey">Failed to extract session auth key.</string>
+    <string name="CopyAgain">Copy Again</string>
+    <string name="ShareSessionString">Share Session String</string>
+    <string name="PyrogramSessionStringV2">Pyrogram Session String (v2)</string>
+    <string name="TelethonSessionStringTitle">Telethon Session String</string>
+    <string name="NoAccounts">No active accounts found.</string>
+    <string name="Feed">Feed</string>
+    <string name="GoToMessage">Go to Message</string>
+    <string name="FeedSettings">Feed Settings</string>
+    <string name="FeedBottomTab">Feed Bottom Tab</string>
+    <string name="FeedBottomTabInfo">Show Feed tab in the bottom navigation bar.</string>
+    <string name="FeedUnreadCounter">Unread Counter</string>
+    <string name="FeedIncludeArchived">Include Archived Channels</string>
+    <string name="FeedIncludeArchivedInfo">Include messages from archived channels in the Feed.</string>
+    <string name="FeedShownChannels">Shown Channels</string>
+    <string name="FeedHiddenChannels">Hidden Channels</string>
+    <string name="FeedChannelsInfo">Uncheck channels you don\'t want to see in your Feed.</string>
+    <string name="FeedMarkAllRead">Mark All as Read</string>
+    <string name="FeedMarkAllReadConfirm">Are you sure you want to mark all posts in the Feed as read?</string>
+    <string name="FeedMarkAllReadDone">All posts marked as read</string>
+    <string name="FeedChannelHidden">Channel %1$s hidden</string>
+    <string name="FeedHideChannel">Hide from Feed</string>
 </resources>

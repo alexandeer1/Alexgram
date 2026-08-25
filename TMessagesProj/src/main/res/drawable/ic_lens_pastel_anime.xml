@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Pastel Anime: Crescent Moon and Magical Sparkling Star -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,8 C17.2,8 10,15.2 10,24 C10,32.8 17.2,40 26,40 C30.6,40 34.7,38.1 37.6,35 C27,34.5 18.5,26 18.5,15.4 C18.5,12.6 19.3,10 20.7,7.8 C22.4,8 24.2,8 26,8 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,10 C34,14 31,17 27,17 C31,17 34,20 34,24 C34,20 37,17 41,17 C37,17 34,14 34,10 Z" />
+</vector>

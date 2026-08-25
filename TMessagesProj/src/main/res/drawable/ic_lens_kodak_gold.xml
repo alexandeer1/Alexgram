@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Kodak Gold 200: Film Canister with Radiant Warm Sun -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,14 L34,14 L34,38 L14,38 Z" />
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M18,10 L30,10 L30,14 L18,14 Z" />
+    <path
+        android:fillColor="#D32F2F"
+        android:pathData="M18,22 L30,22 L30,30 L18,30 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,20 L40,20 L40,32 L34,32 Z" />
+</vector>

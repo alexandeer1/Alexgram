@@ -386,8 +386,23 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             }
             startPressed = true;
 
-            presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true);
-            destroyed = true;
+            boolean presented = presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true);
+            if (!presented) {
+                startPressed = false;
+                destroyed = false;
+                AndroidUtilities.runOnUIThread(() -> {
+                    if (!destroyed && !startPressed && getParentLayout() != null) {
+                        startPressed = true;
+                        if (!presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true)) {
+                            startPressed = false;
+                        } else {
+                            destroyed = true;
+                        }
+                    }
+                }, 200);
+            } else {
+                destroyed = true;
+            }
         });
 
         bottomPages = new BottomPagesView(context, viewPager, 6);
@@ -407,16 +422,29 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             loaderDialog.setCanCancel(false);
             loaderDialog.showDelayed(1000);
 
+            Runnable timeoutRunnable = () -> {
+                if (loaderDialog.isShowing()) {
+                    loaderDialog.dismiss();
+                    startPressed = false;
+                }
+            };
+            AndroidUtilities.runOnUIThread(timeoutRunnable, 5000);
+
             NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
                 @Override
                 public void didReceivedNotification(int id, int account, Object... args) {
                     if (id == NotificationCenter.reloadInterface) {
+                        AndroidUtilities.cancelRunOnUIThread(timeoutRunnable);
                         loaderDialog.dismiss();
 
                         NotificationCenter.getGlobalInstance().removeObserver(this, id);
                         AndroidUtilities.runOnUIThread(()->{
-                            presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true);
-                            destroyed = true;
+                            if (!presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true)) {
+                                startPressed = false;
+                                destroyed = false;
+                            } else {
+                                destroyed = true;
+                            }
                         }, 100);
                     }
                 }
@@ -454,24 +482,15 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             }
             justCreated = false;
         }
-        if (!AndroidUtilities.isTablet()) {
-            Activity activity = getParentActivity();
-            if (activity != null) {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
-        }
+        startPressed = false;
+        destroyed = false;
+        AndroidUtilities.lockOrientation(getParentActivity(), ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
-        if (!AndroidUtilities.isTablet()) {
-            Activity activity = getParentActivity();
-            if (activity != null) {
-                activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-            }
-        }
+        AndroidUtilities.unlockOrientation(getParentActivity());
     }
 
     @Override

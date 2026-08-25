@@ -181,8 +181,11 @@ public class TimeStringHelper {
         // [Alexgram: Deleted Icon Color] - End
 
         if (translatedDrawable == null) {
-            if (NaConfig.INSTANCE.getIconReplacements().Int() == IconsResources.ICON_REPLACE_SOLAR) {
+            int iconType = NaConfig.INSTANCE.getIconReplacements().Int();
+            if (iconType == IconsResources.ICON_REPLACE_SOLAR) {
                 translatedDrawable = Objects.requireNonNull(ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_translate_solar_12)).mutate();
+            } else if (iconType == IconsResources.ICON_REPLACE_REMIX) {
+                translatedDrawable = Objects.requireNonNull(ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_translate_remix)).mutate();
             } else {
                 translatedDrawable = Objects.requireNonNull(ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_translate_12)).mutate();
             }

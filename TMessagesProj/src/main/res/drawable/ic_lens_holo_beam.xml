@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Holo Beam: Holographic Projector Cone -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M14,40 L34,40 L38,44 L10,44 Z" />
+    <path
+        android:fillColor="#8000E5FF"
+        android:pathData="M20,40 L6,14 L42,14 L28,40 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M12,18 L36,18 M16,24 L32,24 M19,30 L29,30" />
+</vector>

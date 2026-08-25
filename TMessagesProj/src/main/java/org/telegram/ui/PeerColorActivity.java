@@ -74,6 +74,7 @@ import org.telegram.messenger.SvgHelper;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.utils.DrawableUtils;
 import org.telegram.messenger.utils.tlutils.AmountUtils;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.tl.TL_account;
@@ -81,6 +82,7 @@ import org.telegram.tgnet.tl.TL_stars;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.MessageDrawable;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
@@ -1334,7 +1336,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
 
     private Theme.ResourcesProvider parentResourcesProvider;
     private final SparseIntArray currentColors = new SparseIntArray();
-    private final Theme.MessageDrawable msgInDrawable, msgInDrawableSelected;
+    private final MessageDrawable msgInDrawable, msgInDrawableSelected;
 
     public void updateThemeColors() {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("themeconfig", Activity.MODE_PRIVATE);
@@ -1447,8 +1449,8 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
                 return isDark;
             }
         };
-        msgInDrawable = new Theme.MessageDrawable(Theme.MessageDrawable.TYPE_TEXT, false, false, resourceProvider);
-        msgInDrawableSelected = new Theme.MessageDrawable(Theme.MessageDrawable.TYPE_TEXT, false, true, resourceProvider);
+        msgInDrawable = new MessageDrawable(MessageDrawable.TYPE_TEXT, false, false, resourceProvider);
+        msgInDrawableSelected = new MessageDrawable(MessageDrawable.TYPE_TEXT, false, true, resourceProvider);
     }
 
     @Override
@@ -1641,10 +1643,10 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
         }
         sunDrawable.beginApplyLayerColors();
         int color = Theme.getColor(Theme.key_chats_menuName);
-        sunDrawable.setLayerColor("Sunny.**", color);
-        sunDrawable.setLayerColor("Path 6.**", color);
-        sunDrawable.setLayerColor("Path.**", color);
-        sunDrawable.setLayerColor("Path 5.**", color);
+        sunDrawable.setLayerColor("Sunny", color);
+        sunDrawable.setLayerColor("Path 6", color);
+        sunDrawable.setLayerColor("Path", color);
+        sunDrawable.setLayerColor("Path 5", color);
         sunDrawable.commitApplyLayerColors();
 
         dayNightItem = new ImageView(context);
@@ -2143,9 +2145,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
                     lock = new LevelLock(context, true, Math.max(currentLevel, minlvl), resourcesProvider);
                 }
             }
-            if (isChannelOrGroup && lock == null) {
-                button = TextCell.applyNewSpan(button);
-            }
+            setContentDescription(button);
             buttonText = new Text(button, 16);
             updateColors();
         }
@@ -2292,15 +2292,10 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            drawable.setBounds(
-                rtl(dp(64) / 2) - drawable.getIntrinsicWidth() / 2,
-                getMeasuredHeight() / 2 - drawable.getIntrinsicHeight() / 2,
-                rtl(dp(64) / 2) + drawable.getIntrinsicWidth() / 2,
-                getMeasuredHeight() / 2 + drawable.getIntrinsicHeight() / 2
-            );
+            DrawableUtils.setBounds(drawable, rtl(dp(28)), getMeasuredHeight() / 2f, Gravity.CENTER);
             drawable.draw(canvas);
             buttonText.ellipsize(getMeasuredWidth() - dp(64 + 7 + 100) - (lock != null ? lock.getIntrinsicWidth() + dp(8) : 0));
-            float textX = LocaleController.isRTL ? getMeasuredWidth() - buttonText.getWidth() - dp(64 + 7) : dp(64 + 7);
+            float textX = LocaleController.isRTL ? getMeasuredWidth() - buttonText.getWidth() - dp(58) : dp(58);
             buttonText.draw(canvas, textX, getMeasuredHeight() / 2f);
             if (lock != null) {
                 int x = (int) (textX + buttonText.getWidth() + dp(6));
@@ -2347,7 +2342,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
                 if (paint == null) {
                     paint = Theme.dividerPaint;
                 }
-                canvas.drawLine(LocaleController.isRTL ? 0 : AndroidUtilities.dp(64), getMeasuredHeight() - 1, getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(64) : 0), getMeasuredHeight() - 1, paint);
+                canvas.drawLine(LocaleController.isRTL ? 0 : AndroidUtilities.dp(58), getMeasuredHeight() - 1, getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(58) : 0), getMeasuredHeight() - 1, paint);
             }
         }
     }
@@ -3459,7 +3454,7 @@ public class PeerColorActivity extends BaseFragment implements NotificationCente
 
     public void updateLightStatusBar() {
         if (getParentActivity() == null) return;
-        AndroidUtilities.setLightStatusBar(getParentActivity().getWindow(), isLightStatusBar());
+        AndroidUtilities.setLightStatusBar(getParentActivity(), isLightStatusBar());
     }
 
     private boolean forceDark = isDark;

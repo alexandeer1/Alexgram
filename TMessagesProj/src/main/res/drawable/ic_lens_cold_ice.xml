@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Cold Ice: Nordic Crystalline Snowflake -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M24,6 L24,42 M6,24 L42,24 M11,11 L37,37 M11,37 L37,11" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M24,10 L21,13 M24,10 L27,13 M24,38 L21,35 M24,38 L27,35 M10,24 L13,21 M10,24 L13,27 M38,24 L35,21 M38,24 L35,27" />
+</vector>

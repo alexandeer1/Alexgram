@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ink Sketch: Fountain Pen Nib & Crosshatched Lines -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M24,6 L32,22 L27,38 L21,38 L16,22 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,18 C22.9,18 22,18.9 22,20 C22,21.1 22.9,22 24,22 C25.1,22 26,21.1 26,20 C26,18.9 25.1,18 24,18 Z M23.5,6 L24.5,6 L24.5,18 L23.5,18 Z" />
+    <path
+        android:strokeColor="#757575"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M8,30 L16,38 M12,30 L20,38 M28,30 L36,38 M32,30 L40,38" />
+</vector>

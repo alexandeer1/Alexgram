@@ -3,11 +3,13 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'com.android.application'
+    id 'org.telegram.lottie-meta'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
     id 'com.google.dagger.hilt.android'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'com.chaquo.python'
 }
 
 def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
@@ -17,6 +19,20 @@ def verCode = buildTimestamp != '0' ? buildTimestamp.toLong().intdiv(1000).toInt
 
 def officialVer = APP_VERSION_NAME
 def officialCode = APP_VERSION_CODE
+
+def appTier = (System.getenv('APP_TIER') ?: (project.hasProperty('appTier') ? project.property('appTier') : 'release')).toLowerCase(Locale.ROOT)
+def appPkgSuffix = ''
+def appNameOverride = 'Alexgram'
+def appGramName = 'Alexgram'
+if (appTier == 'beta') {
+    appPkgSuffix = '.beta'
+    appNameOverride = 'Alexgram Beta'
+    appGramName = 'Alexgram-Beta'
+} else if (appTier == 'nightly') {
+    appPkgSuffix = '.nightly'
+    appNameOverride = 'Alexgram Nightly'
+    appGramName = 'Alexgram-Nightly'
+}
 
 def keystorePwd = null
 def alias = null
@@ -68,8 +84,6 @@ android {
         }
     }
 
-    defaultConfig.applicationId = APP_PACKAGE
-
     packaging {
         jniLibs {
             useLegacyPackaging = true
@@ -78,11 +92,13 @@ android {
 
     splits {
         abi {
-            enable = true
+            enable = false
             reset()
             universalApk = false
             if (!nativeTarget.isBlank()) {
-                include nativeTarget
+                nativeTarget.split(',').collect { it.trim() }.each { abi ->
+                    include abi
+                }
             } else {
                 include 'arm64-v8a', 'x86_64'
             }
@@ -90,6 +106,20 @@ android {
     }
 
     defaultConfig {
+        applicationId APP_PACKAGE + appPkgSuffix
+        manifestPlaceholders = [
+            appName: appNameOverride,
+            accountType: (APP_PACKAGE + appPkgSuffix)
+        ]
+        resValue 'string', 'account_type', (APP_PACKAGE + appPkgSuffix)
+
+        ndk {
+            if (!nativeTarget.isBlank()) {
+                abiFilters.addAll(nativeTarget.split(',').collect { it.trim() })
+            } else {
+                abiFilters "arm64-v8a", "x86_64"
+            }
+        }
         versionName verName
         versionCode verCode
 
@@ -103,6 +133,8 @@ android {
         buildConfigField 'int', 'APP_ID', appId
         buildConfigField 'String', 'APP_HASH', '"' + appHash + '"'
         buildConfigField 'long', 'BUILD_TIMESTAMP', buildTimestamp + 'L'
+        buildConfigField 'boolean', 'DEBUG_PRIVATE_VERSION', 'false'
+        buildConfigField 'String', 'APP_TIER', '"' + appTier + '"'
 
         externalNativeBuild {
             cmake {
@@ -126,6 +158,8 @@ android {
 
         buildFeatures {
             compose = true
+            resValues = true
+            buildConfig = true
         }
     }
 
@@ -137,7 +171,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            version = '3.31.6+'
+            version = '3.22.1'
             path = 'jni/CMakeLists.txt'
         }
     }
@@ -191,13 +225,24 @@ android {
 androidComponents {
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
-            String gramName = 'Alexgram'
-            String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
+            String gramName = appGramName
+            String abi = 'universal'
+            if (!nativeTarget.isBlank()) {
+                if (nativeTarget.contains(',')) {
+                    abi = 'universal'
+                } else {
+                    abi = nativeTarget.trim()
+                }
+            }
+            String commitPart = commitId?.take(7) ? "-${commitId.take(7)}" : ""
+            String codePart = "(${verCode})"
+            String first = String.format('%s-v%s-%s%s%s', gramName, APP_VERSION_NAME, abi, commitPart, codePart)
             output.outputFileName.set(
                 output.outputFileName.get()
                     .replace('TMessagesProj', first)
                     .replace('-release', '')
                     .replace('-staging', '')
+                    .replace('-debug', '')
             )
         }
     }
@@ -220,6 +265,7 @@ dependencies {
     implementation 'androidx.interpolator:interpolator:1.0.0'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'com.google.zxing:core:3.5.4'
     implementation 'androidx.car.app:app:1.4.0'
     implementation 'androidx.car.app:app-projected:1.4.0'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
@@ -253,6 +299,7 @@ dependencies {
     implementation "io.noties.markwon:html:4.6.2"
     implementation "io.noties.markwon:inline-parser:4.6.2"
     implementation "io.noties.markwon:ext-latex:4.6.2"
+    implementation 'com.google.android.recaptcha:recaptcha:18.7.1'
     // payment
     implementation 'com.google.android.gms:play-services-wallet:19.5.0' // 19.1.0
     implementation('com.stripe:stripe-android:2.0.2') {
@@ -263,6 +310,7 @@ dependencies {
 
     // kotlin
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:2.1.10'
     // utilities
     implementation 'org.osmdroid:osmdroid-android:6.1.20'
     // network
@@ -271,7 +319,9 @@ dependencies {
     // add for emoji
     implementation 'com.jaredrummler:truetypeparser-light:1.0.0'
     // add for UnifiedPush
-    implementation 'org.unifiedpush.android:connector:3.2.0'
+    implementation ('org.unifiedpush.android:connector:3.2.0') {
+        exclude group: 'com.google.crypto.tink', module: 'tink'
+    }
     // add for save deleted messages
     implementation 'androidx.room:room-runtime:2.8.4'
     annotationProcessor 'androidx.room:room-compiler:2.8.4'
@@ -284,6 +334,7 @@ dependencies {
     def hilt_version = "2.59.2"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     ksp "com.google.dagger:hilt-compiler:$hilt_version"
+    ksp "org.jetbrains.kotlin:kotlin-reflect:2.1.10"
 
     def compose_bom = platform('androidx.compose:compose-bom:2025.02.00')
     implementation compose_bom
@@ -305,4 +356,37 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     compileOnly fileTree('libs')
+
+    // ZaStoGram plugin engine: Pine — dynamic ART method hooking (Xposed-compatible API).
+    implementation 'top.canyie.pine:core:0.3.0'
+    implementation 'top.canyie.pine:xposed:0.2.0'
+}
+
+def getPythonPath() {
+    def envPath = System.getenv("PYTHON_PATH")
+    if (envPath != null && !envPath.isEmpty()) {
+        return envPath
+    }
+    def localWinPath = "${System.getProperty('user.home')}/AppData/Local/Programs/Python/Python313/python.exe"
+    if (new File(localWinPath).exists()) {
+        return localWinPath
+    }
+    return System.getProperty("os.name").toLowerCase().contains("win") ? "python" : "python3"
+}
+
+chaquopy {
+    defaultConfig {
+        if (nativeTarget.contains("armeabi-v7a")) {
+            version "3.11"
+        } else {
+            version "3.13"
+        }
+        buildPython getPythonPath()
+        pyc {
+            src false
+        }
+        pip {
+            install "requests"
+        }
+    }
 }

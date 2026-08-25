@@ -76,6 +76,18 @@ public class ApplicationLoader extends Application {
     public static volatile Handler applicationHandler;
     public static final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    private static android.content.res.AssetManager iconsAsset;
+    private static tw.nekomimi.nekogram.ui.icons.IconsResources customResources;
+
+    @Override
+    public android.content.res.Resources getResources() {
+        if (customResources == null || iconsAsset != super.getResources().getAssets()) {
+            customResources = new tw.nekomimi.nekogram.ui.icons.IconsResources(super.getResources());
+            iconsAsset = super.getResources().getAssets();
+        }
+        return customResources;
+    }
+
     private static ConnectivityManager connectivityManager;
     private static volatile boolean applicationInited = false;
     private static volatile  ConnectivityManager.NetworkCallback networkCallback;
@@ -275,10 +287,24 @@ public class ApplicationLoader extends Application {
         SharedConfig.loadConfig();
         NekoConfig.init();
         NaConfig.init();
+        tw.nekomimi.nekogram.helpers.HiddenAccountsController.getInstance().restoreHiddenState();
         SharedPrefsHelper.init(applicationContext);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!NaConfig.INSTANCE.getDisableCrashlyticsCollection().Bool());
-        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
+
+        // [Alexgram: Accounts Settings] - Start
+        // Phase 1: Load all account configs (cheap SharedPrefs reads) so isClientActivated() works
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             UserConfig.getInstance(a).loadConfig();
+        }
+        // Phase 2: Only eagerly initialize the first N activated accounts.
+        // N = StartupActiveAccounts setting (default 3). Remaining accounts lazy-load on demand
+        // when the user taps on them, avoiding 97 useless ConnectionsManager threads at startup.
+        int startupLimit = xyz.nextalone.nagram.NaConfig.INSTANCE.getStartupActiveAccounts().Int();
+        int startupInitialized = 0;
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (!UserConfig.getInstance(a).isClientActivated()) continue;
+            if (startupInitialized >= startupLimit) break;
+            startupInitialized++;
             MessagesController.getInstance(a);
             if (a == 0) {
                 SharedConfig.pushStringStatus = "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__";
@@ -291,6 +317,7 @@ public class ApplicationLoader extends Application {
                 SendMessagesHelper.getInstance(a).checkUnsentMessages();
             }
         }
+        // [Alexgram: Accounts Settings] - End
 
         // init fcm
         initPushServices();
@@ -299,10 +326,17 @@ public class ApplicationLoader extends Application {
         }
 
         MediaController.getInstance();
-        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
+        // [Alexgram: Accounts Settings] - Start
+        // Also guard the ContactsController / DownloadController loop with the same startup limit
+        startupInitialized = 0;
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (!UserConfig.getInstance(a).isClientActivated()) continue;
+            if (startupInitialized >= startupLimit) break;
+            startupInitialized++;
             ContactsController.getInstance(a).checkAppAccount();
             DownloadController.getInstance(a);
         }
+        // [Alexgram: Accounts Settings] - End
         BillingController.getInstance().startConnection();
         xyz.nextalone.nagram.analytics.domain.AnalyticsManager.Companion.get(applicationContext).startTracking();
     }
@@ -321,6 +355,13 @@ public class ApplicationLoader extends Application {
         }
 
         super.onCreate();
+
+        // ZaStoGram plugin engine: start CPython + load enabled .plugin files (off the main thread).
+        try {
+            org.telegram.plugins.PluginsController.getInstance().init(applicationContext);
+        } catch (Throwable t) {
+            FileLog.e(t);
+        }
 
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("app start time = " + (startTime = SystemClock.elapsedRealtime()));
@@ -390,6 +431,9 @@ public class ApplicationLoader extends Application {
                 super.onActivityStopped(activity);
                 if (isBackground()) {
                     xyz.nextalone.nagram.analytics.domain.AnalyticsManager.Companion.get(applicationContext).onAppBackground();
+                    if (tw.nekomimi.nekogram.helpers.HiddenAccountsController.getInstance().isAutoLockEnabled()) {
+                        tw.nekomimi.nekogram.helpers.HiddenAccountsController.getInstance().lock();
+                    }
                 }
             }
         };
@@ -807,7 +851,10 @@ public class ApplicationLoader extends Application {
     }
 
     public void addItemOptions(ItemOptions itemOptions) {
-
+        try {
+            org.telegram.plugins.PluginsController.getInstance().addDrawerMenuItems(itemOptions);
+        } catch (Throwable ignore) {
+        }
     }
 
     public boolean checkRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {

@@ -2,6 +2,7 @@ package tw.nekomimi.nekogram.helpers;
 
 import org.telegram.ui.MainTabsActivity;
 
+import com.exteragram.messenger.ExteraConfig;
 import xyz.nextalone.nagram.NaConfig;
 
 public final class MainTabsHelper {
@@ -31,28 +32,45 @@ public final class MainTabsHelper {
         return getMainTabsHeight() + getMainTabsMargin() * 2;
     }
 
+    public static boolean isFeedTabShown() {
+        return ExteraConfig.getShowFeedTab();
+    }
+
     public static boolean isContactsTabHidden() {
-        return NaConfig.INSTANCE.getHideContacts().Bool();
+        return NaConfig.INSTANCE.getHideContacts().Bool() || (isFeedTabShown() && ExteraConfig.getFeedReplaceContactsTab());
     }
 
     public static int getChatsPosition() {
         return 0;
     }
 
+    public static int getFeedPosition() {
+        return isFeedTabShown() ? 1 : -1;
+    }
+
     public static int getContactsPosition() {
-        return isContactsTabHidden() ? -1 : 1;
+        if (isContactsTabHidden()) return -1;
+        return isFeedTabShown() ? 2 : 1;
     }
 
     public static int getCallsOrSettingsPosition() {
-        return isContactsTabHidden() ? 1 : 2;
+        int pos = 1;
+        if (isFeedTabShown()) pos++;
+        if (!isContactsTabHidden()) pos++;
+        return pos;
     }
 
     public static int getProfilePosition() {
-        return isContactsTabHidden() ? 2 : 3;
+        int pos = 2;
+        if (isFeedTabShown()) pos++;
+        if (!isContactsTabHidden()) pos++;
+        return pos;
     }
 
     public static int getFragmentsCount() {
-        return isContactsTabHidden() ? 3 : 4;
+        int count = isContactsTabHidden() ? 3 : 4;
+        if (isFeedTabShown()) count++;
+        return count;
     }
 
     public static int getTabsViewWidth() {

@@ -35,6 +35,7 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
+import tw.nekomimi.nekogram.NekoConfig;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
@@ -161,7 +162,7 @@ public class DrawerUserCell extends FrameLayout implements NotificationCenter.No
             status.set(emojiStatusId, true);
             status.setParticles(DialogObject.isEmojiStatusCollectible(user.emoji_status), true);
             textView.setRightDrawableOutside(true);
-        } else if (MessagesController.getInstance(account).isPremiumUser(user)) {
+        } else if (MessagesController.getInstance(account).isPremiumUser(user) && !NekoConfig.hidePremiumIcon.Bool()) {
             textView.setDrawablePadding(dp(6));
             status.set(PremiumGradient.getInstance().premiumStarDrawableMini, true);
             status.setParticles(false, true);

@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Comic Pop Art: Starburst Comic Action Explosion -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 L27,17 L38,12 L33,22 L44,24 L33,26 L38,36 L27,31 L24,42 L21,31 L10,36 L15,26 L4,24 L15,22 L10,12 L21,17 Z" />
+    <path
+        android:fillColor="#E91E63"
+        android:pathData="M24,14 L26,21 L33,18 L29,24 L36,25 L29,26 L33,32 L26,29 L24,36 L22,29 L15,32 L19,26 L12,25 L19,24 L15,18 L22,21 Z" />
+</vector>

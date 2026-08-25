@@ -6319,6 +6319,21 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
         if (service == null) {
             return;
         }
+        if (call == null) {
+            call = service.groupCall;
+            if (fullscreenAdapter != null) {
+                fullscreenAdapter.setGroupCall(call);
+            }
+            if (renderersContainer != null) {
+                renderersContainer.setGroupCall(call);
+            }
+            if (tabletGridAdapter != null) {
+                tabletGridAdapter.setGroupCall(call);
+            }
+        }
+        if (call == null) {
+            return;
+        }
         callInitied = true;
         oldParticipants.addAll(call.visibleParticipants);
         oldVideoParticipants.addAll(visibleVideoParticipants);
@@ -6326,12 +6341,6 @@ public class GroupCallActivity extends BottomSheet implements NotificationCenter
         oldShadyJoin.addAll(call.shadyJoinParticipants);
         oldShadyLeft.addAll(call.shadyLeftParticipants);
         currentCallState = service.getCallState();
-        if (call == null) {
-            call = service.groupCall;
-            fullscreenAdapter.setGroupCall(call);
-            renderersContainer.setGroupCall(call);
-            tabletGridAdapter.setGroupCall(call);
-        }
         if (groupCallMessagesListView != null) {
             groupCallMessagesListView.setGroupCall(accountInstance.getCurrentAccount(), call.getInputGroupCall(false));
         }

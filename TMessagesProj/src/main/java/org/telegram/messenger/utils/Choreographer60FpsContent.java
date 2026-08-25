@@ -128,7 +128,16 @@ public final class Choreographer60FpsContent implements Choreographer.FrameCallb
      * @param callback the {@link Runnable} to run on each tick
      * @param fps      desired rate in frames per second; clamped to [1, TARGET_FPS]
      */
+    public void addFrameCallbackOnce(Runnable callback, int fps) {
+        addFrameCallback(callback, fps);
+    }
+
+    public void removeFrameCallbackOnce(Runnable callback) {
+        removeFrameCallback(callback);
+    }
+
     public void addFrameCallback(Runnable callback, int fps) {
+
         checkMainThread();
         if (callback == null) {
             return;

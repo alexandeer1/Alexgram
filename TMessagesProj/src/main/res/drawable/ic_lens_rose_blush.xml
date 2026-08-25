@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Rose Blush: Elegant Blooming Rose Petal & Heart Silhouette -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,10 C21,6 15,6 12,10 C8,15 9,22 14,27 L24,37 L34,27 C39,22 40,15 36,10 C33,6 27,6 24,10 Z" />
+    <path
+        android:fillColor="#C2185B"
+        android:pathData="M24,15 C22,12 18,12 16,15 C13,18 14,23 17,26 L24,33 L31,26 C34,23 35,18 32,15 C30,12 26,12 24,15 Z" />
+</vector>

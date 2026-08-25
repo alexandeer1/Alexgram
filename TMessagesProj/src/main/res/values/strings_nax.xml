@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="NagramX" translatable="false">Alexgram</string>
+    <string name="NagramX">Alexgram</string>
     <string name="XChannel">Alexgram Channel</string>
     <string name="EnableSaveDeletedMessages">Save Deleted Messages</string>
     <string name="DeletedMessage">deleted</string>
@@ -14,22 +14,22 @@
     <string name="HideHelpSection">Hide Help in Settings</string>
     <string name="ProviderLLMTranslator">AI Translator</string>
     <string name="LlmApiUrl">API URL</string>
-    <string name="LlmApiUrlHint" translatable="false">https://api.openai.com/v1</string>
+    <string name="LlmApiUrlHint">https://api.openai.com/v1</string>
     <string name="LlmApiKey">API Key</string>
     <string name="LlmModelName">Model</string>
     <string name="LlmApiUrlNotice">API base URL. Defaults to the Gemini OpenAI-compatible endpoint if left blank.</string>
     <string name="LlmApiKeyNotice">Enter one or more API keys, separated by commas (e.g., key1,key2). Multiple keys will be used in rotation.</string>
-    <string name="LlmApiUrlDefault" translatable="false">https://generativelanguage.googleapis.com/v1beta/openai</string>
-    <string name="LlmModelNameDefault" translatable="false">gemini-flash-latest</string>
-    <string name="LlmProviderOpenAIModel" translatable="false">gpt-5.4-nano</string>
-    <string name="LlmProviderGeminiModel" translatable="false">gemini-flash-lite-latest</string>
-    <string name="LlmProviderGroqModel" translatable="false">openai/gpt-oss-120b</string>
-    <string name="LlmProviderDeepSeekModel" translatable="false">deepseek-chat</string>
-    <string name="LlmProviderXAIModel" translatable="false">grok-4-1-fast-non-reasoning</string>
-    <string name="LlmProviderCerebrasModel" translatable="false">gpt-oss-120b</string>
-    <string name="LlmProviderOllamaCloudModel" translatable="false">gemma3:27b</string>
-    <string name="LlmProviderOpenRouterModel" translatable="false">openrouter/free</string>
-    <string name="LlmProviderVercelAIGatewayModel" translatable="false">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmApiUrlDefault">https://generativelanguage.googleapis.com/v1beta/openai</string>
+    <string name="LlmModelNameDefault">gemini-flash-latest</string>
+    <string name="LlmProviderOpenAIModel">gpt-5.4-nano</string>
+    <string name="LlmProviderGeminiModel">gemini-flash-lite-latest</string>
+    <string name="LlmProviderGroqModel">openai/gpt-oss-120b</string>
+    <string name="LlmProviderDeepSeekModel">deepseek-chat</string>
+    <string name="LlmProviderXAIModel">grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderCerebrasModel">gpt-oss-120b</string>
+    <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
+    <string name="LlmProviderOpenRouterModel">openrouter/free</string>
+    <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
     <string name="LlmProviderPreset">Model Provider</string>
     <string name="LlmProviderCustom">Custom</string>
     <string name="LlmProviderOpenAIKey">OpenAI API Key</string>
@@ -181,6 +181,36 @@
     <string name="HideDividers">Hide Dividers</string>
     <string name="IconReplacements">Icon Replacements</string>
     <string name="IconReplacementSolar">Solar Icons by @Design480</string>
+    <string name="IconReplacementRemix">Remix Icons by Remix-Design</string>
+    <string name="AllPacks">All Packs</string>
+    <string name="BaseIconPackInfo">The base icon pack is used as a fallback for icons not replaced by other packs.</string>
+    <string name="BasePacks">Base Packs</string>
+    <string name="DeletePack">Delete Pack</string>
+    <string name="DeletePackInfo">Are you sure you want to delete **%1$s**?</string>
+    <string name="EditIconPackInfo">Edit Info</string>
+    <string name="EnableAfterInstallation">Enable After Installation</string>
+    <string name="EnabledPacks">Enabled Packs</string>
+    <string name="IconPack">Icon Pack</string>
+    <string name="IconPackErrorArchiveTooLarge">Icon pack is too large.</string>
+    <string name="IconPackErrorCompressionRatioTooHigh">Icon pack archive is compressed too aggressively.</string>
+    <string name="IconPackErrorFileTooLarge">One of the icon files is too large.</string>
+    <string name="IconPackErrorInvalidArchive">Icon pack archive is invalid.</string>
+    <string name="IconPackErrorInvalidMetadata">Icon pack metadata is invalid.</string>
+    <string name="IconPackErrorMetadataTooLarge">Icon pack metadata is too large.</string>
+    <string name="IconPackErrorMissingMetadata">Icon pack archive is missing metadata.json.</string>
+    <string name="IconPackErrorStorage">Couldn\'t save icon pack.</string>
+    <string name="IconPackErrorTooManyFiles">Icon pack contains too many files.</string>
+    <string name="IconPacks">Icon Packs</string>
+    <string name="IconPacksHint">Tap to enable or disable a pack. Hold to edit or delete.</string>
+    <string name="IconPacksInfo">Customize icons across the app</string>
+    <string name="IconPickerAllIcons">All Icons</string>
+    <string name="IconPickerFilter">Filter</string>
+    <string name="IconPickerNotReplacedIcons">Not Replaced Icons</string>
+    <string name="IconPickerReplacedIcons">Replaced Icons</string>
+    <string name="IconPickerSaveAndExit">Save &amp; Exit</string>
+    <string name="InstallPack">Install Pack</string>
+    <string name="NewIconPack">Create a new Icon Pack</string>
+    <string name="UpdatePack">Update Pack</string>
     <string name="DebugMenuEnableInvoicePayment">Enable Invoice Payment</string>
     <string name="DebugMenuDisableInvoicePayment">Disable Invoice Payment</string>
     <string name="DebugMenuUseCamera2Api">Use Camera 2 API</string>
@@ -223,6 +253,7 @@
     <string name="CopySticker">Copy Sticker</string>
     <string name="CheckUpdate">Check for Updates</string>
     <string name="AutoCheckUpdateOFF">OFF</string>
+    <string name="AutoCheckUpdateON">ON</string>
     <string name="AutoCheckUpdateSwitch">Update Channel</string>
     <string name="AutoCheckUpdateRelease">Release</string>
     <string name="AutoCheckUpdateBeta">Beta</string>
@@ -240,7 +271,7 @@
     <string name="SwitchStyle">Switch Style</string>
     <string name="SliderStyle">Slider Style</string>
     <string name="StyleModern">Modern</string>
-    <string name="StyleMaterialDesign3" translatable="false">Material Design 3</string>
+    <string name="StyleMaterialDesign3">Material Design 3</string>
     <string name="SaveDeletedExclusionMenu">Save Deleted</string>
     <string name="SaveDeletedExcluded">Exclude</string>
     <string name="MarkdownParser">Markdown Parser</string>
@@ -306,8 +337,8 @@
     <string name="CameraInVideoMessagesAsk">Ask</string>
     <string name="CameraSettings">Camera</string>
     <string name="ContactNotes">Notes</string>
-    <string name="PhoneNotOnTelegramInvite">This phone number is not on Telegram. **Invite >**</string>
-    <string name="PhoneAlreadyInContacts">This phone number is already in your contacts. **View >**</string>
+    <string name="PhoneNotOnTelegramInvite">This phone number is not on Telegram. **Invite &gt;**</string>
+    <string name="PhoneAlreadyInContacts">This phone number is already in your contacts. **View &gt;**</string>
     <string name="PhoneOnTelegram">This phone number is on Telegram.</string>
     <string name="SIMCard">SIM Card</string>
     <string name="DeviceAccount">Device</string>
@@ -375,14 +406,11 @@
     <string name="AllowForwardingRestrictionDescription">Bypass restrictions in channels and groups that forbid copying and forwarding.</string>
     <string name="AllowForwardingRestrictionOnboardingTitle">Media Bypass Instructions</string>
     <string name="AllowForwardingRestrictionOnboardingMessage">To ensure a seamless experience when bypassing forwarding restrictions, please make sure the media is fully downloaded before forwarding. This allows the app to securely re-upload and deliver your content without server-side blocks.</string>
-
     <string name="V8DAudio">Spatial 360 Degree Sound Illusion</string>
     <string name="V8DAudioAbout">Dolby 8D Sound Effect</string>
-
     <string name="usePollinationsAi">Use Pollinations.ai</string>
     <string name="usePollinationsAiAbout">Use Pollinations.ai for free AI Reply, Summarize, and AI Assistance. No API key required.</string>
     <string name="AmbientMode">Ambient Mode</string>
-    <!-- [Alexgram: Special Forward] - Start -->
     <string name="SpecialForward">Special Forward</string>
     <string name="SpecialForwardAbout">Enable an advanced forward menu with message editing and filtering options.</string>
     <string name="SpecialForwardTitle">Special forward</string>
@@ -394,8 +422,6 @@
     <string name="SpecialForwardDeleteAllCaptions">Delete all media captions</string>
     <string name="SpecialForwardAsFile">Forward as file</string>
     <string name="SpecialForwardResetSuccess">Messages reset</string>
-    <!-- [Alexgram: Special Forward] - End -->
-    <!-- [Alexgram: AI Reply] - Start -->
     <string name="AiAssistanceSettings">AI Assistance Settings</string>
     <string name="enableAIReply">Reply with AI</string>
     <string name="enableSummarizeChat">Summarize</string>
@@ -405,19 +431,10 @@
     <string name="aiModelUrl2">AI Model URL 2 (Failover)</string>
     <string name="aiApiKey2">AI API Key 2 (Failover)</string>
     <string name="TestAiApi2">Test API Connection 2</string>
-    <!-- [Alexgram: AI Reply] - End -->
-    <!-- [Alexgram: Default Schedule Delay] - Start -->
     <string name="DefaultScheduleDelay">Default delay</string>
-    <!-- [Alexgram: Default Schedule Delay] - End -->
-    <!-- [Alexgram: Home Drawer] - Start -->
     <string name="HomeDrawer">Home Drawer</string>
     <string name="DrawerElements">Drawer Elements</string>
-    <!-- [Alexgram: Home Drawer] - End -->
-    <!-- [Alexgram: Customizable Message Menu] - Start -->
     <string name="CustomReplyWord">Custom Reply Word</string>
-    <!-- [Alexgram: Customizable Message Menu] - End -->
-
-    <!-- Recent Chats Folder Strings -->
     <string name="SwitchAccountNax">Switch Account</string>
     <string name="CurrentNax">Current</string>
     <string name="PrivateChatMessage">Cannot open private chat: %1$s\n\nThis chat is private and can only be accessed from the original account.</string>
@@ -431,9 +448,9 @@
     <string name="ChatCategoryUsers">Users</string>
     <string name="ChatCategoryBots">Bots</string>
     <string name="ChatHistoryDeleteChats">Delete Chats</string>
-    <string name="ChatHistoryDeleteConfirmation">Are you sure you want to delete </string>
+    <string name="ChatHistoryDeleteConfirmation">Are you sure you want to delete</string>
     <string name="ChatHistorySelected">selected</string>
-    <string name="ChatHistory_NoResultsFor">No results found for "%1$s"</string>
+    <string name="ChatHistory_NoResultsFor">No results found for \"%1$s\"</string>
     <string name="ChatHistory_NoRecentChats">No recent chats</string>
     <string name="ChatHistory_NoCategoryFound">No %1$s found</string>
     <string name="ChatHistory_EnterSearchQuery">Enter search query</string>
@@ -441,7 +458,6 @@
     <string name="ChatHistory_LinkSharedToChat_other">Link forwarded to **%1$d chats**.</string>
     <string name="sendToDiscussWithoutJoin">Write to discuss groups without joining</string>
     <string name="sendToDiscussWithoutJoinInfo">Skip the client-only membership check for discussion groups</string>
-    <!-- [Alexgram: Native Features] - Start -->
     <string name="ExperimentalMusicSpeedControl">Force Music Speed Control</string>
     <string name="ExperimentalMusicSpeedControlAbout">Enable playback speed control for all music files regardless of duration.</string>
     <string name="ExperimentalEditFileName">Edit File Name</string>
@@ -457,7 +473,6 @@
     <string name="ChangeSenderNameOptionAll">Apply to all their messages in this group</string>
     <string name="ChangeSenderNameOptionRestore">Restore original name</string>
     <string name="ChangeSenderNameApply">Apply</string>
-    <!-- [Alexgram: Native Features] - End -->
     <string name="DirectForwardNotAllowed">Direct forwarding is not allowed.</string>
     <string name="ForceForwardStatusMediaCopy">Forwarding media copy</string>
     <string name="Customization">Customization</string>
@@ -466,19 +481,73 @@
     <string name="LocalEditorPlus">Local Editor+</string>
     <string name="LocalEditorPlusAbout">Edit message text and date, or delete messages locally on this device only without sending server requests.</string>
     <string name="LocalEditorMenuOption">More</string>
-
     <string name="LocalEditorEditOption">Edit locally</string>
     <string name="LocalEditorDeleteOption">Delete locally</string>
     <string name="LocalEditorRestore">Restore</string>
-
-    <!-- [Alexgram: Admin Tag in Voice Chat] - Start -->
+    <string name="LocalEditorEmptyTextError">Message text cannot be empty</string>
     <string name="ShowAdminTagInVoiceChat">Show Admin Tag in Voice Chat</string>
     <string name="ShowAdminTagInVoiceChatDesc">Display admin or owner badges next to user names in voice/video chats.</string>
-    <!-- [Alexgram: Admin Tag in Voice Chat] - End -->
+    <string name="ShowSenderNameOnSticker">Show sender name on stickers</string>
+    <string name="ShowSenderNameOnStickerDesc">Display the sender\'s name directly on sticker messages in group chats.</string>
+    <string name="ShowSenderNameOnGif">Show sender name on GIFs</string>
+    <string name="ShowSenderNameOnGifDesc">Display the sender\'s name on GIF messages (works when sender name on stickers is enabled).</string>
+    <string name="ShowSenderNameOnMedia">Show sender name on media like Telegram Desktop</string>
+    <string name="ShowSenderNameOnMediaDesc">Display the sender\'s name overlaying photos and videos instead of above them, similar to Telegram Desktop.</string>
     <string name="Ayugram">Ayugram</string>
     <string name="ProfilePrivacyManager">Profile Privacy Manager</string>
     <string name="ProfilePrivacyManagerAbout">Allows managing individual user privacy settings directly from their profile menu.</string>
+    <string name="Fonts">Fonts</string>
+    <string name="AppFont">App font</string>
+    <string name="AppFontDefault">Default</string>
+    <string name="AppFontDesc">The font used across the app interface.</string>
+    <string name="AppFontResetDesc">Reset to the default app font?</string>
+    <string name="AvailableFonts">Available fonts</string>
+    <string name="IncludeSystemFonts">Include system fonts</string>
+    <string name="IncludeSystemFontsDesc">Show fonts provided by the system in the list below</string>
+    <string name="CopyFileRef">Copy file ref</string>
+    <string name="CopyFileRefAbout">Enable copying file references from message menus and pasting them to the input menu.</string>
+    <string name="CopyFileRefFailed">Failed to copy file reference</string>
+    <string name="CopyFileRefDone">Copied %1$d file(s)</string>
+    <string name="PasteFileRef">Send files by ref</string>
+    <string name="PasteFileRefConfirm">Do you want to send the %1$d copied file(s) to this chat?</string>
+    <string name="PasteFileRefPasteText">Paste text instead</string>
+    <string name="AlwaysAskHowToJoinVoiceChat">Always ask how to join voice chats</string>
+    <string name="AlwaysAskHowToJoinVoiceChatDesc">Prompt to choose whether to join as your personal account or a channel every time you join a voice/video chat.</string>
+    <string name="ChatAutoDownloadTitle">Auto Download Settings</string>
+    <string name="ChatAutoDownloadEnable">Override Global Auto Download</string>
+    <string name="ChatAutoDownloadPhotos">Photos</string>
+    <string name="ChatAutoDownloadVideos">Videos</string>
+    <string name="ChatAutoDownloadFiles">Files &amp; Documents</string>
+    <string name="ChatAutoDownloadVoice">Voice &amp; Video Notes</string>
+    <string name="ChatAutoDownloadAudio">Music &amp; Audio</string>
+    <string name="Plugins">Plugins</string>
+    <string name="ChoosePluginFile">Choose .plugin file</string>
+    <string name="CouldNotOpenFileSelector">Could not open file selector</string>
+    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
+    <string name="PluginInstalled">Plugin «%s» installed</string>
+    <string name="UpdatePlugin">Update plugin?</string>
+    <string name="InstallPlugin">Install plugin?</string>
+    <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
+    <string name="RequiresVersion">Requires version %s+</string>
+    <string name="Install">Install</string>
+    <string name="FailedToInstallPlugin">Failed to install plugin</string>
+    <string name="InstalledPlugins">Installed Plugins</string>
+    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
+    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+    <string name="Error">error</string>
+    <string name="Disabled">off</string>
+    <string name="Enabled">on</string>
+    <string name="Plugin">Plugin</string>
+    <string name="EnabledToggle">Enabled</string>
+    <string name="DeletePlugin">Delete plugin</string>
+    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
+    <string name="DeletePluginTitle">Delete plugin?</string>
+    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+    <string name="Author">Author: %s</string>
+    <string name="Version">Version: %s</string>
+    <string name="FriendsActivities">Friends Activities</string>
+    <string name="FriendsActivitiesDesc">Spy on Friends — see your contacts\' recent messages in shared groups and channels via the Activities tab on their profile.</string>
+    <string name="FriendsActivitiesTab">Activities</string>
+    <string name="FriendsActivitiesEmpty">No recent activities in shared chats.</string>
+    <string name="FriendsActivitiesHowItWorks">Go to a contact\'s profile → tap the Activities tab to see their latest messages in groups and channels you both share.</string>
 </resources>
-
-
-

@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Sepia: Vintage Antique Seal with Hourglass -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M24,6 A18,18 0 1,0 42,24 A18,18 0 0,0 24,6 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,14 L32,14 L26,23 L32,32 L16,32 L22,23 Z" />
+</vector>

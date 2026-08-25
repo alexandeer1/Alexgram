@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">バックグラウンドで実行</string>
+    <string name="RunInBackgroundInfo">通知を確実にするため、アプリをバックグラウンドで実行し続けます。</string>
+    <string name="NagramXPushService">Alexgram プッシュサービス</string>
     <string name="N_Config">A-設定</string>
     <string name="CombineMessage">メッセージを結合</string>
     <string name="TextStyle">テキストスタイル</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">メッセージ ID を表示</string>
     <string name="ShowRPCError">RPC エラーを表示</string>
     <string name="ShowPremiumStickersAnimation">プレミアムステッカーアニメーションを表示</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">カラフル</string>
     <string name="AppIconDarkGreen">ダークグリーン</string>
     <string name="AppIconNeon">ネオン</string>
     <string name="AppIconNiello">ニエロ</string>
     <string name="AppIconBlue">ブルー</string>
+    <string name="AppIconColored">Alexgram カラー</string>
+    <string name="AppIconDark">Alexgram ダーク</string>
+    <string name="AppIconGreen">Alexgram グリーン</string>
+    <string name="AppIconPink">Alexgram ピンク</string>
+    <string name="AppIconRoseBlue">Alexgram ローズブルー</string>
+    <string name="AppIconWhite">Alexgram ホワイト</string>
     <string name="AppIconDarkBlue">ダークブルー</string>
     <string name="AppIconBlurBlue">ブラーブルー</string>
     <string name="InputMessageId">メッセージ ID を入力</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">編集ありメッセージのマーク</string>
     <string name="NotificationIcon">通知アイコンスタイル</string>
     <string name="Official">公式</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">ハロウィン</string>
     <string name="ShowOnlineStatus">ユーザーのオンラインステータスを表示</string>
     <string name="ShowOnlineStatusNotice">グループチャットで、ユーザーのアバターの右下にオンラインステータスを表示します。</string>
@@ -65,7 +76,11 @@
     <string name="ShowQuickReplyInBotCommands">ボットコマンドでクイック返信を表示</string>
     <string name="PushServiceType">通知プッシュサービス</string>
     <string name="PushServiceTypeInApp">内蔵</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">常駐通知を表示</string>
+    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">MP4 動画をファイルとして送信するときにプレビュー可能にする</string>
     <string name="StickersChooseShortNameForStickerPack">パックの短い名前を選択してください</string>
     <string name="StickersCopyStickerSet">ステッカーパック全体をコピー</string>
@@ -86,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">大文字と小文字を区別しない</string>
     <string name="RegexFiltersAdd">フィルターを追加</string>
     <string name="RegexFiltersEdit">フィルターを編集</string>
-    <string name="RegexFiltersAddDescription">ウェブサイト &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; を使用して、正規表現を完全にテストできます。プレーンテキストを使用することもできますが、括弧をエスケープすることを忘れないでください。</string>
+    <string name="RegexFiltersAddDescription">ウェブサイト &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; を使用して、正規表現を完全にテストできます。プレーンテキストを使用することもできますが、括弧をエスケープすることを忘れないでください。</string>
     <string name="RegexFiltersAddError">構文エラー</string>
     <string name="ShowTimeHint">時間をタップして詳細を表示</string>
     <string name="SearchHashtagDefaultPageChannel">チャンネルでのハッシュタグ検索ページ</string>
     <string name="SearchHashtagDefaultPageChat">チャットでのハッシュタグ検索ページ</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">送信時に Pangu を有効化</string>
     <string name="PanguInfo">テキストを読みやすくします。CJK（中国語、日本語、韓国語）、半角英数字、記号の間に自動的にスペースを挿入します。</string>
     <string name="SendWithPangu">Pangu を使用して送信</string>
@@ -104,22 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">SW 優先</string>
     <string name="VideoPlayerDecoderHardware">HW のみ</string>
     <string name="VideoPlayerDecoderPreferHW">HW 優先</string>
-    <string name="RunInBackground">バックグラウンドで実行</string>
-    <string name="RunInBackgroundInfo">通知を確実にするため、アプリをバックグラウンドで実行し続けます。</string>
-    <string name="NagramXPushService">Alexgram プッシュサービス</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram カラー</string>
-    <string name="AppIconDark">Alexgram ダーク</string>
-    <string name="AppIconGreen">Alexgram グリーン</string>
-    <string name="AppIconPink">Alexgram ピンク</string>
-    <string name="AppIconRoseBlue">Alexgram ローズブルー</string>
-    <string name="AppIconWhite">Alexgram ホワイト</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">ライブビデオ壁紙</string>
     <string name="ExportChat">チャットをエクスポート</string>
     <string name="ImportChat">チャットをインポート</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">メインリストから機密チャットを非表示にします。パスコードまたは生体認証でロックを解除した後、タイトルバーを長押ししてアクセスします。</string>
     <string name="HideContacts">連絡先を非表示にする</string>
     <string name="RestartRequired">変更を適用するには再起動が必要です</string>
-    <string name="MaxActiveAccounts">最大アクティブアカウント数</string>
-    <string name="LimitReachedAccountsNa">申し訳ありませんが、**%1$d**個以上のアカウントを追加できません。**A設定 &gt; 一般**でこの制限（最大100）を増やすことができます。</string>
-    <string name="MaxActiveAccountsWarning">現在%1$d個のアクティブアカウントがあります。上限を%2$dに設定すると、一部からログアウトするまで新しいアカウントを追加できなくなります。</string>
     <string name="SplitChat">画面分割チャット</string>
     <string name="SplitChatClose">分割画面を閉じる</string>
     <string name="SplitChatSelectChat">横に開くチャットを選択</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">ブロックされた／シャドウバンされたユーザーのメッセージを完全に非表示にするのではなく、スポイラーマスクの後ろに表示します。</string>
     <string name="RegexFiltersSpoilerMatchOnly">一致した正規表現のみをマスク</string>
     <string name="RegexFiltersSpoilerColor">マスク粒子的色</string>
+    <string name="AccountsSettings">アカウント</string>
+    <string name="AccountLimitsHeader">アカウント制限</string>
+    <string name="StartupPerformanceHeader">起動パフォーマンス</string>
+    <string name="MaxAccountCount">最大アカウント数</string>
+    <string name="MaxActiveAccounts">最大アクティブアカウント数</string>
+    <string name="StartupActiveAccounts">起動時にアクティブにするアカウント数</string>
+    <string name="StartupActiveAccountsInfo">アプリ起動時に初期化するアカウント数を制御します。少ないほど起動が高速になり、バッテリー消費を抑えられます。他のアカウントは切り替え時にオンデマンドで読み込まれます。</string>
+    <string name="LimitReachedAccountsNa">申し訳ありませんが、**%1$d** 個以上のアカウントは追加できません。**A-Settings → アカウント** でこの上限（最大100）を引き上げることができます。</string>
+    <string name="MaxActiveAccountsWarning">現在 %1$d 個のアクティブアカウントがあります。上限を %2$d に設定すると、一部のアカウントからログアウトするまで新しいアカウントを追加できなくなります。</string>
+    <string name="HiddenAccountsTitle">非表示アカウント</string>
+    <string name="HiddenAccountsDesc">鍵アイコンをタップしてアカウントを非表示にします。この金庫のロックを解除するまで、非表示のアカウントはスイッチャーに表示されません。</string>
+    <string name="HiddenAccountsHeader">非表示アカウント</string>
+    <string name="HiddenAccountsChangePIN">PINコードを変更</string>
+    <string name="HiddenAccountsRemovePIN">PINコードを削除してすべて再表示</string>
+    <string name="HiddenAccountsRemovePINConfirm">PINコードが完全に削除され、すべての非表示アカウントが再び表示されるようになります。よろしいですか？</string>
+    <string name="HiddenAccountsAutoLock">バックグラウンド移行時にロック</string>
+    <string name="HiddenAccountsAutoLockDesc">有効にすると、アプリがバックグラウンドに移行したときに金庫が自動的に再ロックされます。</string>
+    <string name="HiddenAccountsSection">アカウント</string>
+    <string name="HiddenAccountsPINManagement">PIN管理</string>
+    <string name="HideHomeSearchField">検索バーを非表示</string>
+    <string name="HideHomeSearchFieldDesc">チャットリストの検索バーを非表示にします。右上の検索アイコンをタップすれば引き続き検索できます。</string>
+    <string name="MainTabsShowSearchButton">下部バーに検索アイコンを表示</string>
+    <string name="MainTabsShowSearchButtonDesc">下部ナビゲーションバーのメインタブの横に検索アイコンを表示します。</string>
+    <string name="SessionManagementHeader">セッション管理</string>
+    <string name="SessionManagementTitle">アカウントセッションマネージャー</string>
+    <string name="SessionManagementDesc">ログイン中のセッション、接続中の端末、Pyrogram/Telethonセッション、バックアップのエクスポート/インポートを管理します。</string>
+    <string name="ExportSessionsTitle">アカウントセッションをエクスポート</string>
+    <string name="ExportSessionsDesc">アクティブなセッションをPyrogram文字列、Pyrogram .sessionファイル、Telethon文字列、または完全なJSONバックアップにエクスポートします。</string>
+    <string name="ImportSessionTitle">アカウントセッションをインポート</string>
+    <string name="ImportSessionDesc">Pyrogram文字列セッション、Pyrogram .sessionファイル、Telethon文字列、またはJSONバックアップファイルをインポートします。</string>
+    <string name="ImportSessionStringTitle">文字列セッションをインポート</string>
+    <string name="ImportSessionStringDesc">Pyrogram (v1/v2) または Telethon セッション文字列を貼り付けて直接ログインします。</string>
+    <string name="TelegramActiveDevices">Telegramのアクティブな端末</string>
+    <string name="TelegramActiveDevicesDesc">アクティブな端末を表示し、Telegramサーバーに登録されているセッションを管理します。</string>
+    <string name="WebSessionsTitleNa">Webセッション</string>
+    <string name="WebSessionsDesc">承認されたウェブサイトおよびWebアプリのセッションを管理します。</string>
+    <string name="ScanSessionQRCode">セッションQRコードをスキャン</string>
+    <string name="ScanSessionQRCodeDesc">QRコードをスキャンして別のデスクトップまたはWebクライアントを認証します。</string>
+    <string name="SessionEncryptExport">バックアップをパスワードで保護</string>
+    <string name="SessionEncryptExportDesc">エクスポートされたセッションバックアップファイルをパスワードで暗号化します。</string>
+    <string name="ActiveSessionsSection">アクティブなアカウントセッション</string>
+    <string name="SessionBackupSection">バックアップと復元</string>
+    <string name="SessionToolsSection">セッションツールと端末</string>
+    <string name="SessionDetailsTitle">セッション詳細</string>
+    <string name="SwitchToAccount">アカウントに切り替え</string>
+    <string name="TerminateAllOtherSessions">他のすべてのセッションを終了</string>
+    <string name="TerminateAllOtherSessionsConfirm">他のすべてのアクティブなTelegramセッションを終了してもよろしいですか？</string>
+    <string name="SessionExportSuccess">セッションバックアップがダウンロードフォルダに正常にエクスポートされました！</string>
+    <string name="SessionExportError">セッションバックアップのエクスポートに失敗しました。</string>
+    <string name="SessionImportSuccess">%1$s のセッションバックアップが正常にインポートされました！</string>
+    <string name="SessionImportError">セッションバックアップのインポートに失敗しました：ファイル形式が無効か破損しています。</string>
+    <string name="ExportPyrogramString">Pyrogram文字列セッションをコピー</string>
+    <string name="ExportPyrogramFile">Pyrogram .sessionファイルをエクスポート</string>
+    <string name="ExportTelethonString">Telethon文字列セッションをコピー</string>
+    <string name="PasteSessionStringHint">ここにPyrogram (v1/v2) または Telethon セッション文字列を貼り付け...</string>
+    <string name="SessionCopied">Pyrogramセッション文字列をクリップボードにコピーしました！</string>
+    <string name="TelethonSessionCopied">Telethonセッション文字列をクリップボードにコピーしました！</string>
+    <string name="ExportTypeTitle">エクスポート形式を選択</string>
+    <string name="ExportPyrogramStringOpt">Pyrogramセッション文字列 (v2 - 最新)</string>
+    <string name="ExportPyrogramFileOpt">Pyrogram SQLite (.session) ファイル</string>
+    <string name="ExportTelethonStringOpt">Telethonセッション文字列</string>
+    <string name="ExportAlexgramBackupOpt">Alexgram完全セッションバックアップ (.session)</string>
+    <string name="PasteClipboard">クリップボードから貼り付け</string>
+    <string name="ImportSessionButton">セッションをインポート</string>
+    <string name="SessionImportSuccessDesc">セッションが正常にインポートされました！\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">アクティブアカウント数の上限に達しました。先にアカウントを削除してください。</string>
+    <string name="SessionPasswordRequired">暗号化されたバックアップにはパスワードが必要です。</string>
+    <string name="SessionFileEmpty">選択したセッションファイルは空です。</string>
+    <string name="SessionNoAccountsInBackup">バックアップファイルに有効なアカウントセッションが見つかりませんでした。</string>
+    <string name="SessionStreamError">ファイルストリームを開けませんでした。</string>
+    <string name="SessionAlreadyActive">既にこのアカウントを使用しています</string>
+    <string name="InvalidSessionString">PyrogramまたはTelethonのセッション文字列形式が無効です。</string>
+    <string name="FailedExtractAuthKey">セッション認証キーの抽出に失敗しました。</string>
+    <string name="CopyAgain">もう一度コピー</string>
+    <string name="ShareSessionString">セッション文字列を共有</string>
+    <string name="PyrogramSessionStringV2">Pyrogramセッション文字列 (v2)</string>
+    <string name="TelethonSessionStringTitle">Telethonセッション文字列</string>
+    <string name="NoAccounts">アクティブなアカウントが見つかりません。</string>
+    <string name="Feed">フィード</string>
+    <string name="GoToMessage">メッセージへ移動</string>
+    <string name="FeedSettings">フィード設定</string>
+    <string name="FeedBottomTab">下部バーにフィードタブを表示</string>
+    <string name="FeedBottomTabInfo">下部ナビゲーションバーに「フィード」タブを表示します。</string>
+    <string name="FeedUnreadCounter">未読カウンター</string>
+    <string name="FeedIncludeArchived">アーカイブされたチャンネルを含める</string>
+    <string name="FeedIncludeArchivedInfo">アーカイブされたチャンネルのメッセージをフィードに含めます。</string>
+    <string name="FeedShownChannels">表示するチャンネル</string>
+    <string name="FeedHiddenChannels">非表示のチャンネル</string>
+    <string name="FeedChannelsInfo">フィードに表示したくないチャンネルのチェックを外してください。</string>
+    <string name="FeedMarkAllRead">すべて既読にする</string>
+    <string name="FeedMarkAllReadConfirm">フィード内のすべての投稿を既読にしてもよろしいですか？</string>
+    <string name="FeedMarkAllReadDone">すべての投稿を既読にしました</string>
+    <string name="FeedChannelHidden">チャンネル %1$s を非表示にしました</string>
+    <string name="FeedHideChannel">フィードから非表示</string>
 </resources>

@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Bulge Warp: Convex Magnifying Lens Bulge -->
+    <path
+        android:fillColor="#FF4081"
+        android:pathData="M21,10 C14.9,10 10,14.9 10,21 C10,27.1 14.9,32 21,32 C23.6,32 26,31.1 27.8,29.6 L35.2,37 L37,35.2 L29.6,27.8 C31.1,26 32,23.6 32,21 C32,14.9 27.1,10 21,10 Z M21,14 C24.9,14 28,17.1 28,21 C28,24.9 24.9,28 21,28 C17.1,28 14,24.9 14,21 C14,17.1 17.1,14 21,14 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M21,17 L21,25 M17,21 L25,21"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2" />
+</vector>

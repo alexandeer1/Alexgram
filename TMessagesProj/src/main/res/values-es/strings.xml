@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="AppName">Alexgram</string>
     <string name="AppNameBeta">Telegram Beta</string>
@@ -7,7 +7,6 @@
     <string name="LanguageNameInEnglish">Spanish</string>
     <string name="LanguageCode">es</string>
     <string name="ContinueOnThisLanguage">Continuar en español</string>
-    <!--signin view-->
     <string name="YourPhone">Tu teléfono</string>
     <string name="StartText">Por favor, confirma el código de tu\npaís y pon tu número de teléfono.</string>
     <string name="Country">País</string>
@@ -30,7 +29,6 @@
     <string name="DidNotGetTheCodeInfo">Si no recibiste el código por SMS o llamada, comprueba tus **ajustes de datos móviles** y número de teléfono:\n\n**%1$s**\n\nLas opciones restantes son probar con otro número o contactar al soporte de Telegram. Toca **Ayuda** para enviarnos los detalles técnicos y así poder identificar el problema.</string>
     <string name="DidNotGetTheCodeHelpButton">Ayuda</string>
     <string name="DidNotGetTheCodeEditNumberButton">Editar número</string>
-    <!--code enter view-->
     <string name="YourCode">Verificación</string>
     <string name="SentSmsCode">Enviamos un SMS con un código de activación a tu teléfono **%1$s**.</string>
     <string name="SentAppCode">Enviamos el código a la app de **Telegram** en tu otro dispositivo.</string>
@@ -69,7 +67,6 @@
     <string name="RequestMissedCall">Recibir el código por llamada</string>
     <string name="LoginAccessibilityCountryCode">Código de país</string>
     <string name="SignInWithGoogle">Iniciar con Google</string>
-    <!--signup view-->
     <string name="YourName">Tu nombre</string>
     <string name="RegisterText2">Pon tu nombre y añade una foto de perfil.</string>
     <string name="FirstName">Nombre (requerido)</string>
@@ -78,7 +75,6 @@
     <string name="LastNameSmall">Apellidos</string>
     <string name="CancelRegistration">Cancelar registro</string>
     <string name="RegistrationProfileInfo">Información de perfil</string>
-    <!--widgets-->
     <string name="EditWidget">Editar widget</string>
     <string name="EditWidgetContactsInfo">Muestra atajos a tus chats más importantes para un acceso rápido.\n\nSi no se selecciona a nadie, en este widget se mostrarán tus contactos más frecuentes.</string>
     <string name="EditWidgetChatsInfo">Muestra el último mensaje de los chats que elijas.\n\nSi no hay chats específicos seleccionados, en este widget se mostrarán tus chats más recientes.</string>
@@ -90,7 +86,6 @@
     <string name="WidgetChats">Chats</string>
     <string name="WidgetShortcuts">Atajos</string>
     <string name="WidgetLoggedOff">La cuenta ha sido desconectada.</string>
-    <!--notification-->
     <string name="NotificationMessageGiftCode">%1$s te envió un código de regalo de %2$s de Telegram Premium</string>
     <string name="NotificationMessageGiveaway">%1$s te envió un sorteo de %2$s Telegram Premium de %3$sm</string>
     <string name="NotificationMessageChannelGiveaway">%1$s publicó un sorteo de %2$s Telegram Premium de %3$sm</string>
@@ -103,8 +98,8 @@
     <string name="MessageLifetimeRemoved">%1$s desactivó la autodestrucción</string>
     <string name="MessageLifetimeYouRemoved">Desactivaste la autodestrucción</string>
     <string name="YouHaveNewMessage">Tienes un mensaje nuevo</string>
-    <string name="NotificationMessageScheduled">&#128197; Tú: %1$s</string>
-    <string name="NotificationMessageScheduledName">&#128197; Tú</string>
+    <string name="NotificationMessageScheduled">📅 Tú: %1$s</string>
+    <string name="NotificationMessageScheduledName">📅 Tú</string>
     <string name="NotificationMessageText">%1$s: %2$s</string>
     <string name="NotificationMessageFew">%1$s te envió %2$s</string>
     <string name="NotificationMessageAlbum">%1$s te envió un álbum</string>
@@ -149,8 +144,8 @@
     <string name="NotificationMessageGroupSticker">%1$s envió un sticker al grupo %2$s</string>
     <string name="NotificationMessageGroupStickerEmoji">%1$s envió un %3$s sticker al grupo %2$s</string>
     <string name="NotificationMessageRecurringPay">%1$s pagaste %2$s</string>
-    <string name="NotificationPaidMedia_one">%1$d &#11088;&#65039; multimedia</string>
-    <string name="NotificationPaidMedia_other">%1$d &#11088;&#65039; multimedia</string>
+    <string name="NotificationPaidMedia_one">%1$d ⭐️ multimedia</string>
+    <string name="NotificationPaidMedia_other">%1$d ⭐️ multimedia</string>
     <string name="NotificationMessagePaidMedia_one">%2$s te envió un post de pago por %1$d estrella</string>
     <string name="NotificationMessagePaidMedia_other">%2$s te envió un post de pago por %1$d estrellas</string>
     <string name="NotificationChannelMessagePaidMedia_one">%2$s publicó un post de pago por %1$d estrella</string>
@@ -246,7 +241,6 @@
     <string name="NotificationActionPinnedGifUser">%1$s fijó un GIF</string>
     <string name="NotificationActionPinnedMusicUser">%1$s fijó un audio</string>
     <string name="SecretChatName">Telegram</string>
-    <!--usernames-->
     <string name="Username">Nombre de usuario</string>
     <string name="UsernameAlso">también %1$s</string>
     <string name="UsernameLinkPlaceholder">username</string>
@@ -264,7 +258,6 @@
     <string name="UsernameEmpty">Ninguno</string>
     <string name="ErrorOccurred">Ocurrió un error.</string>
     <string name="None">Ninguno</string>
-    <!--settings view-->
     <string name="ResetNotificationsText">Todos los ajustes de notificaciones fueron restablecidos a los valores por defecto</string>
     <string name="ResetNotificationsAlertTitle">Restablecer todas las notificaciones</string>
     <string name="ResetNotificationsAlert">¿Quieres restablecer todos los ajustes de notificaciones a los valores por defecto?</string>
@@ -350,9 +343,9 @@
     <string name="BackgroundPreviewLine1">Pista: algunos fondos de pantalla se ven mejor con el efecto difuminado.</string>
     <string name="BackgroundPreviewLine2">¡Woo-hoo! ¡Gracias!</string>
     <string name="FontSizePreviewName">Roberto</string>
-    <string name="FontSizePreviewReply">¡Buenos días! &#128075;</string>
+    <string name="FontSizePreviewReply">¡Buenos días! 👋</string>
     <string name="FontSizePreviewLine1">¿Sabes qué hora es?</string>
-    <string name="FontSizePreviewLine2">Es de mañana en Tokio &#128526;</string>
+    <string name="FontSizePreviewLine2">Es de mañana en Tokio 😎</string>
     <string name="BackgroundColorSinglePreviewLine1">Toca Establecer para aplicar el fondo.</string>
     <string name="BackgroundColorSinglePreviewLine2">Se ve bien</string>
     <string name="SearchByColor">Buscar por color</string>
@@ -401,7 +394,7 @@
     <string name="LanguageUnsupportedError">Idioma no encontrado.</string>
     <string name="LanguageSame">Ya estás usando este pack de idioma (**%1$s**). Puedes cambiar el idioma cuando quieras en Ajustes.</string>
     <string name="LanguageUnknownCustomAlert">Lamentablemente, este pack de idioma personalizado (**%1$s**) no contiene datos para Telegram Android.</string>
-    <string name="AskAQuestionInfo">Ten en cuenta que el soporte de Telegram está en manos de voluntarios. Respondemos lo antes posible, pero puede tomar tiempo.\n\nPuedes mirar las <![CDATA[<a href=\"https://telegram.org/faq/es#preguntas-generales\">preguntas frecuentes de Telegram</a>]]>: tienen <![CDATA[<a href=\"https://telegram.org/faq/es#solucion-de-problemas\">soluciones a problemas</a>]]> y respuestas a muchas preguntas.</string>
+    <string name="AskAQuestionInfo">Ten en cuenta que el soporte de Telegram está en manos de voluntarios. Respondemos lo antes posible, pero puede tomar tiempo.\n\nPuedes mirar las &lt;a href=\"https://telegram.org/faq/es#preguntas-generales\"&gt;preguntas frecuentes de Telegram&lt;/a&gt;: tienen &lt;a href=\"https://telegram.org/faq/es#solucion-de-problemas\"&gt;soluciones a problemas&lt;/a&gt; y respuestas a muchas preguntas.</string>
     <string name="AskButton">Preguntar</string>
     <string name="TelegramFAQ">Preguntas frecuentes</string>
     <string name="TelegramFaq">Preguntas frecuentes</string>
@@ -432,7 +425,7 @@
     <string name="NoPopup">Nunca mostrar</string>
     <string name="OnlyWhenScreenOn">Con pantalla encendida</string>
     <string name="OnlyWhenScreenOff">Con pantalla apagada</string>
-    <string name="AlwaysShowPopup">"Mostrar siempre "</string>
+    <string name="AlwaysShowPopup">\"Mostrar siempre \"</string>
     <string name="BadgeNumber">Globo en el ícono</string>
     <string name="BadgeNumberShow">Mostrar globo en el ícono</string>
     <string name="BadgeNumberMutedChats">Incluir chats silenciados</string>
@@ -702,7 +695,6 @@
     <string name="CheckPhoneNumberLearnMoreUrl">https://telegram.org/faq/es#p-tengo-un-nuevo-numero-que-hago</string>
     <string name="CheckPhoneNumberYes">Sí</string>
     <string name="CheckPhoneNumberNo">No</string>
-    <!--filters-->
     <string name="Filters">Carpetas de chats</string>
     <string name="CreateNewFilter">Crear nueva carpeta</string>
     <string name="CreateNewFilterInfo">Crea carpetas para diferentes grupos de chats y cambia rápidamente entre ellas.</string>
@@ -778,7 +770,6 @@
     <string name="FilterChatsRemovedFrom">Quitaste **%1$s** de **%2$s**.</string>
     <string name="FilterAddToAlertFullTitle">Límite alcanzado</string>
     <string name="FilterAddToAlertFullText">No puedes excluir más de 100 chats de una carpeta.</string>
-    <!--media view-->
     <string name="January">Enero</string>
     <string name="February">Febrero</string>
     <string name="March">Marzo</string>
@@ -812,7 +803,6 @@
     <string name="NoSharedLinksSecret">Los enlaces de este chat aparecerán aquí.</string>
     <string name="NoSharedVoiceSecret">Los mensajes de voz de este chat aparecerán aquí.</string>
     <string name="NoSharedGifSecret">Los GIF de este chat aparecerán aquí.</string>
-    <!--password view-->
     <string name="TwoStepVerification">Verificación en dos pasos</string>
     <string name="TwoStepVerificationTitle">Verificación en dos pasos</string>
     <string name="TwoStepVerificationPasswordSet">¡Contraseña establecida!</string>
@@ -934,10 +924,8 @@
     <string name="CheckYourNewEmail">Revisa tu nuevo correo</string>
     <string name="CheckYourNewEmailSubtitle">Por favor, pon el código que hemos enviado a tu nuevo correo %1$s.</string>
     <string name="LoginOrSingInWithGoogle">o</string>
-    <!--edit video view-->
     <string name="SendingVideo">Enviando video...</string>
     <string name="SendingGif">Enviando GIF...</string>
-    <!--button titles-->
     <string name="Done">Listo</string>
     <string name="Open">Abrir</string>
     <string name="Save">Guardar</string>
@@ -979,7 +967,6 @@
     <string name="Next">Siguiente</string>
     <string name="Enable">Activar</string>
     <string name="ReportFalsePositive">Reportar falso positivo</string>
-    <!--messages-->
     <string name="ActionInviteYou">Te uniste al grupo con un enlace de invitación</string>
     <string name="ActionDeletedInviteLinkClickable">un1 eliminó el enlace de invitación un2</string>
     <string name="ActionEditedInviteLinkClickable">un1 editó el enlace de invitación un2 a un3</string>
@@ -1081,7 +1068,6 @@
     <string name="ActionTakeScreenshootYou">¡Hiciste una captura de pantalla!</string>
     <string name="ActionTakeScreenshoot">¡un1 hizo una captura de pantalla!</string>
     <string name="Album">Álbum</string>
-    <!--Alert messages-->
     <string name="LimitReachedPinnedTopics">No puedes fijar más de %d temas en la parte superior.</string>
     <string name="DeleteAllMessagesAlert">¡Advertencia! Esto **eliminará todos los mensajes** en este chat para **ambos** participantes.</string>
     <string name="DeleteAllMessagesChannelAlert">¡Advertencia! Esto **eliminará todos los mensajes** en este canal.</string>
@@ -1237,7 +1223,6 @@
     <string name="TosAgeText">Toca Aceptar para confirmar que tienes %1$s o más.</string>
     <string name="TosUpdateDecline">Lamentablemente, no hay otras opciones. A diferencia de otras apps, Telegram no usa los datos de los usuarios para publicidad dirigida u otros propósitos comerciales. Telegram sólo almacena la información que necesita para funcionar como un servicio en la nube. Puedes ajustar cómo usamos tus datos en los ajustes de privacidad y seguridad.\n\nSi no estás de acuerdo con los modestos requisitos de Telegram, no podremos brindarte este servicio.</string>
     <string name="TosDeclineDeleteAccount">Advertencia: Esto eliminará de forma irreversible tu cuenta de Telegram y todos los datos que almacenas en la nube de Telegram.\n\nImportante: Puedes “Cancelar” ahora y exportar tus datos primero en lugar de perderlos. (Para hacerlo, abre la última versión de Telegram Desktop y ve a Ajustes &gt; Avanzados &gt; Exportar datos de Telegram).</string>
-    <!--permissions-->
     <string name="PermissionStorageWithHint">**Telegram** necesita acceso al almacenamiento para que puedas enviar y guardar fotos, videos, música y otros archivos. Toca Ajustes &gt; Permisos, y activa **Archivos y contenido multimedia**.</string>
     <string name="PermissionNoAudioWithHint">**Telegram** necesita acceso al micrófono para que puedas enviar mensajes de voz. Toca Ajustes &gt; Permisos, y activa **Micrófono**.</string>
     <string name="PermissionNoAudioVideoWithHint">**Telegram** necesita acceso al micrófono para que puedas enviar mensajes de voz. Toca Ajustes &gt; Permisos, y activa **Micrófono**.</string>
@@ -1257,7 +1242,6 @@
     <string name="PermissionBackgroundLocation">Para compartir tu ubicación en tiempo real en este chat, Telegram necesita acceso a tu ubicación todo el tiempo, incluyendo cuando la aplicación está en segundo plano.\n\nAccederemos a tu ubicación sólo durante el tiempo que elijas, y puedes dejar de compartirla en cualquier momento. No la usaremos para ningún otro propósito que no sea el de compartirla en este chat.</string>
     <string name="PermissionDrawAboveOtherAppsTitle">Modo imagen en imagen</string>
     <string name="PermissionDrawAboveOtherAppsGroupCallTitle">Superposición del videochat</string>
-    <!--Intro view-->
     <string name="Page1Title">Telegram</string>
     <string name="Page2Title">Rápido</string>
     <string name="Page3Title">Gratuito</string>
@@ -1271,11 +1255,9 @@
     <string name="Page5Message">**Telegram** no tiene límite de espacio\npara tus archivos multimedia y chats.</string>
     <string name="Page6Message">**Telegram** te permite acceder a tus\nmensajes desde múltiples dispositivos.</string>
     <string name="StartMessaging">Empezar a chatear</string>
-    <!--contacts shortcuts-->
     <string name="ContactShortcutMessage">Mensaje al %1$s</string>
     <string name="ContactShortcutVoiceCall">Llamada de voz al %1$s</string>
     <string name="ContactShortcutVideoCall">Videollamada al %1$s</string>
-    <!--date formatters-->
     <string name="formatterBoostExpired">d \'de\' MMM \'de\' yyyy</string>
     <string name="formatterGiveawayCard">d \'de\' MMM \'de\' yyyy</string>
     <string name="formatterGiveawayMonthDay">d \'de\' MMMM</string>
@@ -1316,6 +1298,65 @@
     <string name="RemindDayYearAt">\'Recordar el\' d \'de\' MMM \'de\' yyyy \'a las\' HH:mm</string>
     <string name="BotsMenuTitle">Menu</string>
     <string name="Understood">👍 Entendido</string>
-    <!-- [Alexgram: Bot Warmup Banner] -->
     <string name="BotWarmupMessage">⏳ Tu primer mensaje nuevo puede tardar hasta 30 minutos en aparecer. Este aviso desaparecerá automáticamente cuando lleguen los mensajes.</string>
+    <string name="UnsupportedBlockTitle">Bloque no soportado</string>
+    <string name="UnsupportedBlockMessage">Actualiza Telegram para ver esta parte del mensaje</string>
+    <string name="UnsupportedMessageTitle">Mensaje no soportado</string>
+    <string name="UnsupportedMessageMessage">Actualiza Telegram para ver este mensaje</string>
+    <string name="UnsupportedUpdate">Actualizar</string>
+    <string name="CameraFilter_ComicPopArt_Title">Cómic Pop Art</string>
+    <string name="CameraFilter_ComicPopArt_Sub">Cómic estilo Pop Art</string>
+    <string name="CameraFilter_RoseBlush_Title">Rubor Rosa</string>
+    <string name="CameraFilter_RoseBlush_Sub">Rosa suave</string>
+    <string name="CameraFilter_ColdIce_Title">Hielo Frío</string>
+    <string name="CameraFilter_ColdIce_Sub">Azul escarchado</string>
+    <string name="CameraFilter_CinemaTeal_Title">Turquesa Cine</string>
+    <string name="CameraFilter_CinemaTeal_Sub">Turquesa cinematográfico</string>
+    <string name="CameraFilter_Portra400_Title">Portra 400</string>
+    <string name="CameraFilter_Portra400_Sub">Película cálida</string>
+    <string name="CameraFilter_FujiVelvia_Title">Fuji Velvia</string>
+    <string name="CameraFilter_FujiVelvia_Sub">Verde vívido</string>
+    <string name="CameraFilter_Vaporwave_Title">Vaporwave</string>
+    <string name="CameraFilter_Vaporwave_Sub">Estética ochentera</string>
+    <string name="CameraFilter_DreamyBloom_Title">Resplandor Ensueño</string>
+    <string name="CameraFilter_DreamyBloom_Sub">Foco suave</string>
+    <string name="CameraFilter_SinCityRed_Title">Sin City</string>
+    <string name="CameraFilter_SinCityRed_Sub">Rojo monocromático</string>
+    <string name="CameraFilter_EmeraldForest_Title">Esmeralda</string>
+    <string name="CameraFilter_EmeraldForest_Sub">Verde bosque</string>
+    <string name="CameraFilter_SunsetPeach_Title">Melocotón Puesta de Sol</string>
+    <string name="CameraFilter_SunsetPeach_Sub">Melocotón cálido</string>
+    <string name="CameraFilter_PrismRefraction_Title">Prisma</string>
+    <string name="CameraFilter_PrismRefraction_Sub">Refracción de luz</string>
+    <string name="CameraFilter_MochaWarm_Title">Moca</string>
+    <string name="CameraFilter_MochaWarm_Sub">Café cálido</string>
+    <string name="CameraFilter_DuotoneNeon_Title">Dúotono Neón</string>
+    <string name="CameraFilter_DuotoneNeon_Sub">Brillo de neón</string>
+    <string name="LastSeenNow">última vez hace un momento</string>
+    <string name="DownloadingTranslationModelsTitle">Descargando modelos</string>
+    <string name="DownloadingTranslationModelsTextAnd">y</string>
+    <string name="DeleteTranslationModelsTitle">Eliminar modelos</string>
+    <string name="WalletScanCode">Escanear código QR</string>
+    <string name="WalletScanCodeNotFound">No se encontró ningún código QR</string>
+    <string name="DiceNoStake">El staking no está disponible</string>
+    <string name="CacheStreamFile">Transmitir archivos en caché</string>
+    <string name="SystemRoot">Raíz del sistema</string>
+    <string name="New">Nuevo</string>
+    <string name="PeerRequirementBotRights">Permisos de bot</string>
+    <string name="PeerRequirementBotRight">Permiso de bot</string>
+    <string name="StickersStickerAlreadyThere">El sticker ya está en el paquete</string>
+    <string name="AddContactToast">Contacto añadido</string>
+    <string name="StoryPrivacyButtonCloseFriends">Mejores amigos</string>
+    <string name="StoryPrivacyButtonAllContacts">Todos los contactos</string>
+    <string name="StoryPrivacyButtonEveryone">Todos</string>
+    <string name="StoryPrivacyButtonMessage">Enviar mensaje</string>
+    <string name="WebPoweredBy">Desarrollado por</string>
+    <string name="cut">Cortar</string>
+    <string name="copy">Copiar</string>
+    <string name="paste">Pegar</string>
+    <string name="selectAll">Seleccionar todo</string>
+    <string name="autofill">Autocompletar</string>
+    <string name="MessageMenuModeHide">Ocultar</string>
+    <string name="MessageMenuModeText">Texto</string>
+    <string name="MessageMenuModeIcon">Icono</string>
 </resources>

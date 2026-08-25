@@ -76,7 +76,7 @@ public class DialogsHintCell extends FrameLayout {
         messageView.setMaxLines(5);
         contentView.addView(messageView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, Gravity.TOP));
 
-        NotificationCenter.getGlobalInstance().listenGlobal(this, NotificationCenter.emojiLoaded, args -> {
+        NotificationCenter.getGlobalInstance().listen(this, NotificationCenter.emojiLoaded, args -> {
             if (titleView != null) {
                 titleView.invalidate();
             }

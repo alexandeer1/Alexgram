@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="NekoSettings">تنظیمات-A</string>
     <string name="IPv6">ترجیح دادن IPv6</string>
@@ -149,6 +149,7 @@
     <string name="EmojiSetApplied">بسته اموجی اعمال شد.</string>
     <string name="EmojiSetAppliedInfo">%1$s اکنون بسته اموجی شماست.</string>
     <string name="EmojiSetAlreadyApplied">بسته اموجی قبلاً اعمال شده است.</string>
+    <string name="ProviderTelegramAPI">Telegram API</string>
     <string name="RecentChats">گفتگوهای اخیر</string>
     <string name="ClearRecentChats">پاک کردن گفتگوهای اخیر</string>
     <string name="ClearRecentChatAlert">آیا می‌خواهید گفتگوهای اخیر خود را پاک کنید؟</string>
@@ -168,6 +169,7 @@
     <string name="CopyCallback">کپی کردن داده Callback</string>
     <string name="CopyInlineQuery">کپی کردن درخواست درون‌خطی</string>
     <string name="CopyID">کپی کردن شناسه (ID)</string>
+    <string name="NekoX">NekoX</string>
     <string name="Locked">قفل شده</string>
     <string name="AccDescrChatAttachEnterMenu">منوی ورودی گفتگو</string>
     <string name="ChatAttachEnterMenuRecordVideo">ضبط ویدیو</string>
@@ -185,6 +187,7 @@
     <string name="LinkedChannelChat">کانال متصل</string>
     <string name="ChangeTranslateProvider">تغییر ارائه‌دهنده</string>
     <string name="ProviderYandexTranslate">Yandex Translate</string>
+    <string name="GoogleCloudTransKey">Google Cloud Translate Key</string>
     <string name="GoogleCloudTransKeyNotice">اگر کلید Google Cloud Translate را تنظیم کنید، هنگام ترجمه به جای ارسال فرم جعلی به نسخه وب، از API ترجمه ابری استفاده می‌شود (سریع‌تر، پایدارتر و با صرفه‌جویی در مصرف داده).</string>
     <string name="TransToLang">زبان مقصد</string>
     <string name="TransInputToLang">زبان ترجمه قبل از ارسال</string>
@@ -208,8 +211,8 @@
     <string name="ImportStickersX">وارد کردن استیکرها از فایل</string>
     <string name="ImportStickersList">وارد کردن استیکرها</string>
     <string name="StickerSets">بسته‌های استیکر</string>
-    <string name="InvalidStickersFile">فایل استیکر نامعتبر: </string>
-    <string name="ImportedProxies">پروکسی‌های وارد شده: </string>
+    <string name="InvalidStickersFile">فایل استیکر نامعتبر:</string>
+    <string name="ImportedProxies">پروکسی‌های وارد شده:</string>
     <string name="DeleteAllServer">حذف همه سرورها</string>
     <string name="DeleteUnavailableServer">حذف سرورهای غیرقابل دسترس</string>
     <string name="ImportProxyFromClipboard">وارد کردن از کلیپ‌بورد</string>
@@ -256,6 +259,8 @@
     <string name="ConfirmSettings">تاییدها</string>
     <string name="InteractionSettings">تعاملات</string>
     <string name="localPremium">پریمیوم محلی</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">واکنش</string>
     <string name="UpgradeGroup">ارتقاء گروه</string>
     <string name="AccDescrShowKeyboard">نمایش کیبورد</string>
@@ -270,13 +275,14 @@
     <string name="EmojiUseDefault">استفاده از اموجی سیستم</string>
     <string name="Chat">گفتگوها</string>
     <string name="Appearance">ظاهر</string>
-    <!-- [Alexgram: Important Announcement] -->
+    <string name="StarFallInChat">Starfall Chat Decoration</string>
+    <string name="StarFallInChatDescription">Animated falling stars in the chat background</string>
     <string name="GetImportantAnnouncementFromAlexgram">دریافت اطلاعیه‌های مهم از Alexgram</string>
-    <!-- [Alexgram: Birthday Wish] - Start -->
     <string name="BirthdayTitle">تولدت مبارک،\n%1$s! 🎉</string>
     <string name="BirthdayMessage">امروز تماماً متعلق به شماست! ✨ یک سال دیگر با انرژی نقش اول داستان. با آرزوی سالی پر از رشد خالص، بردهای بی‌پایان و بدون حس‌های منفی. برو و بدرخش! 🚀🎂</string>
     <string name="BirthdayMakeWish">یک آرزو کن 🌟</string>
     <string name="BirthdayWishSent">آرزو به ستاره‌ها فرستاده شد! 🌌✨</string>
-    <!-- [Alexgram: Birthday Wish] - End -->
+    <string name="SelectRangeSharedMedia">Select Range in Shared Media</string>
+    <string name="SelectRangeSharedMediaAbout">Enable double checkmark button to select all media items between the first and last selected items.</string>
+    <string name="SelectTwoItemsToSelectRange">Please select at least two items to select a range.</string>
 </resources>
-

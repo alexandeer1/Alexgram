@@ -751,6 +751,9 @@ public class HomeDrawerHelper {
         } else if (id == DrawerLayoutAdapter.nkbtnBookmarks) {
             activity.presentFragment(new BookmarkManagerActivity());
             activity.drawerLayoutContainer.closeDrawer(false);
+        } else if (id == DrawerLayoutAdapter.nkbtnFeed) {
+            activity.presentFragment(new com.exteragram.messenger.feed.ui.FeedActivity());
+            activity.drawerLayoutContainer.closeDrawer(false);
         } else if (id == DrawerLayoutAdapter.nkbtnRecentChats) {
             activity.presentFragment(new ChatHistoryActivity());
             activity.drawerLayoutContainer.closeDrawer(false);

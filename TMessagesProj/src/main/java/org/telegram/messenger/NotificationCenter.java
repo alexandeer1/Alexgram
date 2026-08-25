@@ -158,6 +158,14 @@ public class NotificationCenter {
     public static final int businessLinkCreated = totalEvents++;
     public static final int needDeleteBusinessLink = totalEvents++;
     public static final int messageTranslated = totalEvents++;
+    // [Alexgram: Main Tabs Hiding Search Bar] - Start
+    public static final int mainTabsLayoutChanged = totalEvents++;
+    // [Alexgram: Main Tabs Hiding Search Bar] - End
+    // [Alexgram: Feed Notifications] - Start
+    public static final int feedNeedReload = totalEvents++;
+    public static final int feedTabVisibleToggled = totalEvents++;
+    public static final int feedUnreadCountUpdated = totalEvents++;
+    // [Alexgram: Feed Notifications] - End
     public static final int messageTranslating = totalEvents++;
     public static final int dialogIsTranslatable = totalEvents++;
     public static final int dialogTranslate = totalEvents++;
@@ -382,6 +390,8 @@ public class NotificationCenter {
     public static final int pillStackLayoutChanged = totalEvents++;
     public static final int guardBotDecisionResult = totalEvents++;
     public static final int webBrowserSettingsUpdate = totalEvents++;
+    public static final int communityPendingRequestsUpdate = totalEvents++;
+    public static final int communitySwitchedCollapsed = totalEvents++;
 
     public static boolean alreadyLogged;
 
@@ -389,6 +399,7 @@ public class NotificationCenter {
     public static final int updateLoginToken = totalEvents++;
     public static final int accountLogin = totalEvents++;
     public static final int voiceChangerUpdated = totalEvents++;
+    public static final int pluginsDidLoad = totalEvents++;
 
     private final SparseArray<ArrayList<NotificationCenterDelegate>> observers = new SparseArray<>();
     private final SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();
@@ -586,6 +597,10 @@ public class NotificationCenter {
     }
 
     public void postNotificationName(final int id, Object... args) {
+        if (Thread.currentThread() != ApplicationLoader.applicationHandler.getLooper().getThread()) {
+            AndroidUtilities.runOnUIThread(() -> postNotificationName(id, args));
+            return;
+        }
         boolean allowDuringAnimation = id == startAllHeavyOperations || id == stopAllHeavyOperations || id == didReplacedPhotoInMemCache || id == closeChats || id == invalidateMotionBackground || id == needCheckSystemBarColors || id == messageReceivedByServer2;
         ArrayList<Integer> expiredIndices = null;
         if (!allowDuringAnimation && allowedNotifications.size() > 0) {
@@ -869,32 +884,6 @@ public class NotificationCenter {
         }
     }
 
-    public Runnable listenGlobal(View view, final int id, final Utilities.Callback<Object[]> callback) {
-        if (view == null || callback == null) {
-            return () -> {};
-        }
-        final NotificationCenterDelegate delegate = (_id, account, args) -> {
-            if (_id == id) {
-                callback.run(args);
-            }
-        };
-        final View.OnAttachStateChangeListener viewListener = new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View view) {
-                NotificationCenter.getGlobalInstance().addObserver(delegate, id);
-            }
-            @Override
-            public void onViewDetachedFromWindow(View view) {
-                NotificationCenter.getGlobalInstance().removeObserver(delegate, id);
-            }
-        };
-        view.addOnAttachStateChangeListener(viewListener);
-
-        return () -> {
-            view.removeOnAttachStateChangeListener(viewListener);
-            NotificationCenter.getGlobalInstance().removeObserver(delegate, id);
-        };
-    }
 
     public Runnable listen(View view, final int id, final Utilities.Callback<Object[]> callback) {
         if (view == null || callback == null) {
@@ -924,36 +913,7 @@ public class NotificationCenter {
     }
 
     public static void listenEmojiLoading(View view) {
-        getGlobalInstance().listenGlobal(view, NotificationCenter.emojiLoaded, args -> view.invalidate());
-    }
-
-    public void listenOnce(int id, Runnable callback) {
-        final NotificationCenterDelegate[] observer = new NotificationCenterDelegate[1];
-        observer[0] = (nid, account, args) -> {
-            if (nid == id && observer[0] != null) {
-                if (callback != null) {
-                    callback.run();
-                }
-                removeObserver(observer[0], id);
-                observer[0] = null;
-            }
-        };
-        addObserver(observer[0], id);
-    }
-
-    public void listenOnce(int id, Utilities.Callback3<Integer, Object[], Runnable> callback) {
-        final NotificationCenterDelegate[] observer = new NotificationCenterDelegate[1];
-        observer[0] = (nid, account, args) -> {
-            if (nid == id && observer[0] != null) {
-                if (callback != null) {
-                    callback.run(account, args, () -> {
-                        removeObserver(observer[0], id);
-                        observer[0] = null;
-                    });
-                }
-            }
-        };
-        addObserver(observer[0], id);
+        getGlobalInstance().listen(view, NotificationCenter.emojiLoaded, args -> view.invalidate());
     }
 
     private class UniqArrayList<T> extends ArrayList<T> {

@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Chrono Speed Blur: Hyperdrive Warp Speed Radial Rays -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M24,24 L6,6 M24,24 L42,6 M24,24 L6,42 M24,24 L42,42 M24,24 L24,4 M24,24 L24,44 M24,24 L4,24 M24,24 L44,24"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2.5" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22,22 L26,22 L26,26 L22,26 Z" />
+</vector>

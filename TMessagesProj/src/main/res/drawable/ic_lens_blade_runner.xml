@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Blade Runner 2049: Neon Pyramids & Cyberpunk Flare -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,6 L42,38 L6,38 Z" />
+    <path
+        android:fillColor="#FF7043"
+        android:pathData="M24,14 L37,36 L11,36 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4,42 L44,42 L44,44 L4,44 Z" />
+</vector>

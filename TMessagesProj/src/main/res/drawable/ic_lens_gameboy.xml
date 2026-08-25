@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Retro GameBoy: 1989 Dot Matrix Handheld Console -->
+    <path
+        android:fillColor="#9E9E9E"
+        android:pathData="M12,6 L36,6 C38.2,6 40,7.8 40,10 L40,38 C40,40.2 38.2,42 36,42 L12,42 C9.8,42 8,40.2 8,38 L8,10 C8,7.8 9.8,6 12,6 Z" />
+    <path
+        android:fillColor="#8BC34A"
+        android:pathData="M14,10 L34,10 L34,24 L14,24 Z" />
+    <path
+        android:fillColor="#33691E"
+        android:pathData="M17,13 L31,13 L31,21 L17,21 Z" />
+    <path
+        android:fillColor="#212121"
+        android:pathData="M14,30 L18,30 L18,28 L20,28 L20,30 L24,30 L24,32 L20,32 L20,34 L18,34 L18,32 L14,32 Z" />
+    <path
+        android:fillColor="#D81B60"
+        android:pathData="M31,31 C30.4,31 30,30.6 30,30 C30,29.4 30.4,29 31,29 C31.6,29 32,29.4 32,30 C32,30.6 31.6,31 31,31 Z M34,28 C33.4,28 33,27.6 33,27 C33,26.4 33.4,26 34,26 C34.6,26 35,26.4 35,27 C35,27.6 34.6,28 34,28 Z" />
+</vector>

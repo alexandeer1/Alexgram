@@ -195,7 +195,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         if (firstFrameRendered) {
             Bitmap bitmap = textureView.getBitmap(100, 100);
             if (bitmap != null) {
-                Utilities.blurBitmap(bitmap, 3, 1, bitmap.getWidth(), bitmap.getHeight(), bitmap.getRowBytes());
+                Utilities.blurBitmap(bitmap, 3);
                 Drawable drawable = new BitmapDrawable(bitmap);
                 blurredStubView.setBackground(drawable);
             }
@@ -701,6 +701,7 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 FileLog.d("CameraView " + "start create thread");
             }
             cameraThread = new CameraGLThread(surface);
+            cameraThread.setFilterType(currentFilterType, currentFilterIntensity);
             if (blurTextureView != null) {
                 cameraThread.setBlurSurfaceTexture(blurTextureView.getSurfaceTexture());
             }
@@ -974,6 +975,25 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
 
     public void setDelegate(CameraViewDelegate cameraViewDelegate) {
         delegate = cameraViewDelegate;
+    }
+
+    private int currentFilterType = 0;
+    private float currentFilterIntensity = 1.0f;
+
+    public void setFilter(int filterType, float intensity) {
+        currentFilterType = filterType;
+        currentFilterIntensity = intensity;
+        if (cameraThread != null) {
+            cameraThread.setFilterType(filterType, intensity);
+        }
+    }
+
+    public int getFilterType() {
+        return currentFilterType;
+    }
+
+    public float getFilterIntensity() {
+        return currentFilterIntensity;
     }
 
     public boolean isInited() {
@@ -1272,6 +1292,12 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         private int shapeToHandle;
         private int shapeHandle;
 
+        private int filterTypeHandle;
+        private int filterIntensityHandle;
+        private int filterTimeHandle;
+        private int activeFilterType = 0;
+        private float activeFilterIntensity = 1.0f;
+
         private boolean initDual, initDualReverse;
         private Matrix initDualMatrix;
         private boolean recording;
@@ -1414,6 +1440,10 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     shapeFromHandle = GLES20.glGetUniformLocation(drawProgram, "shapeFrom");
                     shapeToHandle = GLES20.glGetUniformLocation(drawProgram, "shapeTo");
                     shapeHandle = GLES20.glGetUniformLocation(drawProgram, "shapeT");
+
+                    filterTypeHandle = GLES20.glGetUniformLocation(drawProgram, "filterType");
+                    filterIntensityHandle = GLES20.glGetUniformLocation(drawProgram, "filterIntensity");
+                    filterTimeHandle = GLES20.glGetUniformLocation(drawProgram, "filterTime");
                 }
             } else {
                 if (BuildVars.LOGS_ENABLED) {
@@ -1627,6 +1657,12 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             }
         }
 
+        public void setFilter(int type, float intensity) {
+            activeFilterType = type;
+            activeFilterIntensity = intensity;
+            requestRender(false, false);
+        }
+
         private boolean crossfading;
         private final AnimatedFloat crossfade = new AnimatedFloat(() -> this.requestRender(false, false), 560, CubicBezierInterpolator.EASE_OUT_QUINT);
         private final AnimatedFloat camera1Appear = new AnimatedFloat(1f, () -> this.requestRender(false, false), 0, 420, CubicBezierInterpolator.EASE_OUT_QUINT);
@@ -1788,6 +1824,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     GLES20.glUniform1f(dualHandle, 1f);
                 }
                 GLES20.glUniform1f(blurHandle, i == 0 ? camera1Blur : 0f);
+                GLES20.glUniform1i(filterTypeHandle, activeFilterType);
+                GLES20.glUniform1f(filterIntensityHandle, activeFilterIntensity);
+                GLES20.glUniform1f(filterTimeHandle, (System.currentTimeMillis() % 1000000L) / 1000.0f);
                 if (i == 1) {
                     GLES20.glUniform1f(alphaHandle, 1);
                     if (a < 0) {
@@ -2235,6 +2274,14 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
             }
         }
 
+        public void setFilterType(int filterType, float intensity) {
+            postRunnable(() -> {
+                activeFilterType = filterType;
+                activeFilterIntensity = intensity;
+                requestRender(false, false);
+            });
+        }
+
         public void setBlurSurfaceTexture(SurfaceTexture blurSurfaceTexture) {
             Handler handler = getHandler();
             if (handler != null) {
@@ -2420,6 +2467,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
         private int alphaHandle;
         private int scaleHandle;
         private int blurHandle;
+        private int filterTypeHandle;
+        private int filterIntensityHandle;
+        private int filterTimeHandle;
         private int zeroTimeStamps;
         private Integer lastCameraId = 0;
 
@@ -2823,6 +2873,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                 } else {
                     GLES20.glUniform1f(dualHandle, 1f);
                 }
+                GLES20.glUniform1i(filterTypeHandle, currentFilterType);
+                GLES20.glUniform1f(filterIntensityHandle, currentFilterIntensity);
+                GLES20.glUniform1f(filterTimeHandle, (System.currentTimeMillis() % 1000000L) / 1000.0f);
                 if (i == 1) {
                     GLES20.glUniform1f(alphaHandle, 1);
                     if (a < 0) {
@@ -3169,6 +3222,9 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
                     shapeFromHandle = GLES20.glGetUniformLocation(drawProgram, "shapeFrom");
                     shapeToHandle = GLES20.glGetUniformLocation(drawProgram, "shapeTo");
                     shapeHandle = GLES20.glGetUniformLocation(drawProgram, "shapeT");
+                    filterTypeHandle = GLES20.glGetUniformLocation(drawProgram, "filterType");
+                    filterIntensityHandle = GLES20.glGetUniformLocation(drawProgram, "filterIntensity");
+                    filterTimeHandle = GLES20.glGetUniformLocation(drawProgram, "filterTime");
                 }
             }
         }

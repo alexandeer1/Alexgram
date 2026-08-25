@@ -49,7 +49,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
+import org.telegram.ui.recyclerview.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AccountInstance;
@@ -1461,8 +1461,8 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
                     topPanelLayout.setViewVisible(fragmentContextViewWrapper, visibility == VISIBLE, true);
                 }
             };
-            fragmentContextView.isInsideBubble = true;
             fragmentContextViewWrapper.addView(fragmentContextView);
+            topPanelLayout.setCallFragmentContextView(fragmentContextView);
         }
         FrameLayout.LayoutParams layoutParams = LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT);
         if (inPreviewMode) {
@@ -3649,7 +3649,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             } else if (view instanceof FilteredSearchView) {
                 ((FilteredSearchView) view).setKeyboardHeight(keyboardSize, false);
                 Item item = viewPagerAdapter.items.get(position);
-                ((FilteredSearchView) view).search(-chatId, minDate, maxDate, FiltersView.filters[item.filterIndex], includeFolder, query, reset);
+                ((FilteredSearchView) view).search(-chatId, 0, minDate, maxDate, FiltersView.filters[item.filterIndex], includeFolder, query, reset);
             } else if (view instanceof SearchDownloadsContainer) {
                 ((SearchDownloadsContainer) view).setKeyboardHeight(keyboardSize, false);
                 ((SearchDownloadsContainer) view).search(query);

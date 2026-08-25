@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="NekoSettings">Pengaturan-A</string>
     <string name="IPv6">Lebih suka IPv6</string>
@@ -169,6 +169,7 @@
     <string name="CopyCallback">Salin Data Callback</string>
     <string name="CopyInlineQuery">Salin Kueri Inline</string>
     <string name="CopyID">Salin ID</string>
+    <string name="NekoX">NekoX</string>
     <string name="Locked">Dikunci</string>
     <string name="AccDescrChatAttachEnterMenu">Menu input obrolan</string>
     <string name="ChatAttachEnterMenuRecordVideo">Rekam Video</string>
@@ -210,8 +211,8 @@
     <string name="ImportStickersX">Impor stiker dari berkas</string>
     <string name="ImportStickersList">Impor stiker</string>
     <string name="StickerSets">Kumpulan Stiker</string>
-    <string name="InvalidStickersFile">Berkas stiker tidak sah: </string>
-    <string name="ImportedProxies">Server proksi yang diimpor: </string>
+    <string name="InvalidStickersFile">Berkas stiker tidak sah:</string>
+    <string name="ImportedProxies">Server proksi yang diimpor:</string>
     <string name="DeleteAllServer">Hapus semua server</string>
     <string name="DeleteUnavailableServer">Hapus server yang tidak tersedia</string>
     <string name="ImportProxyFromClipboard">Impor Dari Papan Klip</string>
@@ -258,6 +259,8 @@
     <string name="ConfirmSettings">Konfirmasi</string>
     <string name="InteractionSettings">Interaksi</string>
     <string name="localPremium">Premium Lokal</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">Reaksi</string>
     <string name="UpgradeGroup">Tingkatkan Grup</string>
     <string name="AccDescrShowKeyboard">Tampilkan keyboard</string>
@@ -272,13 +275,14 @@
     <string name="EmojiUseDefault">Gunakan emoji sistem</string>
     <string name="Chat">Obrolan</string>
     <string name="Appearance">Tampilan</string>
-    <!-- [Alexgram: Important Announcement] -->
+    <string name="StarFallInChat">Starfall Chat Decoration</string>
+    <string name="StarFallInChatDescription">Animated falling stars in the chat background</string>
     <string name="GetImportantAnnouncementFromAlexgram">Dapatkan Pengumuman Penting dari Alexgram</string>
-    <!-- [Alexgram: Birthday Wish] - Start -->
     <string name="BirthdayTitle">Selamat Ulang Tahun,\n%1$s! 🎉</string>
     <string name="BirthdayMessage">Hari ini sepenuhnya tentangmu! ✨ Satu tahun lagi dengan energi karakter utama. Semoga tahun ini penuh pertumbuhan, kemenangan tanpa akhir, dan bebas dari energi negatif. Ayo taklukkan hari ini! 🚀🎂</string>
     <string name="BirthdayMakeWish">Kabulkan Impian 🌟</string>
     <string name="BirthdayWishSent">Keinginan Terkirim ke Bintang-bintang! 🌌✨</string>
-    <!-- [Alexgram: Birthday Wish] - End -->
+    <string name="SelectRangeSharedMedia">Select Range in Shared Media</string>
+    <string name="SelectRangeSharedMediaAbout">Enable double checkmark button to select all media items between the first and last selected items.</string>
+    <string name="SelectTwoItemsToSelectRange">Please select at least two items to select a range.</string>
 </resources>
-

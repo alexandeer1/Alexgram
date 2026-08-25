@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Anamorphic Flare: Horizontal Cinematic Blue Streak -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M2,23 L46,23 L46,25 L2,25 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20,20 L28,20 L28,28 L20,28 Z" />
+    <path
+        android:fillColor="#2979FF"
+        android:pathData="M12,22 L36,22 L36,26 L12,26 Z" />
+</vector>

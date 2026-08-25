@@ -359,7 +359,7 @@ public class ChatAttachAlertQuickRepliesLayout extends ChatAttachAlert.AttachAle
         iBlur3CaptureView = listView;
         occupyStatusBar = true;
         occupyNavigationBar = true;
-        NotificationCenter.getInstance(UserConfig.selectedAccount).listenGlobal(listView, NotificationCenter.emojiLoaded, args -> {
+        NotificationCenter.getInstance(UserConfig.selectedAccount).listen(listView, NotificationCenter.emojiLoaded, args -> {
             AndroidUtilities.forEachViews(listView, view -> {
                 if (view instanceof QuickRepliesActivity.QuickReplyView) {
                     ((QuickRepliesActivity.QuickReplyView) view).invalidateEmojis();

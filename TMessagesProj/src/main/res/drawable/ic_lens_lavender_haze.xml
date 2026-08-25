@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Lavender Haze: Floral Sprig with Soft Stars -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,40 L24,20"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="#E1BEE7"
+        android:pathData="M24,10 C22,10 20,12 20,14 C20,16 22,18 24,18 C26,18 28,16 28,14 C28,12 26,10 24,10 Z M18,17 C16,17 15,19 15,21 C15,23 17,24 19,23 C21,22 21,20 20,18 Z M30,17 C32,17 33,19 33,21 C33,23 31,24 29,23 C27,22 27,20 28,18 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,12 L14,14 L12,16 L10,14 Z M36,28 L38,30 L36,32 L34,30 Z" />
+</vector>

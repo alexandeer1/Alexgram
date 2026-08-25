@@ -26,7 +26,51 @@
           "status": 1
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482033834017:android:66b1d11ea4bb803408eb61",
+        "android_client_info": {
+          "package_name": "org.tele.alexgram.beta"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYZ0Xans1xi7nbGLD7rVLjnc3NEFiO3kU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        },
+        "analytics_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482033834017:android:66b1d11ea4bb803408eb62",
+        "android_client_info": {
+          "package_name": "org.tele.alexgram.nightly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYZ0Xans1xi7nbGLD7rVLjnc3NEFiO3kU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        },
+        "analytics_service": {
+          "status": 1
+        }
+      }
     }
   ],
   "configuration_version": "1"
-}
+}

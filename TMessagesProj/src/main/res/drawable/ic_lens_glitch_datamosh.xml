@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Glitch Datamosh: Shredded Digital Byte Shift Blocks -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M6,12 L26,12 L26,18 L6,18 Z M16,22 L38,22 L38,28 L16,28 Z M10,32 L32,32 L32,38 L10,38 Z" />
+    <path
+        android:fillColor="#FF007F"
+        android:pathData="M24,14 L42,14 L42,20 L24,20 Z M8,24 L18,24 L18,30 L8,30 Z M28,30 L44,30 L44,36 L28,36 Z" />
+</vector>

@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import tw.nekomimi.nekogram.llm.utils.LlmModelUtil;
+import tw.nekomimi.nekogram.llm.utils.ModelUtil;
 import tw.nekomimi.nekogram.utils.HttpClient;
 
 public final class OpenAICompatClient {
@@ -70,7 +70,7 @@ public final class OpenAICompatClient {
                 return new LlmResponse<>(null, "Parse error: " + e + " ; raw=" + truncate(body), duration, code);
             }
             if (isGeminiModelsEndpoint(requestBaseUrl)) {
-                models = LlmModelUtil.stripModelsPrefix(models);
+                models = ModelUtil.stripModelsPrefix(models);
             }
             if (models.isEmpty()) {
                 return new LlmResponse<>(null, "No models found: " + truncate(body), duration, code);
@@ -97,9 +97,9 @@ public final class OpenAICompatClient {
             requestJson = new JSONObject()
                     .put("model", modelName)
                     .put("messages", messages);
-            if (LlmModelUtil.isReasoning(modelName)) {
-                requestJson.put("reasoning_effort", LlmModelUtil.getReasoningEffort(modelName));
-            } else if (LlmModelUtil.isCerebrasGlm(baseUrl, modelName)) {
+            if (ModelUtil.isReasoning(modelName)) {
+                requestJson.put("reasoning_effort", ModelUtil.getReasoningEffort(modelName));
+            } else if (ModelUtil.isCerebrasGlm(baseUrl, modelName)) {
                 requestJson.put("disable_reasoning", true);
             }
         } catch (Exception e) {
@@ -111,7 +111,7 @@ public final class OpenAICompatClient {
             return response;
         }
         return new LlmResponse<>(
-                LlmModelUtil.sanitizeResponse(modelName, response.data()),
+                ModelUtil.sanitizeResponse(modelName, response.data()),
                 null,
                 response.durationMs(),
                 response.httpCode()

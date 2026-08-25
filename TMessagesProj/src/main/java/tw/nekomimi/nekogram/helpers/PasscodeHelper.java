@@ -80,6 +80,10 @@ public class PasscodeHelper {
     }
 
     public static boolean isAccountHidden(int account) {
+        if (tw.nekomimi.nekogram.helpers.HiddenAccountsController.getInstance().isAccountHidden(account)
+                && tw.nekomimi.nekogram.helpers.HiddenAccountsController.getInstance().isLocked()) {
+            return true;
+        }
         return hasPasscodeForAccount(account) && preferences.getBoolean("hide" + account, false);
     }
 

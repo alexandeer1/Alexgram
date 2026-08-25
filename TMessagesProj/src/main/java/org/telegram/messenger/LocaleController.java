@@ -2364,6 +2364,32 @@ public class LocaleController {
         return "LOC_ERR";
     }
 
+
+    public static String formatPmSentDate(long date) {
+        try {
+            date *= 1000;
+            Calendar rightNow = Calendar.getInstance();
+            int day = rightNow.get(Calendar.DAY_OF_YEAR);
+            int year = rightNow.get(Calendar.YEAR);
+            rightNow.setTimeInMillis(date);
+            int dateDay = rightNow.get(Calendar.DAY_OF_YEAR);
+            int dateYear = rightNow.get(Calendar.YEAR);
+
+            if (dateDay == day && year == dateYear) {
+                return LocaleController.formatString(R.string.PmSentTodayAt, getInstance().getFormatterDay().format(new Date(date)));
+            } else if (dateDay + 1 == day && year == dateYear) {
+                return LocaleController.formatString(R.string.PmSentYesterdayAt, getInstance().getFormatterDay().format(new Date(date)));
+            } else if (Math.abs(System.currentTimeMillis() - date) < 31536000000L) {
+                return LocaleController.formatString(R.string.PmSentDateTimeAt, getInstance().getFormatterDayMonth().format(new Date(date)), getInstance().getFormatterDay().format(new Date(date)));
+            } else {
+                return LocaleController.formatString(R.string.PmSentDateTimeAt, getInstance().getFormatterYear().format(new Date(date)), getInstance().getFormatterDay().format(new Date(date)));
+            }
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+        return "LOC_ERR";
+    }
+
     public static String formatPmEditedDate(long date) {
         try {
             date *= 1000;
@@ -3041,6 +3067,19 @@ public class LocaleController {
     }
 
     public static String formatUserStatus(int currentAccount, TLRPC.User user, boolean[] isOnline, boolean[] madeShorter) {
+        if (user != null && user.id == UserConfig.getInstance(currentAccount).getClientUserId()) {
+            if (!tw.nekomimi.nekogram.NekoConfig.sendOnlinePackets.Bool() || tw.nekomimi.nekogram.NekoConfig.sendOfflinePacketAfterOnline.Bool()) {
+                if (isOnline != null) {
+                    isOnline[0] = false;
+                }
+                int lastSeen = LastSeenHelper.getLastSeen(user.id);
+                if (lastSeen > 0) {
+                    return getString("Offline", R.string.VoipOfflineTitle) + ", " + formatDateOnline(lastSeen, madeShorter);
+                } else {
+                    return getString("Offline", R.string.VoipOfflineTitle);
+                }
+            }
+        }
         if (user != null && user.status != null && user.status.expires == 0) {
             if (user.status instanceof TLRPC.TL_userStatusRecently) {
                 user.status.expires = user.status.by_me ? -1000 : -100;

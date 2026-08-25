@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Fisheye: Curved Optical Sphere Lens with Curvature Grid -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M24,6 A18,18 0 1,0 42,24 A18,18 0 0,0 24,6 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M24,6 C30,12 33,18 33,24 C33,30 30,36 24,42 C18,36 15,30 15,24 C15,18 18,12 24,6 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M6,24 C12,18 18,15 24,15 C30,15 36,18 42,24 C36,30 30,33 24,33 C18,33 12,30 6,24 Z" />
+</vector>

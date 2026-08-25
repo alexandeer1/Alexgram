@@ -125,15 +125,15 @@ public class UserConfig extends BaseController {
         return false;
     }
 
-    // [Alexgram: Max Active Accounts] - Start
+    // [Alexgram: Accounts Settings] - Start
     public static int getMaxAccountCount() {
         try {
-            return tw.nekomimi.nekogram.NekoConfig.getPreferences().getInt("MaxActiveAccounts", 10);
+            return xyz.nextalone.nagram.NaConfig.INSTANCE.getMaxAccountCount().Int();
         } catch (Exception e) {
             return 10;
         }
     }
-    // [Alexgram: Max Active Accounts] - End
+    // [Alexgram: Accounts Settings] - End
 
     public int getNewMessageId() {
         int id;
@@ -304,6 +304,13 @@ public class UserConfig extends BaseController {
         }
     }
 
+    public void reloadConfig() {
+        synchronized (sync) {
+            configLoaded = false;
+            loadConfig();
+        }
+    }
+
     public void
     loadConfig() {
         synchronized (sync) {
@@ -366,7 +373,7 @@ public class UserConfig extends BaseController {
                 migrateOffsetUserId = AndroidUtilities.getPrefIntOrLong(preferences, "6migrateOffsetUserId", 0);
                 migrateOffsetChatId = AndroidUtilities.getPrefIntOrLong(preferences, "6migrateOffsetChatId", 0);
                 migrateOffsetChannelId = AndroidUtilities.getPrefIntOrLong(preferences, "6migrateOffsetChannelId", 0);
-                migrateOffsetAccess = preferences.getLong("6migrateOffsetAccess", 0);
+                migrateOffsetAccess = AndroidUtilities.getPrefIntOrLong(preferences, "6migrateOffsetAccess", 0);
             }
 
             String string = preferences.getString("tmpPassword", null);
@@ -560,12 +567,12 @@ public class UserConfig extends BaseController {
 
     public long[] getDialogLoadOffsets(int folderId) {
         SharedPreferences preferences = getPreferences();
-        int dialogsLoadOffsetId = preferences.getInt("2dialogsLoadOffsetId" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
-        int dialogsLoadOffsetDate = preferences.getInt("2dialogsLoadOffsetDate" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
+        int dialogsLoadOffsetId = (int) AndroidUtilities.getPrefIntOrLong(preferences, "2dialogsLoadOffsetId" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
+        int dialogsLoadOffsetDate = (int) AndroidUtilities.getPrefIntOrLong(preferences, "2dialogsLoadOffsetDate" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
         long dialogsLoadOffsetUserId = AndroidUtilities.getPrefIntOrLong(preferences, "2dialogsLoadOffsetUserId" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
         long dialogsLoadOffsetChatId = AndroidUtilities.getPrefIntOrLong(preferences, "2dialogsLoadOffsetChatId" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
         long dialogsLoadOffsetChannelId = AndroidUtilities.getPrefIntOrLong(preferences, "2dialogsLoadOffsetChannelId" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
-        long dialogsLoadOffsetAccess = preferences.getLong("2dialogsLoadOffsetAccess" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
+        long dialogsLoadOffsetAccess = AndroidUtilities.getPrefIntOrLong(preferences, "2dialogsLoadOffsetAccess" + (folderId == 0 ? "" : folderId), hasValidDialogLoadIds ? 0 : -1);
         return new long[]{dialogsLoadOffsetId, dialogsLoadOffsetDate, dialogsLoadOffsetUserId, dialogsLoadOffsetChatId, dialogsLoadOffsetChannelId, dialogsLoadOffsetAccess};
     }
 

@@ -5,6 +5,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.OutputSerializedData;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_iv;
 
 public class MessageCustomParamsHelper {
 
@@ -26,6 +27,7 @@ public class MessageCustomParamsHelper {
             message.translatedToLanguage == null &&
             message.translatedPoll == null &&
             message.translatedText == null &&
+            message.translatedRichMessage == null &&
             message.translatedButtons == null &&
             message.translatedButtonsLanguage == null &&
             message.errorAllowedPriceStars == 0 &&
@@ -45,6 +47,7 @@ public class MessageCustomParamsHelper {
         toMessage.translatedToLanguage = fromMessage.translatedToLanguage;
         toMessage.translatedPoll = fromMessage.translatedPoll;
         toMessage.translatedText = fromMessage.translatedText;
+        toMessage.translatedRichMessage = fromMessage.translatedRichMessage;
         toMessage.errorAllowedPriceStars = fromMessage.errorAllowedPriceStars;
         toMessage.errorNewPriceStars = fromMessage.errorNewPriceStars;
         toMessage.translatedVoiceTranscription = fromMessage.translatedVoiceTranscription;
@@ -113,6 +116,7 @@ public class MessageCustomParamsHelper {
             flags = setFlag(flags, FLAG_12, message.translatedSummaryLanguage != null);
             flags = setFlag(flags, FLAG_13, message.translatedButtonsLanguage != null);
             flags = setFlag(flags, FLAG_14, message.translatedButtons != null);
+            flags = setFlag(flags, FLAG_15, message.translatedRichMessage != null);
         }
 
         @Override
@@ -172,6 +176,9 @@ public class MessageCustomParamsHelper {
                     stream.writeString(entry.getValue());
                 }
             }
+            if (hasFlag(flags, FLAG_15)) {
+                message.translatedRichMessage.serializeToStream(stream);
+            }
         }
 
         @Override
@@ -230,6 +237,9 @@ public class MessageCustomParamsHelper {
                     String value = stream.readString(exception);
                     message.translatedButtons.put(key, value);
                 }
+            }
+            if (hasFlag(flags, FLAG_15)) {
+                message.translatedRichMessage = TL_iv.RichMessage.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
         }
 

@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Golden Hour: Sunset sun over warm horizon waves -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,10 A11,11 0 0,1 35,21 A11,11 0 0,1 24,32 A11,11 0 0,1 13,21 A11,11 0 0,1 24,10 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M24,4 L24,7 M24,35 L24,38 M7,21 L10,21 M38,21 L41,21 M12,9 L14,11 M34,31 L36,33 M12,33 L14,31 M34,11 L36,9" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M8,41 Q24,38 40,41" />
+</vector>

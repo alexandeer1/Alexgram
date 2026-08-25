@@ -22,6 +22,18 @@ public abstract class BaseRemoteHelper {
     public static final long CHANNEL_METADATA_ID = 3637588965L;
     public static final String CHANNEL_METADATA_NAME = "Alexgram_updates";
 
+    public String getChannelMetadataName() {
+        return CHANNEL_METADATA_NAME;
+    }
+
+    public long getChannelMetadataId() {
+        return preferences.getLong(getChannelMetadataName() + "_id", CHANNEL_METADATA_ID);
+    }
+
+    public void setChannelMetadataId(long id) {
+        preferences.edit().putLong(getChannelMetadataName() + "_id", id).apply();
+    }
+
     protected static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("nekoremoteconfig", Activity.MODE_PRIVATE);
 
     protected MessagesController getMessagesController() {
@@ -76,10 +88,13 @@ public abstract class BaseRemoteHelper {
         }
     }
 
-    private void onGetMessageSuccess(TLObject response, Delegate delegate) {
+    protected void onGetMessageSuccess(TLObject response, Delegate delegate) {
         var tag = "#" + getTag();
         final var res = (TLRPC.messages_Messages) response;
-        getMessagesController().removeDeletedMessagesFromArray(CHANNEL_METADATA_ID, res.messages);
+        long chId = getChannelMetadataId();
+        if (chId != 0) {
+            getMessagesController().removeDeletedMessagesFromArray(chId, res.messages);
+        }
         ArrayList<JSONObject> responses = new ArrayList<>();
         for (var message : res.messages) {
             if (TextUtils.isEmpty(message.message) || !message.message.startsWith(tag)) {
@@ -104,17 +119,14 @@ public abstract class BaseRemoteHelper {
 
     private void load(boolean forceRefreshAccessHash, Delegate delegate) {
         var tag = "#" + getTag();
-        TLRPC.TL_messages_search req = new TLRPC.TL_messages_search();
-        req.limit = 10;
-        req.offset_id = 0;
-        req.filter = new TLRPC.TL_inputMessagesFilterEmpty();
-        req.q = tag;
-        req.peer = getMessagesController().getInputPeer(-CHANNEL_METADATA_ID);
-        if (req.peer == null || req.peer.access_hash == 0 || forceRefreshAccessHash) {
+        long chId = getChannelMetadataId();
+        TLRPC.InputPeer currentPeer = chId != 0 ? getMessagesController().getInputPeer(-chId) : null;
+        if (currentPeer == null || currentPeer.access_hash == 0 || forceRefreshAccessHash) {
             TLRPC.TL_contacts_resolveUsername req1 = new TLRPC.TL_contacts_resolveUsername();
-            req1.username = CHANNEL_METADATA_NAME;
+            req1.username = getChannelMetadataName();
             getConnectionsManager().sendRequest(req1, (response1, error1) -> {
                 if (error1 != null) {
+                    onError(error1.text, delegate);
                     return;
                 }
                 if (!(response1 instanceof TLRPC.TL_contacts_resolvedPeer)) {
@@ -127,26 +139,42 @@ public abstract class BaseRemoteHelper {
                 if ((resolvedPeer.chats == null || resolvedPeer.chats.size() == 0)) {
                     return;
                 }
-                req.peer = new TLRPC.TL_inputPeerChannel();
-                req.peer.channel_id = resolvedPeer.chats.get(0).id;
-                req.peer.access_hash = resolvedPeer.chats.get(0).access_hash;
-                getConnectionsManager().sendRequest(req, (response, error) -> {
-                    if (error == null) {
-                        onGetMessageSuccess(response, delegate);
-                    } else {
-                        onError(error.text, delegate);
-                    }
-                });
+                long resolvedChatId = resolvedPeer.chats.get(0).id;
+                setChannelMetadataId(resolvedChatId);
+                TLRPC.TL_inputPeerChannel peerChannel = new TLRPC.TL_inputPeerChannel();
+                peerChannel.channel_id = resolvedChatId;
+                peerChannel.access_hash = resolvedPeer.chats.get(0).access_hash;
+                sendFetchRequest(peerChannel, tag, delegate);
             });
         } else {
-            getConnectionsManager().sendRequest(req, (response, error) -> {
-                if (error == null) {
-                    onGetMessageSuccess(response, delegate);
-                } else {
-                    load(true, delegate);
-                }
-            });
+            sendFetchRequest(currentPeer, tag, delegate);
         }
+    }
+
+    private void sendFetchRequest(TLRPC.InputPeer peer, String tag, Delegate delegate) {
+        TLObject req;
+        if (this instanceof UpdateHelper) {
+            TLRPC.TL_messages_getHistory gh = new TLRPC.TL_messages_getHistory();
+            gh.peer = peer;
+            gh.limit = 30;
+            gh.offset_id = 0;
+            req = gh;
+        } else {
+            TLRPC.TL_messages_search s = new TLRPC.TL_messages_search();
+            s.limit = 10;
+            s.offset_id = 0;
+            s.filter = new TLRPC.TL_inputMessagesFilterEmpty();
+            s.q = tag;
+            s.peer = peer;
+            req = s;
+        }
+        getConnectionsManager().sendRequest(req, (response, error) -> {
+            if (error == null) {
+                onGetMessageSuccess(response, delegate);
+            } else {
+                onError(error.text, delegate);
+            }
+        });
     }
 
     public interface Delegate {

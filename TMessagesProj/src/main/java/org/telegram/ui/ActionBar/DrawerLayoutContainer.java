@@ -8,6 +8,8 @@
 
 package org.telegram.ui.ActionBar;
 
+import androidx.core.view.DisplayCutoutCompat;
+
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
 import static org.telegram.messenger.AndroidUtilities.lerp;
@@ -22,6 +24,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -45,7 +48,6 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
-import androidx.core.view.DisplayCutoutCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.dynamicanimation.animation.FloatPropertyCompat;
@@ -67,6 +69,7 @@ public class DrawerLayoutContainer extends FrameLayout {
     private FrameLayout drawerLayout;
     private View drawerListView;
     private INavigationLayout parentActionBarLayout;
+    private ActionBarLayout actionBarLayout;
 
     private boolean maybeStartTracking;
     private boolean startedTracking;
@@ -83,9 +86,7 @@ public class DrawerLayoutContainer extends FrameLayout {
     private final Paint backgroundPaint = new Paint();
 
     private int behindKeyboardColor;
-
     private boolean hasCutout;
-
     private boolean inLayout;
     private final int minDrawerMargin;
     private float scrimOpacity;
@@ -105,6 +106,22 @@ public class DrawerLayoutContainer extends FrameLayout {
     private float startY;
     private boolean keyboardVisibility;
     private int imeHeight;
+    private boolean isUseSpringAnimation() {
+        return NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING;
+    }
+    private SpringAnimation currentSpringAnimation;
+
+    public final static FloatPropertyCompat<DrawerLayoutContainer> DRAWER_POSITION_PROPERTY = new FloatPropertyCompat<DrawerLayoutContainer>("drawerPosition") {
+        @Override
+        public float getValue(DrawerLayoutContainer object) {
+            return object.getDrawerPosition();
+        }
+
+        @Override
+        public void setValue(DrawerLayoutContainer object, float value) {
+            object.setDrawerPosition(value);
+        }
+    };
 
     public DrawerLayoutContainer(Context context) {
         super(context);
@@ -208,7 +225,7 @@ public class DrawerLayoutContainer extends FrameLayout {
         }
         cancelCurrentAnimation();
 
-        if (USE_SPRING_ANIMATION) {
+        if (isUseSpringAnimation()) {
             currentSpringAnimation = new SpringAnimation(this, DRAWER_POSITION_PROPERTY)
                     .setSpring(new SpringForce()
                             .setStiffness(getSpringStiffness(fast))
@@ -246,7 +263,7 @@ public class DrawerLayoutContainer extends FrameLayout {
         }
         cancelCurrentAnimation();
 
-        if (USE_SPRING_ANIMATION) {
+        if (isUseSpringAnimation()) {
             currentSpringAnimation = new SpringAnimation(this, DRAWER_POSITION_PROPERTY)
                     .setSpring(new SpringForce()
                             .setStiffness(getSpringStiffness(fast))
@@ -295,6 +312,10 @@ public class DrawerLayoutContainer extends FrameLayout {
     private void setScrimOpacity(float value) {
         scrimOpacity = value;
         invalidate();
+    }
+
+    private float getSpringStiffness(boolean fast) {
+        return fast ? SpringForce.STIFFNESS_LOW : SpringForce.STIFFNESS_MEDIUM;
     }
 
     public void setParentActionBarLayout(INavigationLayout layout) {
@@ -364,6 +385,10 @@ public class DrawerLayoutContainer extends FrameLayout {
             allowDrawContent = value;
             invalidate();
         }
+    }
+
+    public void setActionBarLayout(ActionBarLayout actionBarLayout) {
+        this.actionBarLayout = actionBarLayout;
     }
 
     public boolean isDrawCurrentPreviewFragmentAbove() {
@@ -577,27 +602,21 @@ public class DrawerLayoutContainer extends FrameLayout {
     @SuppressLint("NewApi")
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (!BuildVars.USE_LEGACY_SYSTEM_INSETS) {
-            final WindowInsetsCompat insetsCompat = ViewCompat.getRootWindowInsets(this);
-            if (insetsCompat != null) {
-                final Insets systemInsets = insetsCompat.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars());
-
-                AndroidUtilities.statusBarHeight = systemInsets.top;
-                AndroidUtilities.navigationBarHeight = systemInsets.bottom;
-            }
-        }
-
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         setMeasuredDimension(widthSize, heightSize);
-        final int newSize = heightSize
-            - AndroidUtilities.statusBarHeight
-            - AndroidUtilities.navigationBarHeight;
 
-        if (newSize > 0 && newSize < 4096) {
-            AndroidUtilities.displaySize.y = newSize;
-        }
+        final int newDisplayWidth = widthSize
+            - systemAndCutoutInsets.left
+            - systemAndCutoutInsets.right;
+
+        final int newDisplayHeight = heightSize
+            - systemAndCutoutInsets.top
+            - systemAndCutoutInsets.bottom;
+
+        AndroidUtilities.displaySize.x = newDisplayWidth;
+        AndroidUtilities.displaySize.y = newDisplayHeight;
 
         final int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -649,31 +668,10 @@ public class DrawerLayoutContainer extends FrameLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
-//        canvas.save();
-//        if (BuildVars.DEBUG_PRIVATE_VERSION && Build.VERSION.SDK_INT >= 31) {
-//            canvas.drawColor(0xFF000000);
-//            final WindowInsets insets = getRootWindowInsets();
-//            if (insets != null) {
-//                AndroidUtilities.rectTmp.set(0, 0, getWidth(), getHeight());
-//                final RoundedCorner topLeft = insets.getRoundedCorner(android.view.RoundedCorner.POSITION_TOP_LEFT);
-//                final RoundedCorner topRight = insets.getRoundedCorner(android.view.RoundedCorner.POSITION_TOP_RIGHT);
-//                final RoundedCorner bottomRight = insets.getRoundedCorner(android.view.RoundedCorner.POSITION_BOTTOM_RIGHT);
-//                final RoundedCorner bottomLeft = insets.getRoundedCorner(RoundedCorner.POSITION_BOTTOM_LEFT);
-//                radii[0] = radii[1] = topLeft == null ? 0 : topLeft.getRadius();
-//                radii[2] = radii[3] = topRight == null ? 0 : topRight.getRadius();
-//                radii[4] = radii[5] = bottomRight == null ? 0 : bottomRight.getRadius();
-//                radii[6] = radii[7] = bottomLeft == null ? 0 : bottomLeft.getRadius();
-//
-//                clipPath.rewind();
-//                clipPath.addRoundRect(AndroidUtilities.rectTmp, radii, Path.Direction.CW);
-//                canvas.clipPath(clipPath);
-//
-//                paint.setColor(Theme.getColor(Theme.key_windowBackgroundGray));
-//                canvas.drawRect(0, getHeight() - AndroidUtilities.navigationBarHeight, getWidth(), getHeight(), paint);
-//            }
-//        }
+        if (actionBarLayout != null && actionBarLayout.getParent() == this) {
+            actionBarLayout.parentDraw(this, canvas);
+        }
         super.dispatchDraw(canvas);
-//        canvas.restore();
         if (drawCurrentPreviewFragmentAbove && parentActionBarLayout != null) {
             if (previewBlurDrawable != null) {
                 previewBlurDrawable.setAlpha((int) (parentActionBarLayout.getCurrentPreviewFragmentAlpha() * 255));
@@ -733,39 +731,6 @@ public class DrawerLayoutContainer extends FrameLayout {
         return result;
     }
 
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        if (lastWindowInsetsCompat == null) {
-            return;
-        }
-
-        final Insets insets = lastWindowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()
-            | WindowInsetsCompat.Type.systemBars()
-            | WindowInsetsCompat.Type.displayCutout());
-
-        if (insets.bottom > 0) {
-            backgroundPaint.setColor(behindKeyboardColor);
-            canvas.drawRect(
-                0,
-                getMeasuredHeight() - insets.bottom,
-                getMeasuredWidth(),
-                getMeasuredHeight(),
-                internalNavbarPaint
-            );
-        }
-
-        if (hasCutout) {
-            backgroundPaint.setColor(0xff000000);
-            int left = insets.left;
-            if (left != 0) {
-                canvas.drawRect(0, 0, left, getMeasuredHeight(), backgroundPaint);
-            }
-            int right = insets.right;
-            if (right != 0) {
-                canvas.drawRect(right, 0, getMeasuredWidth(), getMeasuredHeight(), backgroundPaint);
-            }
-        }
-    }
 
     @Override
     public boolean hasOverlappingRendering() {
@@ -867,41 +832,31 @@ public class DrawerLayoutContainer extends FrameLayout {
     }
 
     private @Nullable WindowInsetsCompat lastWindowInsetsCompat;
+    private @NonNull Insets systemAndCutoutInsets = Insets.NONE;
+    private @NonNull Insets systemAndCutoutAndImeInsets = Insets.NONE;
 
     private void dispatchApplyWindowInsetsInternal(View child, WindowInsetsCompat insets) {
         boolean canApplyInsets = child instanceof ActionBarLayout || child == drawerLayout || child.getTag() == null;
-        if (!canApplyInsets) {
-            return;
+        if (canApplyInsets) {
+            ViewCompat.dispatchApplyWindowInsets(child, insets);
         }
-
-        final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-        final Insets systemInsetsWithIme = insets.getInsets(WindowInsetsCompat.Type.ime()
-                | WindowInsetsCompat.Type.systemBars()
-                | WindowInsetsCompat.Type.displayCutout());
-
-        final boolean changed = lp.topMargin != 0 || lp.bottomMargin != 0
-                || lp.leftMargin != systemInsetsWithIme.left
-                || lp.rightMargin != systemInsetsWithIme.right;
-
-        if (changed) {
-            lp.leftMargin = systemInsetsWithIme.left;
-            lp.topMargin = 0;
-            lp.rightMargin = systemInsetsWithIme.right;
-            lp.bottomMargin = 0;
-
-            child.requestLayout();
-        }
-
-        final WindowInsetsCompat consumed = insets.inset(
-                lp.leftMargin, lp.topMargin,
-                lp.rightMargin, lp.bottomMargin);
-
-        ViewCompat.dispatchApplyWindowInsets(child, consumed);
     }
 
     @NonNull
     private WindowInsetsCompat onApplyWindowInsets(@NonNull View ignoredV, @NonNull WindowInsetsCompat insets) {
         lastWindowInsetsCompat = insets;
+
+        final Insets systemInsets = AndroidUtilities.getDefaultWindowInsets(insets, false);
+        final Insets systemAndImeInsets = AndroidUtilities.getDefaultWindowInsets(insets, true);
+
+        if (!systemAndCutoutInsets.equals(systemInsets) || !systemAndCutoutAndImeInsets.equals(systemAndImeInsets)) {
+            AndroidUtilities.statusBarHeight = systemInsets.top;
+            AndroidUtilities.navigationBarHeight = systemInsets.bottom;
+
+            systemAndCutoutInsets = systemInsets;
+            systemAndCutoutAndImeInsets = systemAndImeInsets;
+            requestLayout();
+        }
 
         for (int a = 0, N = getChildCount(); a < N; a++) {
             final View child = getChildAt(a);
@@ -912,22 +867,4 @@ public class DrawerLayoutContainer extends FrameLayout {
         return WindowInsetsCompat.CONSUMED;
     }
 
-    private final boolean USE_SPRING_ANIMATION = NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING;
-    private SpringAnimation currentSpringAnimation;
-
-    private float getSpringStiffness(boolean fast) {
-        return fast ? 1000f : 750f;
-    }
-
-    public final static FloatPropertyCompat<DrawerLayoutContainer> DRAWER_POSITION_PROPERTY = new FloatPropertyCompat<>("drawerPosition") {
-        @Override
-        public float getValue(DrawerLayoutContainer object) {
-            return object.getDrawerPosition();
-        }
-
-        @Override
-        public void setValue(DrawerLayoutContainer object, float value) {
-            object.setDrawerPosition(value);
-        }
-    };
 }

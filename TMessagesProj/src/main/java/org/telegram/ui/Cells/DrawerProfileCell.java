@@ -42,6 +42,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
+import tw.nekomimi.nekogram.NekoConfig;
 import org.telegram.ui.ActionBar.DrawerLayoutContainer;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
@@ -318,7 +319,7 @@ public class DrawerProfileCell extends FrameLayout implements NotificationCenter
             if (isCollectible) {
                 statusGiftId = ((TLRPC.TL_emojiStatusCollectible) user.emoji_status).collectible_id;
             }
-        } else if (MessagesController.getInstance(account).isPremiumUser(user)) {
+        } else if (MessagesController.getInstance(account).isPremiumUser(user) && !NekoConfig.hidePremiumIcon.Bool()) {
             animatedStatus.animate().alpha(1f).setDuration(200).start();
             nameTextView.setDrawablePadding(AndroidUtilities.dp(4));
             if (premiumStar == null) {

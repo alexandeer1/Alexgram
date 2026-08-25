@@ -121,6 +121,9 @@ public class GroupedIconsView extends FrameLayout {
     }
 
     private void addOption(OptionConfig config) {
+        if (!config.isEnabled) {
+            return;
+        }
         var imageView = new ImageView(context);
         imageView.setPadding(dp(8), dp(8), dp(8), dp(8));
         imageView.setScaleType(ImageView.ScaleType.CENTER);
@@ -135,16 +138,12 @@ public class GroupedIconsView extends FrameLayout {
 
         linearLayout.addView(imageView);
 
-        if (config.isEnabled) {
-            imageView.setOnClickListener(v1 -> chatActivity.processSelectedOption(config.shortPressOptionId));
-            if (config.longPressOptionId != null && config.isLongClickEnabled) {
-                imageView.setOnLongClickListener(v1 -> {
-                    chatActivity.processSelectedOption(config.longPressOptionId);
-                    return true;
-                });
-            }
-        } else {
-            imageView.setAlpha(0.4f);
+        imageView.setOnClickListener(v1 -> chatActivity.processSelectedOption(config.shortPressOptionId));
+        if (config.longPressOptionId != null && config.isLongClickEnabled) {
+            imageView.setOnLongClickListener(v1 -> {
+                chatActivity.processSelectedOption(config.longPressOptionId);
+                return true;
+            });
         }
     }
 

@@ -222,6 +222,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
         frameLayout.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
 
         emptyView = new EmptyTextProgressView(context);
+        emptyView.setText(getString(R.string.ClearOtherWebSessionsHelp));
         emptyView.showProgress();
         frameLayout.addView(emptyView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
 
@@ -668,6 +669,9 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
             TL_account.getAuthorizations req = new TL_account.getAuthorizations();
             int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
                 loading = false;
+                if (emptyView != null) {
+                    emptyView.showTextView();
+                }
                 int oldItemsCount = listAdapter != null ? listAdapter.getItemCount() : 0;
                 if (error == null) {
                     sessions.clear();
@@ -710,6 +714,9 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
             TL_account.getWebAuthorizations req = new TL_account.getWebAuthorizations();
             int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
                 loading = false;
+                if (emptyView != null) {
+                    emptyView.showTextView();
+                }
                 if (error == null) {
                     sessions.clear();
                     TL_account.webAuthorizations res = (TL_account.webAuthorizations) response;

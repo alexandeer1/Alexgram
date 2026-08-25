@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Mocha Warm: Steaming Coffee Mug with Heart Latte Art -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,18 L34,18 L34,32 C34,36.4 30.4,40 26,40 L18,40 C13.6,40 10,36.4 10,32 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M34,22 C37.3,22 40,24.7 40,28 C40,31.3 37.3,34 34,34" />
+    <!-- Steam waves -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M16,14 C15,11 17,9 16,6 M22,14 C21,11 23,9 22,6 M28,14 C27,11 29,9 28,6" />
+</vector>

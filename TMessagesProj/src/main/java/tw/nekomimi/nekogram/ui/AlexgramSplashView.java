@@ -163,6 +163,16 @@ public class AlexgramSplashView extends View {
 
         ringPnt.setStyle(Paint.Style.STROKE);
         ringPnt.setColor(NEON_CYAN);
+
+        setOnClickListener(v -> finishSplash());
+    }
+
+    private final Runnable fallbackRunnable = this::finishSplash;
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        postDelayed(fallbackRunnable, TOTAL + 300);
     }
 
     public void setOnFinishedCallback(Runnable cb) { onDone = cb; }
@@ -671,15 +681,26 @@ public class AlexgramSplashView extends View {
 
     @Override protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        removeCallbacks(fallbackRunnable);
         if (ani != null) { ani.cancel(); ani = null; }
     }
 
     public void finishSplash() {
-        if (ani != null) ani.cancel();
-        animate().alpha(0f).setDuration(150).withEndAction(() -> {
-            ViewGroup par = (ViewGroup) getParent();
-            if (par != null) par.removeView(AlexgramSplashView.this);
-        }).start();
+        removeCallbacks(fallbackRunnable);
+        if (ani != null) {
+            ani.cancel();
+            ani = null;
+        }
+        if (onDone != null) {
+            Runnable cb = onDone;
+            onDone = null;
+            cb.run();
+        } else {
+            animate().alpha(0f).setDuration(150).withEndAction(() -> {
+                ViewGroup par = (ViewGroup) getParent();
+                if (par != null) par.removeView(AlexgramSplashView.this);
+            }).start();
+        }
     }
 
     private class Spark {

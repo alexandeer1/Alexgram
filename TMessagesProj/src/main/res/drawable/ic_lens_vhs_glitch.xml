@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- VHS Glitch: Glitched Split CRT Screen & Tracking Waves -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,10 L36,10 L36,20 L8,20 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,22 L40,22 L40,30 L12,30 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,32 L34,32 L34,38 L6,38 Z" />
+    <path
+        android:strokeColor="#FF1744"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M16,15 L28,15 M20,26 L32,26" />
+</vector>

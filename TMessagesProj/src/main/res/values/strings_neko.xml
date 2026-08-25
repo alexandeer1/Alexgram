@@ -169,7 +169,7 @@
     <string name="CopyCallback">Copy Callback Data</string>
     <string name="CopyInlineQuery">Copy Inline Query</string>
     <string name="CopyID">Copy ID</string>
-    <string name="NekoX" translatable="false">NekoX</string>
+    <string name="NekoX">NekoX</string>
     <string name="Locked">Locked</string>
     <string name="AccDescrChatAttachEnterMenu">Chat input menu</string>
     <string name="ChatAttachEnterMenuRecordVideo">Record Video</string>
@@ -211,8 +211,8 @@
     <string name="ImportStickersX">Import stickers from file</string>
     <string name="ImportStickersList">Import stickers</string>
     <string name="StickerSets">Sticker Sets</string>
-    <string name="InvalidStickersFile">Invalid stickers file: </string>
-    <string name="ImportedProxies">Imported proxy servers: </string>
+    <string name="InvalidStickersFile">Invalid stickers file:</string>
+    <string name="ImportedProxies">Imported proxy servers:</string>
     <string name="DeleteAllServer">Delete all servers</string>
     <string name="DeleteUnavailableServer">Delete unavailable servers</string>
     <string name="ImportProxyFromClipboard">Import From Clipboard</string>
@@ -259,6 +259,8 @@
     <string name="ConfirmSettings">Confirmations</string>
     <string name="InteractionSettings">Interactions</string>
     <string name="localPremium">Local Premium</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">Reaction</string>
     <string name="UpgradeGroup">Upgrade Group</string>
     <string name="AccDescrShowKeyboard">Show keyboard</string>
@@ -273,18 +275,14 @@
     <string name="EmojiUseDefault">Use system emoji</string>
     <string name="Chat">Chats</string>
     <string name="Appearance">Appearance</string>
-
     <string name="StarFallInChat">Starfall Chat Decoration</string>
     <string name="StarFallInChatDescription">Animated falling stars in the chat background</string>
-    <!-- [Alexgram: Important Announcement] - Start -->
     <string name="GetImportantAnnouncementFromAlexgram">Get Important Announcement From Alexgram</string>
-    <!-- [Alexgram: Birthday Wish] - Start -->
     <string name="BirthdayTitle">Happy Birthday,\n%1$s! 🎉</string>
     <string name="BirthdayMessage">Today is all about you! ✨ Another year of main character energy. Wishing you a year of pure growth, endless wins, and zero bad vibes. Go crush it! 🚀🎂</string>
     <string name="BirthdayMakeWish">Make a Wish 🌟</string>
     <string name="BirthdayWishSent">Wish Sent to the Stars! 🌌✨</string>
-    <!-- [Alexgram: Birthday Wish] - End -->
     <string name="SelectRangeSharedMedia">Select Range in Shared Media</string>
     <string name="SelectRangeSharedMediaAbout">Enable double checkmark button to select all media items between the first and last selected items.</string>
     <string name="SelectTwoItemsToSelectRange">Please select at least two items to select a range.</string>
-</resources>
+</resources>

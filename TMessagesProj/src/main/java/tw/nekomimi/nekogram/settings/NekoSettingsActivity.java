@@ -31,6 +31,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.AIAssistanceSettingsActivity;
+import org.telegram.ui.Plugins.PluginsActivity;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -476,11 +477,15 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
 
                 } else if (position == coreSettingsRow) {
                     List<CoreItem> items = new ArrayList<>();
+                    // [Alexgram: Accounts Settings] - Start
+                    items.add(new CoreItem("Accounts", "Limits, Startup & Performance", R.drawable.msg_contacts, 0xFF3F51B5, v -> presentFragment(new AccountsSettingsActivity())));
+                    // [Alexgram: Accounts Settings] - End
                     items.add(new CoreItem("General", "Appearance, Language, Behavior", R.drawable.msg_settings, 0xFF2196F3, v -> presentFragment(new NekoGeneralSettingsActivity())));
                     items.add(new CoreItem(LocaleController.getString("Customization", R.string.Customization), "Icons, Styles, Theme & Decoration", R.drawable.msg_theme, 0xFFFF9C00, v -> presentFragment(new NekoCustomizationSettingsActivity())));
                     items.add(new CoreItem("Translator", "Messages, Languages, Engine", R.drawable.ic_translate, 0xFF9C27B0, v -> presentFragment(new NekoTranslatorSettingsActivity())));
                     items.add(new CoreItem("AI Assistance", "Alexgram assistant behavior & animations", R.drawable.settings_chat, 0xFF8E44AD, v -> presentFragment(new AIAssistanceSettingsActivity())));
                     items.add(new CoreItem("Chats", "UI, Privacy, Media", R.drawable.msg_discussion, 0xFF4CAF50, v -> presentFragment(new NekoChatSettingsActivity())));
+                    items.add(new CoreItem("Plugins", "Manage Python Plugins", R.drawable.msg_fave, 0xFF009688, v -> presentFragment(new PluginsActivity())));
                     if (!PasscodeHelper.isSettingsHidden()) {
                         items.add(new CoreItem("Passcode", "Security & Fingerprint", R.drawable.msg_permissions, 0xFFF44336, v -> presentFragment(new NekoPasscodeSettingsActivity())));
                     }

@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Pixel Art 8-Bit: Retro Chunky Pixel Grid Heart -->
+    <path
+        android:fillColor="#FF1744"
+        android:pathData="M16,12 L22,12 L22,18 L16,18 Z M26,12 L32,12 L32,18 L26,18 Z M10,18 L38,18 L38,24 L10,24 Z M10,24 L38,24 L38,30 L10,30 Z M16,30 L32,30 L32,36 L16,36 Z M22,36 L26,36 L26,42 L22,42 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,18 L20,18 L20,22 L16,22 Z" />
+</vector>

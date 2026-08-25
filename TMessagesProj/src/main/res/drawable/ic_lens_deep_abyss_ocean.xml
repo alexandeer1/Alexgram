@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Deep Abyss Ocean: Bioluminescent Deep Sea Jellyfish -->
+    <path
+        android:fillColor="#00B0FF"
+        android:pathData="M14,20 C14,14.5 18.5,10 24,10 C29.5,10 34,14.5 34,20 C34,22 32,23 30,23 C28,23 26,22 24,22 C22,22 20,23 18,23 C16,23 14,22 14,20 Z" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M18,23 L18,36 M22,22 L22,40 M26,22 L26,40 M30,23 L30,36"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="1.5" />
+</vector>

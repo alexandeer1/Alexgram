@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Peach Glow: Dewy Peach with Sparkle Highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,14 C17,14 12,20 12,28 C12,35 18,40 24,40 C30,40 36,35 36,28 C36,20 31,14 24,14 Z" />
+    <path
+        android:fillColor="#FF8A80"
+        android:pathData="M24,8 C27,10 29,13 29,15 C26,15 23,13 22,10 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M18,22 C18,20 19,19 21,19 C20,21 20,23 18,24 Z" />
+</vector>

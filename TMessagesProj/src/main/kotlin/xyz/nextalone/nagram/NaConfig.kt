@@ -10,7 +10,7 @@ import org.telegram.messenger.NotificationCenter
 import tw.nekomimi.nekogram.NekoConfig
 import tw.nekomimi.nekogram.config.ConfigItem
 import tw.nekomimi.nekogram.config.ConfigItemKeyLinked
-import tw.nekomimi.nekogram.llm.utils.LlmUrlNormalizer
+import tw.nekomimi.nekogram.llm.utils.UrlNormalizer
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 
@@ -408,6 +408,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val hideHomeSearchField =
+        addConfig(
+            "HideHomeSearchField",
+            ConfigItem.configTypeBool,
+            false
+        )
     val showQuickReplyInBotCommands =
         addConfig(
             "ShowQuickReplyInBotCommands",
@@ -528,6 +534,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val launchAnimationStyle =
+        addConfig(
+            "LaunchAnimationStyle",
+            ConfigItem.configTypeInt,
+            0
+        )
     val searchHashtagDefaultPageChannel =
         addConfig(
             "SearchHashtagDefaultPageChannel",
@@ -644,14 +656,26 @@ object NaConfig {
             ConfigItem.configTypeInt,
             0
         )
-    // [Alexgram: Max Active Accounts] - Start
+    // [Alexgram: Accounts Settings] - Start
+    val maxAccountCount =
+        addConfig(
+            "MaxAccountCount",
+            ConfigItem.configTypeInt,
+            100
+        )
     val maxActiveAccounts =
         addConfig(
             "MaxActiveAccounts",
             ConfigItem.configTypeInt,
             10
         )
-    // [Alexgram: Max Active Accounts] - End
+    val startupActiveAccounts =
+        addConfig(
+            "StartupActiveAccounts",
+            ConfigItem.configTypeInt,
+            3
+        )
+    // [Alexgram: Accounts Settings] - End
     val showVoiceChangerInChatMenu =
         addConfig(
             "ShowVoiceChangerInChatMenu",
@@ -1564,12 +1588,26 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val mainTabsShowSearchButton =
+        addConfig(
+            "MainTabsShowSearchButton",
+            ConfigItem.configTypeBool,
+            false
+        )
     val hideContacts =
         addConfig(
             "HideContacts",
             ConfigItem.configTypeBool,
             false
         )
+    // [Alexgram: Friends Activities] - Start
+    val friendsActivities =
+        addConfig(
+            "FriendsActivities",
+            ConfigItem.configTypeBool,
+            false
+        )
+    // [Alexgram: Friends Activities] - End
     val showNotificationPreviewWhenLocked =
         addConfig(
             "ShowNotificationPreviewWhenLocked",
@@ -1762,6 +1800,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val drawerItemFeed =
+        addConfig(
+            "DrawerItemFeed",
+            ConfigItem.configTypeBool,
+            true
+        )
     // [Alexgram: Home Drawer Items] - End
 
     val preferredTranslateTargetLangList = ArrayList<String>()
@@ -1835,7 +1879,7 @@ object NaConfig {
         }
 
         val currentLlmApiUrl = llmApiUrl.String()
-        val normalizedLlmApiUrl = LlmUrlNormalizer.normalizeBaseUrl(currentLlmApiUrl)
+        val normalizedLlmApiUrl = UrlNormalizer.normalizeBaseUrl(currentLlmApiUrl)
         if (normalizedLlmApiUrl != currentLlmApiUrl) {
             llmApiUrl.setConfigString(normalizedLlmApiUrl)
         }

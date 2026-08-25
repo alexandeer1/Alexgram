@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">Робота у фоні</string>
+    <string name="RunInBackgroundInfo">Залишати програму запущеною у фоні для стабільної роботи сповіщень.</string>
+    <string name="NagramXPushService">Служба сповіщень Alexgram</string>
     <string name="N_Config">А-Налаштування</string>
     <string name="CombineMessage">Об\'єднати повідомлення</string>
     <string name="TextStyle">Стиль тексту</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">Показати ID повідомлення</string>
     <string name="ShowRPCError">Показувати помилки RPC</string>
     <string name="ShowPremiumStickersAnimation">Показувати анімацію Premium наліпок</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Барвистість</string>
     <string name="AppIconDarkGreen">Темно-зелений</string>
     <string name="AppIconNeon">Неон</string>
     <string name="AppIconNiello">Ніелло</string>
     <string name="AppIconBlue">Синій</string>
+    <string name="AppIconColored">Alexgram Кольорова</string>
+    <string name="AppIconDark">Alexgram Темна</string>
+    <string name="AppIconGreen">Alexgram Зелена</string>
+    <string name="AppIconPink">Alexgram Рожева</string>
+    <string name="AppIconRoseBlue">Alexgram Рожево-синя</string>
+    <string name="AppIconWhite">Alexgram Біла</string>
     <string name="AppIconDarkBlue">Темний синій</string>
     <string name="AppIconBlurBlue">Розмитий синій</string>
     <string name="InputMessageId">Введіть ID повідомлення</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">Підпис для видалених повідомлень</string>
     <string name="NotificationIcon">Значок сповіщень</string>
     <string name="Official">Офіційний</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">Хелловін</string>
     <string name="ShowOnlineStatus">Показувати онлайн-статус</string>
     <string name="ShowOnlineStatusNotice">Показує онлайн-статус інших людей поруч із зображенням профілю в групах.</string>
@@ -65,7 +76,11 @@
     <string name="ShowQuickReplyInBotCommands">Показувати швидку відповідь у командах бота</string>
     <string name="PushServiceType">Служба Push-сповіщень</string>
     <string name="PushServiceTypeInApp">У застосунку</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Показувати постійне сповіщення</string>
+    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">Надіслати MP4 «без стиснення» як відео</string>
     <string name="StickersChooseShortNameForStickerPack">Виберіть коротке ім\'я для свого набору.</string>
     <string name="StickersCopyStickerSet">Копіювати набір наліпок</string>
@@ -86,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Нечутливі до регістрів вирази</string>
     <string name="RegexFiltersAdd">Додати фільтр</string>
     <string name="RegexFiltersEdit">Редагувати фільтр</string>
-    <string name="RegexFiltersAddDescription">Ви можете скористатися сайтом &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; для повної перевірки вашого регулярного виразу. Ви також можете використовувати звичайний текст, але не забудьте екранувати дужки.</string>
+    <string name="RegexFiltersAddDescription">Ви можете скористатися сайтом &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; для повної перевірки вашого регулярного виразу. Ви також можете використовувати звичайний текст, але не забудьте екранувати дужки.</string>
     <string name="RegexFiltersAddError">Помилка синтаксису регулярного виразу</string>
     <string name="ShowTimeHint">Натисніть «Час» для детальної інформації</string>
     <string name="SearchHashtagDefaultPageChannel">Типовий пошук хештегів у каналах</string>
     <string name="SearchHashtagDefaultPageChat">Типовий пошук хештегів у чатах</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Увімкнути Pangu при надсиланні</string>
     <string name="PanguInfo">Параноїдальний інтервал для тексту для кращої читабельності, автоматичне вставлення пробілів між символами CJK (китайська, японська, корейська), англійськими напівширинними, цифрами та символами.</string>
     <string name="SendWithPangu">Надіслати з Pangu</string>
@@ -104,22 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">Перевага програмному</string>
     <string name="VideoPlayerDecoderHardware">Тільки апаратне декодування</string>
     <string name="VideoPlayerDecoderPreferHW">Перевага апаратному</string>
-    <string name="RunInBackground">Робота у фоні</string>
-    <string name="RunInBackgroundInfo">Залишати програму запущеною у фоні для стабільної роботи сповіщень.</string>
-    <string name="NagramXPushService">Служба сповіщень Alexgram</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram Кольорова</string>
-    <string name="AppIconDark">Alexgram Темна</string>
-    <string name="AppIconGreen">Alexgram Зелена</string>
-    <string name="AppIconPink">Alexgram Рожева</string>
-    <string name="AppIconRoseBlue">Alexgram Рожево-синя</string>
-    <string name="AppIconWhite">Alexgram Біла</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">Живі відеошпалери</string>
     <string name="ExportChat">Експорт чату</string>
     <string name="ImportChat">Імпорт чату</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">Приховайте важливі чати з основного списку. Доступ до них можна отримати довгим натисканням на заголовок після розблокування кодом або відбитком.</string>
     <string name="HideContacts">Приховати контакти</string>
     <string name="RestartRequired">Потрібен перезапуск для застосування змін</string>
-    <string name="MaxActiveAccounts">Максимальна кількість активних акаунтів</string>
-    <string name="LimitReachedAccountsNa">Вибачте, ви не можете додати більше **%1$d** акаунтів. Ви можете збільшити це обмеження (до 100) у **A-Налаштування &gt; Загальні**.</string>
-    <string name="MaxActiveAccountsWarning">Наразі у вас %1$d активних акаунтів. Встановлення ліміту на %2$d не дозволить додавати нові акаунти, поки ви не вийдете з деяких.</string>
     <string name="SplitChat">Розділений екран</string>
     <string name="SplitChatClose">Закрити розділений екран</string>
     <string name="SplitChatSelectChat">Виберіть чат для відкриття поруч</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">Показувати повідомлення заблокованих/тіньових забанених користувачів під спойлером замість повного приховування.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Маскувати лише збіги з регулярними виразами</string>
     <string name="RegexFiltersSpoilerColor">Колір часток спойлера</string>
+    <string name="AccountsSettings">Облікові записи</string>
+    <string name="AccountLimitsHeader">Ліміти облікових записів</string>
+    <string name="StartupPerformanceHeader">Продуктивність запуску</string>
+    <string name="MaxAccountCount">Максимальна кількість облікових записів</string>
+    <string name="MaxActiveAccounts">Максимум активних записів</string>
+    <string name="StartupActiveAccounts">Активні записи під час запуску</string>
+    <string name="StartupActiveAccountsInfo">Визначає, скільки облікових записів ініціалізується під час відкриття програми. Менші значення прискорюють запуск та заощаджують заряд батареї. Інші записи завантажуються за вимогою під час перемикання.</string>
+    <string name="LimitReachedAccountsNa">Вибачте, ви не можете додати більше ніж **%1$d** облікових записів. Ви можете збільшити цей ліміт (до 100) у **A-Settings → Облікові записи**.</string>
+    <string name="MaxActiveAccountsWarning">Зараз у вас %1$d активних облікових записів. Встановлення ліміту на %2$d завадить додавати нові записи, доки ви не вийдете з деяких.</string>
+    <string name="HiddenAccountsTitle">Приховані акаунти</string>
+    <string name="HiddenAccountsDesc">Торкніться значка замка, щоб приховати обліковий запис. Приховані записи не відображатимуться в списку, доки ви не розблокуєте це сховище.</string>
+    <string name="HiddenAccountsHeader">Приховані акаунти</string>
+    <string name="HiddenAccountsChangePIN">Змінити PIN-код</string>
+    <string name="HiddenAccountsRemovePIN">Видалити PIN і показати всі</string>
+    <string name="HiddenAccountsRemovePINConfirm">Це призведе до остаточного видалення PIN-коду та відновлення видимості всіх прихованих акаунтів. Ви впевнені?</string>
+    <string name="HiddenAccountsAutoLock">Блокувати у фоні</string>
+    <string name="HiddenAccountsAutoLockDesc">Якщо увімкнено, сховище автоматично блокується під час згортання програми.</string>
+    <string name="HiddenAccountsSection">Облікові записи</string>
+    <string name="HiddenAccountsPINManagement">Керування PIN-кодом</string>
+    <string name="HideHomeSearchField">Приховати рядок пошуку</string>
+    <string name="HideHomeSearchFieldDesc">Приховує рядок пошуку в списку чатів. Ви все одно можете шукати, торкнувшись значка пошуку у правому верхньому куті.</string>
+    <string name="MainTabsShowSearchButton">Значок пошуку на нижній панелі</string>
+    <string name="MainTabsShowSearchButtonDesc">Відображати значок пошуку на нижній панелі поруч із головними вкладками навігації.</string>
+    <string name="SessionManagementHeader">Керування сесіями</string>
+    <string name="SessionManagementTitle">Менеджер сесій акаунтів</string>
+    <string name="SessionManagementDesc">Керування активними сесіями, підключеними пристроями, сесіями Pyrogram/Telethon та експорт/імпорт резервних копій.</string>
+    <string name="ExportSessionsTitle">Експорт сесій акаунтів</string>
+    <string name="ExportSessionsDesc">Експорт активних сесій у рядок Pyrogram, файл .session Pyrogram, рядок Telethon або повний JSON-бекап.</string>
+    <string name="ImportSessionTitle">Імпорт сесії акаунта</string>
+    <string name="ImportSessionDesc">Імпорт рядка сесії Pyrogram, файлу .session, рядка Telethon або файлу JSON-бекапу.</string>
+    <string name="ImportSessionStringTitle">Імпорт рядка сесії</string>
+    <string name="ImportSessionStringDesc">Вставте рядок сесії Pyrogram (v1/v2) або Telethon для прямого входу.</string>
+    <string name="TelegramActiveDevices">Активні пристрої Telegram</string>
+    <string name="TelegramActiveDevicesDesc">Перегляд активних пристроїв та керування сесіями на серверах Telegram.</string>
+    <string name="WebSessionsTitleNa">Веб-сесії</string>
+    <string name="WebSessionsDesc">Керування авторизованими веб-сайтами та сесіями веб-додатків.</string>
+    <string name="ScanSessionQRCode">Сканувати QR-код сесії</string>
+    <string name="ScanSessionQRCodeDesc">Авторизувати інший клієнт для комп\'ютера або веб-клієнт за допомогою QR-коду.</string>
+    <string name="SessionEncryptExport">Захистити резервну копію паролем</string>
+    <string name="SessionEncryptExportDesc">Шифрувати експортовані файли сесій паролем.</string>
+    <string name="ActiveSessionsSection">Сесії активних акаунтів</string>
+    <string name="SessionBackupSection">Резервне копіювання та відновлення</string>
+    <string name="SessionToolsSection">Інструменти сесій і пристрої</string>
+    <string name="SessionDetailsTitle">Деталі сесії</string>
+    <string name="SwitchToAccount">Перемкнутися на акаунт</string>
+    <string name="TerminateAllOtherSessions">Завершити всі інші сеанси</string>
+    <string name="TerminateAllOtherSessionsConfirm">Ви впевнені, що хочете завершити всі інші активні сеанси Telegram?</string>
+    <string name="SessionExportSuccess">Резервну копію сесії успішно експортовано в Завантаження!</string>
+    <string name="SessionExportError">Не вдалося експортувати резервну копію сесії.</string>
+    <string name="SessionImportSuccess">Резервну копію сесії успішно імпортовано для %1$s!</string>
+    <string name="SessionImportError">Не вдалося імпортувати резервну копію: недійсний або пошкоджений формат файлу.</string>
+    <string name="ExportPyrogramString">Скопіювати рядок Pyrogram</string>
+    <string name="ExportPyrogramFile">Експортувати файл Pyrogram .session</string>
+    <string name="ExportTelethonString">Скопіювати рядок Telethon</string>
+    <string name="PasteSessionStringHint">Вставте рядок сесії Pyrogram (v1/v2) або Telethon тут...</string>
+    <string name="SessionCopied">Рядок сесії Pyrogram скопійовано в буфер обміну!</string>
+    <string name="TelethonSessionCopied">Рядок сесії Telethon скопійовано в буфер обміну!</string>
+    <string name="ExportTypeTitle">Виберіть формат експорту</string>
+    <string name="ExportPyrogramStringOpt">Рядок сесії Pyrogram (v2 — найновіший)</string>
+    <string name="ExportPyrogramFileOpt">Файл SQLite Pyrogram (.session)</string>
+    <string name="ExportTelethonStringOpt">Рядок сесії Telethon</string>
+    <string name="ExportAlexgramBackupOpt">Повний бекап Alexgram (.session)</string>
+    <string name="PasteClipboard">Вставити з буфера</string>
+    <string name="ImportSessionButton">Імпортувати сесію</string>
+    <string name="SessionImportSuccessDesc">Сесію успішно імпортовано!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Досягнуто ліміту активних облікових записів. Будь ласка, спочатку видаліть обліковий запис.</string>
+    <string name="SessionPasswordRequired">Для зашифрованої резервної копії потрібен пароль.</string>
+    <string name="SessionFileEmpty">Вибраний файл сесії порожній.</string>
+    <string name="SessionNoAccountsInBackup">У файлі резервної копії не знайдено дійсних акаунтів.</string>
+    <string name="SessionStreamError">Не вдалося відкрити потік файлу.</string>
+    <string name="SessionAlreadyActive">Ви вже використовуєте цей акаунт</string>
+    <string name="InvalidSessionString">Недійсний формат рядка сесії Pyrogram або Telethon.</string>
+    <string name="FailedExtractAuthKey">Не вдалося витягти ключ авторизації сесії.</string>
+    <string name="CopyAgain">Скопіювати знову</string>
+    <string name="ShareSessionString">Поділитися рядком сесії</string>
+    <string name="PyrogramSessionStringV2">Рядок сесії Pyrogram (v2)</string>
+    <string name="TelethonSessionStringTitle">Рядок сесії Telethon</string>
+    <string name="NoAccounts">Активних акаунтів не знайдено.</string>
+    <string name="Feed">Стрічка</string>
+    <string name="GoToMessage">Перейти до повідомлення</string>
+    <string name="FeedSettings">Налаштування стрічки</string>
+    <string name="FeedBottomTab">Вкладка стрічки на нижній панелі</string>
+    <string name="FeedBottomTabInfo">Показувати вкладку «Стрічка» на нижній панелі навігації.</string>
+    <string name="FeedUnreadCounter">Лічильник непрочитаних</string>
+    <string name="FeedIncludeArchived">Включати архівовані канали</string>
+    <string name="FeedIncludeArchivedInfo">Включати повідомлення з архівованих каналів у Стрічку.</string>
+    <string name="FeedShownChannels">Відображувані канали</string>
+    <string name="FeedHiddenChannels">Приховані канали</string>
+    <string name="FeedChannelsInfo">Зніміть прапорці з каналів, публікації яких ви не хочете бачити в Стрічці.</string>
+    <string name="FeedMarkAllRead">Позначити все як прочитане</string>
+    <string name="FeedMarkAllReadConfirm">Ви впевнені, що хочете позначити всі публікації у Стрічці як прочитані?</string>
+    <string name="FeedMarkAllReadDone">Усі публікації позначено як прочитані</string>
+    <string name="FeedChannelHidden">Канал %1$s приховано</string>
+    <string name="FeedHideChannel">Приховати зі Стрічки</string>
 </resources>

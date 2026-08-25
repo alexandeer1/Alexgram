@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Tunnel Zoom: Infinite Concentric Hyperspace Squares -->
+    <path
+        android:strokeColor="#7C4DFF"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M6,6 L42,6 L42,42 L6,42 Z" />
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M12,12 L36,12 L36,36 L12,36 Z" />
+    <path
+        android:strokeColor="#FF007F"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M18,18 L30,18 L30,30 L18,30 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22,22 L26,22 L26,26 L22,26 Z" />
+</vector>
