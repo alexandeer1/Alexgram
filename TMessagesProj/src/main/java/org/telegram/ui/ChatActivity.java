@@ -22270,26 +22270,7 @@ public class ChatActivity extends BaseFragment implements
 
                 if (!isChannelComment && !isInScheduleMode() && chatMode != MODE_PINNED && (startId != minVal || endId != minVal)) {
                     int limit = 200;
-                    ArrayList<MessageObject> deletedObjects = AyuHistoryHook.getDeletedMessagesSync(currentAccount, startId, endId, dialogId, limit, topicId, load_type, isChannelComment, threadMessageId, isTopic);
-                    if (deletedObjects != null && !deletedObjects.isEmpty()) {
-                        SparseArray<MessageObject> existingMap = new SparseArray<>(messArr.size() + deletedObjects.size());
-                        for (int i = 0; i < messArr.size(); i++) {
-                            MessageObject m = messArr.get(i);
-                            existingMap.put(m.getId(), m);
-                        }
-                        for (int i = 0; i < deletedObjects.size(); i++) {
-                            MessageObject d = deletedObjects.get(i);
-                            if (existingMap.indexOfKey(d.getId()) < 0 && (loadIndex >= messagesDict.length || messagesDict[loadIndex].indexOfKey(d.getId()) < 0)) {
-                                messArr.add(d);
-                                existingMap.put(d.getId(), d);
-                            }
-                        }
-                        Comparator<MessageObject> comparator = AyuHistoryHook::doHook_compareMessages;
-                        if (load_type == 1) {
-                            comparator = comparator.reversed();
-                        }
-                        messArr.sort(comparator);
-                    }
+                    AyuHistoryHook.doHookAsync(currentAccount, startId, endId, dialogId, limit, topicId, load_type, isChannelComment, threadMessageId, isTopic);
                 }
             }
             // --- AyuGram history hook end
