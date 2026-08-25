@@ -3349,7 +3349,10 @@ public class ChatActivity extends BaseFragment implements
             .add(NotificationCenter.invalidateMotionBackground)
             .add(NotificationCenter.didSetNewWallpapper)
             .add(NotificationCenter.didApplyNewTheme)
-            .add(NotificationCenter.goingToPreviewTheme);
+            .add(NotificationCenter.goingToPreviewTheme)
+            // [Alexgram: Text Style Settings] - Start
+            .add(NotificationCenter.reloadInterface);
+            // [Alexgram: Text Style Settings] - End
 
         if (chatMode == MODE_EDIT_BUSINESS_LINK) {
             observersGroup.add(NotificationCenter.businessLinksUpdated);
@@ -4704,7 +4707,7 @@ public class ChatActivity extends BaseFragment implements
 
 
             @Override
-            protected boolean isCentered() {
+            public boolean isCentered() {
                 return isTitleCentered();
             }
 
@@ -5729,6 +5732,7 @@ public class ChatActivity extends BaseFragment implements
                         MessageObject message = slidingView.getMessageObject();
                         final boolean allowReplyOnOpenTopic = canSendMessageToTopic(message);
                         if (
+                            isFeedSearch() ||
                             bottomChannelButtonsLayout != null && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE && !(bottomOverlayChatWaitsReply && allowReplyOnOpenTopic || message.wasJustSent) ||
                             currentChat != null && (
                                 !tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !isThreadChat() ||
@@ -5736,6 +5740,9 @@ public class ChatActivity extends BaseFragment implements
                                 !ChatObject.canSendMessages(currentChat)
                             )
                         ) {
+                            if (isFeedSearch()) {
+                                message = com.exteragram.messenger.feed.FeedMessageUtils.getForwardingMessageObject(currentAccount, true, message);
+                            }
                             if (message.getGroupId() != 0) {
                                 MessageObject.GroupedMessages group = getGroup(message.getGroupId());
                                 if (group != null && group.captionMessage != null) {
@@ -11765,50 +11772,102 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean filledEditTextItemMenu = false;
+    // [Alexgram: Text Style Settings] - Start
     private void checkEditTextItemMenu() {
         if (filledEditTextItemMenu || editTextItem == null) {
             return;
         }
 
         ActionBarMenuItem item = editTextItem.createView();
-        item.addSubItem(text_spoiler, LocaleController.getString(R.string.Spoiler));
+
+        // Build a lookup table: key -> (itemId, charSequence title)
+        // Add ALL items initially; visibility will be set by refreshTextStyleMenu()
+        SpannableStringBuilder sb;
+
+        // translate
+        item.addSubItem(text_transalte, LocaleController.getString(R.string.TranslateMessage));
+
+        // bold
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.Bold));
+        sb.setSpan(new TypefaceSpan(AndroidUtilities.bold()), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_bold, sb);
+
+        // italic
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.Italic));
+        sb.setSpan(new TypefaceSpan(AndroidUtilities.getTypeface("fonts/ritalic.ttf")), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_italic, sb);
+
+        // mono
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.Mono));
+        sb.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_mono, sb);
+
+        // code
+        sb = new SpannableStringBuilder(LocaleController.getString(R.string.MonoCode));
+        sb.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.addSubItem(text_code, sb);
+
+        // strike
+        if (currentEncryptedChat == null || AndroidUtilities.getPeerLayerVersion(currentEncryptedChat.layer) >= 101) {
+            sb = new SpannableStringBuilder(LocaleController.getString(R.string.Strike));
+            TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
+            run.flags |= TextStyleSpan.FLAG_STYLE_STRIKE;
+            sb.setSpan(new TextStyleSpan(run), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.addSubItem(text_strike, sb);
+
+            // underline
+            sb = new SpannableStringBuilder(LocaleController.getString(R.string.Underline));
+            run = new TextStyleSpan.TextStyleRun();
+            run.flags |= TextStyleSpan.FLAG_STYLE_UNDERLINE;
+            sb.setSpan(new TextStyleSpan(run), 0, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.addSubItem(text_underline, sb);
+        }
+
+        // quote (only in normal chat mode)
         if (chatMode == 0) {
             item.addSubItem(text_quote, LocaleController.getString(R.string.Quote));
         }
-        SpannableStringBuilder stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Bold));
-        stringBuilder.setSpan(new TypefaceSpan(AndroidUtilities.bold()), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_bold, stringBuilder);
-        stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Italic));
-        stringBuilder.setSpan(new TypefaceSpan(AndroidUtilities.getTypeface("fonts/ritalic.ttf")), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_italic, stringBuilder);
-        stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Mono));
-        stringBuilder.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_mono, stringBuilder);
-        stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.MonoCode));
-        stringBuilder.setSpan(new TypefaceSpan(Typeface.MONOSPACE), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        item.addSubItem(text_code, stringBuilder);
-        if (currentEncryptedChat == null || AndroidUtilities.getPeerLayerVersion(currentEncryptedChat.layer) >= 101) {
-            stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Strike));
-            TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
-            run.flags |= TextStyleSpan.FLAG_STYLE_STRIKE;
-            stringBuilder.setSpan(new TextStyleSpan(run), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            item.addSubItem(text_strike, stringBuilder);
 
-            stringBuilder = new SpannableStringBuilder(LocaleController.getString(R.string.Underline));
-            run = new TextStyleSpan.TextStyleRun();
-            run.flags |= TextStyleSpan.FLAG_STYLE_UNDERLINE;
-            stringBuilder.setSpan(new TextStyleSpan(run), 0, stringBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            item.addSubItem(text_underline, stringBuilder);
-        }
+        // spoiler
+        item.addSubItem(text_spoiler, LocaleController.getString(R.string.Spoiler));
+
+        // link
         item.addSubItem(text_link, LocaleController.getString(R.string.CreateLink));
-        item.addSubItem(text_mention, LocaleController.getString(R.string.CreateMention)); // NekoX
+
+        // mention
+        item.addSubItem(text_mention, LocaleController.getString(R.string.CreateMention));
+
+        // date
         if (currentEncryptedChat == null) {
             item.addSubItem(text_date, LocaleController.getString(R.string.FormattedDate));
         }
+
+        // regular
         item.addSubItem(text_regular, LocaleController.getString(R.string.Regular));
 
         filledEditTextItemMenu = true;
+        refreshTextStyleMenu();
     }
+
+    /** Apply NaConfig show/hide settings for each text-style menu item. */
+    private void refreshTextStyleMenu() {
+        if (!filledEditTextItemMenu || editTextItem == null || editTextItem.getView() == null) return;
+        ActionBarMenuItem item = editTextItem.getView();
+        item.setSubItemVisibility(text_transalte,  NaConfig.INSTANCE.getShowTextTranslate().Bool());
+        item.setSubItemVisibility(text_bold,        NaConfig.INSTANCE.getShowTextBold().Bool());
+        item.setSubItemVisibility(text_italic,      NaConfig.INSTANCE.getShowTextItalic().Bool());
+        item.setSubItemVisibility(text_mono,        NaConfig.INSTANCE.getShowTextMono().Bool());
+        item.setSubItemVisibility(text_code,        NaConfig.INSTANCE.getShowTextMonoCode().Bool());
+        item.setSubItemVisibility(text_strike,      NaConfig.INSTANCE.getShowTextStrikethrough().Bool());
+        item.setSubItemVisibility(text_underline,   NaConfig.INSTANCE.getShowTextUnderline().Bool());
+        item.setSubItemVisibility(text_quote,       NaConfig.INSTANCE.getShowTextQuote().Bool() && chatMode == 0);
+        item.setSubItemVisibility(text_spoiler,     NaConfig.INSTANCE.getShowTextSpoiler().Bool());
+        item.setSubItemVisibility(text_link,        NaConfig.INSTANCE.getShowTextCreateLink().Bool());
+        item.setSubItemVisibility(text_mention,     NaConfig.INSTANCE.getShowTextCreateMention().Bool());
+        item.setSubItemVisibility(text_date,        NaConfig.INSTANCE.getShowTextCreateDate().Bool() && currentEncryptedChat == null);
+        item.setSubItemVisibility(text_regular,     NaConfig.INSTANCE.getShowTextRegular().Bool());
+    }
+    // [Alexgram: Text Style Settings] - End
 
     private void updatePagedownButtonsPosition() {
         updatePagedownButtonsPosition(shouldHideBottomForGesture());
@@ -21613,6 +21672,12 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void didReceivedNotification(int id, int account, final Object... args) {
+        // [Alexgram: Text Style Settings] - Start
+        if (id == NotificationCenter.reloadInterface) {
+            refreshTextStyleMenu();
+            return;
+        }
+        // [Alexgram: Text Style Settings] - End
         if (id == NotificationCenter.messagesDidLoad) {
             int guid = (Integer) args[10];
             if (guid != classGuid) {
@@ -24567,12 +24632,18 @@ public class ChatActivity extends BaseFragment implements
             if (messagePreviewParams != null) {
                 messagePreviewParams.checkEdits(messageObjects);
             }
-            if (did != dialog_id && did != mergeDialogId) {
+            if (did != dialog_id && did != mergeDialogId && !isFeedSearch()) {
                 return;
             }
             int loadIndex = did == dialog_id ? 0 : 1;
             doOnIdle(() -> {
-                replaceMessageObjects(messageObjects, loadIndex, false);
+                if (isFeedSearch()) {
+                    for (int m = 0; m < messageObjects.size(); m++) {
+                        updateMessageTranslation(messageObjects.get(m), false);
+                    }
+                } else {
+                    replaceMessageObjects(messageObjects, loadIndex, false);
+                }
             });
         } else if (id == NotificationCenter.notificationsSettingsUpdated) {
             updateTitleIcons();
@@ -25555,7 +25626,7 @@ public class ChatActivity extends BaseFragment implements
         } else if (id == NotificationCenter.messageTranslated) {
             final MessageObject messageObject = (MessageObject) args[0];
             final boolean summary = args.length > 1 && (boolean) args[1];
-            if (getDialogId() != messageObject.getDialogId()) {
+            if (getDialogId() != messageObject.getDialogId() && !isFeedSearch()) {
                 return;
             }
             updateMessageTranslation(messageObject, summary);
@@ -25564,7 +25635,7 @@ public class ChatActivity extends BaseFragment implements
             }
         } else if (id == NotificationCenter.messageTranslating) {
             MessageObject messageObject = (MessageObject) args[0];
-            if (getDialogId() != messageObject.getDialogId()) {
+            if (getDialogId() != messageObject.getDialogId() && !isFeedSearch()) {
                 return;
             }
             if (chatListView == null || chatAdapter == null) {
@@ -25919,13 +25990,28 @@ public class ChatActivity extends BaseFragment implements
         boolean updated = false;
         ArrayList<Integer> lazyUpdaterList = new ArrayList<>();
         for (MessageObject pinnedMessageObject : pinnedMessageObjects.values()) {
-            if (pinnedMessageObject != null && pinnedMessageObject.getId() == messageObject.getId()) {
+            if (pinnedMessageObject != null && (pinnedMessageObject.getId() == messageObject.getId() || (isFeedSearch() && pinnedMessageObject.getRealId() == messageObject.getRealId() && pinnedMessageObject.getDialogId() == messageObject.getDialogId()))) {
                 pinnedMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                 pinnedMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
+                pinnedMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                pinnedMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
+                pinnedMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                 if (pinnedMessageObject.updateTranslation(true)) {
                     lazyUpdaterList.add(pinnedMessageObject.getId());
                     updatePinnedMessageView(true, 1);
                     updated = true;
+                }
+            }
+        }
+        if (isFeedSearch()) {
+            com.exteragram.messenger.feed.FeedController feedController = com.exteragram.messenger.feed.FeedController.peekInstance(currentAccount);
+            if (feedController != null) {
+                MessageObject cached = feedController.getMessage(messageObject.getDialogId(), messageObject.getRealId());
+                if (cached != null && cached != messageObject) {
+                    com.exteragram.messenger.feed.FeedMessageUtils.copyTranslationState(messageObject, cached);
+                    cached.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                    cached.messageOwner.translated = messageObject.messageOwner.translated;
+                    cached.updateTranslation(false);
                 }
             }
         }
@@ -25942,12 +26028,18 @@ public class ChatActivity extends BaseFragment implements
                     continue;
                 }
                 boolean update = lazyUpdaterList.contains(cellMessageObject.getId());
-                if (cellMessageObject.getId() == messageObject.getId()) {
+                boolean isTarget = cellMessageObject == messageObject
+                        || cellMessageObject.getId() == messageObject.getId()
+                        || (isFeedSearch() && cellMessageObject.getRealId() == messageObject.getRealId() && cellMessageObject.getDialogId() == messageObject.getDialogId());
+                if (isTarget) {
                     cellMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                     cellMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
                     cellMessageObject.messageOwner.summaryText = messageObject.messageOwner.summaryText;
                     cellMessageObject.messageOwner.translatedSummaryText = messageObject.messageOwner.translatedSummaryText;
                     cellMessageObject.messageOwner.translatedSummaryLanguage = messageObject.messageOwner.translatedSummaryLanguage;
+                    cellMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                    cellMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
+                    cellMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                     if (cellMessageObject.updateTranslation(false)) {
                         update = true;
                         ArrayList<Integer> dependentMessages = replyMessageOwners.get(cellMessageObject.getId());
@@ -25967,11 +26059,14 @@ public class ChatActivity extends BaseFragment implements
                     }
                     groupChecked.add(group.groupId);
                 }
-                if (cellMessageObject.replyMessageObject != null && cellMessageObject.replyMessageObject.getId() == messageObject.getId() && cellMessageObject.replyMessageObject.getDialogId() == messageObject.getDialogId()) {
+                if (cellMessageObject.replyMessageObject != null && (cellMessageObject.replyMessageObject.getId() == messageObject.getId() || (isFeedSearch() && cellMessageObject.replyMessageObject.getRealId() == messageObject.getRealId())) && cellMessageObject.replyMessageObject.getDialogId() == messageObject.getDialogId()) {
                     cellMessageObject.replyMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
                     cellMessageObject.replyMessageObject.messageOwner.translatedSummaryText = messageObject.messageOwner.translatedSummaryText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedSummaryLanguage = messageObject.messageOwner.translatedSummaryLanguage;
+                    cellMessageObject.replyMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
+                    cellMessageObject.replyMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
+                    cellMessageObject.replyMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                     if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
                         lazyUpdaterList.add(cellMessageObject.replyMessageObject.getId());
                         update = true;
@@ -35626,8 +35721,12 @@ public class ChatActivity extends BaseFragment implements
                 // [Alexgram: Allow Forwarding/Copying] - End
                     return;
                 }
-                if (selectedObject != null && currentChat != null && (!tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !ChatObject.isMonoForum(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat))) {
+                boolean replyInOtherChat = isFeedSearch() || (selectedObject != null && currentChat != null && (!tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !ChatObject.isMonoForum(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat)));
+                if (replyInOtherChat) {
                     MessageObject messageObject = selectedObject;
+                    if (isFeedSearch()) {
+                        messageObject = com.exteragram.messenger.feed.FeedMessageUtils.getForwardingMessageObject(currentAccount, true, messageObject);
+                    }
                     if (messageObject.getGroupId() != 0) {
                         MessageObject.GroupedMessages group = getGroup(messageObject.getGroupId());
                         if (group != null) {
@@ -51225,7 +51324,10 @@ public class ChatActivity extends BaseFragment implements
         if (parentFragment.isThreadChat() && !parentFragment.isTopic || parentFragment.isReport()) {
             return false;
         }
-        return parentFragment.getChatMode() != MODE_SEARCH && parentFragment.getChatMode() != MODE_SAVED;
+        if (parentFragment.getChatMode() == MODE_SAVED || UserObject.isUserSelf(parentFragment.currentUser)) {
+            return false;
+        }
+        return parentFragment.getChatMode() != MODE_SEARCH;
     }
 
     public boolean handleTranslateDuringAutoTrans(Object message) {

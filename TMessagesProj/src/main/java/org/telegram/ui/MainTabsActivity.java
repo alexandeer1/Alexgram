@@ -377,26 +377,19 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        Integer[] tabIndices = new Integer[]{INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE};
-        java.util.Arrays.sort(tabIndices, (a, b) -> {
-            int posA = indexToPosition(a);
-            int posB = indexToPosition(b);
-            if (posA < 0) posA = 99;
-            if (posB < 0) posB = 99;
-            return Integer.compare(posA, posB);
-        });
+        int[] tabIndices = new int[]{INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE};
 
         for (int i = 0; i < tabIndices.length; i++) {
             int index = tabIndices[i];
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
-            final int position = indexToPosition(index);
             tabs[index].setOnLongClickListener(v -> processLongClick(v, tabIndex));
             tabs[index].setOnClickListener(v -> {
+                final int position = indexToPosition(tabIndex);
                 if (position < 0) {
                     return;
                 }
-                if (viewPager.isManualScrolling() || viewPager.isTouch()) {
+                if (viewPager == null || viewPager.isManualScrolling() || viewPager.isTouch()) {
                     return;
                 }
 
@@ -1225,19 +1218,28 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // [Alexgram: Hide Navigation Bar on Scroll] - End
         } else if (id == NotificationCenter.feedTabVisibleToggled) {
             final boolean feedTabVisible = MainTabsHelper.isFeedTabShown();
-            if (tabsView != null) {
-                tabsView.setViewVisible(tabs[INDEX_FEED], feedTabVisible, true);
-            }
-            if (!feedTabVisible && viewPager != null) {
-                final int feedPos = MainTabsHelper.getFeedPosition();
-                if (viewPager.getCurrentPosition() == feedPos) {
-                    viewPager.scrollToPosition(MainTabsHelper.getChatsPosition());
-                    selectTab(MainTabsHelper.getChatsPosition(), true);
-                } else {
-                    dropFragmentAtPosition(feedPos);
+            final boolean contactsTabVisible = !MainTabsHelper.isContactsTabHidden();
+            if (tabsView != null && tabs != null) {
+                if (tabs[INDEX_FEED] != null) {
+                    tabsView.setViewVisible(tabs[INDEX_FEED], feedTabVisible, true);
+                }
+                if (tabs[INDEX_CONTACTS] != null) {
+                    tabsView.setViewVisible(tabs[INDEX_CONTACTS], contactsTabVisible, true);
                 }
             }
-            clearViews();
+            if (viewPager != null) {
+                final int chatsPos = MainTabsHelper.getChatsPosition();
+                if (viewPager.getCurrentPosition() != chatsPos) {
+                    viewPager.scrollToPosition(chatsPos);
+                    selectTab(chatsPos, true);
+                }
+                for (int pos = 1; pos < 6; pos++) {
+                    dropFragmentAtPosition(pos);
+                }
+            }
+            checkUi_tabsPosition();
+            checkUi_fadeView();
+            repositionSearchButton();
         } else if (id == NotificationCenter.mainTabsLayoutChanged) {
             updateSearchTabButtonVisibility();
         }

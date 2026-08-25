@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="NekoSettings">A-Ustawienia</string>
     <string name="IPv6">Preferuj IPv6</string>
@@ -149,6 +149,7 @@
     <string name="EmojiSetApplied">Zastosowano zestaw emoji.</string>
     <string name="EmojiSetAppliedInfo">%1$s jest teraz Twoim zestawem emoji.</string>
     <string name="EmojiSetAlreadyApplied">Zestaw emoji został już zastosowany.</string>
+    <string name="ProviderTelegramAPI">Telegram API</string>
     <string name="RecentChats">Ostatnie czaty</string>
     <string name="ClearRecentChats">Wyczyść ostatnie czaty</string>
     <string name="ClearRecentChatAlert">Czy chcesz wyczyścić ostatnie czaty?</string>
@@ -168,6 +169,7 @@
     <string name="CopyCallback">Skopiuj dane wywołania zwrotnego</string>
     <string name="CopyInlineQuery">Kopiuj zapytanie wbudowane</string>
     <string name="CopyID">Skopiuj ID</string>
+    <string name="NekoX">NekoX</string>
     <string name="Locked">Zablokowany</string>
     <string name="AccDescrChatAttachEnterMenu">Menu wprowadzania czatu</string>
     <string name="ChatAttachEnterMenuRecordVideo">Nagraj wideo</string>
@@ -185,6 +187,7 @@
     <string name="LinkedChannelChat">Połączony kanał</string>
     <string name="ChangeTranslateProvider">Zmień dostawcę</string>
     <string name="ProviderYandexTranslate">Tłumacz Yandex</string>
+    <string name="GoogleCloudTransKey">Google Cloud Translate Key</string>
     <string name="GoogleCloudTransKeyNotice">Jeśli skonfigurujesz klucz Google Cloud Trans Key, zamiast przesyłania fałszywego formularza do wersji internetowej podczas tłumaczenia zostanie wywołane API tłumaczeń w chmurze (szybciej, stabilniej i z mniejszym ruchem).</string>
     <string name="TransToLang">Język docelowy</string>
     <string name="TransInputToLang">Język tłumaczenia wstępnego</string>
@@ -256,6 +259,8 @@
     <string name="ConfirmSettings">Potwierdzenia</string>
     <string name="InteractionSettings">Interakcje</string>
     <string name="localPremium">Włącz funkcje premium</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">Reakcje</string>
     <string name="UpgradeGroup">Ulepsz Grupę</string>
     <string name="AccDescrShowKeyboard">Pokaż klawiaturę</string>
@@ -270,13 +275,14 @@
     <string name="EmojiUseDefault">Użyj systemowych emoji</string>
     <string name="Chat">Czaty</string>
     <string name="Appearance">Wygląd</string>
-    <!-- [Alexgram: Important Announcement] -->
+    <string name="StarFallInChat">Starfall Chat Decoration</string>
+    <string name="StarFallInChatDescription">Animated falling stars in the chat background</string>
     <string name="GetImportantAnnouncementFromAlexgram">Pobierz ważne ogłoszenia z Alexgram</string>
-    <!-- [Alexgram: Birthday Wish] - Start -->
     <string name="BirthdayTitle">Wszystkiego najlepszego,\n%1$s! 🎉</string>
     <string name="BirthdayMessage">Dzisiaj wszystko kręci się wokół Ciebie! ✨ Kolejny rok z energią głównego bohatera. Życzymy Ci roku czystego rozwoju, niekończących się sukcesów i zera negatywnych wibracji. Idź i zdobywaj świat! 🚀🎂</string>
     <string name="BirthdayMakeWish">Pomyśl życzenie 🌟</string>
     <string name="BirthdayWishSent">Życzenie wysłane do gwiazd! 🌌✨</string>
-    <!-- [Alexgram: Birthday Wish] - End -->
+    <string name="SelectRangeSharedMedia">Select Range in Shared Media</string>
+    <string name="SelectRangeSharedMediaAbout">Enable double checkmark button to select all media items between the first and last selected items.</string>
+    <string name="SelectTwoItemsToSelectRange">Please select at least two items to select a range.</string>
 </resources>
-

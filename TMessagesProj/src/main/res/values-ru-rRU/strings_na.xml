@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">Работа в фоне</string>
+    <string name="RunInBackgroundInfo">Оставлять приложение запущенным в фоне для стабильной работы уведомлений.</string>
+    <string name="NagramXPushService">Служба уведомлений Alexgram</string>
     <string name="N_Config">А-Настройки</string>
     <string name="CombineMessage">Объединить сообщения</string>
     <string name="TextStyle">Стиль текста</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">Показывать ID сообщения</string>
     <string name="ShowRPCError">Показывать ошибки RPC</string>
     <string name="ShowPremiumStickersAnimation">Показывать анимацию Premium-стикеров</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Красочная</string>
     <string name="AppIconDarkGreen">Тёмно-зелёная</string>
     <string name="AppIconNeon">Неон</string>
     <string name="AppIconNiello">Ниелло</string>
     <string name="AppIconBlue">Синяя</string>
+    <string name="AppIconColored">Alexgram Цветная</string>
+    <string name="AppIconDark">Alexgram Тёмная</string>
+    <string name="AppIconGreen">Alexgram Зелёная</string>
+    <string name="AppIconPink">Alexgram Розовая</string>
+    <string name="AppIconRoseBlue">Alexgram Розово-синяя</string>
+    <string name="AppIconWhite">Alexgram Белая</string>
     <string name="AppIconDarkBlue">Тёмно-синяя</string>
     <string name="AppIconBlurBlue">Размытая синяя</string>
     <string name="InputMessageId">Введите ID сообщения</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">Подпись для изменённых сообщений</string>
     <string name="NotificationIcon">Иконка уведомления</string>
     <string name="Official">Официальная</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">Хэллоуин</string>
     <string name="ShowOnlineStatus">Показывать онлайн-статус</string>
     <string name="ShowOnlineStatusNotice">Отображать онлайн-статус других людей рядом с фотографией их профиля в группах.</string>
@@ -65,6 +76,9 @@
     <string name="ShowQuickReplyInBotCommands">Показывать кнопку быстрого ответа в поле ввода</string>
     <string name="PushServiceType">Тип сервиса уведомлений</string>
     <string name="PushServiceTypeInApp">В приложении</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Показывать постоянное уведомление</string>
     <string name="PushServiceTypeUnifiedGateway">Шлюз UnifiedPush</string>
     <string name="SendMp4DocumentAsVideo">Отправлять MP4 «без сжатия» как видео</string>
@@ -87,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Не учитывать регистр</string>
     <string name="RegexFiltersAdd">Добавить фильтр</string>
     <string name="RegexFiltersEdit">Изменить фильтр</string>
-    <string name="RegexFiltersAddDescription">Вы можете использовать сайт &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; для проверки регулярных выражений. Вы также можете использовать простой текст, но не забывайте экранировать скобки.</string>
+    <string name="RegexFiltersAddDescription">Вы можете использовать сайт &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; для проверки регулярных выражений. Вы также можете использовать простой текст, но не забывайте экранировать скобки.</string>
     <string name="RegexFiltersAddError">Синтаксическая ошибка регулярного выражения</string>
     <string name="ShowTimeHint">Подробности по нажатию на время</string>
     <string name="SearchHashtagDefaultPageChannel">Страница поиска по хэштегам в каналах по умолчанию</string>
     <string name="SearchHashtagDefaultPageChat">Страница поиска по хэштегам в чатах по умолчанию</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Включить Pangu при отправке</string>
     <string name="PanguInfo">Автоматическая расстановка пробелов для удобочитаемости: добавление пробелов между символами CJK (китайскими, японскими, корейскими), латинскими буквами, цифрами и специальными знаками.</string>
     <string name="SendWithPangu">Отправить с Pangu</string>
@@ -105,21 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">Предпочтение SW</string>
     <string name="VideoPlayerDecoderHardware">Только HW</string>
     <string name="VideoPlayerDecoderPreferHW">Предпочтение HW</string>
-    <string name="RunInBackground">Работа в фоне</string>
-    <string name="RunInBackgroundInfo">Оставлять приложение запущенным в фоне для стабильной работы уведомлений.</string>
-    <string name="NagramXPushService">Служба уведомлений Alexgram</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram Цветная</string>
-    <string name="AppIconDark">Alexgram Тёмная</string>
-    <string name="AppIconGreen">Alexgram Зелёная</string>
-    <string name="AppIconPink">Alexgram Розовая</string>
-    <string name="AppIconRoseBlue">Alexgram Розово-синяя</string>
-    <string name="AppIconWhite">Alexgram Белая</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">Живые видеообои</string>
     <string name="ExportChat">Экспорт чата</string>
     <string name="ImportChat">Импорт чата</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">Скройте важные чаты из основного списка. Доступ к ним можно получить долгим нажатием на заголовок после разблокировки кодом или отпечатком.</string>
     <string name="HideContacts">Скрыть контакты</string>
     <string name="RestartRequired">Требуется перезапуск для применения изменений</string>
-    <string name="MaxActiveAccounts">Максимальное количество активных аккаунтов</string>
-    <string name="LimitReachedAccountsNa">Извините, вы не можете добавить более **%1$d** аккаунтов. Вы можете увеличить это ограничение (до 100) в **A-Настройки &gt; Основные**.</string>
-    <string name="MaxActiveAccountsWarning">У вас сейчас %1$d активных аккаунтов. Установка лимита на %2$d не позволит добавлять новые аккаунты, пока вы не выйдете из некоторых.</string>
     <string name="SplitChat">Разделение экрана</string>
     <string name="SplitChatClose">Закрыть разделение</string>
     <string name="SplitChatSelectChat">Выберите чат для открытия рядом</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">Показывать сообщения заблокированных/скрытых пользователей под спойлером вместо их полного скрытия.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Скрывать только совпадения с регулярными выражениями</string>
     <string name="RegexFiltersSpoilerColor">Цвет частиц спойлера</string>
+    <string name="AccountsSettings">Аккаунты</string>
+    <string name="AccountLimitsHeader">Лимиты аккаунтов</string>
+    <string name="StartupPerformanceHeader">Производительность при запуске</string>
+    <string name="MaxAccountCount">Максимальное количество аккаунтов</string>
+    <string name="MaxActiveAccounts">Максимум активных аккаунтов</string>
+    <string name="StartupActiveAccounts">Активные аккаунты при запуске</string>
+    <string name="StartupActiveAccountsInfo">Определяет, сколько аккаунтов инициализируются при запуске приложения. Меньшие значения ускоряют запуск и экономят заряд. Другие аккаунты загружаются по запросу при переключении на них.</string>
+    <string name="LimitReachedAccountsNa">Извините, вы не можете добавить более **%1$d** аккаунтов. Вы можете увеличить этот лимит (до 100) в **Настройки Alexgram → Аккаунты**.</string>
+    <string name="MaxActiveAccountsWarning">В настоящее время у вас %1$d активных аккаунтов. Установка лимита в %2$d не позволит вам добавлять новые аккаунты, пока вы не выйдете из некоторых.</string>
+    <string name="HiddenAccountsTitle">Скрытые аккаунты</string>
+    <string name="HiddenAccountsDesc">Нажмите на значок замка, чтобы скрыть аккаунт. Скрытые аккаунты не будут отображаться в списке, пока вы не разблокируете это хранилище.</string>
+    <string name="HiddenAccountsHeader">Скрытые аккаунты</string>
+    <string name="HiddenAccountsChangePIN">Изменить PIN-код</string>
+    <string name="HiddenAccountsRemovePIN">Удалить PIN и показать все</string>
+    <string name="HiddenAccountsRemovePINConfirm">Это действие удалит PIN-код и снова сделает все скрытые аккаунты видимыми. Вы уверены?</string>
+    <string name="HiddenAccountsAutoLock">Блокировать в фоне</string>
+    <string name="HiddenAccountsAutoLockDesc">Если включено, хранилище автоматически блокируется при сворачивании приложения.</string>
+    <string name="HiddenAccountsSection">Аккаунты</string>
+    <string name="HiddenAccountsPINManagement">Управление PIN-кодом</string>
+    <string name="HideHomeSearchField">Скрыть строку поиска</string>
+    <string name="HideHomeSearchFieldDesc">Скрыть строку поиска в списке чатов. Вы по-прежнему можете искать, нажав значок поиска в правом верхнем углу.</string>
+    <string name="MainTabsShowSearchButton">Значок поиска в нижней панели</string>
+    <string name="MainTabsShowSearchButtonDesc">Отображать значок поиска в нижней панели рядом с основными вкладками навигации.</string>
+    <string name="SessionManagementHeader">Управление сессиями</string>
+    <string name="SessionManagementTitle">Менеджер сессий аккаунтов</string>
+    <string name="SessionManagementDesc">Управление активными устройствами, сессиями Pyrogram/Telethon, а также экспорт и импорт резервных копий.</string>
+    <string name="ExportSessionsTitle">Экспорт сессий аккаунтов</string>
+    <string name="ExportSessionsDesc">Экспорт активных сессий в строку Pyrogram, файл .session, строку Telethon или полный JSON-бэкап.</string>
+    <string name="ImportSessionTitle">Импорт сессии аккаунта</string>
+    <string name="ImportSessionDesc">Импорт строки Pyrogram, файла .session, строки Telethon или JSON-файла резервной копии.</string>
+    <string name="ImportSessionStringTitle">Импорт строки сессии</string>
+    <string name="ImportSessionStringDesc">Вставьте строку сессии Pyrogram (v1/v2) или Telethon для прямого входа.</string>
+    <string name="TelegramActiveDevices">Активные устройства Telegram</string>
+    <string name="TelegramActiveDevicesDesc">Просмотр активных устройств и управление сессиями на серверах Telegram.</string>
+    <string name="WebSessionsTitleNa">Веб-сессии</string>
+    <string name="WebSessionsDesc">Управление авторизованными сайтами и веб-сессиями.</string>
+    <string name="ScanSessionQRCode">Сканировать QR-код сессии</string>
+    <string name="ScanSessionQRCodeDesc">Авторизовать клиент на компьютере или в браузере с помощью сканирования QR-кода.</string>
+    <string name="SessionEncryptExport">Защитить резервную копию паролем</string>
+    <string name="SessionEncryptExportDesc">Шифровать экспортируемые файлы сессий паролем.</string>
+    <string name="ActiveSessionsSection">Сессии активных аккаунтов</string>
+    <string name="SessionBackupSection">Резервное копирование и восстановление</string>
+    <string name="SessionToolsSection">Инструменты сессий и устройства</string>
+    <string name="SessionDetailsTitle">Сведения о сессии</string>
+    <string name="SwitchToAccount">Переключиться на аккаунт</string>
+    <string name="TerminateAllOtherSessions">Завершить все другие сеансы</string>
+    <string name="TerminateAllOtherSessionsConfirm">Вы уверены, что хотите завершить все остальные активные сеансы Telegram?</string>
+    <string name="SessionExportSuccess">Резервная копия сессии успешно сохранена в Загрузки!</string>
+    <string name="SessionExportError">Не удалось экспортировать резервную копию сессии.</string>
+    <string name="SessionImportSuccess">Сессия для %1$s успешно импортирована!</string>
+    <string name="SessionImportError">Ошибка импорта сессии: неверный или поврежденный файл.</string>
+    <string name="ExportPyrogramString">Скопировать строку Pyrogram</string>
+    <string name="ExportPyrogramFile">Экспортировать файл Pyrogram .session</string>
+    <string name="ExportTelethonString">Скопировать строку Telethon</string>
+    <string name="PasteSessionStringHint">Вставьте строку сессии Pyrogram (v1/v2) или Telethon...</string>
+    <string name="SessionCopied">Строка сессии Pyrogram скопирована в буфер обмена!</string>
+    <string name="TelethonSessionCopied">Строка сессии Telethon скопирована в буфер обмена!</string>
+    <string name="ExportTypeTitle">Выберите формат экспорта</string>
+    <string name="ExportPyrogramStringOpt">Строка сессии Pyrogram (v2 — последняя)</string>
+    <string name="ExportPyrogramFileOpt">Файл SQLite Pyrogram (.session)</string>
+    <string name="ExportTelethonStringOpt">Строка сессии Telethon</string>
+    <string name="ExportAlexgramBackupOpt">Полный бэкап Alexgram (.session)</string>
+    <string name="PasteClipboard">Вставить из буфера</string>
+    <string name="ImportSessionButton">Импортировать сессию</string>
+    <string name="SessionImportSuccessDesc">Сессия успешно импортирована!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Достигнут лимит активных аккаунтов. Сначала удалите один из аккаунтов.</string>
+    <string name="SessionPasswordRequired">Требуется пароль для зашифрованной резервной копии.</string>
+    <string name="SessionFileEmpty">Выбранный файл сессии пуст.</string>
+    <string name="SessionNoAccountsInBackup">В файле резервной копии не найдено подходящих аккаунтов.</string>
+    <string name="SessionStreamError">Не удалось открыть поток файла.</string>
+    <string name="SessionAlreadyActive">Уже используется этот аккаунт</string>
+    <string name="InvalidSessionString">Неверный формат строки сессии Pyrogram или Telethon.</string>
+    <string name="FailedExtractAuthKey">Не удалось извлечь ключ авторизации сессии.</string>
+    <string name="CopyAgain">Копировать снова</string>
+    <string name="ShareSessionString">Поделиться строкой сессии</string>
+    <string name="PyrogramSessionStringV2">Строка сессии Pyrogram (v2)</string>
+    <string name="TelethonSessionStringTitle">Строка сессии Telethon</string>
+    <string name="NoAccounts">Активные аккаунты не найдены.</string>
+    <string name="Feed">Лента</string>
+    <string name="GoToMessage">Перейти к сообщению</string>
+    <string name="FeedSettings">Настройки ленты</string>
+    <string name="FeedBottomTab">Вкладка ленты внизу</string>
+    <string name="FeedBottomTabInfo">Отображать вкладку «Лента» на нижней панели навигации.</string>
+    <string name="FeedUnreadCounter">Счетчик непрочитанных</string>
+    <string name="FeedIncludeArchived">Включать архивные каналы</string>
+    <string name="FeedIncludeArchivedInfo">Включать сообщения из архивных каналов в общую Ленту.</string>
+    <string name="FeedShownChannels">Отображаемые каналы</string>
+    <string name="FeedHiddenChannels">Скрытые каналы</string>
+    <string name="FeedChannelsInfo">Снимите отметку с каналов, посты которых вы не хотите видеть в Ленте.</string>
+    <string name="FeedMarkAllRead">Отметить все как прочитанные</string>
+    <string name="FeedMarkAllReadConfirm">Вы уверены, что хотите отметить все публикации в Ленте как прочитанные?</string>
+    <string name="FeedMarkAllReadDone">Все публикации отмечены как прочитанные</string>
+    <string name="FeedChannelHidden">Канал %1$s скрыт</string>
+    <string name="FeedHideChannel">Скрыть из Ленты</string>
 </resources>

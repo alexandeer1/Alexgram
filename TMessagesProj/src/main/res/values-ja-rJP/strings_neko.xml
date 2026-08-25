@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="NekoSettings">A-設定</string>
     <string name="IPv6">IPv6 を優先</string>
@@ -149,6 +149,7 @@
     <string name="EmojiSetApplied">絵文字セットが適用されました。</string>
     <string name="EmojiSetAppliedInfo">%1$s が絵文字セットとして適用されました。</string>
     <string name="EmojiSetAlreadyApplied">絵文字セットは既に適用されています。</string>
+    <string name="ProviderTelegramAPI">Telegram API</string>
     <string name="RecentChats">最近のチャット</string>
     <string name="ClearRecentChats">最近のチャットをクリア</string>
     <string name="ClearRecentChatAlert">本当に最近のチャットをクリアしますか？</string>
@@ -168,6 +169,7 @@
     <string name="CopyCallback">コールバックデータをコピー</string>
     <string name="CopyInlineQuery">インラインクエリをコピー</string>
     <string name="CopyID">ID をコピー</string>
+    <string name="NekoX">NekoX</string>
     <string name="Locked">ロックされています</string>
     <string name="AccDescrChatAttachEnterMenu">チャット入力メニュー</string>
     <string name="ChatAttachEnterMenuRecordVideo">録画</string>
@@ -185,6 +187,7 @@
     <string name="LinkedChannelChat">リンクされたチャンネル</string>
     <string name="ChangeTranslateProvider">プロバイダを変更</string>
     <string name="ProviderYandexTranslate">Yandex 翻訳</string>
+    <string name="GoogleCloudTransKey">Google Cloud Translate Key</string>
     <string name="GoogleCloudTransKeyNotice">Google Cloud Trans Key を設定すると、翻訳時に偽のフォームをウェブバージョンに送信する代わりにクラウド翻訳APIが呼び出されます（高速で安定しており、トラフィックの節約になります）</string>
     <string name="TransToLang">翻訳先言語</string>
     <string name="TransInputToLang">入力翻訳先言語</string>
@@ -256,6 +259,8 @@
     <string name="ConfirmSettings">確認</string>
     <string name="InteractionSettings">インタラクション</string>
     <string name="localPremium">ローカルプレミアム</string>
+    <string name="HidePremiumIcon">Hide Premium Icon on Home Screen</string>
+    <string name="HidePremiumIconDesc">Hide the premium star next to the app title</string>
     <string name="ReactionSettings">リアクション</string>
     <string name="UpgradeGroup">グループをアップグレード</string>
     <string name="AccDescrShowKeyboard">キーボードを表示</string>
@@ -270,13 +275,14 @@
     <string name="EmojiUseDefault">システム絵文字を使用</string>
     <string name="Chat">チャット</string>
     <string name="Appearance">外観</string>
-    <!-- [Alexgram: Important Announcement] -->
+    <string name="StarFallInChat">Starfall Chat Decoration</string>
+    <string name="StarFallInChatDescription">Animated falling stars in the chat background</string>
     <string name="GetImportantAnnouncementFromAlexgram">Alexgramから重要なお知らせを受け取る</string>
-    <!-- [Alexgram: Birthday Wish] - Start -->
     <string name="BirthdayTitle">お誕生日おめでとうございます、\n%1$sさん！🎉</string>
     <string name="BirthdayMessage">今日はあなたが主役です！✨ 主人公のエネルギーに満ちた新しい一年の始まり。純粋な成長、無限の勝利、そしてネガティブな感情ゼロの一年になりますように。全力で楽しんでください！🚀🎂</string>
     <string name="BirthdayMakeWish">願い事をする 🌟</string>
     <string name="BirthdayWishSent">願いが星に届きました！🌌✨</string>
-    <!-- [Alexgram: Birthday Wish] - End -->
+    <string name="SelectRangeSharedMedia">Select Range in Shared Media</string>
+    <string name="SelectRangeSharedMediaAbout">Enable double checkmark button to select all media items between the first and last selected items.</string>
+    <string name="SelectTwoItemsToSelectRange">Please select at least two items to select a range.</string>
 </resources>
-

@@ -2237,7 +2237,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
         final boolean hasAvatar = chatAvatarContainer.hasVisibleAvatar();
         int visualWidth = chatAvatarContainer.getVisualWidth();
-        if (hasAvatar) {
+        if (hasAvatar && !chatAvatarContainer.isCentered()) {
             visualWidth = Math.max(visualWidth, dp(192));
         }
 
@@ -2279,7 +2279,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     public void checkMenuItemsWidth() {
         int defaultMenuWidth = Math.max(0, menu != null ? (int) menu.getItemsWidth() - dp(1) - dp(1) : 0);
-        if (!isSearchFieldVisible && chatAvatarContainer == null && menu != null && menu.isCenteredTitle()) {
+        if (!isSearchFieldVisible && menu != null && menu.isCenteredTitle()) {
+            defaultMenuWidth = Math.max(defaultMenuWidth, dp(46));
+        } else if (!isSearchFieldVisible && chatAvatarContainer != null && chatAvatarContainer.isCentered()) {
             defaultMenuWidth = Math.max(defaultMenuWidth, dp(46));
         }
         final int actionMenuWidth = Math.max(0, actionMode != null ? actionMode.getItemsWidth() - dp(1) - dp(1) : 0);
@@ -2326,10 +2328,14 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                 final int width = lerp(Math.min(widthDefault, (int) animatorAvatarContainerWidth.getFactor() + p * 2), expandedWidth, Math.max(searchFactor, actionModeFactor));
                 left = (rightDefault + leftDefault - width) / 2;
                 right = left + width;
-                chatAvatarContainer.setTranslationX(left
-                    - ((MarginLayoutParams)(chatAvatarContainer.getLayoutParams())).leftMargin
-                    - chatAvatarContainer.getLeftPadding()
-                    + p + dp(3));
+                if (chatAvatarContainer.isCentered()) {
+                    chatAvatarContainer.setTranslationX(0);
+                } else {
+                    chatAvatarContainer.setTranslationX(left
+                        - ((MarginLayoutParams)(chatAvatarContainer.getLayoutParams())).leftMargin
+                        - chatAvatarContainer.getLeftPadding()
+                        + p + dp(3));
+                }
             } else {
                 if (actionModeFactor > 0) {
                     final int targetActionModeWidth = Math.min(widthDefault, dp(58));
@@ -2393,9 +2399,17 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             return;
         }
         final float rRight = dp(23);
-        final float targetLeft = AvatarCornerHelper.getAvatarRoundRadius(46.0f, glassModeIsForum);
+        final float targetLeft = (chatAvatarContainer != null && chatAvatarContainer.isCentered()) ? dp(23) : AvatarCornerHelper.getAvatarRoundRadius(46.0f, glassModeIsForum);
         final float rLeft = lerp(targetLeft, dp(23), searchFieldVisibleAlpha);
         glassDrawable.setRadius(rLeft, rRight, rRight, rLeft);
+        if (glassDrawableMenu != null) {
+            if (chatAvatarContainer != null && chatAvatarContainer.isCentered()) {
+                final float avatarRadius = AvatarCornerHelper.getAvatarRoundRadius(46.0f, glassModeIsForum);
+                glassDrawableMenu.setRadius(avatarRadius);
+            } else {
+                glassDrawableMenu.setRadius(dp(23));
+            }
+        }
     }
 
     public void setForceSkipTouches(boolean forceSkipTouches) {

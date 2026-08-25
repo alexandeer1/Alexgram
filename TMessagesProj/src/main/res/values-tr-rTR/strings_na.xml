@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">Arka planda çalıştır</string>
+    <string name="RunInBackgroundInfo">Güvenilir bildirimler için uygulamayı arka planda çalışmaya devam ettirin.</string>
+    <string name="NagramXPushService">Alexgram Bildirim Servisi</string>
     <string name="N_Config">A-Ayarlar</string>
     <string name="CombineMessage">Mesajları Birleştir</string>
     <string name="TextStyle">Metin Stili</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">Mesaj Kimliğini (ID) Göster</string>
     <string name="ShowRPCError">RPC Hatalarını Ekranda Bildir (Toast)</string>
     <string name="ShowPremiumStickersAnimation">Premium Çıkartma Animasyonlarını Göster</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Renkli</string>
     <string name="AppIconDarkGreen">Koyu Yeşil</string>
     <string name="AppIconNeon">Neon</string>
     <string name="AppIconNiello">Savatsı (Niello)</string>
     <string name="AppIconBlue">Mavi</string>
+    <string name="AppIconColored">Alexgram Renkli</string>
+    <string name="AppIconDark">Alexgram Karanlık</string>
+    <string name="AppIconGreen">Alexgram Yeşil</string>
+    <string name="AppIconPink">Alexgram Pembe</string>
+    <string name="AppIconRoseBlue">Alexgram GülMavi</string>
+    <string name="AppIconWhite">Alexgram Beyaz</string>
     <string name="AppIconDarkBlue">Koyu Mavi</string>
     <string name="AppIconBlurBlue">Bulanık Mavi</string>
     <string name="InputMessageId">Mesaj Kimliği (ID) Girin</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">Özel Düzenlendi İşareti</string>
     <string name="NotificationIcon">Bildirim Simgesi</string>
     <string name="Official">Resmi</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">Cadılar Bayramı (Halloween)</string>
     <string name="ShowOnlineStatus">Çevrimiçi Durumu Göster</string>
     <string name="ShowOnlineStatusNotice">Gruplarda diğer kişilerin çevrimiçi durumunu profil fotoğraflarının yanında gösterin.</string>
@@ -65,7 +76,11 @@
     <string name="ShowQuickReplyInBotCommands">Bot Komutlarında Hızlı Yanıtı Göster</string>
     <string name="PushServiceType">Bildirim (Push) Servisi Türü</string>
     <string name="PushServiceTypeInApp">Uygulama İçi</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Kalıcı Bildirimleri Göster</string>
+    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">MP4 Belgesini Video Olarak Gönder</string>
     <string name="StickersChooseShortNameForStickerPack">Paketiniz için kısa bir ad seçin.</string>
     <string name="StickersCopyStickerSet">Çıkartma Setini Kopyala</string>
@@ -86,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Büyük/küçük harfe duyarsız ifadeler</string>
     <string name="RegexFiltersAdd">Filtre ekle</string>
     <string name="RegexFiltersEdit">Filtreyi düzenle</string>
-    <string name="RegexFiltersAddDescription">Düzenli ifadenizi (regex) tam olarak test etmek için &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt; sitesini kullanabilirsiniz. Düz metin de kullanabilirsiniz, ancak köşeli parantezleri kaçış karakteriyle (escape) ayırmayı unutmayın.</string>
+    <string name="RegexFiltersAddDescription">Düzenli ifadenizi (regex) tam olarak test etmek için &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt; sitesini kullanabilirsiniz. Düz metin de kullanabilirsiniz, ancak köşeli parantezleri kaçış karakteriyle (escape) ayırmayı unutmayın.</string>
     <string name="RegexFiltersAddError">Regex sözdizimi (syntax) hatası</string>
     <string name="ShowTimeHint">Ayrıntılar için Saate Dokunun</string>
     <string name="SearchHashtagDefaultPageChannel">Kanallarda Varsayılan Hashtag Arama Sayfası</string>
     <string name="SearchHashtagDefaultPageChat">Sohbetlerde Varsayılan Hashtag Arama Sayfası</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Gönderirken Pangu\'yu Etkinleştir</string>
     <string name="PanguInfo">İyi bir okunabilirlik için paranoyak metin aralığı; CJK (Çince, Japonca, Korece), yarı genişlikteki İngilizce karakterler, rakamlar ve semboller arasına otomatik olarak boşluk ekler.</string>
     <string name="SendWithPangu">Pangu ile gönder</string>
@@ -104,22 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">Yazılım (SW) Tercih Et</string>
     <string name="VideoPlayerDecoderHardware">Sadece Donanım (HW)</string>
     <string name="VideoPlayerDecoderPreferHW">Donanım (HW) Tercih Et</string>
-    <string name="RunInBackground">Arka planda çalıştır</string>
-    <string name="RunInBackgroundInfo">Güvenilir bildirimler için uygulamayı arka planda çalışmaya devam ettirin.</string>
-    <string name="NagramXPushService">Alexgram Bildirim Servisi</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram Renkli</string>
-    <string name="AppIconDark">Alexgram Karanlık</string>
-    <string name="AppIconGreen">Alexgram Yeşil</string>
-    <string name="AppIconPink">Alexgram Pembe</string>
-    <string name="AppIconRoseBlue">Alexgram GülMavi</string>
-    <string name="AppIconWhite">Alexgram Beyaz</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">Canlı Video Duvar Kağıdı</string>
     <string name="ExportChat">Sohbeti dışa aktar</string>
     <string name="ImportChat">Sohbeti içe aktar</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">Hassas sohbetleri ana listeden gizleyin. Şifre veya biyometrik ile kilidi açtıktan sonra Başlık çubuğuna basılı tutarak bunlara erişin.</string>
     <string name="HideContacts">Kişileri gizle</string>
     <string name="RestartRequired">Değişiklikleri uygulamak için yeniden başlatma gerekiyor</string>
-    <string name="MaxActiveAccounts">Maksimum Aktif Hesap Sayısı</string>
-    <string name="LimitReachedAccountsNa">Üzgünüz, **%1$d**\'den fazla hesap ekleyemezsiniz. Bu sınırı (100\'e kadar) **A-Ayarlar &gt; Genel** bölümünden artırabilirsiniz.</string>
-    <string name="MaxActiveAccountsWarning">Şu anda %1$d aktif hesabınız var. Sınırı %2$d olarak ayarlamak, bazılarından çıkış yapana kadar yeni hesap eklemenizi engelleyecektir.</string>
     <string name="SplitChat">Sohbeti Böl</string>
     <string name="SplitChatClose">Bölmeyi Kapat</string>
     <string name="SplitChatSelectChat">Yan yana açmak için bir sohbet seçin</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">Engellenen/gölge yasaklı kullanıcıların mesajlarını gizlemek yerine spoyler maskesi arkasında göster.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Yalnızca eşleşen düzenli ifadeleri maskele</string>
     <string name="RegexFiltersSpoilerColor">Maske parçacık rengi</string>
+    <string name="AccountsSettings">Hesaplar</string>
+    <string name="AccountLimitsHeader">Hesap Limitleri</string>
+    <string name="StartupPerformanceHeader">Başlangıç Performansı</string>
+    <string name="MaxAccountCount">Maksimum Hesap Sayısı</string>
+    <string name="MaxActiveAccounts">Maksimum Etkin Hesap</string>
+    <string name="StartupActiveAccounts">Başlangıçta Etkin Hesaplar</string>
+    <string name="StartupActiveAccountsInfo">Uygulama açıldığında kaç hesabın başlatılacağını kontrol eder. Daha düşük değerler daha hızlı açılış ve daha az pil kullanımı sağlar. Diğer hesaplar üzerlerine geçildiğinde yüklenir.</string>
+    <string name="LimitReachedAccountsNa">Üzgünüz, **%1$d** adetten fazla hesap ekleyemezsiniz. Bu limiti **A-Settings → Hesaplar** bölümünden (100\'e kadar) artırabilirsiniz.</string>
+    <string name="MaxActiveAccountsWarning">Şu anda %1$d aktif hesabınız var. Limiti %2$d olarak ayarlamak, bazı hesaplardan çıkış yapana kadar yeni hesap eklemenizi engeller.</string>
+    <string name="HiddenAccountsTitle">Gizli Hesaplar</string>
+    <string name="HiddenAccountsDesc">Bir hesabı gizlemek için kilit simgesine dokunun. Gizli hesaplar, bu kasayı açana kadar hesap değiştiricide görünmez.</string>
+    <string name="HiddenAccountsHeader">Gizli Hesaplar</string>
+    <string name="HiddenAccountsChangePIN">PIN Değiştir</string>
+    <string name="HiddenAccountsRemovePIN">PIN\'i Kaldır &amp; Tümünü Göster</string>
+    <string name="HiddenAccountsRemovePINConfirm">Bu işlem PIN\'i kalıcı olarak kaldıracak ve tüm gizli hesapları tekrar görünür yapacaktır. Emin misiniz?</string>
+    <string name="HiddenAccountsAutoLock">Arka Planda Kilitle</string>
+    <string name="HiddenAccountsAutoLockDesc">Etkinleştirildiğinde, uygulama arka plana geçtiğinde kasa otomatik olarak yeniden kilitlenir.</string>
+    <string name="HiddenAccountsSection">Hesaplar</string>
+    <string name="HiddenAccountsPINManagement">PIN Yönetimi</string>
+    <string name="HideHomeSearchField">Arama Çubuğunu Gizle</string>
+    <string name="HideHomeSearchFieldDesc">Sohbet listesindeki arama çubuğunu gizleyin. Sağ üstteki arama simgesine dokunarak yine de arama yapabilirsiniz.</string>
+    <string name="MainTabsShowSearchButton">Alt Çubukta Arama Simgesini Göster</string>
+    <string name="MainTabsShowSearchButtonDesc">Ana gezinti sekmelerinin yanında alt çubukta bir arama simgesi görüntüler.</string>
+    <string name="SessionManagementHeader">Oturum Yönetimi</string>
+    <string name="SessionManagementTitle">Hesap Oturum Yöneticisi</string>
+    <string name="SessionManagementDesc">Giriş yapılmış oturumları, etkin cihazları, Pyrogram/Telethon oturumlarını ve yedekleme dışa/içe aktarmayı yönetin.</string>
+    <string name="ExportSessionsTitle">Hesap Oturumlarını Dışa Aktar</string>
+    <string name="ExportSessionsDesc">Etkin oturumları Pyrogram Dizesi, Pyrogram .session dosyası, Telethon veya tam JSON Yedeği olarak dışa aktarın.</string>
+    <string name="ImportSessionTitle">Hesap Oturumu İçe Aktar</string>
+    <string name="ImportSessionDesc">Pyrogram oturum dizesi, Pyrogram .session dosyası, Telethon dizesi veya JSON yedekleme dosyası içe aktarın.</string>
+    <string name="ImportSessionStringTitle">Oturum Dizesi İçe Aktar</string>
+    <string name="ImportSessionStringDesc">Doğrudan giriş yapmak için bir Pyrogram (v1/v2) veya Telethon oturum dizesi yapıştırın.</string>
+    <string name="TelegramActiveDevices">Telegram Etkin Cihazları</string>
+    <string name="TelegramActiveDevicesDesc">Etkin cihazları görüntüleyin ve Telegram sunucularında kayıtlı oturumları yönetin.</string>
+    <string name="WebSessionsTitleNa">Web Oturumları</string>
+    <string name="WebSessionsDesc">Yetkilendirilmiş web sitelerini ve web uygulaması oturumlarını yönetin.</string>
+    <string name="ScanSessionQRCode">Oturum QR Kodunu Tara</string>
+    <string name="ScanSessionQRCodeDesc">QR kodunu tarayarak başka bir masaüstü veya web istemcisini yetkilendirin.</string>
+    <string name="SessionEncryptExport">Yedeği Parolayla Koru</string>
+    <string name="SessionEncryptExportDesc">Dışa aktarılan oturum yedek dosyalarını bir parolayla şifreleyin.</string>
+    <string name="ActiveSessionsSection">Etkin Hesap Oturumları</string>
+    <string name="SessionBackupSection">Yedekleme &amp; Geri Yükleme</string>
+    <string name="SessionToolsSection">Oturum Araçları &amp; Cihazlar</string>
+    <string name="SessionDetailsTitle">Oturum Ayrıntıları</string>
+    <string name="SwitchToAccount">Hesaba Geç</string>
+    <string name="TerminateAllOtherSessions">Diğer Tüm Oturumları Kapat</string>
+    <string name="TerminateAllOtherSessionsConfirm">Diğer tüm aktif Telegram oturumlarını kapatmak istediğinizden emin misiniz?</string>
+    <string name="SessionExportSuccess">Oturum yedeği İndirilenler klasörüne başarıyla aktarıldı!</string>
+    <string name="SessionExportError">Oturum yedeği dışa aktarılamadı.</string>
+    <string name="SessionImportSuccess">%1$s için oturum yedeği başarıyla işlendi!</string>
+    <string name="SessionImportError">Oturum yedeği içe aktarılamadı: Geçersiz veya bozuk dosya biçimi.</string>
+    <string name="ExportPyrogramString">Pyrogram Oturum Dizesini Kopyala</string>
+    <string name="ExportPyrogramFile">Pyrogram .session Dosyasını Dışa Aktar</string>
+    <string name="ExportTelethonString">Telethon Oturum Dizesini Kopyala</string>
+    <string name="PasteSessionStringHint">Pyrogram (v1/v2) veya Telethon oturum dizesini buraya yapıştırın...</string>
+    <string name="SessionCopied">Pyrogram oturum dizesi panoya kopyalandı!</string>
+    <string name="TelethonSessionCopied">Telethon oturum dizesi panoya kopyalandı!</string>
+    <string name="ExportTypeTitle">Dışa Aktarma Biçimini Seçin</string>
+    <string name="ExportPyrogramStringOpt">Pyrogram Oturum Dizesi (v2 - En Son)</string>
+    <string name="ExportPyrogramFileOpt">Pyrogram SQLite (.session) Dosyası</string>
+    <string name="ExportTelethonStringOpt">Telethon Oturum Dizesi</string>
+    <string name="ExportAlexgramBackupOpt">Alexgram Tam Oturum Yedeği (.session)</string>
+    <string name="PasteClipboard">Panodan Yapıştır</string>
+    <string name="ImportSessionButton">Oturumu İçe Aktar</string>
+    <string name="SessionImportSuccessDesc">Oturum başarıyla içe aktarıldı!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Maksimum etkin hesap sınırına ulaşıldı. Lütfen önce bir hesabı kaldırın.</string>
+    <string name="SessionPasswordRequired">Şifrelenmiş oturum yedeği için parola gereklidir.</string>
+    <string name="SessionFileEmpty">Seçilen oturum dosyası boş.</string>
+    <string name="SessionNoAccountsInBackup">Yedekleme dosyasında geçerli hesap oturumu bulunamadı.</string>
+    <string name="SessionStreamError">Dosya akışı açılamadı.</string>
+    <string name="SessionAlreadyActive">Zaten bu hesaptasınız</string>
+    <string name="InvalidSessionString">Geçersiz Pyrogram veya Telethon oturum dizesi biçimi.</string>
+    <string name="FailedExtractAuthKey">Oturum kimlik doğrulama anahtarı çıkarılamadı.</string>
+    <string name="CopyAgain">Yeniden Kopyala</string>
+    <string name="ShareSessionString">Oturum Dizesini Paylaş</string>
+    <string name="PyrogramSessionStringV2">Pyrogram Oturum Dizesi (v2)</string>
+    <string name="TelethonSessionStringTitle">Telethon Oturum Dizesi</string>
+    <string name="NoAccounts">Etkin hesap bulunamadı.</string>
+    <string name="Feed">Akış</string>
+    <string name="GoToMessage">Mesaja Git</string>
+    <string name="FeedSettings">Akış Ayarları</string>
+    <string name="FeedBottomTab">Alt Çubukta Akış Sekmesi</string>
+    <string name="FeedBottomTabInfo">Alt gezinti çubuğunda Akış sekmesini göster.</string>
+    <string name="FeedUnreadCounter">Okunmamış Sayacı</string>
+    <string name="FeedIncludeArchived">Arşivlenmiş Kanalları Dahil Et</string>
+    <string name="FeedIncludeArchivedInfo">Arşivlenmiş kanallardan gelen mesajları Akışa dahil et.</string>
+    <string name="FeedShownChannels">Gösterilen Kanallar</string>
+    <string name="FeedHiddenChannels">Gizlenen Kanallar</string>
+    <string name="FeedChannelsInfo">Akışınızda görmek istemediğiniz kanalların işaretini kaldırın.</string>
+    <string name="FeedMarkAllRead">Tümünü Okundu Olarak İşaretle</string>
+    <string name="FeedMarkAllReadConfirm">Akıştaki tüm gönderileri okundu olarak işaretlemek istediğinizden emin misiniz?</string>
+    <string name="FeedMarkAllReadDone">Tüm gönderiler okundu olarak işaretlendi</string>
+    <string name="FeedChannelHidden">%1$s kanalı gizlendi</string>
+    <string name="FeedHideChannel">Akıştan Gizle</string>
 </resources>

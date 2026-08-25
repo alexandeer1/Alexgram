@@ -1,5 +1,8 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="RunInBackground">Uruchom w tle</string>
+    <string name="RunInBackgroundInfo">Utrzymuj aplikację w tle, aby zapewnić niezawodne powiadomienia.</string>
+    <string name="NagramXPushService">Alexgram Push Service</string>
     <string name="N_Config">A-Konfiguracja</string>
     <string name="CombineMessage">Połącz wiadomości</string>
     <string name="TextStyle">Styl tekstu</string>
@@ -19,11 +22,18 @@
     <string name="ShowMessageID">Pokaż identyfikator wiadomości</string>
     <string name="ShowRPCError">Pokaż błędy RPC</string>
     <string name="ShowPremiumStickersAnimation">Pokaż animację naklejek premium</string>
+    <string name="AppIconGoogle">Google</string>
     <string name="AppIconColorful">Kolorowy</string>
     <string name="AppIconDarkGreen">Ciemna zieleń</string>
     <string name="AppIconNeon">Neonowy</string>
     <string name="AppIconNiello">Niello</string>
     <string name="AppIconBlue">Niebieski</string>
+    <string name="AppIconColored">Alexgram Colored</string>
+    <string name="AppIconDark">Alexgram Dark</string>
+    <string name="AppIconGreen">Alexgram Green</string>
+    <string name="AppIconPink">Alexgram Pink</string>
+    <string name="AppIconRoseBlue">Alexgram RoseBlue</string>
+    <string name="AppIconWhite">Alexgram White</string>
     <string name="AppIconDarkBlue">Ciemnoniebieski</string>
     <string name="AppIconBlurBlue">Rozmyty niebieski</string>
     <string name="InputMessageId">Wprowadź identyfikator wiadomości</string>
@@ -38,6 +48,7 @@
     <string name="CustomEditedMessage">Niestandardowy edytowany znak</string>
     <string name="NotificationIcon">Ikona powiadomienia</string>
     <string name="Official">Oficjalny</string>
+    <string name="Nagram">Alexgram</string>
     <string name="HalloWeen">Halloweenowy</string>
     <string name="ShowOnlineStatus">Pokaż status online</string>
     <string name="ShowOnlineStatusNotice">Pokaż status online innych osób obok ich zdjęcia profilowego w grupach.</string>
@@ -65,7 +76,11 @@
     <string name="ShowQuickReplyInBotCommands">Pokaż szybką odpowiedź w poleceniach bota</string>
     <string name="PushServiceType">Typ usługi push</string>
     <string name="PushServiceTypeInApp">W aplikacji</string>
+    <string name="PushServiceTypeFCM">Google FCM</string>
+    <string name="PushServiceTypeUnified">UnifiedPush</string>
+    <string name="PushServiceTypeMicroG">microG</string>
     <string name="PushServiceTypeInAppDialog">Pokaż powiadomienia dla mieszkańców</string>
+    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
     <string name="SendMp4DocumentAsVideo">Wyślij dokument MP4 jako wideo</string>
     <string name="StickersChooseShortNameForStickerPack">Wybierz krótką nazwę dla swojego pakietu.</string>
     <string name="StickersCopyStickerSet">Skopiuj zestaw naklejek</string>
@@ -86,11 +101,12 @@
     <string name="RegexFiltersCaseInsensitive">Wyrażenia bez uwzględniania wielkości liter</string>
     <string name="RegexFiltersAdd">Dodaj filtr</string>
     <string name="RegexFiltersEdit">Edytuj filtr</string>
-    <string name="RegexFiltersAddDescription">Możesz skorzystać ze strony &lt;a href="https://regex101.com"&gt;regex101.com&lt;/a&gt;, aby w pełni przetestować swoje wyrażenie regularne. Możesz również użyć zwykłego tekstu, ale pamiętaj o użyciu nawiasów kwadratowych.</string>
+    <string name="RegexFiltersAddDescription">Możesz skorzystać ze strony &lt;a href=\"https://regex101.com\"&gt;regex101.com&lt;/a&gt;, aby w pełni przetestować swoje wyrażenie regularne. Możesz również użyć zwykłego tekstu, ale pamiętaj o użyciu nawiasów kwadratowych.</string>
     <string name="RegexFiltersAddError">Błąd składni wyrażenia regularnego</string>
     <string name="ShowTimeHint">Kliknij Czas, aby poznać szczegóły</string>
     <string name="SearchHashtagDefaultPageChannel">Domyślna strona wyszukiwania hashtagów w kanałach</string>
     <string name="SearchHashtagDefaultPageChat">Domyślna strona wyszukiwania hashtagów w czatach</string>
+    <string name="Pangu">Pangu</string>
     <string name="EnablePanguOnSending">Włącz Pangu podczas wysyłania</string>
     <string name="PanguInfo">Paranoiczne odstępy w tekście w celu zapewnienia lepszej czytelności, aby automatycznie wstawiać odstępy między znakami CJK (chiński, japoński, koreański), znakami o połowie szerokości języka angielskiego, cyframi i symbolami.</string>
     <string name="SendWithPangu">Wyślij z Pangu</string>
@@ -104,22 +120,6 @@
     <string name="VideoPlayerDecoderPreferSW">Preferuj SW</string>
     <string name="VideoPlayerDecoderHardware">Tylko HW</string>
     <string name="VideoPlayerDecoderPreferHW">Preferuj HW</string>
-    <string name="RunInBackground">Uruchom w tle</string>
-    <string name="RunInBackgroundInfo">Utrzymuj aplikację w tle, aby zapewnić niezawodne powiadomienia.</string>
-    <string name="NagramXPushService">Alexgram Push Service</string>
-    <string name="AppIconGoogle" translatable="false">Google</string>
-    <string name="AppIconColored">Alexgram Colored</string>
-    <string name="AppIconDark">Alexgram Dark</string>
-    <string name="AppIconGreen">Alexgram Green</string>
-    <string name="AppIconPink">Alexgram Pink</string>
-    <string name="AppIconRoseBlue">Alexgram RoseBlue</string>
-    <string name="AppIconWhite">Alexgram White</string>
-    <string name="Nagram" translatable="false">Alexgram</string>
-    <string name="PushServiceTypeFCM" translatable="false">Google FCM</string>
-    <string name="PushServiceTypeUnified" translatable="false">UnifiedPush</string>
-    <string name="PushServiceTypeMicroG" translatable="false">microG</string>
-    <string name="PushServiceTypeUnifiedGateway">Unified Push Gateway</string>
-    <string name="Pangu" translatable="false">Pangu</string>
     <string name="EnableLiveVideoWallpaper">Animowana tapeta wideo</string>
     <string name="ExportChat">Eksportuj czat</string>
     <string name="ImportChat">Importuj czat</string>
@@ -137,9 +137,6 @@
     <string name="HiddenChatsAbout">Ukryj wrażliwe czaty z listy głównej. Dostęp do nich uzyskasz, przytrzymując pasek tytułu po odblokowaniu hasłem lub biometrią.</string>
     <string name="HideContacts">Ukryj kontakty</string>
     <string name="RestartRequired">Wymagany restart, aby zastosować zmiany</string>
-    <string name="MaxActiveAccounts">Maksymalna liczba aktywnych kont</string>
-    <string name="LimitReachedAccountsNa">Przepraszamy, nie możesz dodać więcej niż **%1$d** kont. Możesz zwiększyć ten limit (do 100) w **A-Ustawienia &gt; Ogólne**.</string>
-    <string name="MaxActiveAccountsWarning">Masz obecnie %1$d aktywnych kont. Ustawienie limitu na %2$d uniemożliwi Ci dodawanie nowych kont, dopóki nie wylogujesz się z niektórych.</string>
     <string name="SplitChat">Podziel Chat</string>
     <string name="SplitChatClose">Zamknij Podział</string>
     <string name="SplitChatSelectChat">Wybierz czat do otwarcia obok</string>
@@ -155,4 +152,98 @@
     <string name="MaskBlockedUserMessagesAbout">Pokazuj wiadomości od zablokowanych/ukrytych użytkowników pod spoilerem zamiast całkowitego ich ukrywania.</string>
     <string name="RegexFiltersSpoilerMatchOnly">Maskuj tylko pasujące wyrażenia regularne</string>
     <string name="RegexFiltersSpoilerColor">Kolor cząsteczek spoilera</string>
+    <string name="AccountsSettings">Konta</string>
+    <string name="AccountLimitsHeader">Limity kont</string>
+    <string name="StartupPerformanceHeader">Wydajność startowa</string>
+    <string name="MaxAccountCount">Maksymalna liczba kont</string>
+    <string name="MaxActiveAccounts">Maksymalna liczba aktywnych kont</string>
+    <string name="StartupActiveAccounts">Aktywne konta podczas uruchamiania</string>
+    <string name="StartupActiveAccountsInfo">Określa, ile kont jest inicjalizowanych podczas otwierania aplikacji. Niższe wartości przyspieszają uruchamianie i oszczędzają baterię. Inne konta są ładowane na żądanie po przełączeniu.</string>
+    <string name="LimitReachedAccountsNa">Przepraszamy, nie możesz dodać więcej niż **%1$d** kont. Możesz zwiększyć ten limit (do 100) w **A-Settings → Konta**.</string>
+    <string name="MaxActiveAccountsWarning">Masz obecnie %1$d aktywnych kont. Ustawienie limitu na %2$d uniemożliwi dodawanie nowych kont, dopóki nie wylogujesz się z niektórych.</string>
+    <string name="HiddenAccountsTitle">Ukryte konta</string>
+    <string name="HiddenAccountsDesc">Dotknij ikony kłódki, aby ukryć konto. Ukryte konta nie pojawią się w przełączniku, dopóki nie odblokujesz tego sejfu.</string>
+    <string name="HiddenAccountsHeader">Ukryte konta</string>
+    <string name="HiddenAccountsChangePIN">Zmień PIN</string>
+    <string name="HiddenAccountsRemovePIN">Usuń PIN i odkryj wszystkie</string>
+    <string name="HiddenAccountsRemovePINConfirm">Spowoduje to trwałe usunięcie kodu PIN i ponowne uwidocznienie wszystkich ukrytych kont. Czy na pewno?</string>
+    <string name="HiddenAccountsAutoLock">Blokuj w tle</string>
+    <string name="HiddenAccountsAutoLockDesc">Gdy włączone, sejf automatycznie blokuje się po przejściu aplikacji do tła.</string>
+    <string name="HiddenAccountsSection">Konta</string>
+    <string name="HiddenAccountsPINManagement">Zarządzanie PIN-em</string>
+    <string name="HideHomeSearchField">Ukryj pasek wyszukiwania</string>
+    <string name="HideHomeSearchFieldDesc">Ukrywa pasek wyszukiwania na liście czatów. Nadal możesz wyszukiwać za pomocą ikony w prawym górnym rogu.</string>
+    <string name="MainTabsShowSearchButton">Pokaż ikonę wyszukiwania na dolnym pasku</string>
+    <string name="MainTabsShowSearchButtonDesc">Wyświetla ikonę wyszukiwania na dolnym pasku obok głównych kart nawigacyjnych.</string>
+    <string name="SessionManagementHeader">Zarządzanie sesjami</string>
+    <string name="SessionManagementTitle">Menedżer sesji kont</string>
+    <string name="SessionManagementDesc">Zarządzaj zalogowanymi sesjami, aktywnymi urządzeniami, sesjami Pyrogram/Telethon oraz eksportem/importem kopii zapasowych.</string>
+    <string name="ExportSessionsTitle">Eksportuj sesje kont</string>
+    <string name="ExportSessionsDesc">Eksportuj aktywne sesje do ciągu Pyrogram, pliku Pyrogram .session, ciągu Telethon lub pełnej kopii JSON.</string>
+    <string name="ImportSessionTitle">Importuj sesję konta</string>
+    <string name="ImportSessionDesc">Importuj ciąg sesji Pyrogram, plik Pyrogram .session, ciąg Telethon lub plik kopii zapasowej JSON.</string>
+    <string name="ImportSessionStringTitle">Importuj ciąg sesji</string>
+    <string name="ImportSessionStringDesc">Wklej ciąg sesji Pyrogram (v1/v2) lub Telethon, aby zalogować się bezpośrednio.</string>
+    <string name="TelegramActiveDevices">Aktywne urządzenia Telegram</string>
+    <string name="TelegramActiveDevicesDesc">Przeglądaj aktywne urządzenia i zarządzaj sesjami zarejestrowanymi na serwerach Telegram.</string>
+    <string name="WebSessionsTitleNa">Sesje internetowe</string>
+    <string name="WebSessionsDesc">Zarządzaj autoryzowanymi witrynami i sesjami aplikacji internetowych.</string>
+    <string name="ScanSessionQRCode">Zeskanuj kod QR sesji</string>
+    <string name="ScanSessionQRCodeDesc">Autoryzuj innego klienta stacjonarnego lub przeglądarkowego, skanując jego kod QR.</string>
+    <string name="SessionEncryptExport">Chroń kopię zapasową hasłem</string>
+    <string name="SessionEncryptExportDesc">Szyfruj eksportowane pliki kopii zapasowej sesji za pomocą hasła.</string>
+    <string name="ActiveSessionsSection">Aktywne sesje kont</string>
+    <string name="SessionBackupSection">Kopia zapasowa i przywracanie</string>
+    <string name="SessionToolsSection">Narzędzia sesji i urządzenia</string>
+    <string name="SessionDetailsTitle">Szczegóły sesji</string>
+    <string name="SwitchToAccount">Przełącz na konto</string>
+    <string name="TerminateAllOtherSessions">Zakończ wszystkie inne sesje</string>
+    <string name="TerminateAllOtherSessionsConfirm">Czy na pewno chcesz zakończyć wszystkie inne aktywne sesje Telegrama?</string>
+    <string name="SessionExportSuccess">Kopia zapasowa sesji została pomyślnie wyeksportowana do folderu Pobrane!</string>
+    <string name="SessionExportError">Nie udało się wyeksportować kopii zapasowej sesji.</string>
+    <string name="SessionImportSuccess">Pomyślnie zaimportowano sesję dla %1$s!</string>
+    <string name="SessionImportError">Błąd importu sesji: nieprawidłowy lub uszkodzony format pliku.</string>
+    <string name="ExportPyrogramString">Kopiuj ciąg sesji Pyrogram</string>
+    <string name="ExportPyrogramFile">Eksportuj plik Pyrogram .session</string>
+    <string name="ExportTelethonString">Kopiuj ciąg sesji Telethon</string>
+    <string name="PasteSessionStringHint">Wklej tutaj ciąg sesji Pyrogram (v1/v2) lub Telethon...</string>
+    <string name="SessionCopied">Ciąg sesji Pyrogram skopiowany do schowka!</string>
+    <string name="TelethonSessionCopied">Ciąg sesji Telethon skopiowany do schowka!</string>
+    <string name="ExportTypeTitle">Wybierz format eksportu</string>
+    <string name="ExportPyrogramStringOpt">Ciąg sesji Pyrogram (v2 — najnowszy)</string>
+    <string name="ExportPyrogramFileOpt">Plik SQLite Pyrogram (.session)</string>
+    <string name="ExportTelethonStringOpt">Ciąg sesji Telethon</string>
+    <string name="ExportAlexgramBackupOpt">Pełna kopia zapasowa Alexgram (.session)</string>
+    <string name="PasteClipboard">Wklej ze schowka</string>
+    <string name="ImportSessionButton">Importuj sesję</string>
+    <string name="SessionImportSuccessDesc">Sesja została pomyślnie zaimportowana!\n\n%1$s</string>
+    <string name="MaxAccountsLimitReached">Osiągnięto limit aktywnych kont. Najpierw usuń konto.</string>
+    <string name="SessionPasswordRequired">Wymagane hasło do zaszyfrowanej kopii zapasowej.</string>
+    <string name="SessionFileEmpty">Wybrany plik sesji jest pusty.</string>
+    <string name="SessionNoAccountsInBackup">W pliku kopii zapasowej nie znaleziono prawidłowych sesji kont.</string>
+    <string name="SessionStreamError">Nie można otworzyć strumienia pliku.</string>
+    <string name="SessionAlreadyActive">Jesteś już na tym koncie</string>
+    <string name="InvalidSessionString">Nieprawidłowy format ciągu sesji Pyrogram lub Telethon.</string>
+    <string name="FailedExtractAuthKey">Nie udało się wyodrębnić klucza uwierzytelniającego sesji.</string>
+    <string name="CopyAgain">Kopiuj ponownie</string>
+    <string name="ShareSessionString">Udostępnij ciąg sesji</string>
+    <string name="PyrogramSessionStringV2">Ciąg sesji Pyrogram (v2)</string>
+    <string name="TelethonSessionStringTitle">Ciąg sesji Telethon</string>
+    <string name="NoAccounts">Nie znaleziono aktywnych kont.</string>
+    <string name="Feed">Kanały</string>
+    <string name="GoToMessage">Przejdź do wiadomości</string>
+    <string name="FeedSettings">Ustawienia kanałów</string>
+    <string name="FeedBottomTab">Karta Kanały na dolnym pasku</string>
+    <string name="FeedBottomTabInfo">Pokaż kartę Kanały na dolnym pasku nawigacyjnym.</string>
+    <string name="FeedUnreadCounter">Licznik nieprzeczytanych</string>
+    <string name="FeedIncludeArchived">Uwzględnij zarchiwizowane kanały</string>
+    <string name="FeedIncludeArchivedInfo">Uwzględniaj posty ze zarchiwizowanych kanałów w kanale ogólnym.</string>
+    <string name="FeedShownChannels">Wyświetlane kanały</string>
+    <string name="FeedHiddenChannels">Ukryte kanały</string>
+    <string name="FeedChannelsInfo">Odznacz kanały, których postów nie chcesz widzieć w kanale ogólnym.</string>
+    <string name="FeedMarkAllRead">Oznacz wszystkie jako przeczytane</string>
+    <string name="FeedMarkAllReadConfirm">Czy na pewno chcesz oznaczyć wszystkie posty jako przeczytane?</string>
+    <string name="FeedMarkAllReadDone">Wszystkie posty oznaczone jako przeczytane</string>
+    <string name="FeedChannelHidden">Ukryto kanał %1$s</string>
+    <string name="FeedHideChannel">Ukryj z kanałów</string>
 </resources>
