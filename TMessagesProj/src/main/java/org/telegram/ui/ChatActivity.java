@@ -51324,7 +51324,10 @@ public class ChatActivity extends BaseFragment implements
         if (parentFragment.isThreadChat() && !parentFragment.isTopic || parentFragment.isReport()) {
             return false;
         }
-        return parentFragment.getChatMode() != MODE_SEARCH && parentFragment.getChatMode() != MODE_SAVED;
+        if (parentFragment.getChatMode() == MODE_SAVED || UserObject.isUserSelf(parentFragment.currentUser)) {
+            return false;
+        }
+        return parentFragment.getChatMode() != MODE_SEARCH;
     }
 
     public boolean handleTranslateDuringAutoTrans(Object message) {
