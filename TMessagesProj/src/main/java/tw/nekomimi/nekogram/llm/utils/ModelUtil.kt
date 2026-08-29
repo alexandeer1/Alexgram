@@ -98,7 +98,23 @@ object ModelUtil {
     @JvmStatic
     fun isGemma4(model: String?): Boolean {
         val base = getBaseModelName(model).lowercase()
-        return base.contains("gemma") && base.contains("4")
+        return base.contains("gemma4") || base.contains("gemma-4")
+    }
+
+    @JvmStatic
+    fun isGemini3(model: String?): Boolean {
+        return getBaseModelName(model).lowercase().startsWith("gemini-3")
+    }
+
+    @JvmStatic
+    fun isGeminiLegacy(model: String?): Boolean {
+        val base = getBaseModelName(model).lowercase()
+        return base.startsWith("gemini-2") || base.startsWith("gemini-3-") || base.startsWith("gemini-3.1")
+    }
+
+    @JvmStatic
+    fun isDeepSeekV4(model: String?): Boolean {
+        return getBaseModelName(model).lowercase().startsWith("deepseek-v4")
     }
 
     @JvmStatic
@@ -109,10 +125,22 @@ object ModelUtil {
 
     @JvmStatic
     fun isReasoning(model: String?): Boolean {
+        return isOpenaiCompatibleReasoning(model) || isGemma4(model) || isDeepSeekV4(model)
+    }
+
+    @JvmStatic
+    fun isOpenaiCompatibleReasoning(model: String?): Boolean {
         val base = getBaseModelName(model).lowercase()
         return base.contains("gemini") && base.contains("flash")
-                || base.startsWith("gpt-oss")
                 || (base.startsWith("gpt-5") && !base.contains("instant") && !base.contains("chat"))
+                || base.startsWith("gpt-oss")
+                || base.startsWith("grok-4.3")
+                || base.startsWith("glm-5")
+                || base.startsWith("hy3")
+                || base.startsWith("inkling")
+                || base.startsWith("kimi-k2.5") || base.startsWith("kimi-k2.6") || base.startsWith("kimi-k3")
+                || base.startsWith("nemotron-3")
+                || base.startsWith("qwen3")
     }
 
     @JvmStatic
@@ -121,15 +149,125 @@ object ModelUtil {
         return when {
             base.startsWith("gpt-oss") -> "low"
             base.startsWith("gpt-5.") -> "none"
-            base.startsWith("gpt-5") -> "minimal"
+            base.startsWith("gpt-5") -> "low"
+            base.startsWith("gemini") && (base.endsWith("latest") || !isGeminiLegacy(model)) -> "low"
+            isGemma4(model) -> "low"
             else -> "none"
         }
     }
 
     @JvmStatic
+    fun applyReasoningParameters(requestJson: org.json.JSONObject, url: String?, model: String?) {
+        if (!isReasoning(model)) {
+            return
+        }
+        val providerPreset = when (url) {
+            PresetRegistry.getPresetBaseUrl(PresetRegistry.GEMINI) -> PresetRegistry.GEMINI
+            PresetRegistry.getPresetBaseUrl(PresetRegistry.OPENROUTER) -> PresetRegistry.OPENROUTER
+            PresetRegistry.getPresetBaseUrl(PresetRegistry.VERCEL_AI_GATEWAY) -> PresetRegistry.VERCEL_AI_GATEWAY
+            else -> null
+        }
+        if (isGemma4(model) && providerPreset != PresetRegistry.GEMINI) {
+            return
+        }
+        applyReasoningParametersInternal(requestJson, providerPreset, model)
+    }
+
+    private fun applyReasoningParametersInternal(requestJson: org.json.JSONObject, providerPreset: Int?, model: String?) {
+        if (providerPreset != null && applyReasoningParametersRouter(requestJson, providerPreset, model)) {
+            return
+        }
+        applyReasoningParametersOriginal(requestJson, model)
+    }
+
+    private fun applyReasoningParametersOriginal(requestJson: org.json.JSONObject, model: String?) {
+        if (isOpenaiCompatibleReasoning(model) || isGemma4(model)) {
+            val effort = getReasoningEffort(model)
+            if (effort.isNotEmpty() && effort != "none") {
+                requestJson.put("reasoning_effort", effort)
+            }
+        } else if (isDeepSeekV4(model)) {
+            requestJson.put("thinking", org.json.JSONObject().put("type", "disabled"))
+        }
+    }
+
+    private fun applyReasoningParametersRouter(requestJson: org.json.JSONObject, providerPreset: Int, model: String?): Boolean {
+        val routerProvider = getRouterModelProvider(model) ?: return false
+        return when (providerPreset) {
+            PresetRegistry.OPENROUTER -> {
+                when (routerProvider) {
+                    "google" -> {
+                        val effort = getReasoningEffort(model)
+                        if (effort.isNotEmpty() && effort != "none") {
+                            requestJson.put("reasoning", org.json.JSONObject().put("effort", effort))
+                        }
+                        return true
+                    }
+                    "openai" -> {
+                        if (model?.contains("gpt-oss") ?: return false) {
+                            requestJson.put("reasoning", org.json.JSONObject().put("effort", "low"))
+                            return true
+                        }
+                    }
+                }
+                requestJson.put("reasoning", org.json.JSONObject().put("effort", "none"))
+                true
+            }
+            PresetRegistry.VERCEL_AI_GATEWAY -> {
+                when (routerProvider) {
+                    "google" -> {
+                        val thinkingConfig = if (isGemini3(model)) {
+                            org.json.JSONObject().put("thinkingLevel", "low")
+                        } else {
+                            org.json.JSONObject().put("thinkingBudget", 0)
+                        }
+                        putProviderOptions(
+                            requestJson,
+                            "google",
+                            org.json.JSONObject().put("thinkingConfig", thinkingConfig)
+                        )
+                        return true
+                    }
+                    "deepseek" -> {
+                        if (isDeepSeekV4(model)) {
+                            putProviderOptions(
+                                requestJson,
+                                "deepseek",
+                                org.json.JSONObject().put("thinking", org.json.JSONObject().put("type", "disabled"))
+                            )
+                            return true
+                        }
+                    }
+                }
+                putProviderOptions(
+                    requestJson,
+                    routerProvider,
+                    org.json.JSONObject().put("reasoning", org.json.JSONObject().put("effort", "none"))
+                )
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun getRouterModelProvider(model: String?): String? {
+        if (model.isNullOrBlank() || !model.contains('/')) {
+            return null
+        }
+        return model.trim().substringBefore('/').lowercase()
+    }
+
+    private fun putProviderOptions(requestJson: org.json.JSONObject, provider: String, options: org.json.JSONObject) {
+        val providerOptions = requestJson.optJSONObject("providerOptions") ?: org.json.JSONObject().also {
+            requestJson.put("providerOptions", it)
+        }
+        providerOptions.put(provider, options)
+    }
+
+    @JvmStatic
     fun supportsTemperature(model: String?): Boolean {
         val base = getBaseModelName(model).lowercase()
-        return !base.startsWith("gpt-5")
+        return !base.startsWith("gpt-5") && (!base.startsWith("gemini") || isGeminiLegacy(model))
     }
 
     @JvmStatic

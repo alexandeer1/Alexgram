@@ -97,9 +97,8 @@ public final class OpenAICompatClient {
             requestJson = new JSONObject()
                     .put("model", modelName)
                     .put("messages", messages);
-            if (ModelUtil.isReasoning(modelName)) {
-                requestJson.put("reasoning_effort", ModelUtil.getReasoningEffort(modelName));
-            } else if (ModelUtil.isCerebrasGlm(baseUrl, modelName)) {
+            ModelUtil.applyReasoningParameters(requestJson, baseUrl, modelName);
+            if (ModelUtil.isCerebrasGlm(baseUrl, modelName)) {
                 requestJson.put("disable_reasoning", true);
             }
         } catch (Exception e) {
@@ -130,6 +129,9 @@ public final class OpenAICompatClient {
         String key = apiKey != null ? apiKey.trim() : "";
         if (key.isEmpty()) {
             return new LlmResponse<>(null, getString(R.string.ApiKeyNotSet), 0, 0);
+        }
+        if (key.contains("\n") || key.contains("\r")) {
+            return new LlmResponse<>(null, "API key contains invalid characters (newline)", 0, 0);
         }
 
         long start = System.currentTimeMillis();

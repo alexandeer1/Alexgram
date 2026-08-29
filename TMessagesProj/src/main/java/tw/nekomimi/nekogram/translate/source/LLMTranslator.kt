@@ -221,9 +221,8 @@ object LLMTranslator : Translator {
             if (ModelUtil.supportsTemperature(model)) {
                 put("temperature", NaConfig.llmTemperature.Float())
             }
-            if (ModelUtil.isReasoning(model)) {
-                put("reasoning_effort", ModelUtil.getReasoningEffort(model))
-            } else if (ModelUtil.isCerebrasGlm(apiUrl, model)) {
+            ModelUtil.applyReasoningParameters(this, apiUrl, model)
+            if (ModelUtil.isCerebrasGlm(apiUrl, model)) {
                 put("disable_reasoning", true)
             }
         }.toString()

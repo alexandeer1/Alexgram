@@ -1095,12 +1095,12 @@ public class TranslateController extends BaseController {
         }
 
         // --- NagramX Start ---
-        if (MessageHelper.shouldSkipTranslation(message.messageOwner.message)) {
+        if (MessageHelper.shouldSkipTranslation(source.text)) {
             return;
         }
 
         final ArrayList<String> buttonsToTranslate = new ArrayList<>();
-        if (message.messageOwner.reply_markup instanceof TLRPC.TL_replyInlineMarkup) {
+        if (!isTranscription && message.messageOwner.reply_markup instanceof TLRPC.TL_replyInlineMarkup) {
             TLRPC.TL_replyInlineMarkup inlineMarkup = (TLRPC.TL_replyInlineMarkup) message.messageOwner.reply_markup;
             for (int i = 0; i < inlineMarkup.rows.size(); i++) {
                 org.telegram.tgnet.tl.TL_keyboard.KeyboardInlineButtonRow row = inlineMarkup.rows.get(i);
@@ -1120,9 +1120,9 @@ public class TranslateController extends BaseController {
 
             final String query;
             if (buttonsToTranslate.isEmpty()) {
-                query = message.messageOwner.message;
+                query = source.text;
             } else {
-                StringBuilder sb = new StringBuilder(message.messageOwner.message);
+                StringBuilder sb = new StringBuilder(source.text);
                 for (String btn : buttonsToTranslate) {
                     sb.append("\n<<<<\n").append(btn);
                 }
@@ -1130,7 +1130,7 @@ public class TranslateController extends BaseController {
             }
 
             final String llmContext = buildLlmAutoTranslateContext(message);
-            Translator.translateWithContext(TranslatorKt.getCode2Locale(language), query, message.messageOwner.entities, llmContext, new Translator.Companion.TranslateCallBack2() {
+            Translator.translateWithContext(TranslatorKt.getCode2Locale(language), query, source.entities, llmContext, new Translator.Companion.TranslateCallBack2() {
                 @Override
                 public void onSuccess(@NonNull TLRPC.TL_textWithEntities finalText) {
                     synchronized (TranslateController.this) {

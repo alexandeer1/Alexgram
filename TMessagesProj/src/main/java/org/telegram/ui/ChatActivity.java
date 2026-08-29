@@ -33815,7 +33815,7 @@ public class ChatActivity extends BaseFragment implements
                             return true;
                         });
                     }
-                    if (option == nkbtn_translate && !NaConfig.INSTANCE.getShowTranslateMessageLLM().Bool()) {
+                    if (option == nkbtn_translate || option == OPTION_TRANSLATE) {
                         MessageObject msg = getMessageForTranslate();
                         boolean isRichMessage = msg != null && msg.isRich();
                         if (msg != null && !isRichMessage && !msg.isTranslated()) {
@@ -35213,6 +35213,12 @@ public class ChatActivity extends BaseFragment implements
                 }
                 break;
             }
+            case nkbtn_translateVoice:
+                TranscribeButton.retryOrTranslateVoiceTranscription(selectedObject, false, null);
+                break;
+            case nkbtn_transcriptionRetry:
+                TranscribeButton.retryOrTranslateVoiceTranscription(selectedObject, true, null);
+                break;
             case nkbtn_editAdmin: {
                 if (selectedObject != null && selectedObject.messageOwner != null && selectedObject.messageOwner.from_id != null) {
                     long uid = selectedObject.getFromChatId();
@@ -47449,6 +47455,7 @@ public class ChatActivity extends BaseFragment implements
             }
             case nkbtn_translate_llm:
             case nkbtn_translate:
+            case OPTION_TRANSLATE:
                 if (handleTranslateDuringAutoTrans(null)) {
                     return;
                 }
@@ -49233,12 +49240,12 @@ public class ChatActivity extends BaseFragment implements
                 if (selectedObject != null && !selectedObject.isEphemeral() && selectedObject.contentType == 0) {
                     if (isMessageTranslated(selectedObject)) {
                         items.add(LocaleController.getString(R.string.ShowOriginalButton));
-                        options.add(OPTION_TRANSLATE);
+                        options.add(nkbtn_translate);
                         icons.add(R.drawable.msg_translate);
                     } else if ((!TextUtils.isEmpty(selectedObject.getMessageTextToTranslate(groupedMessages, null)) && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) || (selectedObject.type == MessageObject.TYPE_ARTICLE && selectedObject.messageOwner != null && selectedObject.messageOwner.rich_message != null && !selectedObject.translated)) {
-                        items.add(LocaleController.getString(R.string.TranslateMessage));
-                        options.add(OPTION_TRANSLATE);
-                        icons.add(R.drawable.msg_translate);
+                        items.add(LlmConfig.llmIsDefaultProvider() ? LocaleController.getString(R.string.TranslateMessageLLM) : LocaleController.getString(R.string.TranslateMessage));
+                        options.add(nkbtn_translate);
+                        icons.add(LlmConfig.llmIsDefaultProvider() ? R.drawable.magic_stick_solar : R.drawable.msg_translate);
                     }
                 }
                 if (ChatObject.isMonoForum(currentChat) && selectedObject.getGroupId() == 0 && selectedObjectGroup == null && message != null && message.messageOwner != null && message.messageOwner.suggested_post == null && message.messageOwner.action == null) {
@@ -49407,6 +49414,16 @@ public class ChatActivity extends BaseFragment implements
                             items.add(LocaleController.getString(R.string.SaveToDownloads));
                             options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                             icons.add(R.drawable.msg_download);
+                        }
+                        if (!TextUtils.isEmpty(selectedObject.getVoiceTranscription())) {
+                            items.add(LlmConfig.isLLMTranslatorAvailable() ? getString(R.string.TranslateMessageLLM) : getString(R.string.Translate));
+                            options.add(nkbtn_translateVoice);
+                            icons.add(LlmConfig.isLLMTranslatorAvailable() ? R.drawable.magic_stick_solar : R.drawable.msg_translate);
+                            if (TranscribeHelper.useTranscribeAI(selectedObject.currentAccount)) {
+                                items.add(getString(R.string.Retry));
+                                options.add(nkbtn_transcriptionRetry);
+                                icons.add(R.drawable.msg_retry);
+                            }
                         }
                     }
                 } else if (type == 3 && !noforwardsOrPaidMedia) {
@@ -49581,12 +49598,12 @@ public class ChatActivity extends BaseFragment implements
                 if (selectedObject != null && !selectedObject.isEphemeral() && selectedObject.contentType == 0) {
                     if (isMessageTranslated(selectedObject)) {
                         items.add(LocaleController.getString(R.string.ShowOriginalButton));
-                        options.add(OPTION_TRANSLATE);
+                        options.add(nkbtn_translate);
                         icons.add(R.drawable.msg_translate);
                     } else if ((!TextUtils.isEmpty(selectedObject.getMessageTextToTranslate(selectedObjectGroup, null)) && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) || (selectedObject.type == MessageObject.TYPE_ARTICLE && selectedObject.messageOwner != null && selectedObject.messageOwner.rich_message != null && !selectedObject.translated)) {
-                        items.add(LocaleController.getString(R.string.TranslateMessage));
-                        options.add(OPTION_TRANSLATE);
-                        icons.add(R.drawable.msg_translate);
+                        items.add(LlmConfig.llmIsDefaultProvider() ? LocaleController.getString(R.string.TranslateMessageLLM) : LocaleController.getString(R.string.TranslateMessage));
+                        options.add(nkbtn_translate);
+                        icons.add(LlmConfig.llmIsDefaultProvider() ? R.drawable.magic_stick_solar : R.drawable.msg_translate);
                     }
                 }
                 if (allowEdit || chatMode == MODE_WELCOME_MESSAGES) {

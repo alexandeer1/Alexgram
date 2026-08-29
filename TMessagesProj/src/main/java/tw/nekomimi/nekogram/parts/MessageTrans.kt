@@ -454,11 +454,17 @@ private suspend fun ChatActivityInterface.translateMessageContent(
         }
     }
 
-    val query = if (buttonsToTranslate.isEmpty()) {
+    val baseText = if (!msg.messageOwner.message.isNullOrEmpty()) {
         msg.messageOwner.message
     } else {
+        msg.voiceTranscription?.toString() ?: ""
+    }
+
+    val query = if (buttonsToTranslate.isEmpty()) {
+        baseText
+    } else {
         buildString {
-            append(msg.messageOwner.message)
+            append(baseText)
             for (btn in buttonsToTranslate) {
                 append("\n<<<<\n").append(btn)
             }
@@ -493,10 +499,13 @@ private suspend fun ChatActivityInterface.translateMessageContent(
 
     val keepOriginal = MessageHelper.shouldKeepOriginalForManualTranslation(translatorMode)
     msg.messageOwner.translatedMessage = MessageHelper.buildTranslatedDisplayText(
-        msg.messageOwner.message,
+        baseText,
         result,
         keepOriginal
     )
+    if (msg.isVoice || !msg.messageOwner.voiceTranscription.isNullOrEmpty()) {
+        msg.messageOwner.translatedVoiceTranscription = result
+    }
     msg.messageOwner.translatedText = result
 
     return true
@@ -659,8 +668,9 @@ private fun MessageObject.needsTranslation(
     if (controller.isTranslating(this)) return false
 
     val hasRichText = isRich && RichMessageTransHelper.collectPlainTexts(messageOwner.rich_message).isNotEmpty()
+    val hasVoiceTranscription = !voiceTranscription.isNullOrEmpty()
 
-    if (!(hasRichText || isPoll || messageOwner.message.isNotEmpty())) return false
+    if (!(hasRichText || isPoll || messageOwner.message.isNotEmpty() || hasVoiceTranscription)) return false
 
     val needsSummary = needsSummaryTranslation(canReuseCache, targetLanguage)
     val needsOriginal = needsOriginalTranslation(canReuseCache, targetLanguage)

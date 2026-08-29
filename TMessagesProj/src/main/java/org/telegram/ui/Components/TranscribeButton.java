@@ -704,7 +704,7 @@ public class TranscribeButton {
                 if (TranscribeHelper.useTranscribeAI(account)) {
                     var path = MessageHelper.getPathToMessage(messageObject);
                     if (path == null) {
-                        NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject);
+                        NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
                         NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, getString(R.string.PleaseDownload));
                         return;
@@ -734,7 +734,10 @@ public class TranscribeButton {
                                 if (transcribeOperationsByDialogPosition != null) {
                                     transcribeOperationsByDialogPosition.remove(reqInfoHash(messageObject));
                                 }
-                                NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject);
+                                messageObject.messageOwner.voiceTranscriptionOpen = false;
+                                messageObject.messageOwner.voiceTranscriptionFinal = true;
+                                MessagesStorage.getInstance(account).updateMessageVoiceTranscriptionOpen(dialogId, messageId, messageObject.messageOwner);
+                                NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
                                 NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
                                 AndroidUtil.showErrorDialog(exception);
                             });
@@ -854,7 +857,7 @@ public class TranscribeButton {
             if (TranscribeHelper.useTranscribeAI(account)) {
                 var path = MessageHelper.getPathToMessage(messageObject);
                 if (path == null) {
-                    NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject);
+                    NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
                     NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, getString(R.string.PleaseDownload));
                     return;
@@ -884,7 +887,10 @@ public class TranscribeButton {
                             if (transcribeOperationsByDialogPosition != null) {
                                 transcribeOperationsByDialogPosition.remove(reqInfoHash(messageObject));
                             }
-                            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject);
+                            messageObject.messageOwner.voiceTranscriptionOpen = false;
+                            messageObject.messageOwner.voiceTranscriptionFinal = true;
+                            MessagesStorage.getInstance(account).updateMessageVoiceTranscriptionOpen(dialogId, messageId, messageObject.messageOwner);
+                            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
                             NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
                             AndroidUtil.showErrorDialog(exception);
                         });
@@ -894,9 +900,17 @@ public class TranscribeButton {
             }
         }
 
+        String textToTranslate = MessageHelper.getMessagePlainText(messageObject, null);
+        if (TextUtils.isEmpty(textToTranslate)) {
+            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
+            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, getString(R.string.NoWordsRecognized));
+            return;
+        }
+
         var path = MessageHelper.getPathToMessage(messageObject);
         if (path == null) {
-            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject);
+            NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
             NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, getString(R.string.PleaseDownload));
             return;
@@ -907,7 +921,6 @@ public class TranscribeButton {
         }
         transcribeOperationsByDialogPosition.put(reqInfoHash(messageObject), messageObject);
 
-        String textToTranslate = MessageHelper.getMessagePlainText(messageObject, null);
         locale = locale != null ? locale : TranslatorKt.getCode2Locale(NekoConfig.translateToLang.String());
         Translator.translate(locale, textToTranslate, LlmConfig.isLLMTranslatorAvailable() ? Translator.providerLLMTranslator : 0, new Translator.Companion.TranslateCallBack() {
             @Override
@@ -933,7 +946,10 @@ public class TranscribeButton {
                     if (transcribeOperationsByDialogPosition != null) {
                         transcribeOperationsByDialogPosition.remove(reqInfoHash(messageObject));
                     }
-                    NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject);
+                    messageObject.messageOwner.voiceTranscriptionOpen = false;
+                    messageObject.messageOwner.voiceTranscriptionFinal = true;
+                    MessagesStorage.getInstance(account).updateMessageVoiceTranscriptionOpen(dialogId, messageId, messageObject.messageOwner);
+                    NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.voiceTranscriptionUpdate, messageObject, null, null, (Boolean) false, (Boolean) true);
                     NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.updateTranscriptionLock);
 
                     var fragment = LaunchActivity.getSafeLastFragment();
