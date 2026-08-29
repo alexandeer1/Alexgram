@@ -370,7 +370,13 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             if (parentFragment == null || (parentFragment.getChatMode() != ChatActivity.MODE_QUICK_REPLIES && parentFragment.getChatMode() != ChatActivity.MODE_WELCOME_MESSAGES && parentFragment.getChatMode() != ChatActivity.MODE_EDIT_BUSINESS_LINK) && parentFragment.getChatMode() != ChatActivity.MODE_SUGGESTIONS && !parentFragment.isInBotForumMode()) {
                 sharedMediaPreloader = new SharedMediaLayout.SharedMediaPreloader(baseFragment);
             }
-            avatarImageIsHidden = parentFragment != null && (parentFragment.isThreadChat() || parentFragment.getChatMode() == ChatActivity.MODE_PINNED || parentFragment.getChatMode() == ChatActivity.MODE_QUICK_REPLIES || parentFragment.getChatMode() == ChatActivity.MODE_WELCOME_MESSAGES || parentFragment.getChatMode() == ChatActivity.MODE_EDIT_BUSINESS_LINK);
+            avatarImageIsHidden = parentFragment != null && (
+                parentFragment.isThreadChat() && !parentFragment.isReplyChatComment() ||
+                parentFragment.getChatMode() == ChatActivity.MODE_PINNED ||
+                parentFragment.getChatMode() == ChatActivity.MODE_QUICK_REPLIES ||
+                parentFragment.getChatMode() == ChatActivity.MODE_WELCOME_MESSAGES ||
+                parentFragment.getChatMode() == ChatActivity.MODE_EDIT_BUSINESS_LINK
+            );
             if (avatarImageIsHidden) {
                 avatarImageView.setVisibility(GONE);
             }
@@ -554,12 +560,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     protected void dispatchDraw(Canvas canvas) {
         canvas.save();
         final float s = bounce.getScale(.02f);
-        canvas.scale(s, s, getWidth() / 2f, getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
+        canvas.scale(s, s, isCentered() ? getWidth() / 2f : getPivotX(), getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
 
         if (NaConfig.getVoiceChangerEffectValue() != 0) {
             canvas.drawCircle(titleTextView.getRight() + dp(4), titleTextView.getTop() + dp(12), dp(3), voiceChangerPaint);
         }
-
         super.dispatchDraw(canvas);
         canvas.restore();
     }
@@ -2085,7 +2090,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     public int getVisualWidth() {
         int width = getVisualTextWidth();
         if (hasVisibleAvatar() && !isCentered()) {
-            width += dp(glassMode ? 76 : 64);
+            width += dp(glassMode ? 78 : 70);
         } else {
             width += dp(glassMode ? 48 : 34);
         }
