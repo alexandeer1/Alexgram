@@ -1162,7 +1162,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (videoPlayer == null || ambientModeView == null || !ambientModeView.isAmbientEnabled) {
                 return;
             }
-            if (isPlaying) {
+            boolean playing = (videoPlayer != null && (videoPlayer.isPlaying() || videoPlayer.isBuffering())) || isPlaying;
+            if (playing) {
                 updateAmbientMode();
                 AndroidUtilities.runOnUIThread(this, 1000);
             }
@@ -1178,7 +1179,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private void syncAmbientState(boolean enabled) {
         if (ambientModeView != null) {
             ambientModeView.setAmbientEnabled(enabled);
-            if (enabled && isPlaying) {
+            boolean playing = (videoPlayer != null && (videoPlayer.isPlaying() || videoPlayer.isBuffering())) || isPlaying;
+            if (enabled && playing) {
                 updateAmbientMode();
                 AndroidUtilities.cancelRunOnUIThread(ambientUpdateRunnable);
                 AndroidUtilities.runOnUIThread(ambientUpdateRunnable, 1000);
@@ -2408,7 +2410,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         private boolean isAmbientEnabled;
         private RadialGradient radialGradient;
 
-        private float lastCenterX, lastCenterY, lastW, lastH;
+        private float lastW, lastH;
 
         public AmbientModeView(Context context) {
             super(context);
@@ -2451,7 +2453,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
         }
 
-
         @Override
         protected void onDraw(Canvas canvas) {
             int viewWidth = getMeasuredWidth();
@@ -2477,7 +2478,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
             float videoWidth, videoHeight;
 
-            if (viewWidth / viewHeight > videoRatio) {
+            if (viewWidth / (float) viewHeight > videoRatio) {
                 videoHeight = viewHeight;
                 videoWidth = videoHeight * videoRatio;
             } else {
@@ -2487,7 +2488,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
             float videoCenterX = viewWidth / 2f;
             float videoCenterY = viewHeight / 2f;
-            if (aspectRatioFrameLayout != null) {
+            if (aspectRatioFrameLayout != null && aspectRatioFrameLayout.getWidth() > 0 && aspectRatioFrameLayout.getHeight() > 0) {
                 videoCenterX = aspectRatioFrameLayout.getX() + aspectRatioFrameLayout.getWidth() / 2f;
                 videoCenterY = aspectRatioFrameLayout.getY() + aspectRatioFrameLayout.getHeight() / 2f;
             }
@@ -2501,8 +2502,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             matrix.postTranslate(videoCenterX - (bitmap.getWidth() * scaleX) / 2f, videoCenterY - (bitmap.getHeight() * scaleY) / 2f);
 
             if (radialGradient == null || viewWidth != lastW || viewHeight != lastH) {
-                lastW = (int)viewWidth;
-                lastH = (int)viewHeight;
+                lastW = viewWidth;
+                lastH = viewHeight;
                 radialGradient = new RadialGradient(0, 0, Math.max(viewWidth, viewHeight) * 1.5f,
                         new int[]{0x00000000, 0x00000000, 0x00000000, 0xFF000000}, new float[]{0.0f, 0.3f, 0.5f, 1.0f}, Shader.TileMode.CLAMP);
                 gradientPaint.setShader(radialGradient);
@@ -2512,7 +2513,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             radialGradient.setLocalMatrix(shaderMatrix);
             
             int sc = canvas.saveLayer(0, 0, viewWidth, viewHeight, null);
-            if (prevBitmap != null && cf < 1f) {
+            if (prevBitmap != null && !prevBitmap.isRecycled() && cf < 1f) {
                 paint.setAlpha((int) (alpha * 140 * (1f - cf)));
                 canvas.drawBitmap(prevBitmap, matrix, paint);
             }
@@ -2541,8 +2542,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 invalidate();
                 return;
             }
-            if (this.bitmap != null) {
-                if (prevBitmap == null) {
+            if (this.bitmap != null && !this.bitmap.isRecycled()) {
+                if (prevBitmap == null || prevBitmap.getWidth() != this.bitmap.getWidth() || prevBitmap.getHeight() != this.bitmap.getHeight()) {
+                    if (prevBitmap != null) {
+                        prevBitmap.recycle();
+                    }
                     prevBitmap = Bitmap.createBitmap(this.bitmap.getWidth(), this.bitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 }
                 Canvas c = new Canvas(prevBitmap);
@@ -2556,7 +2560,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     c.drawBitmap(this.bitmap, 0, 0, null);
                 }
             }
-            if (this.bitmap == null) {
+            if (this.bitmap == null || this.bitmap.getWidth() != newBitmap.getWidth() || this.bitmap.getHeight() != newBitmap.getHeight()) {
+                if (this.bitmap != null) {
+                    this.bitmap.recycle();
+                }
                 this.bitmap = Bitmap.createBitmap(newBitmap.getWidth(), newBitmap.getHeight(), Bitmap.Config.ARGB_8888);
             }
             Canvas c = new Canvas(this.bitmap);
@@ -10894,6 +10901,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
             isPlaying = false;
             AndroidUtilities.cancelRunOnUIThread(updateProgressRunnable);
+            // [Alexgram: Ambient Mode] - Start
+            AndroidUtilities.cancelRunOnUIThread(ambientUpdateRunnable);
+            isAmbientBlurring = false;
+            // [Alexgram: Ambient Mode] - End
             if (playbackState == ExoPlayer.STATE_ENDED) {
                 if (isCurrentVideo) {
                     if (!videoTimelineView.isDragging()) {
@@ -11597,57 +11608,89 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
     // [Alexgram: Ambient Mode] - Start
     private void updateAmbientMode() {
-        if (ambientModeView == null || !isPlaying || !ambientModeView.isAmbientEnabled || isAmbientBlurring) {
+        boolean playing = (videoPlayer != null && (videoPlayer.isPlaying() || videoPlayer.isBuffering())) || isPlaying;
+        if (ambientModeView == null || !playing || !ambientModeView.isAmbientEnabled || isAmbientBlurring) {
             return;
-        }
-        if (ambientBitmap == null || ambientBitmap.isRecycled() || ambientBitmap.getWidth() != 32) {
-            try {
-                ambientBitmap = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888);
-            } catch (Throwable e) {
-                return;
-            }
         }
 
         if (videoTextureView != null && videoTextureView.isAvailable()) {
             try {
-                videoTextureView.getBitmap(ambientBitmap);
-                final Bitmap bitmapToBlur = Bitmap.createBitmap(ambientBitmap);
-                isAmbientBlurring = true;
-                Utilities.globalQueue.postRunnable(() -> {
-                    Utilities.stackBlurBitmap(bitmapToBlur, 40);
-                    AndroidUtilities.runOnUIThread(() -> {
-                        isAmbientBlurring = false;
-                        if (ambientModeView != null) {
-                            ambientModeView.setBitmap(bitmapToBlur);
+                int vw = videoTextureView.getWidth();
+                int vh = videoTextureView.getHeight();
+                int w = vw > 0 ? Math.max(32, vw / 8) : 48;
+                int h = vh > 0 ? Math.max(32, vh / 8) : 48;
+                final Bitmap frame = videoTextureView.getBitmap(w, h);
+                if (frame != null) {
+                    isAmbientBlurring = true;
+                    Utilities.globalQueue.postRunnable(() -> {
+                        try {
+                            Utilities.stackBlurBitmap(frame, 40);
+                            AndroidUtilities.runOnUIThread(() -> {
+                                isAmbientBlurring = false;
+                                if (ambientModeView != null) {
+                                    ambientModeView.setBitmap(frame);
+                                }
+                                frame.recycle();
+                            });
+                        } catch (Throwable t) {
+                            isAmbientBlurring = false;
+                            try {
+                                frame.recycle();
+                            } catch (Throwable ignored) {
+                            }
                         }
-                        bitmapToBlur.recycle();
                     });
-                });
+                }
             } catch (Throwable ignore) {
                 isAmbientBlurring = false;
             }
         } else if (videoSurfaceView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoPlayer != null) {
-            if (isAmbientBlurring) return;
             Surface surface = videoSurfaceView.getHolder().getSurface();
-            if (surface != null && surface.isValid()) {
-                isAmbientBlurring = true;
-                PixelCopy.request(videoSurfaceView, ambientBitmap, result -> {
-                    if (result == PixelCopy.SUCCESS && ambientBitmap != null && !ambientBitmap.isRecycled()) {
-                        final Bitmap bitmapToBlur = Bitmap.createBitmap(ambientBitmap);
-                        Utilities.globalQueue.postRunnable(() -> {
-                            Utilities.stackBlurBitmap(bitmapToBlur, 40);
-                            AndroidUtilities.runOnUIThread(() -> {
-                                isAmbientBlurring = false;
-                                if (ambientModeView != null) {
-                                    ambientModeView.setBitmap(bitmapToBlur);
-                                }
-                                bitmapToBlur.recycle();
-                            });
-                        });
-                    } else {
-                        isAmbientBlurring = false;
+            if (surface != null && surface.isValid() && videoSurfaceView.getWidth() > 0 && videoSurfaceView.getHeight() > 0) {
+                int vw = videoSurfaceView.getWidth();
+                int vh = videoSurfaceView.getHeight();
+                int w = vw > 0 ? Math.max(32, vw / 8) : 48;
+                int h = vh > 0 ? Math.max(32, vh / 8) : 48;
+                if (ambientBitmap == null || ambientBitmap.isRecycled() || ambientBitmap.getWidth() != w || ambientBitmap.getHeight() != h) {
+                    if (ambientBitmap != null) {
+                        ambientBitmap.recycle();
                     }
-                }, new Handler(Looper.getMainLooper()));
+                    try {
+                        ambientBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                    } catch (Throwable e) {
+                        return;
+                    }
+                }
+                isAmbientBlurring = true;
+                try {
+                    PixelCopy.request(videoSurfaceView, ambientBitmap, result -> {
+                        if (result == PixelCopy.SUCCESS && ambientBitmap != null && !ambientBitmap.isRecycled()) {
+                            final Bitmap bitmapToBlur = Bitmap.createBitmap(ambientBitmap);
+                            Utilities.globalQueue.postRunnable(() -> {
+                                try {
+                                    Utilities.stackBlurBitmap(bitmapToBlur, 40);
+                                    AndroidUtilities.runOnUIThread(() -> {
+                                        isAmbientBlurring = false;
+                                        if (ambientModeView != null) {
+                                            ambientModeView.setBitmap(bitmapToBlur);
+                                        }
+                                        bitmapToBlur.recycle();
+                                    });
+                                } catch (Throwable t) {
+                                    isAmbientBlurring = false;
+                                    try {
+                                        bitmapToBlur.recycle();
+                                    } catch (Throwable ignored) {
+                                    }
+                                }
+                            });
+                        } else {
+                            isAmbientBlurring = false;
+                        }
+                    }, new Handler(Looper.getMainLooper()));
+                } catch (Throwable e) {
+                    isAmbientBlurring = false;
+                }
             }
         }
     }
@@ -11664,6 +11707,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             AndroidUtilities.cancelRunOnUIThread(setLoadingRunnable);
             AndroidUtilities.cancelRunOnUIThread(hideActionBarRunnable);
             // [Alexgram: Ambient Mode] - Start
+            AndroidUtilities.cancelRunOnUIThread(ambientUpdateRunnable);
+            isAmbientBlurring = false;
             if (ambientModeView != null) {
                 ambientModeView.setBitmap(null);
             }
@@ -24646,6 +24691,11 @@ private class PhotoViewerWindowView extends FrameLayout {
             animatingImageView.measure(MeasureSpec.makeMeasureSpec(layoutParams.width, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(layoutParams.height, MeasureSpec.AT_MOST));
             containerView.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY));
             navigationBar.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(navigationBarHeight, MeasureSpec.EXACTLY));
+            // [Alexgram: Ambient Mode] - Start
+            if (ambientModeView != null) {
+                ambientModeView.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(heightSize, MeasureSpec.EXACTLY));
+            }
+            // [Alexgram: Ambient Mode] - End
         }
 
         @Override
@@ -24659,6 +24709,11 @@ private class PhotoViewerWindowView extends FrameLayout {
             animatingImageView.layout(getPaddingLeft(), 0, getPaddingLeft() + animatingImageView.getMeasuredWidth(), animatingImageView.getMeasuredHeight());
             containerView.layout(getPaddingLeft(), 0, getPaddingLeft() + containerView.getMeasuredWidth(), containerView.getMeasuredHeight());
             navigationBar.layout(getPaddingLeft(), containerView.getMeasuredHeight(), navigationBar.getMeasuredWidth(), containerView.getMeasuredHeight() + navigationBar.getMeasuredHeight());
+            // [Alexgram: Ambient Mode] - Start
+            if (ambientModeView != null) {
+                ambientModeView.layout(getPaddingLeft(), 0, getPaddingLeft() + containerView.getMeasuredWidth(), containerView.getMeasuredHeight());
+            }
+            // [Alexgram: Ambient Mode] - End
             wasLayout = true;
             if (changed) {
                 if (!dontResetZoomOnFirstLayout) {
