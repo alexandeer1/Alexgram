@@ -39,7 +39,9 @@ subprojects {
                     sourceCompatibility = JavaVersion.VERSION_21
                     targetCompatibility = JavaVersion.VERSION_21
 
-                    coreLibraryDesugaringEnabled = true
+                    if (project.name != 'jlatexmath') {
+                        coreLibraryDesugaringEnabled = true
+                    }
                 }
 
                 defaultConfig {

@@ -298,7 +298,10 @@ dependencies {
     implementation "io.noties.markwon:ext-tables:4.6.2"
     implementation "io.noties.markwon:html:4.6.2"
     implementation "io.noties.markwon:inline-parser:4.6.2"
-    implementation "io.noties.markwon:ext-latex:4.6.2"
+    implementation("io.noties.markwon:ext-latex:4.6.2") {
+        exclude group: 'ru.noties', module: 'jlatexmath-android'
+    }
+    api project(':jlatexmath')
     implementation 'com.google.android.recaptcha:recaptcha:18.7.1'
     // payment
     implementation 'com.google.android.gms:play-services-wallet:19.5.0' // 19.1.0
