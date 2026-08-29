@@ -4683,7 +4683,11 @@ public class ChatActivity extends BaseFragment implements
                         return true;
                     }
                     if (headerItem != null) {
-                        headerItem.performClick();
+                        if (headerItem.hasSubMenu()) {
+                            headerItem.toggleSubMenu();
+                        } else {
+                            headerItem.performClick();
+                        }
                         return true;
                     }
                 }
@@ -4779,7 +4783,7 @@ public class ChatActivity extends BaseFragment implements
             });
             getConnectionsManager().bindRequestToGuid(req, classGuid);
         } else {
-            actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !inPreviewMode ? 52 : 0, 0, 52, 0));
+            actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(isTitleCentered() ? LayoutHelper.MATCH_PARENT : LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !inPreviewMode && !isTitleCentered() ? 52 : 0, 0, isTitleCentered() ? 0 : 52, 0));
             actionBar.createMenu().bringToFront();
         }
 
@@ -19519,7 +19523,14 @@ public class ChatActivity extends BaseFragment implements
                 }*/ else {
                     showSearchAsIcon = false;
                 }
-                if (showSearchAsIcon || showAudioCallAsIcon || UserObject.isBotForumWithEditableTopics(currentUser)) {
+                if (isTitleCentered()) {
+                    if (avatarContainer != null && avatarContainer.getLayoutParams() != null) {
+                        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) avatarContainer.getLayoutParams();
+                        lp.leftMargin = 0;
+                        lp.rightMargin = 0;
+                        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    }
+                } else if (showSearchAsIcon || showAudioCallAsIcon || UserObject.isBotForumWithEditableTopics(currentUser)) {
                     if (avatarContainer != null && avatarContainer.getLayoutParams() != null) {
                         ((ViewGroup.MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = AndroidUtilities.dp(chatMode == MODE_SAVED ? 52 : 92);
                     }
@@ -31063,7 +31074,7 @@ public class ChatActivity extends BaseFragment implements
         }
         if (avatarContainer != null) {
             avatarContainer.setOccupyStatusBar(!value);
-            avatarContainer.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !value ? 56 : (chatMode == MODE_PINNED ? 10 : 0), 0, isTitleCentered() ? 0 : 40, 0));
+            avatarContainer.setLayoutParams(LayoutHelper.createFrame(isTitleCentered() ? LayoutHelper.MATCH_PARENT : LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, isTitleCentered() ? 0 : (!value ? 56 : (chatMode == MODE_PINNED ? 10 : 0)), 0, isTitleCentered() ? 0 : 40, 0));
         }
         if (chatActivityEnterView != null) {
             chatActivityEnterView.setVisibility(!value ? View.VISIBLE : View.INVISIBLE);

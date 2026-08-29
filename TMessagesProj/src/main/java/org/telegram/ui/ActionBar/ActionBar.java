@@ -1955,17 +1955,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (ev.getAction() == MotionEvent.ACTION_DOWN) {
                 final int x = (int) ev.getX();
                 final int y = (int) ev.getY();
-                View child = findChildUnder(this, x, y, chatAvatarContainer);
-                if (child == null) {
-                    child = findChildUnder(this, x, y, null);
-                }
-
                 boolean contains = false;
                 contains |= glassDrawable != null && glassDrawable.getBounds().contains(x, y);
-                if (child != null && child != chatAvatarContainer) {
-                    contains |= glassDrawableBack != null && glassDrawableBack.getBounds().contains(x, y);
-                    contains |= glassDrawableMenu != null && glassDrawableMenu.getBounds().contains(x, y);
-                }
+                contains |= glassDrawableBack != null && glassDrawableBack.getBounds().contains(x, y);
+                contains |= glassDrawableMenu != null && glassDrawableMenu.getBounds().contains(x, y);
 
                 if (!contains) {
                     return false;
