@@ -2605,15 +2605,25 @@ public class ChatActivity extends BaseFragment implements
             if (editTextItem != null && !isEditTextItemVisibilitySuppressed) {
                 editTextItem.setVisibility(View.GONE);
             }
-            if (TextUtils.isEmpty(chatActivityEnterView.getSlowModeTimer())) {
+            if (chatActivityEnterView != null && chatActivityEnterView.hasText() && TextUtils.isEmpty(chatActivityEnterView.getSlowModeTimer()) && (currentChat == null || ChatObject.canSendPlain(currentChat))) {
                 if (headerItem != null) {
                     headerItem.setVisibility(View.GONE);
                 }
                 if (attachItem != null) {
-                    attachItem.setVisibility(View.VISIBLE);
+                    attachItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (otherIcon != null) {
                     otherIcon.setIconVisible(!isTitleCentered());
+                }
+            } else {
+                if (headerItem != null) {
+                    headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
+                }
+                if (attachItem != null) {
+                    attachItem.setVisibility(View.GONE);
+                }
+                if (otherIcon != null) {
+                    otherIcon.setIconVisible(false);
                 }
             }
         }
@@ -2624,7 +2634,7 @@ public class ChatActivity extends BaseFragment implements
                 return;
             }
             if (headerItem != null) {
-                headerItem.setVisibility(View.VISIBLE);
+                headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
             }
             if (editTextItem != null && !isEditTextItemVisibilitySuppressed) {
                 editTextItem.setVisibility(View.GONE);
@@ -4680,7 +4690,7 @@ public class ChatActivity extends BaseFragment implements
                         editTextItem.getView().performClick();
                         return true;
                     }
-                    if (attachItem != null && attachItem.getView() != null && attachItem.getView().getVisibility() == VISIBLE) {
+                    if (attachItem != null && attachItem.getView() != null && attachItem.getView().getVisibility() == VISIBLE && chatActivityEnterView != null && chatActivityEnterView.hasText() && (currentChat == null || ChatObject.canSendPlain(currentChat))) {
                         attachItem.getView().performClick();
                         return true;
                     }
@@ -29401,7 +29411,7 @@ public class ChatActivity extends BaseFragment implements
                     editTextItem.setVisibility(View.GONE);
                 }
                 if (headerItem != null) {
-                    headerItem.setVisibility(View.VISIBLE);
+                    headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
             } else {
                 if (botUser != null && currentUser != null && currentUser.bot || currentUser != null && currentUser.id == UserObject.VERIFY || chatMode == MODE_SAVED && getSavedDialogId() != getUserConfig().getClientUserId()) {

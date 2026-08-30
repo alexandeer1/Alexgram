@@ -258,7 +258,7 @@ public class AnimatedTextView extends View {
                         if ((gravity | ~Gravity.RIGHT) == ~0) {
                             x += fullWidth - lwidth;
                         } else if ((gravity | ~Gravity.CENTER_HORIZONTAL) == ~0) {
-                            x += (fullWidth - lwidth) / 2f;
+                            x += Math.max(0, (fullWidth - lwidth) / 2f);
                         } else if (isRTL && !ignoreRTL) {
                             x += fullWidth - lwidth;
                         }
@@ -293,7 +293,7 @@ public class AnimatedTextView extends View {
                         if ((gravity | ~Gravity.RIGHT) == ~0) {
                             x += fullWidth - oldWidth;
                         } else if ((gravity | ~Gravity.CENTER_HORIZONTAL) == ~0) {
-                            x += (fullWidth - oldWidth) / 2f;
+                            x += Math.max(0, (fullWidth - oldWidth) / 2f);
                         } else if (isRTL && !ignoreRTL) {
                             x += fullWidth - oldWidth;
                         }
@@ -322,7 +322,7 @@ public class AnimatedTextView extends View {
                             if ((gravity | ~Gravity.RIGHT) == ~0) {
                                 x += fullWidth - currentWidth;
                             } else if ((gravity | ~Gravity.CENTER_HORIZONTAL) == ~0) {
-                                x += (fullWidth - currentWidth) / 2f;
+                                x += Math.max(0, (fullWidth - currentWidth) / 2f);
                             } else if (isRTL && !ignoreRTL) {
                                 x += fullWidth - currentWidth;
                             }

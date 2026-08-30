@@ -407,7 +407,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         // titleTextView.setRightDrawableOutside(true);
         titleTextView.setRightDrawableOutside(!isCentered());
         titleTextView.setScrollNonFitText(false);
-        titleTextView.setPadding(isCentered() ? dp(20) : 0, dp(6), isCentered() ? dp(20) : 0, dp(12));
+        titleTextView.setPadding(0, dp(6), 0, dp(12));
         addView(titleTextView);
 
         if (useAnimatedSubtitle()) {
@@ -418,7 +418,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             animatedSubtitleTextView.setTag(Theme.key_actionBarDefaultSubtitle);
             animatedSubtitleTextView.setTextSize(dp(14));
             animatedSubtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
-            animatedSubtitleTextView.setPadding(isCentered() ? dp(20) : 0, 0, isCentered() ? dp(20) : dp(10), 0);
+            animatedSubtitleTextView.setPadding(0, 0, isCentered() ? 0 : dp(10), 0);
             animatedSubtitleTextView.setTranslationY(-dp(1));
             addView(animatedSubtitleTextView);
         } else {
@@ -428,7 +428,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             subtitleTextView.setTag(Theme.key_actionBarDefaultSubtitle);
             subtitleTextView.setTextSize(14);
             subtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
-            subtitleTextView.setPadding(isCentered() ? dp(20) : 0, 0, isCentered() ? dp(20) : dp(10), 0);
+            subtitleTextView.setPadding(0, 0, isCentered() ? 0 : dp(10), 0);
             addView(subtitleTextView);
         }
 
@@ -866,12 +866,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 animatedSubtitleTextView.setEllipsizeByGradient(false);
             }
         }
-        int padding = isCentered() ? dp(isPreviewMode() ? 35 : 10) : 0;
+        int padding = isCentered() ? dp(isPreviewMode() ? 35 : 0) : 0;
         final int width = MeasureSpec.getSize(widthMeasureSpec);
         int screenWidth = actionBar != null && actionBar.getMeasuredWidth() > 0 ? actionBar.getMeasuredWidth() : AndroidUtilities.displaySize.x;
-        int maxGlassTextWidth = screenWidth - dp(isCentered() ? 156 : 185);
+        int maxGlassTextWidth = screenWidth - dp(isCentered() ? 128 : 185);
         final int availableWidth = width - dp(((avatarImageView.getVisibility() == VISIBLE && !isCentered()) ? 54 : 0) + 16);
-        final int textMaxWidth = Math.max(dp(72), glassMode ? Math.min(availableWidth - padding, maxGlassTextWidth) : (isCentered() ? Math.min(width - dp(40), maxGlassTextWidth) : availableWidth - padding));
+        final int textMaxWidth = Math.max(dp(72), glassMode ? Math.min(availableWidth - padding, maxGlassTextWidth) : (isCentered() ? Math.min(width - dp(104), maxGlassTextWidth) : availableWidth - padding));
 
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(dp(avatarSizeInDp) - 2, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(avatarSizeInDp) - 2, MeasureSpec.EXACTLY));
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textMaxWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(dp(24 + 8), MeasureSpec.AT_MOST));
