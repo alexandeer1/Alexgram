@@ -871,7 +871,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int screenWidth = actionBar != null && actionBar.getMeasuredWidth() > 0 ? actionBar.getMeasuredWidth() : AndroidUtilities.displaySize.x;
         int maxGlassTextWidth = screenWidth - dp(isCentered() ? 156 : 185);
         final int availableWidth = width - dp(((avatarImageView.getVisibility() == VISIBLE && !isCentered()) ? 54 : 0) + 16);
-        final int textMaxWidth = Math.max(dp(72), isCentered() ? (width - dp(40)) : (glassMode ? Math.min(availableWidth - padding, maxGlassTextWidth) : availableWidth - padding));
+        final int textMaxWidth = Math.max(dp(72), glassMode ? Math.min(availableWidth - padding, maxGlassTextWidth) : (isCentered() ? Math.min(width - dp(40), maxGlassTextWidth) : availableWidth - padding));
 
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(dp(avatarSizeInDp) - 2, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(avatarSizeInDp) - 2, MeasureSpec.EXACTLY));
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textMaxWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(dp(24 + 8), MeasureSpec.AT_MOST));

@@ -1550,7 +1550,7 @@ public class ChatActivity extends BaseFragment implements
         if (show) {
             if (chatActivityEnterView.hasText() && TextUtils.isEmpty(chatActivityEnterView.getSlowModeTimer())) {
                 if (attachItem != null) {
-                    attachItem.setVisibility(View.VISIBLE);
+                    attachItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (headerItem != null) {
                     headerItem.setVisibility(View.GONE);
@@ -1563,7 +1563,7 @@ public class ChatActivity extends BaseFragment implements
                     attachItem.setVisibility(View.GONE);
                 }
                 if (headerItem != null) {
-                    headerItem.setVisibility(View.VISIBLE);
+                    headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (otherIcon != null) {
                     otherIcon.setIconVisible(false);
@@ -2422,8 +2422,8 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public void onUpdateSlowModeButton(View button, boolean show, CharSequence time) {
             showSlowModeHint(button, show, time);
-            if (headerItem != null && headerItem.getVisibility() != View.VISIBLE) {
-                headerItem.setVisibility(View.VISIBLE);
+            if (headerItem != null && headerItem.getVisibility() != (isTitleCentered() ? View.GONE : View.VISIBLE)) {
+                headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 if (attachItem != null) {
                     attachItem.setVisibility(View.GONE);
                 }
@@ -2501,14 +2501,14 @@ public class ChatActivity extends BaseFragment implements
                                     headerItem.setVisibility(View.GONE);
                                 }
                                 if (attachItem != null) {
-                                    attachItem.setVisibility(View.VISIBLE);
+                                    attachItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                                 }
                                 if (otherIcon != null) {
                                     otherIcon.setIconVisible(!isTitleCentered());
                                 }
                             } else {
                                 if (headerItem != null) {
-                                    headerItem.setVisibility(View.VISIBLE);
+                                    headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                                 }
                                 if (attachItem != null) {
                                     attachItem.setVisibility(View.GONE);
@@ -3570,7 +3570,9 @@ public class ChatActivity extends BaseFragment implements
                 messagesSearchListView.getLayoutManager().scrollToPosition(0);
             }
             updateSearchListEmptyView();
-            hashtagSearchEmptyView.showProgress(true);
+            if (hashtagSearchEmptyView != null) {
+                hashtagSearchEmptyView.showProgress(true);
+            }
             firstLoadMessages();
         }
     }
@@ -9719,34 +9721,43 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private void createSearchHashtagViewsIfNeeded() {
-        if (hashtagSearchEmptyView != null || hashtagHistoryView != null) {
+        if (hashtagSearchEmptyView != null && hashtagHistoryView != null) {
+            return;
+        }
+        if (messagesSearchListContainer == null) {
             return;
         }
 
-        hashtagLoadingView = new FlickerLoadingView(getContext(), themeDelegate);
-        hashtagLoadingView.setViewType(FlickerLoadingView.DIALOG_CELL_TYPE);
+        if (hashtagLoadingView == null) {
+            hashtagLoadingView = new FlickerLoadingView(getContext(), themeDelegate);
+            hashtagLoadingView.setViewType(FlickerLoadingView.DIALOG_CELL_TYPE);
+        }
 
-        hashtagSearchEmptyView = new StickerEmptyView(getContext(), hashtagLoadingView, StickerEmptyView.STICKER_TYPE_SEARCH);
-        hashtagSearchEmptyView.setClickable(true);
-        hashtagSearchEmptyView.title.setText(LocaleController.getString(R.string.NoResult));
-        hashtagSearchEmptyView.setVisibility(View.GONE);
-        hashtagSearchEmptyView.addView(hashtagLoadingView, 0);
-        hashtagSearchEmptyView.showProgress(true, false);
-        messagesSearchListContainer.addView(hashtagSearchEmptyView, new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
+        if (hashtagSearchEmptyView == null) {
+            hashtagSearchEmptyView = new StickerEmptyView(getContext(), hashtagLoadingView, StickerEmptyView.STICKER_TYPE_SEARCH);
+            hashtagSearchEmptyView.setClickable(true);
+            hashtagSearchEmptyView.title.setText(LocaleController.getString(R.string.NoResult));
+            hashtagSearchEmptyView.setVisibility(View.GONE);
+            hashtagSearchEmptyView.addView(hashtagLoadingView, 0);
+            hashtagSearchEmptyView.showProgress(true, false);
+            messagesSearchListContainer.addView(hashtagSearchEmptyView, new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
+        }
 
-        hashtagHistoryView = new HashtagHistoryView(getContext(), resourceProvider, currentAccount);
-        hashtagHistoryView.setOnHashtagClickListener(this::openHashtagSearch);
-        hashtagHistoryView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    AndroidUtilities.hideKeyboard(contentView);
+        if (hashtagHistoryView == null) {
+            hashtagHistoryView = new HashtagHistoryView(getContext(), resourceProvider, currentAccount);
+            hashtagHistoryView.setOnHashtagClickListener(this::openHashtagSearch);
+            hashtagHistoryView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                        AndroidUtilities.hideKeyboard(contentView);
+                    }
                 }
-            }
-        });
-        hashtagHistoryView.setVisibility(View.GONE);
-        messagesSearchListContainer.addView(hashtagHistoryView, LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT);
+            });
+            hashtagHistoryView.setVisibility(View.GONE);
+            messagesSearchListContainer.addView(hashtagHistoryView, LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT);
+        }
 
         checkUi_messagesSearchListPadding();
         checkUi_hashtagSearchHistoryVisibility();
@@ -36953,7 +36964,7 @@ public class ChatActivity extends BaseFragment implements
         } else if (forwardingPreviewView != null && forwardingPreviewView.isShowing()) {
             if (invoked) forwardingPreviewView.dismiss(true);
             return false;
-        } else if (messagesSearchListContainer.getTag() != null) {
+        } else if (messagesSearchListContainer != null && messagesSearchListContainer.getTag() != null) {
             if (invoked) showMessagesSearchListView(false);
             return false;
         } else if (scrimPopupWindow != null) {
@@ -36988,8 +36999,19 @@ public class ChatActivity extends BaseFragment implements
         } else if (chatMode == MODE_EDIT_BUSINESS_LINK && chatActivityEnterView.businessLinkHasChanges()) {
             if (invoked) showBusinessLinksDiscardAlert(this::finishFragment);
             return false;
-        } else if (actionBar != null && actionBar.isSearchFieldVisible()) {
-            if (invoked) actionBar.closeSearchField();
+        } else if (searching || searchItemVisible || (searchItem != null && searchItem.isSearchFieldVisible()) || (actionBar != null && actionBar.isSearchFieldVisible()) || searchingHashtag != null) {
+            if (invoked) {
+                if (actionBar != null && actionBar.isSearchFieldVisible()) {
+                    actionBar.closeSearchField();
+                } else if (searchItem != null && searchItem.isSearchFieldVisible()) {
+                    if (actionBar != null) {
+                        actionBar.onSearchFieldVisibilityChanged(false);
+                    }
+                    searchItem.toggleSearch(true);
+                } else {
+                    clearSearch();
+                }
+            }
             return false;
         } else if (isInPollAddOptionMode()) {
             if (invoked) pollAddOptionModeClose();
@@ -37535,7 +37557,9 @@ public class ChatActivity extends BaseFragment implements
         }
         getMediaDataController().searchMessagesInChat(searchingQuery, dialog_id, mergeDialogId, classGuid, 0, threadMessageId, false, searchingUserMessages, searchingChatMessages, false, searchingReaction, searchingType);
         updatePinnedMessageView(true);
-        hashtagSearchEmptyView.showProgress(true);
+        if (hashtagSearchEmptyView != null) {
+            hashtagSearchEmptyView.showProgress(true);
+        }
         showMessagesSearchListView(true);
         if (hashtagSearchTabs != null) {
             hashtagSearchTabs.show(!channelHashtags);
@@ -37682,11 +37706,19 @@ public class ChatActivity extends BaseFragment implements
     private void updateSearchListEmptyView() {
         createSearchHashtagViewsIfNeeded();
         if (searchingHashtag != null) {
-            hashtagSearchEmptyView.subtitle.setText(LocaleController.formatString(R.string.HashtagSearchEmptyViewFilteredSubtitle, searchingHashtag));
-            messagesSearchListView.setEmptyView(hashtagSearchEmptyView);
+            if (hashtagSearchEmptyView != null) {
+                hashtagSearchEmptyView.subtitle.setText(LocaleController.formatString(R.string.HashtagSearchEmptyViewFilteredSubtitle, searchingHashtag));
+                if (messagesSearchListView != null) {
+                    messagesSearchListView.setEmptyView(hashtagSearchEmptyView);
+                }
+            }
         } else {
-            messagesSearchListView.setEmptyView(null);
-            hashtagSearchEmptyView.setVisibility(View.GONE);
+            if (messagesSearchListView != null) {
+                messagesSearchListView.setEmptyView(null);
+            }
+            if (hashtagSearchEmptyView != null) {
+                hashtagSearchEmptyView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -39137,6 +39169,9 @@ public class ChatActivity extends BaseFragment implements
         if (chatMode == MODE_QUICK_REPLIES && (messages.isEmpty() || threadMessageId == 0)) {
             return false;
         }
+        if (searching || searchItemVisible || (searchItem != null && searchItem.isSearchFieldVisible()) || (actionBar != null && actionBar.isSearchFieldVisible()) || (messagesSearchListContainer != null && messagesSearchListContainer.getTag() != null) || searchingHashtag != null) {
+            return false;
+        }
         return swipeBackEnabled && chatActivityEnterView.swipeToBackEnabled() && pullingDownOffset == 0
             && (quickShareSelectorOverlay == null || !quickShareSelectorOverlay.isActive());
     }
@@ -39144,6 +39179,9 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public boolean isSwipeBackEnabled(MotionEvent event) {
         if (chatMode == MODE_QUICK_REPLIES && (messages.isEmpty() || threadMessageId == 0)) {
+            return false;
+        }
+        if (searching || searchItemVisible || (searchItem != null && searchItem.isSearchFieldVisible()) || (actionBar != null && actionBar.isSearchFieldVisible()) || (messagesSearchListContainer != null && messagesSearchListContainer.getTag() != null) || searchingHashtag != null) {
             return false;
         }
         return swipeBackEnabled && (forwardingPreviewView == null || !forwardingPreviewView.isShowing())
@@ -41022,16 +41060,16 @@ public class ChatActivity extends BaseFragment implements
                 }
             } else {
                 if (headerItem != null) {
-                    headerItem.setVisibility(View.VISIBLE);
+                    headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (audioCallIconItem != null && showAudioCallAsIcon) {
-                    audioCallIconItem.setVisibility(View.VISIBLE);
+                    audioCallIconItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (topicCreateItem != null) {
-                    topicCreateItem.setVisibility(View.VISIBLE);
+                    topicCreateItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (searchIconItem != null && showSearchAsIcon) {
-                    searchIconItem.setVisibility(View.VISIBLE);
+                    searchIconItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
                 if (editTextItem != null) {
                     editTextItem.setVisibility(View.GONE);
@@ -41207,7 +41245,9 @@ public class ChatActivity extends BaseFragment implements
                     ((ChatActivityContainer) view).chatActivity.updateSearchingHashtag(searchingHashtag);
                 }
                 updateSearchListEmptyView();
-                hashtagSearchEmptyView.showProgress(true);
+                if (hashtagSearchEmptyView != null) {
+                    hashtagSearchEmptyView.showProgress(true);
+                }
                 showMessagesSearchListView(true);
             } else {
                 searchingHashtag = null;
