@@ -15,8 +15,10 @@ import android.system.OsConstants;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DataSpec;
+import androidx.annotation.OptIn;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.DataSpec;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.FileLoader;
@@ -28,6 +30,7 @@ import org.telegram.tgnet.TLRPC;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+@OptIn(markerClass = UnstableApi.class)
 public class MediaStreamingProvider extends ContentProvider {
 
     private HandlerThread callbackThread;

@@ -3,13 +3,15 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'com.android.application'
-    id 'org.telegram.lottie-meta'
+    id 'org.telegram.build-app-plugin'
+    id 'org.telegram.build-plugin'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
     id 'com.google.dagger.hilt.android'
     id 'com.google.devtools.ksp'
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.chaquo.python'
+    id 'idea'
 }
 
 def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
@@ -76,6 +78,25 @@ if (nativeTarget == 'SKIP') {
         }
     }
 }
+
+idea {
+    module {
+        excludeDirs += [
+            file('jni/td'),
+            file('jni/third_party/boringssl'),
+            file('jni/third_party/dav1d'),
+            file('jni/third_party/ffmpeg'),
+            file('jni/third_party/libvpx'),
+            file('jni/third_party/libyuv'),
+            file('jni/third_party/openh264'),
+            file('jni/third_party/xiph'),
+            file('jni/tlottie'),
+            file('jni/voip/webrtc'),
+            file('jni/sqlite')
+        ]
+    }
+}
+
 
 android {
     kotlin {
@@ -266,6 +287,8 @@ dependencies {
     implementation 'androidx.interpolator:interpolator:1.0.0'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.webkit:webkit:1.14.0'
+    implementation 'com.google.android.gms:play-services-cast-framework:21.4.0'
     implementation 'com.google.zxing:core:3.5.4'
     implementation 'androidx.car.app:app:1.4.0'
     implementation 'androidx.car.app:app-projected:1.4.0'
@@ -304,6 +327,12 @@ dependencies {
     implementation("io.noties.markwon:ext-latex:4.6.2") {
         exclude group: 'ru.noties', module: 'jlatexmath-android'
     }
+
+    api project(":TMessagesProj_Modules:media3:media-lib-exoplayer")
+    api project(":TMessagesProj_Modules:media3:media-lib-exoplayer-dash")
+    api project(":TMessagesProj_Modules:media3:media-lib-exoplayer-hls")
+    api project(":TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg")
+    api project(":TMessagesProj_Modules:media3:media-lib-session")
     api project(':jlatexmath')
     implementation 'com.google.android.recaptcha:recaptcha:18.7.1'
     // payment

@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.util.Log;
+import android.util.Log;
 import org.telegram.messenger.BuildVars;
 
 import static android.view.View.MeasureSpec;

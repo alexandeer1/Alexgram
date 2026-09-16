@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:9.0.1'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.10'
         classpath 'org.jetbrains.kotlin:kotlin-reflect:2.1.10'
         classpath 'com.google.devtools.ksp:symbol-processing-gradle-plugin:2.1.10-1.0.31'
     }
@@ -47,7 +48,7 @@ subprojects {
                     sourceCompatibility = JavaVersion.VERSION_21
                     targetCompatibility = JavaVersion.VERSION_21
 
-                    if (project.name != 'jlatexmath') {
+                    if (project.name == 'TMessagesProj') {
                         coreLibraryDesugaringEnabled = true
                     }
                 }
@@ -65,4 +66,22 @@ subprojects {
             }
         }
     }
+
+    if (project.projectDir.absolutePath.replace('\\', '/').contains('/TMessagesProj_Modules/media/')) {
+        project.plugins.withId('com.android.library') {
+            project.android {
+                if (namespace == null) {
+                    def manifestFile = file("${project.projectDir}/src/main/AndroidManifest.xml")
+
+                    if (manifestFile.exists()) {
+                        def matcher = manifestFile.text =~ /package\s*=\s*["']([^"']+)["']/
+                        if (matcher.find()) {
+                            namespace matcher.group(1)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+

@@ -496,6 +496,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     if (uri != null) {
                         String url = uri.toString().toLowerCase();
                         isProxy = url.startsWith("tg:proxy") || url.startsWith("tg://proxy")
+                                || url.startsWith("tg:webproxy") || url.startsWith("tg://webproxy")
                                 || url.startsWith("tg:socks") || url.startsWith("tg://socks");
                     }
                 }
@@ -4038,31 +4039,26 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         final TLRPC.TL_messages_requestUrlAuth req = new TLRPC.TL_messages_requestUrlAuth();
                         req.url = oauth_url;
                         req.flags |= 4;
-                        ConnectionsManager.getInstance(intentAccount[0]).sendRequest(req,
-                                (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                                    final BaseFragment fragment = getSafeLastFragment();
-                                    if (response != null) {
-                                        if (response instanceof TLRPC.TL_urlAuthResultRequest) {
-                                            OAuthSheet.handle(false, currentAccount, req,
-                                                    (TLRPC.TL_urlAuthResultRequest) response);
-                                        } else if (response instanceof TLRPC.TL_urlAuthResultAccepted) {
-                                            OAuthSheet.handle(false, currentAccount, req,
-                                                    (TLRPC.TL_urlAuthResultAccepted) response);
-                                        } else if (response instanceof TLRPC.TL_urlAuthResultDefault) {
-                                            AlertsCreator.showOpenUrlAlert(fragment, oauth_url, false, true);
-                                        }
-                                    } else if (error != null) {
-                                        if ("URL_EXPIRED".equalsIgnoreCase(error.text)) {
-                                            OAuthSheet.getBulletinFactory()
-                                                    .createSimpleBulletin(R.raw.error,
-                                                            getString(R.string.BotAuthLoggedInFailTitle),
-                                                            getString(R.string.BotAuthLoggedInFailNoDomain))
-                                                    .show();
-                                        } else {
-                                            OAuthSheet.getBulletinFactory().showForError(error);
-                                        }
-                                    }
-                                }), ConnectionsManager.RequestFlagFailOnServerErrors);
+                        ConnectionsManager.getInstance(intentAccount[0]).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                            final BaseFragment fragment = getSafeLastFragment();
+                            if (response != null) {
+                                if (response instanceof TLRPC.TL_urlAuthResultRequest) {
+                                    OAuthSheet.handle(false, currentAccount, req, (TLRPC.TL_urlAuthResultRequest) response);
+                                } else if (response instanceof TLRPC.TL_urlAuthResultAccepted) {
+                                    OAuthSheet.handle(false, currentAccount, req, (TLRPC.TL_urlAuthResultAccepted) response);
+                                } else if (response instanceof TLRPC.TL_urlAuthResultDefault) {
+                                    AlertsCreator.showOpenUrlAlert(fragment, oauth_url, false, true);
+                                }
+                            } else if (error != null) {
+                                if ("URL_EXPIRED".equalsIgnoreCase(error.text)) {
+                                    OAuthSheet.getBulletinFactory()
+                                        .createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.BotAuthLoggedInFailTitle), LocaleController.getString(R.string.BotAuthLoggedInFailNoDomain))
+                                        .show();
+                                } else {
+                                    OAuthSheet.getBulletinFactory().showForError(error);
+                                }
+                            }
+                        }), ConnectionsManager.RequestFlagFailOnServerErrors);
                         pushOpened = true;
                     } else if (widgetId != 0) {
                         open_settings = 6;
@@ -4562,7 +4558,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         final LoginActivity loginActivity = new LoginActivity().changeEmail(() -> {
             Bulletin.LottieLayout layout = new Bulletin.LottieLayout(this, null);
             layout.setAnimation(R.raw.email_check_inbox);
-            layout.textView.setText(getString(R.string.YourLoginEmailChangedSuccess));
+            layout.textView.setText(LocaleController.getString(R.string.YourLoginEmailChangedSuccess));
             int duration = Bulletin.DURATION_SHORT;
 
             BaseFragment fragment = getLastFragment();
@@ -4591,10 +4587,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
             new AlertDialog.Builder(this)
                     .setTitle(spannable)
-                    .setMessage(getString(R.string.EmailLoginChangeMessage))
-                    .setPositiveButton(getString(R.string.ChangeEmail),
-                            (dialog, which) -> presentFragment(loginActivity))
-                    .setNegativeButton(getString(R.string.Cancel), null)
+                    .setMessage(LocaleController.getString(R.string.EmailLoginChangeMessage))
+                    .setPositiveButton(LocaleController.getString(R.string.ChangeEmail), (dialog, which) -> presentFragment(loginActivity))
+                    .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
                     .show();
         } else {
             presentFragment(loginActivity);
@@ -5303,221 +5298,196 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (contactToken != null) {
             TLRPC.TL_contacts_importContactToken req = new TLRPC.TL_contacts_importContactToken();
             req.token = contactToken;
-            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req,
-                    (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                        if (response instanceof TLRPC.User) {
-                            TLRPC.User user = (TLRPC.User) response;
-                            MessagesController.getInstance(intentAccount).putUser(user, false);
-                            Bundle args = new Bundle();
-                            args.putLong("user_id", user.id);
-                            presentFragment(new ChatActivity(args));
-                        } else {
-                            FileLog.e("cant import contact token. token=" + contactToken + " err="
-                                    + (error == null ? null : error.text));
-                            BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
-                                    .createErrorBulletin(LocaleController.getString(R.string.NoUsernameFound)).show();
-                        }
+            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                if (response instanceof TLRPC.User) {
+                    TLRPC.User user = (TLRPC.User) response;
+                    MessagesController.getInstance(intentAccount).putUser(user, false);
+                    Bundle args = new Bundle();
+                    args.putLong("user_id", user.id);
+                    presentFragment(new ChatActivity(args));
+                } else {
+                    FileLog.e("cant import contact token. token=" + contactToken + " err=" + (error == null ? null : error.text));
+                    BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1)).createErrorBulletin(LocaleController.getString(R.string.NoUsernameFound)).show();
+                }
 
-                        try {
-                            dismissLoading.run();
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                    }));
+                try {
+                    dismissLoading.run();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            }));
         } else if (folderSlug != null) {
             TL_chatlists.TL_chatlists_checkChatlistInvite req = new TL_chatlists.TL_chatlists_checkChatlistInvite();
             req.slug = folderSlug;
-            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req,
-                    (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                        BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
-                        if (response instanceof TL_chatlists.chatlist_ChatlistInvite) {
-                            TL_chatlists.chatlist_ChatlistInvite inv = (TL_chatlists.chatlist_ChatlistInvite) response;
-                            ArrayList<TLRPC.Chat> chats = null;
-                            ArrayList<TLRPC.User> users = null;
-                            if (inv instanceof TL_chatlists.TL_chatlists_chatlistInvite) {
-                                chats = ((TL_chatlists.TL_chatlists_chatlistInvite) inv).chats;
-                                users = ((TL_chatlists.TL_chatlists_chatlistInvite) inv).users;
-                            } else if (inv instanceof TL_chatlists.TL_chatlists_chatlistInviteAlready) {
-                                chats = ((TL_chatlists.TL_chatlists_chatlistInviteAlready) inv).chats;
-                                users = ((TL_chatlists.TL_chatlists_chatlistInviteAlready) inv).users;
-                            }
-                            MessagesController.getInstance(intentAccount).putChats(chats, false);
-                            MessagesController.getInstance(intentAccount).putUsers(users, false);
-                            if (!(inv instanceof TL_chatlists.TL_chatlists_chatlistInvite
-                                    && ((TL_chatlists.TL_chatlists_chatlistInvite) inv).peers.isEmpty())) {
-                                final FolderBottomSheet sheet = new FolderBottomSheet(fragment, folderSlug, inv);
-                                if (fragment != null) {
-                                    fragment.showDialog(sheet);
-                                } else {
-                                    sheet.show();
-                                }
-                            } else {
-                                BulletinFactory.of(fragment)
-                                        .createErrorBulletin(LocaleController.getString(R.string.NoFolderFound)).show();
-                            }
+            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
+                if (response instanceof TL_chatlists.chatlist_ChatlistInvite) {
+                    TL_chatlists.chatlist_ChatlistInvite inv = (TL_chatlists.chatlist_ChatlistInvite) response;
+                    ArrayList<TLRPC.Chat> chats = null;
+                    ArrayList<TLRPC.User> users = null;
+                    if (inv instanceof TL_chatlists.TL_chatlists_chatlistInvite) {
+                        chats = ((TL_chatlists.TL_chatlists_chatlistInvite) inv).chats;
+                        users = ((TL_chatlists.TL_chatlists_chatlistInvite) inv).users;
+                    } else if (inv instanceof TL_chatlists.TL_chatlists_chatlistInviteAlready) {
+                        chats = ((TL_chatlists.TL_chatlists_chatlistInviteAlready) inv).chats;
+                        users = ((TL_chatlists.TL_chatlists_chatlistInviteAlready) inv).users;
+                    }
+                    MessagesController.getInstance(intentAccount).putChats(chats, false);
+                    MessagesController.getInstance(intentAccount).putUsers(users, false);
+                    if (!(inv instanceof TL_chatlists.TL_chatlists_chatlistInvite && ((TL_chatlists.TL_chatlists_chatlistInvite) inv).peers.isEmpty())) {
+                        final FolderBottomSheet sheet = new FolderBottomSheet(fragment, folderSlug, inv);
+                        if (fragment != null) {
+                            fragment.showDialog(sheet);
                         } else {
-                            BulletinFactory.of(fragment)
-                                    .createErrorBulletin(LocaleController.getString(R.string.NoFolderFound)).show();
+                            sheet.show();
                         }
+                    } else {
+                        BulletinFactory.of(fragment).createErrorBulletin(LocaleController.getString(R.string.NoFolderFound)).show();
+                    }
+                } else {
+                    BulletinFactory.of(fragment).createErrorBulletin(LocaleController.getString(R.string.NoFolderFound)).show();
+                }
 
-                        try {
-                            dismissLoading.run();
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                    }));
+                try {
+                    dismissLoading.run();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            }));
         } else if (stargiftPreviewSlug != null) {
-            requestId[0] = GiftAuctionController.getInstance(currentAccount)
-                    .requestGiftAuctionBySlug(stargiftPreviewSlug, (res, err) -> {
-                        if (err != null) {
-                            BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
-                                    .createSimpleBulletin(R.raw.error, getString(R.string.GiftAuctionNotFound))
-                                    .show();
-                        } else if (res != null) {
-                            GiftAuctionController.Auction auction = GiftAuctionController.getInstance(currentAccount)
-                                    .getAuction(res.gift.id);
-                            if (auction != null) {
-                                new StarGiftPreviewSheet(LaunchActivity.this, null, currentAccount, auction.gift.title,
-                                        auction.previewAttributes, false).show();
-                            }
-                        }
+            requestId[0] = GiftAuctionController.getInstance(currentAccount).requestGiftAuctionBySlug(stargiftPreviewSlug, (res, err) -> {
+                if (err != null) {
+                    BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
+                            .createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.GiftAuctionNotFound))
+                            .show();
+                } else if (res != null) {
+                    GiftAuctionController.Auction auction = GiftAuctionController.getInstance(currentAccount).getAuction(res.gift.id);
+                    if (auction != null) {
+                        new StarGiftPreviewSheet(LaunchActivity.this, null, currentAccount, auction.gift.title, auction.previewAttributes, false).show();
+                    }
+                }
 
-                        try {
-                            dismissLoading.run();
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                    });
+                try {
+                    dismissLoading.run();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            });
         } else if (auctionSlug != null) {
-            requestId[0] = GiftAuctionController.getInstance(currentAccount).requestGiftAuctionBySlug(auctionSlug,
-                    (res, err) -> {
-                        if (err != null) {
-                            BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
-                                    .createSimpleBulletin(R.raw.error, getString(R.string.GiftAuctionNotFound))
-                                    .show();
-                        } else if (res != null) {
-                            AuctionJoinSheet.show(LaunchActivity.this, null, currentAccount, 0, res.gift.id, null);
-                        }
+            requestId[0] = GiftAuctionController.getInstance(currentAccount).requestGiftAuctionBySlug(auctionSlug, (res, err) -> {
+                if (err != null) {
+                    BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
+                            .createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.GiftAuctionNotFound))
+                            .show();
+                } else if (res != null) {
+                    AuctionJoinSheet.show(LaunchActivity.this, null, currentAccount, 0, res.gift.id, null);
+                }
 
-                        try {
-                            dismissLoading.run();
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                    });
+                try {
+                    dismissLoading.run();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            });
         } else if (uniqueGiftSlug != null) {
             TL_stars.getUniqueStarGift req = new TL_stars.getUniqueStarGift();
             req.slug = uniqueGiftSlug;
-            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req,
-                    (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                        if (error != null) {
-                            final BaseFragment lastFragment = getSafeLastFragment();
-                            if (lastFragment == null)
-                                return;
-                            if ("STARGIFT_ALREADY_BURNED".equalsIgnoreCase(error.text)) {
-                                BulletinFactory.of(lastFragment)
-                                        .createSimpleBulletin(R.raw.fire_on,
-                                                getString(R.string.UniqueGiftNotFoundBurned))
-                                        .show();
+            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                if (error != null) {
+                    final BaseFragment lastFragment = getSafeLastFragment();
+                    if (lastFragment == null) return;
+                    if ("STARGIFT_ALREADY_BURNED".equalsIgnoreCase(error.text)) {
+                        BulletinFactory.of(lastFragment)
+                            .createSimpleBulletin(R.raw.fire_on, LocaleController.getString(R.string.UniqueGiftNotFoundBurned))
+                            .show();
+                    } else {
+                        BulletinFactory.of(lastFragment)
+                            .createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.UniqueGiftNotFound))
+                            .show();
+                    }
+                } else if (response instanceof TL_stars.TL_payments_uniqueStarGift) {
+                    final TL_stars.TL_payments_uniqueStarGift r = (TL_stars.TL_payments_uniqueStarGift) response;
+                    MessagesController.getInstance(currentAccount).putUsers(r.users, false);
+                    MessagesController.getInstance(currentAccount).putChats(r.chats, false);
+                    BaseFragment lastFragment = getSafeLastFragment();
+                    if (r.gift instanceof TL_stars.TL_starGiftUnique) {
+                        final TL_stars.TL_starGiftUnique gift = (TL_stars.TL_starGiftUnique) r.gift;
+                        final StarGiftSheet sheet = new StarGiftSheet(this, intentAccount, 0, null).set(uniqueGiftSlug, gift, null);
+                        if (lastFragment != null) {
+                            if (lastFragment.getLastStoryViewer() != null && lastFragment.getLastStoryViewer().isFullyVisible()) {
+                                lastFragment.getLastStoryViewer().showDialog(sheet);
                             } else {
-                                BulletinFactory.of(lastFragment)
-                                        .createSimpleBulletin(R.raw.error, getString(R.string.UniqueGiftNotFound))
-                                        .show();
+                                lastFragment.showDialog(sheet);
                             }
-                        } else if (response instanceof TL_stars.TL_payments_uniqueStarGift) {
-                            final TL_stars.TL_payments_uniqueStarGift r = (TL_stars.TL_payments_uniqueStarGift) response;
-                            MessagesController.getInstance(currentAccount).putUsers(r.users, false);
-                            MessagesController.getInstance(currentAccount).putChats(r.chats, false);
-                            BaseFragment lastFragment = getSafeLastFragment();
-                            if (r.gift instanceof TL_stars.TL_starGiftUnique) {
-                                final TL_stars.TL_starGiftUnique gift = (TL_stars.TL_starGiftUnique) r.gift;
-                                final StarGiftSheet sheet = new StarGiftSheet(this, intentAccount, 0, null)
-                                        .set(uniqueGiftSlug, gift, null);
-                                if (lastFragment != null) {
-                                    if (lastFragment.getLastStoryViewer() != null
-                                            && lastFragment.getLastStoryViewer().isFullyVisible()) {
-                                        lastFragment.getLastStoryViewer().showDialog(sheet);
-                                    } else {
-                                        lastFragment.showDialog(sheet);
-                                    }
-                                } else {
-                                    sheet.show();
-                                }
-                            }
+                        } else {
+                            sheet.show();
                         }
+                    }
+                }
 
-                        try {
-                            dismissLoading.run();
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                    }));
+                try {
+                    dismissLoading.run();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            }));
         } else if (inputInvoiceSlug != null) {
             TLRPC.TL_payments_getPaymentForm req = new TLRPC.TL_payments_getPaymentForm();
             TLRPC.TL_inputInvoiceSlug invoiceSlug = new TLRPC.TL_inputInvoiceSlug();
             invoiceSlug.slug = inputInvoiceSlug;
             req.invoice = invoiceSlug;
-            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req,
-                    (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                        if (error != null) {
-                            if ("SUBSCRIPTION_ALREADY_ACTIVE".equalsIgnoreCase(error.text)) {
-                                BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
-                                        .createErrorBulletin(LocaleController
-                                                .getString(R.string.PaymentInvoiceSubscriptionLinkAlreadyPaid))
-                                        .show();
-                            } else {
-                                BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1))
-                                        .createErrorBulletin(
-                                                LocaleController.getString(R.string.PaymentInvoiceLinkInvalid))
-                                        .show();
+            requestId[0] = ConnectionsManager.getInstance(intentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                if (error != null) {
+                    if ("SUBSCRIPTION_ALREADY_ACTIVE".equalsIgnoreCase(error.text)) {
+                        BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1)).createErrorBulletin(LocaleController.getString(R.string.PaymentInvoiceSubscriptionLinkAlreadyPaid)).show();
+                    } else {
+                        BulletinFactory.of(mainFragmentsStack.get(mainFragmentsStack.size() - 1)).createErrorBulletin(LocaleController.getString(R.string.PaymentInvoiceLinkInvalid)).show();
+                    }
+                } else if (!LaunchActivity.this.isFinishing()) {
+                    PaymentFormActivity paymentFormActivity = null;
+                    if (response instanceof TLRPC.TL_payments_paymentFormStars) {
+                        Runnable callback = navigateToPremiumGiftCallback;
+                        navigateToPremiumGiftCallback = null;
+                        StarsController.getInstance(currentAccount).openPaymentForm(null, invoiceSlug, (TLRPC.TL_payments_paymentFormStars) response, () -> {
+                            try {
+                                dismissLoading.run();
+                            } catch (Exception e) {
+                                FileLog.e(e);
                             }
-                        } else if (!LaunchActivity.this.isFinishing()) {
-                            PaymentFormActivity paymentFormActivity = null;
-                            if (response instanceof TLRPC.TL_payments_paymentFormStars) {
-                                Runnable callback = navigateToPremiumGiftCallback;
-                                navigateToPremiumGiftCallback = null;
-                                StarsController.getInstance(currentAccount).openPaymentForm(null, invoiceSlug,
-                                        (TLRPC.TL_payments_paymentFormStars) response, () -> {
-                                            try {
-                                                dismissLoading.run();
-                                            } catch (Exception e) {
-                                                FileLog.e(e);
-                                            }
-                                        }, status -> {
-                                            if (callback != null && "paid".equals(status)) {
-                                                callback.run();
-                                            }
-                                        });
-                                return;
-                            } else if (response instanceof TLRPC.PaymentForm) {
-                                TLRPC.PaymentForm form = (TLRPC.PaymentForm) response;
-                                MessagesController.getInstance(intentAccount).putUsers(form.users, false);
-                                paymentFormActivity = new PaymentFormActivity(form, inputInvoiceSlug,
-                                        getActionBarLayout().getLastFragment());
-                            } else if (response instanceof TLRPC.PaymentReceipt) {
-                                paymentFormActivity = new PaymentFormActivity((TLRPC.PaymentReceipt) response);
+                        }, status -> {
+                            if (callback != null && "paid".equals(status)) {
+                                callback.run();
                             }
+                        });
+                        return;
+                    } else if (response instanceof TLRPC.PaymentForm) {
+                        TLRPC.PaymentForm form = (TLRPC.PaymentForm) response;
+                        MessagesController.getInstance(intentAccount).putUsers(form.users, false);
+                        paymentFormActivity = new PaymentFormActivity(form, inputInvoiceSlug, getActionBarLayout().getLastFragment());
+                    } else if (response instanceof TLRPC.PaymentReceipt) {
+                        paymentFormActivity = new PaymentFormActivity((TLRPC.PaymentReceipt) response);
+                    }
 
-                            if (paymentFormActivity != null) {
-                                if (navigateToPremiumGiftCallback != null) {
-                                    Runnable callback = navigateToPremiumGiftCallback;
-                                    navigateToPremiumGiftCallback = null;
-                                    paymentFormActivity.setPaymentFormCallback(status -> {
-                                        if (status == PaymentFormActivity.InvoiceStatus.PAID) {
-                                            callback.run();
-                                        }
-                                    });
+                    if (paymentFormActivity != null) {
+                        if (navigateToPremiumGiftCallback != null) {
+                            Runnable callback = navigateToPremiumGiftCallback;
+                            navigateToPremiumGiftCallback = null;
+                            paymentFormActivity.setPaymentFormCallback(status -> {
+                                if (status == PaymentFormActivity.InvoiceStatus.PAID) {
+                                    callback.run();
                                 }
-                                presentFragment(paymentFormActivity);
-                            }
+                            });
                         }
+                        presentFragment(paymentFormActivity);
+                    }
+                }
 
-                        try {
-                            dismissLoading.run();
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                    }));
+                try {
+                    dismissLoading.run();
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            }));
         } else if (username != null) {
             if (progress != null) {
                 progress.init();
@@ -7850,15 +7820,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         }
                         localeDialog = null;
                     } else if (dialog == proxyErrorDialog) {
-                        /*
-                         * SharedPreferences preferences = MessagesController.getGlobalMainSettings();
-                         * SharedPreferences.Editor editor =
-                         * MessagesController.getGlobalMainSettings().edit();
-                         * editor.putBoolean("proxy_enabled", false);
-                         * editor.putBoolean("proxy_enabled_calls", false);
-                         * editor.commit();
-                         * ConnectionsManager.setProxySettings(false, "", 1080, "", "", "");
-                         */
                         SharedConfig.setProxyEnable(false);
                         NotificationCenter.getGlobalInstance()
                                 .postNotificationName(NotificationCenter.proxySettingsChanged);
@@ -9686,10 +9647,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, null);
                 builder.setTitle("TL Error");
                 builder.setMessage(messageToShow);
-                builder.setNegativeButton(getString(R.string.Copy), (d, i) -> {
+                builder.setNegativeButton(LocaleController.getString(R.string.Copy), (d, i) -> {
                     AndroidUtilities.addToClipboard(messageToCopy);
                 });
-                builder.setPositiveButton(getString(R.string.OK), null);
+                builder.setPositiveButton(LocaleController.getString(R.string.OK), null);
                 builder.setOnDismissListener(d -> {
                     AndroidUtilities.runOnUIThread(() -> {
                         tlErrorAlertDialog = null;
@@ -9714,7 +9675,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, null);
                 builder.setTitle("Memory Leak Found");
                 builder.setMessage(messageToShow);
-                builder.setPositiveButton(getString(R.string.OK), null);
+                builder.setPositiveButton(LocaleController.getString(R.string.OK), null);
                 builder.setOnDismissListener(d -> {
                     AndroidUtilities.runOnUIThread(() -> {
                         memoryLeakErrorAlertDialog = null;
