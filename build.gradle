@@ -23,6 +23,10 @@ plugins {
     id 'com.chaquo.python' version '17.0.0' apply false
 }
 
+allprojects {
+    ext.modulePrefix = ':TMessagesProj_Modules:media3:media-'
+}
+
 // Strip JLatexMath fonts we don't ship (transitive AAR assets from
 // io.noties.markwon:ext-latex -> ru.noties:jlatexmath-android, ~764 KB total under
 // assets/org/scilab/forge/jlatexmath/fonts/). Has to live in the APK modules — a

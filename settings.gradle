@@ -23,7 +23,48 @@ include ':TMessagesProj'
 include ':jlatexmath'
 project(':jlatexmath').projectDir = file('TMessagesProj/lib/jlatexmath/jlatexmath')
 
-include ':TMessagesProj_Modules:media3'
-project(':TMessagesProj_Modules:media3').projectDir = file('TMessagesProj_Modules/media')
+def mediaRootDir = file("TMessagesProj_Modules/media")
+gradle.ext.androidxMediaSettingsDir = mediaRootDir.canonicalPath
+gradle.ext.modulePrefix = ':TMessagesProj_Modules:media3:media-'
 gradle.ext.androidxMediaModulePrefix = 'TMessagesProj_Modules:media3:media-'
-apply from: file("TMessagesProj_Modules/media/core_settings.gradle")
+def modulePrefix = ':TMessagesProj_Modules:media3:media-'
+
+include ':TMessagesProj_Modules:media3'
+project(':TMessagesProj_Modules:media3').projectDir = mediaRootDir
+project(':TMessagesProj_Modules:media3').buildFileName = 'disabled.gradle'
+
+def mediaModules = [
+    'lib-common': 'libraries/common',
+    'lib-container': 'libraries/container',
+    'lib-datasource': 'libraries/datasource',
+    'lib-decoder': 'libraries/decoder',
+    'lib-extractor': 'libraries/extractor',
+    'lib-database': 'libraries/database',
+    'lib-exoplayer': 'libraries/exoplayer',
+    'lib-exoplayer-dash': 'libraries/exoplayer_dash',
+    'lib-exoplayer-hls': 'libraries/exoplayer_hls',
+    'lib-decoder-ffmpeg': 'libraries/decoder_ffmpeg',
+    'lib-session': 'libraries/session'
+]
+
+mediaModules.each { name, relPath ->
+    def projectPath = "${modulePrefix}${name}"
+    include projectPath
+    def pDir = new File(mediaRootDir, relPath)
+    project(projectPath).projectDir = pDir
+    def rules = new File(pDir, "proguard-rules.txt")
+    if (!rules.exists()) {
+        rules.createNewFile()
+    }
+}
+
+def dummyDir = file('TMessagesProj_Modules/dummy')
+if (!dummyDir.exists()) {
+    dummyDir.mkdirs()
+}
+['test-utils', 'test-data', 'test-utils-robolectric'].each { name ->
+    def projectPath = "${modulePrefix}${name}"
+    include projectPath
+    project(projectPath).projectDir = dummyDir
+    project(projectPath).buildFileName = 'disabled.gradle'
+}
