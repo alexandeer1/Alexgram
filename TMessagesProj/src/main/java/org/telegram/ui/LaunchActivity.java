@@ -7821,8 +7821,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         localeDialog = null;
                     } else if (dialog == proxyErrorDialog) {
                         SharedConfig.setProxyEnable(false);
-                        NotificationCenter.getGlobalInstance()
-                                .postNotificationName(NotificationCenter.proxySettingsChanged);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged);
                         proxyErrorDialog = null;
                     }
                 }
@@ -8768,6 +8767,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             editorView.destroy();
         }
         FloatingDebugController.onDestroy();
+        AnimatedEmojiDrawable.dropGlobalEmojiCache();
         if (BuildConfig.DEBUG) {
             LeakDetector.getInstance().stop();
         }
