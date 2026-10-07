@@ -81,7 +81,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLException;
-
 import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.ErrorDatabase;
 
@@ -89,8 +88,6 @@ import tw.nekomimi.nekogram.NekoXConfig;
 import tw.nekomimi.nekogram.utils.DnsFactory;
 import tw.nekomimi.nekogram.utils.ProxyUtil;
 import xyz.nextalone.nagram.NaConfig;
-
-@OptIn(markerClass = UnstableApi.class)
 public class ConnectionsManager extends BaseController {
 
     public final static int ConnectionTypeGeneric = 1;
