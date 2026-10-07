@@ -8237,6 +8237,7 @@ public class ChatActivity extends BaseFragment implements
                     topPanelLayout.setViewVisible(fragmentContextViewWrapper, visibility == VISIBLE);
                 }
             };
+            fragmentContextView.setSpeedHintViewParent(contentView);
             topPanelLayout.setCallFragmentContextView(fragmentContextView);
             fragmentContextViewWrapper.addView(fragmentContextView);
             fragmentLocationContextViewWrapper.addView(fragmentLocationContextView);
@@ -13342,8 +13343,8 @@ public class ChatActivity extends BaseFragment implements
                     try {
                         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(getParentActivity(), ApplicationLoader.getApplicationId() + ".provider", file));
                         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (Exception ignore) {
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                    } catch (Exception e) {
+                        FileLog.e(e);
                     }
                 } else {
                     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
@@ -21326,6 +21327,211 @@ public class ChatActivity extends BaseFragment implements
         return null;
     }
 
+    private boolean openArticlePhoto(ChatMessageCell messageCell, TL_iv.PageBlock targetBlock) {
+        if (messageCell == null || targetBlock == null || getParentActivity() == null) return false;
+        MessageObject messageObject = messageCell.getMessageObject();
+        if (messageObject == null || messageObject.messageOwner == null || messageObject.richLayout == null) return false;
+        final TL_iv.RichMessage richMessage = messageObject.messageOwner.rich_message;
+        if (richMessage == null) return false;
+
+        final ArrayList<TL_iv.PageBlock> pageBlocks = new ArrayList<>();
+        messageObject.richLayout.collectMediaBlocks(pageBlocks);
+        final int index = pageBlocks.indexOf(targetBlock);
+        if (index < 0) return false;
+
+        PhotoViewer photoViewer = PhotoViewer.getInstance();
+        photoViewer.setParentActivity(this);
+        return photoViewer.openPhoto(index,
+            new ChatArticlePageBlocksAdapter(richMessage, pageBlocks, messageObject),
+            new ChatArticlePhotoViewerProvider(pageBlocks));
+    }
+
+    private static void collectArticlePhotoBlocks(View view, ArrayList<TL_iv.PageBlock> out) {
+        if (view == null) return;
+        if (view instanceof ArticleViewer.BlockPhotoCell) {
+            TL_iv.pageBlockPhoto block = ((ArticleViewer.BlockPhotoCell) view).getCurrentBlock();
+            if (block != null) out.add(block);
+            return;
+        }
+        if (view instanceof ArticleViewer.BlockVideoCell) {
+            TL_iv.pageBlockVideo block = ((ArticleViewer.BlockVideoCell) view).getCurrentBlock();
+            if (block != null) out.add(block);
+            return;
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0, n = group.getChildCount(); i < n; i++) {
+                collectArticlePhotoBlocks(group.getChildAt(i), out);
+            }
+        }
+    }
+
+    private static ImageReceiver findArticleImageReceiverForBlock(View view, TL_iv.PageBlock target, int[] coords) {
+        if (view == null) return null;
+        if (view instanceof ArticleViewer.BlockPhotoCell) {
+            ArticleViewer.BlockPhotoCell cell = (ArticleViewer.BlockPhotoCell) view;
+            if (cell.getCurrentBlock() == target) {
+                view.getLocationInWindow(coords);
+                return cell.getImageView();
+            }
+            return null;
+        }
+        if (view instanceof ArticleViewer.BlockVideoCell) {
+            ArticleViewer.BlockVideoCell cell = (ArticleViewer.BlockVideoCell) view;
+            if (cell.getCurrentBlock() == target) {
+                view.getLocationInWindow(coords);
+                return cell.getImageView();
+            }
+            return null;
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0, n = group.getChildCount(); i < n; i++) {
+                ImageReceiver result = findArticleImageReceiverForBlock(group.getChildAt(i), target, coords);
+                if (result != null) return result;
+            }
+        }
+        return null;
+    }
+
+    private static class ChatArticlePageBlocksAdapter implements PhotoViewer.PageBlocksAdapter {
+        private final TL_iv.RichMessage page;
+        private final List<TL_iv.PageBlock> blocks;
+        private final MessageObject messageObject;
+
+        ChatArticlePageBlocksAdapter(TL_iv.RichMessage page, List<TL_iv.PageBlock> blocks, MessageObject messageObject) {
+            this.page = page;
+            this.blocks = blocks;
+            this.messageObject = messageObject;
+        }
+
+        @Override
+        public int getItemsCount() { return blocks.size(); }
+
+        @Override
+        public TL_iv.PageBlock get(int index) { return blocks.get(index); }
+
+        @Override
+        public List<TL_iv.PageBlock> getAll() { return blocks; }
+
+        @Override
+        public boolean isVideo(int index) {
+            if (index < 0 || index >= blocks.size()) return false;
+            return ArticleViewer.WebPageUtils.isVideo(page, blocks.get(index));
+        }
+
+        @Override
+        public TLObject getMedia(int index) {
+            if (index < 0 || index >= blocks.size()) return null;
+            return ArticleViewer.WebPageUtils.getMedia(page, blocks.get(index));
+        }
+
+        @Override
+        public File getFile(int index) {
+            if (index < 0 || index >= blocks.size()) return null;
+            return ArticleViewer.WebPageUtils.getMediaFile(page, blocks.get(index));
+        }
+
+        @Override
+        public String getFileName(int index) {
+            TLObject media = getMedia(index);
+            if (media instanceof TLRPC.Photo) {
+                media = FileLoader.getClosestPhotoSizeWithSize(((TLRPC.Photo) media).sizes, AndroidUtilities.getPhotoSize());
+            }
+            return FileLoader.getAttachFileName(media);
+        }
+
+        @Override
+        public CharSequence getCaption(int index) { return null; }
+
+        @Override
+        public TLRPC.PhotoSize getFileLocation(TLObject media, int[] size) {
+            if (media instanceof TLRPC.Photo) {
+                TLRPC.Photo photo = (TLRPC.Photo) media;
+                TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(photo.sizes, AndroidUtilities.getPhotoSize());
+                if (sizeFull != null) {
+                    size[0] = sizeFull.size;
+                    if (size[0] == 0) size[0] = -1;
+                    return sizeFull;
+                } else {
+                    size[0] = -1;
+                }
+            } else if (media instanceof TLRPC.Document) {
+                TLRPC.Document document = (TLRPC.Document) media;
+                TLRPC.PhotoSize thumb = FileLoader.getClosestPhotoSizeWithSize(document.thumbs, 320, false, null, true);
+                if (thumb == null) {
+                    thumb = FileLoader.getClosestPhotoSizeWithSize(document.thumbs, 90);
+                }
+                if (thumb != null) {
+                    size[0] = thumb.size;
+                    if (size[0] == 0) size[0] = -1;
+                    return thumb;
+                } else {
+                    size[0] = -1;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void updateSlideshowCell(TL_iv.PageBlock currentPageBlock) {
+        }
+
+        @Override
+        public Object getParentObject() { return messageObject != null ? messageObject : page; }
+
+        @Override
+        public boolean isHardwarePlayer(int index) { return false; }
+    }
+
+    private class ChatArticlePhotoViewerProvider extends PhotoViewer.EmptyPhotoViewerProvider {
+        private final List<TL_iv.PageBlock> blocks;
+        private final int[] tempCoords = new int[2];
+
+        ChatArticlePhotoViewerProvider(List<TL_iv.PageBlock> blocks) {
+            this.blocks = blocks;
+        }
+
+        @Override
+        public PhotoViewer.PlaceProviderObject getPlaceForPhoto(MessageObject messageObject, TLRPC.FileLocation fileLocation, int index, boolean needPreview, boolean closing) {
+            if (chatListView == null || index < 0 || index >= blocks.size()) return null;
+            final TL_iv.PageBlock targetBlock = blocks.get(index);
+            for (int a = 0, count = chatListView.getChildCount(); a < count; a++) {
+                View view = chatListView.getChildAt(a);
+                ImageReceiver imageReceiver = null;
+                if (view instanceof ChatMessageCell) {
+                    final ChatMessageCell cell = (ChatMessageCell) view;
+                    final MessageObject mo = cell.getMessageObject();
+                    if (mo != null && mo.richLayout != null) {
+                        final int[] off = new int[2];
+                        imageReceiver = mo.richLayout.findMediaImageReceiver(targetBlock, off);
+                        if (imageReceiver != null) {
+                            view.getLocationInWindow(tempCoords);
+                            tempCoords[0] += cell.getTextX() + off[0];
+                            tempCoords[1] += cell.getTextY() + off[1];
+                        }
+                    }
+                }
+                if (imageReceiver == null) continue;
+                PhotoViewer.PlaceProviderObject object = new PhotoViewer.PlaceProviderObject();
+                object.viewX = tempCoords[0];
+                object.viewY = tempCoords[1];
+                object.parentView = chatListView;
+                object.imageReceiver = imageReceiver;
+                object.thumb = imageReceiver.getBitmapSafe();
+                object.radius = imageReceiver.getRoundRadius(true);
+                object.clipTopAddition = (int) (chatListViewPaddingTop - chatListViewPaddingVisibleOffset - AndroidUtilities.dp(4));
+                object.clipBottomAddition = (int) (blurredViewBottomOffset
+                    + dp(9)
+                    + windowInsetsStateHolder.getAnimatedMaxBottomInset()
+                    + getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM)
+                    + inputIslandHeightCurrent);
+                return object;
+            }
+            return null;
+        }
+    }
+
     private void showAttachmentError() {
         if (getParentActivity() == null) {
             return;
@@ -27178,7 +27384,11 @@ public class ChatActivity extends BaseFragment implements
                         if (notPushedSponsoredMessages == null) {
                             notPushedSponsoredMessages = new ArrayList<>();
                         }
-                        notPushedSponsoredMessages.add(obj);
+                        // When retrying, arr is notPushedSponsoredMessages itself: obj is already queued,
+                        // and appending to the list being iterated would loop forever.
+                        if (arr != notPushedSponsoredMessages) {
+                            notPushedSponsoredMessages.add(obj);
+                        }
                         continue;
                     }
                 }
