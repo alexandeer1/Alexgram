@@ -66,4 +66,8 @@
     <string name="PresetMidnight">ミッドナイトAMOLED</string>
     <string name="PresetPastel">パステルドリーム</string>
     <string name="PresetRoyal">ディープローヤル</string>
+    <string name="PeekOnlineMenuText">オンライン確認</string>
+    <string name="PeekOnlineSuccess">オンライン状態を更新しました</string>
+    <string name="PeekOnlineUnavailable">正確なオンライン状態を取得できませんでした。</string>
+    <string name="PeekOnlineRestoreFailed">「最終オンライン」プライバシー設定を復元できませんでした。</string>
 </resources>

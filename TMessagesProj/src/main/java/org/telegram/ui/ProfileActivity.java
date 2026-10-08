@@ -143,6 +143,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ChatThemeController;
 import org.telegram.messenger.ContactsController;
+import com.radolyn.ayugram.utils.PeekOnlineHelper;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.DocumentObject;
 import org.telegram.messenger.Emoji;
@@ -652,6 +653,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private final static int add_to_folder = 105;
     private final static int shadow_ban = 107;
     private final static int manage_privacy = 108;
+    private final static int peek_online = 109;
+
+    private boolean peekOnlineInProgress;
+    private String onlineOverride;
 
     private Rect rect = new Rect();
 
@@ -2639,6 +2644,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (user != null) {
                         presentFragment(new ProfilePrivacyActivity(user));
                     }
+                } else if (id == peek_online) {
+                    onPeekOnlineClicked();
                 } else if (id == add_contact) {
                     TLRPC.User user = getMessagesController().getUser(userId);
                     Bundle args = new Bundle();
@@ -11670,7 +11677,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             onlineTextOverride = LocaleController.getString(R.string.ConnectingToProxy);
         } else {
-            onlineTextOverride = null;
+            onlineTextOverride = onlineOverride;
         }
 
         BaseFragment prevFragment = null;
@@ -12647,6 +12654,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (!isBot && getContactsController().contactsDict.get(userId) != null) {
                     otherItem.addSubItem(add_shortcut, R.drawable.msg_home, LocaleController.getString(R.string.AddShortcut));
                 }
+                addPeekOnlineSubItem(user);
             }
         } else if (chatId != 0) {
             TLRPC.Chat chat = getMessagesController().getChat(chatId);
@@ -17962,6 +17970,88 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             BulletinFactory.of(this).createSimpleBulletin(drawable, text).show();
         }
         createActionBarMenu(true);
+    }
+
+    private boolean canPeekOnline(TLRPC.User user) {
+        return user != null
+            && !user.bot
+            && !UserObject.isDeleted(user)
+            && !UserObject.isUserSelf(user)
+            && !MessagesController.isSupportUser(user)
+            && user.id != UserObject.VERIFY;
+    }
+
+    private void addPeekOnlineSubItem(TLRPC.User user) {
+        if (otherItem != null && canPeekOnline(user)) {
+            otherItem.addSubItem(peek_online, R.drawable.msg_stories_stealth, getString(R.string.PeekOnlineMenuText));
+        }
+    }
+
+    private void onPeekOnlineClicked() {
+        if (peekOnlineInProgress) {
+            if (BulletinFactory.canShowBulletin(this)) {
+                BulletinFactory.of(this).createSimpleBulletin(R.raw.info, getString(R.string.Loading)).show();
+            }
+            return;
+        }
+
+        TLRPC.User user = getMessagesController().getUser(userId);
+        if (!canPeekOnline(user)) {
+            return;
+        }
+
+        onlineOverride = null;
+        peekOnlineInProgress = true;
+        PeekOnlineHelper.peekOnline(currentAccount, user, new PeekOnlineHelper.Callback() {
+            @Override
+            public void onSuccess(TLRPC.User user, String formattedStatus, int sourceAccount) {
+                peekOnlineInProgress = false;
+                onlineOverride = formattedStatus;
+                if (fragmentView != null) {
+                    updateProfileData(false);
+                }
+                if (BulletinFactory.canShowBulletin(ProfileActivity.this)) {
+                    BulletinFactory.of(ProfileActivity.this)
+                        .createSimpleBulletin(R.raw.info, getString(R.string.PeekOnlineSuccess) + " " + ContactsController.formatName(UserConfig.getInstance(sourceAccount).getCurrentUser()))
+                        .show();
+                }
+            }
+
+            @Override
+            public void onError(TLRPC.TL_error error) {
+                peekOnlineInProgress = false;
+                onlineOverride = null;
+                if (!BulletinFactory.canShowBulletin(ProfileActivity.this)) {
+                    return;
+                }
+                if (error != null) {
+                    BulletinFactory.of(ProfileActivity.this).showForError(error);
+                } else {
+                    BulletinFactory.of(ProfileActivity.this).createSimpleBulletin(R.raw.error, getString(R.string.UnknownError)).show();
+                }
+            }
+
+            @Override
+            public void onExactStatusUnavailable() {
+                peekOnlineInProgress = false;
+                onlineOverride = null;
+                if (fragmentView != null) {
+                    updateProfileData(false);
+                }
+                if (BulletinFactory.canShowBulletin(ProfileActivity.this)) {
+                    BulletinFactory.of(ProfileActivity.this).createSimpleBulletin(R.raw.info, getString(R.string.PeekOnlineUnavailable)).show();
+                }
+            }
+
+            @Override
+            public void onRestoreFailed(TLRPC.TL_error error, int account) {
+                peekOnlineInProgress = false;
+                onlineOverride = null;
+                if (BulletinFactory.canShowBulletin(ProfileActivity.this)) {
+                    BulletinFactory.of(ProfileActivity.this).createSimpleBulletin(R.raw.error, getString(R.string.PeekOnlineRestoreFailed)).show();
+                }
+            }
+        });
     }
 
     private void showAddCurrentChatToFolderSheet() {

@@ -66,4 +66,8 @@
     <string name="PresetMidnight">Midnight AMOLED</string>
     <string name="PresetPastel">Pastel Dream</string>
     <string name="PresetRoyal">Deep Royal</string>
+    <string name="PeekOnlineMenuText">Peek Online</string>
+    <string name="PeekOnlineSuccess">Online status refreshed</string>
+    <string name="PeekOnlineUnavailable">Could not fetch exact online status.</string>
+    <string name="PeekOnlineRestoreFailed">Failed to restore Last Seen privacy.</string>
 </resources>

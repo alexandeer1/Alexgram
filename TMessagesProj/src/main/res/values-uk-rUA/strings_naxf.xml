@@ -66,4 +66,8 @@
     <string name="PresetMidnight">Опівнічний AMOLED</string>
     <string name="PresetPastel">Пастельна мрія</string>
     <string name="PresetRoyal">Глибокий королівський синій</string>
+    <string name="PeekOnlineMenuText">Перевірити онлайн</string>
+    <string name="PeekOnlineSuccess">Онлайн-статус оновлено</string>
+    <string name="PeekOnlineUnavailable">Не вдалося отримати точний статус.</string>
+    <string name="PeekOnlineRestoreFailed">Не вдалося відновити налаштування приватності «Останній візит».</string>
 </resources>
