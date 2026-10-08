@@ -66,6 +66,7 @@ subprojects {
 
                 androidResources {
                     ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~:!optional:!licences:!*stmary*:!*eufb*'
+                    noCompress 'pack', 'bin'
                 }
             }
         }

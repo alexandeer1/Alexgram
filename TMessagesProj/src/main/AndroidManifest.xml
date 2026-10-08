@@ -105,6 +105,7 @@
 
     <application
         android:name="org.telegram.messenger.ApplicationLoader"
+        android:pageSizeCompat="enabled"
         android:allowBackup="true"
         android:restoreAnyVersion="true"
         android:backupAgent=".BackupAgent"

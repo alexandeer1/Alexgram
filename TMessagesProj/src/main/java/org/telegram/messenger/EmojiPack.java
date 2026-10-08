@@ -4,8 +4,11 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -34,7 +37,7 @@ public final class EmojiPack {
     private static final int FULL_IMAGE = 3;
     private static final int MAP_REFERENCE = 4;
 
-    private final MappedByteBuffer buffer;
+    private final ByteBuffer buffer;
     private final int count;
     private final int emojiCount;
     private final Inflater inflater = new Inflater(true);
@@ -67,7 +70,7 @@ public final class EmojiPack {
     }
 
     private EmojiPack() throws IOException {
-        // The mapping remains valid after closing the descriptors.
+        ByteBuffer buf = null;
         try (AssetFileDescriptor afd = ApplicationLoader.applicationContext
                 .getAssets().openFd(ASSET_NAME);
              FileInputStream stream = afd.createInputStream()) {
@@ -75,9 +78,24 @@ public final class EmojiPack {
             if (length < HEADER_SIZE || length > Integer.MAX_VALUE) {
                 throw new IOException("Invalid emoji pack length: " + length);
             }
-            buffer = stream.getChannel().map(FileChannel.MapMode.READ_ONLY,
+            buf = stream.getChannel().map(FileChannel.MapMode.READ_ONLY,
                     afd.getStartOffset(), length);
+        } catch (Exception e) {
+            FileLog.e(e);
+            try (InputStream is = ApplicationLoader.applicationContext.getAssets().open(ASSET_NAME)) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] temp = new byte[65536];
+                int read;
+                while ((read = is.read(temp)) != -1) {
+                    baos.write(temp, 0, read);
+                }
+                byte[] bytes = baos.toByteArray();
+                buf = ByteBuffer.allocateDirect(bytes.length);
+                buf.put(bytes);
+                buf.position(0);
+            }
         }
+        buffer = buf;
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         if (buffer.getInt(0) != 0x334B5045 || (u16(4) != 2 && u16(4) != 3) || u16(6) != ENTRY_SIZE
                 || buffer.getInt(8) != SIDE || buffer.getInt(12) != SIDE

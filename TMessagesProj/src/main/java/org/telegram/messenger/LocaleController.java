@@ -1460,7 +1460,7 @@ public class LocaleController {
     private String getStringInternal(String key, String fallback, int res) {
         final String value = getStringV2(key, res, fallback);
         if (value == null) {
-            return "LOC_ERR:" + key;
+            return "LOC_ERR:" + (key != null ? key : (res != 0 ? ("id_" + res) : "null"));
         }
         return value;
     }
@@ -1642,7 +1642,7 @@ public class LocaleController {
         try {
             final String value = getInstance().getStringV2(key, res, fallback);
             if (value == null) {
-                return "LOC_ERR: " + key;
+                return "LOC_ERR: " + (key != null ? key : (res != 0 ? ("id_" + res) : "null"));
             }
 
             if (getInstance().currentLocale != null) {
@@ -1668,7 +1668,7 @@ public class LocaleController {
         try {
             final String value = getInstance().getStringV2(key, res, fallback);
             if (value == null) {
-                return "LOC_ERR: " + key;
+                return "LOC_ERR: " + (key != null ? key : (res != 0 ? ("id_" + res) : "null"));
             }
 
             SpannableStringBuilder builder = new SpannableStringBuilder(value);
@@ -4580,7 +4580,25 @@ public class LocaleController {
             return value;
         }
 
-        return localizationInternal.getByResName(fallback);
+        value = localizationInternal.getByResName(fallback);
+        if (value != null) {
+            return value;
+        }
+
+        if (context != null) {
+            try {
+                if (stringRes != 0) {
+                    return context.getString(stringRes);
+                } else if (!TextUtils.isEmpty(key)) {
+                    int id = context.getResources().getIdentifier(key, "string", context.getPackageName());
+                    if (id != 0) {
+                        return context.getString(id);
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+
+        return null;
     }
 
 
