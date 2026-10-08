@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">خواندن پیام</string>
     <string name="GhostModeExcludeRead">Exclude Read</string>
     <string name="GhostModeExcludeTyping">Exclude Typing</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">پیش‌فرض</string>
+    <string name="GhostModeExceptionForceBlockRead">مسدود کردن اجباری خواندن</string>
+    <string name="GhostModeExceptionForceAllowRead">مجاز کردن اجباری خواندن</string>
+    <string name="GhostModeExceptionForceBlockTyping">مسدود کردن اجباری نوشتن</string>
+    <string name="GhostModeExceptionForceAllowTyping">مجاز کردن اجباری نوشتن</string>
+    <string name="ShowFilteredMessagesMenuText">نمایش فیلتر شده‌ها</string>
+    <string name="HideFilteredMessagesMenuText">مخفی کردن فیلتر شده‌ها</string>
     <string name="SendWithSound">ارسال با صدا</string>
     <string name="PerformanceClass">کلاس عملکرد دستگاه</string>
     <string name="PerformanceClassHigh">بالا</string>

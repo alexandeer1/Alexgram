@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Прочитати повідомлення</string>
     <string name="GhostModeExcludeRead">Виключити читання</string>
     <string name="GhostModeExcludeTyping">Виключити введення тексту</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">За замовчуванням</string>
+    <string name="GhostModeExceptionForceBlockRead">Примусово блокувати читання</string>
+    <string name="GhostModeExceptionForceAllowRead">Примусово дозволяти читання</string>
+    <string name="GhostModeExceptionForceBlockTyping">Примусово блокувати введення тексту</string>
+    <string name="GhostModeExceptionForceAllowTyping">Примусово дозволяти введення тексту</string>
+    <string name="ShowFilteredMessagesMenuText">Показувати відфільтровані</string>
+    <string name="HideFilteredMessagesMenuText">Приховувати відфільтровані</string>
     <string name="SendWithSound">Надіслати зі звуком</string>
     <string name="PerformanceClass">Клас продуктивності пристрою</string>
     <string name="PerformanceClassHigh">Високий</string>

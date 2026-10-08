@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Read Message</string>
     <string name="GhostModeExcludeRead">Exclude Read</string>
     <string name="GhostModeExcludeTyping">Exclude Typing</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">기본값</string>
+    <string name="GhostModeExceptionForceBlockRead">읽음 표시 강제 차단</string>
+    <string name="GhostModeExceptionForceAllowRead">읽음 표시 강제 허용</string>
+    <string name="GhostModeExceptionForceBlockTyping">입력 중 표시 강제 차단</string>
+    <string name="GhostModeExceptionForceAllowTyping">입력 중 표시 강제 허용</string>
+    <string name="ShowFilteredMessagesMenuText">필터링된 메시지 표시</string>
+    <string name="HideFilteredMessagesMenuText">필터링된 메시지 숨기기</string>
     <string name="SendWithSound">Send with Sound</string>
     <string name="PerformanceClass">Device Performance Class</string>
     <string name="PerformanceClassHigh">High</string>

@@ -115,6 +115,8 @@ import android.widget.TextView;
 
 // [Alexgram: Advanced Tools] - Start
 import xyz.nextalone.nagram.ui.VoiceChangerSelectAlert;
+import tw.nekomimi.nekogram.menu.ayugram.AyuGramMenuPopupWrapper;
+import tw.nekomimi.nekogram.filters.AyuFilter;
 // [Alexgram: Advanced Tools] - End
 
 // [Alexgram: AI Reply] - Start
@@ -4857,11 +4859,22 @@ public class ChatActivity extends BaseFragment implements
                 @Override
                 public void onShowSubMenu() {
                     updateScrimSourceBitmap();
+                    if (headerItem != null && headerItem.getPopupLayout() != null && headerItem.getPopupLayout().getSwipeBack() != null) {
+                        headerItem.getPopupLayout().getSwipeBack().setBackgroundViewIndex(0);
+                    }
+                    if (ayuGramMenuPopupWrapper != null) {
+                        ayuGramMenuPopupWrapper.resetDetail();
+                    }
                 }
 
                 @Override
                 public void onHideSubMenu() {
-
+                    if (headerItem != null && headerItem.getPopupLayout() != null && headerItem.getPopupLayout().getSwipeBack() != null) {
+                        headerItem.getPopupLayout().getSwipeBack().setBackgroundViewIndex(0);
+                    }
+                    if (ayuGramMenuPopupWrapper != null) {
+                        ayuGramMenuPopupWrapper.resetDetail();
+                    }
                 }
             });
             otherIcon.addView(headerItem.getIconView());
@@ -4960,6 +4973,45 @@ public class ChatActivity extends BaseFragment implements
                 }
             });
             ActionBarMenuItem.addColoredGap(advancedToolsLayout, getResourceProvider());
+
+            boolean showGhostMode = !ChatObject.isChannelAndNotMegaGroup(currentChat);
+            boolean showSaveDeleted = NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool();
+            boolean showRegexFilters = NaConfig.INSTANCE.getRegexFiltersEnabled().Bool();
+            boolean showViewDeleted = showSaveDeleted && NaConfig.INSTANCE.getChatMenuItemViewDeleted().Bool();
+            boolean showClearDeleted = showSaveDeleted && NaConfig.INSTANCE.getChatMenuItemClearDeleted().Bool();
+            if (showGhostMode || showSaveDeleted || showRegexFilters || showViewDeleted || showClearDeleted) {
+                Runnable dismissMenu = () -> {
+                    if (headerItem != null && headerItem.isSubMenuShowing()) {
+                        headerItem.toggleSubMenu();
+                    }
+                };
+
+                ActionBarPopupWindow.ActionBarPopupWindowLayout parentPopupLayout = headerItem.getPopupLayout();
+                PopupSwipeBackLayout parentSwipeBack = parentPopupLayout != null ? parentPopupLayout.getSwipeBack() : null;
+                ayuGramMenuPopupWrapper = new AyuGramMenuPopupWrapper(this, parentSwipeBack, dialog_id, getResourceProvider(), dismissMenu, showGhostMode, showSaveDeleted, showRegexFilters, showViewDeleted, showClearDeleted);
+
+                if (parentPopupLayout != null && ayuGramMenuPopupWrapper.swipeBack.getParent() == null) {
+                    parentPopupLayout.addViewToSwipeBack(ayuGramMenuPopupWrapper.swipeBack);
+                }
+
+                ActionBarMenuSubItem ayuGramItem = ActionBarMenuItem.addItem(advancedToolsLayout, R.drawable.msg2_reactions2, LocaleController.getString(R.string.AyuGramMenu), false, getResourceProvider());
+                ayuGramItem.setRightIcon(R.drawable.msg_arrowright);
+                ayuGramItem.setOnClickListener(v -> {
+                    PopupSwipeBackLayout swipeBack = headerItem.getPopupLayout() != null ? headerItem.getPopupLayout().getSwipeBack() : null;
+                    if (swipeBack != null && ayuGramMenuPopupWrapper != null) {
+                        if (ayuGramMenuPopupWrapper.swipeBack.getParent() == null) {
+                            headerItem.getPopupLayout().addViewToSwipeBack(ayuGramMenuPopupWrapper.swipeBack);
+                        }
+                        int advIndex = swipeBack.indexOfChild(advancedToolsLayout);
+                        int ayuIndex = swipeBack.indexOfChild(ayuGramMenuPopupWrapper.swipeBack);
+                        if (advIndex >= 0 && ayuIndex >= 0) {
+                            swipeBack.setBackgroundViewIndex(advIndex);
+                            swipeBack.openForeground(ayuIndex);
+                        }
+                    }
+                });
+            }
+
             ActionBarMenuSubItem voiceChangerItem = ActionBarMenuItem.addItem(advancedToolsLayout, R.drawable.ic_voice_changer_na, LocaleController.getString("VoiceChanger", R.string.VoiceChanger), false, getResourceProvider());
             voiceChangerItem.setOnClickListener(v -> {
                 headerItem.closeSubMenu();
@@ -4992,6 +5044,7 @@ public class ChatActivity extends BaseFragment implements
                 headerItem.closeSubMenu();
                 actionBar.actionBarMenuOnItemClick.onItemClick(nkbtn_auto_download);
             });
+
             headerItem.lazilyAddSwipeBackItem(R.drawable.ic_advanced_tool_na, null, "Advanced Tool", advancedToolsLayout);
             headerItem.lazilyAddColoredGap();
             // [Alexgram: Advanced Tools] - End
@@ -5109,8 +5162,6 @@ public class ChatActivity extends BaseFragment implements
                 headerItem.setSubItemShown(nkbtn_bookmarks_manager, BookmarksHelper.getBookmarkedMessageIds(currentAccount, dialog_id).length > 0);
             }
             hideTitleItem = NaConfig.INSTANCE.getChatMenuItemHideTitle().Bool() ? headerItem.lazilyAddSubItem(nkheaderbtn_hide_title, R.drawable.hide_title, getString(R.string.HideTitle)) : null;
-            if (NaConfig.INSTANCE.getChatMenuItemViewDeleted().Bool() && NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool()) headerItem.lazilyAddSubItem(nkbtn_viewDeleted, R.drawable.msg_view_file, getString(R.string.ViewDeleted));
-            if (NaConfig.INSTANCE.getChatMenuItemClearDeleted().Bool() && NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool()) headerItem.lazilyAddSubItem(nkbtn_clearDeleted, R.drawable.msg_clear, getString(R.string.ClearDeleted));
             if (!isTopic) {
                 if (NaConfig.INSTANCE.getChatMenuItemDeleteOwnMessages().Bool() && (ChatObject.isMegagroup(currentChat) || currentChat != null && !ChatObject.isChannel(currentChat))) {
                     headerItem.lazilyAddSubItem(nkheaderbtn_zibi, R.drawable.msg_delete, LocaleController.getString(R.string.DeleteAllFromSelf));
@@ -9806,6 +9857,7 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean lastInAppInputVisible;
+    private AyuGramMenuPopupWrapper ayuGramMenuPopupWrapper;
     private void checkInsets() {
         chatInputViewsContainer.checkInsets();
         updatePagedownButtonsPosition();

@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Leggi messaggi</string>
     <string name="GhostModeExcludeRead">Escludi Lette</string>
     <string name="GhostModeExcludeTyping">Escludi Scrittura</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Predefinito</string>
+    <string name="GhostModeExceptionForceBlockRead">Blocca lettura forzatamente</string>
+    <string name="GhostModeExceptionForceAllowRead">Consenti lettura forzatamente</string>
+    <string name="GhostModeExceptionForceBlockTyping">Blocca scrittura forzatamente</string>
+    <string name="GhostModeExceptionForceAllowTyping">Consenti scrittura forzatamente</string>
+    <string name="ShowFilteredMessagesMenuText">Mostra filtrati</string>
+    <string name="HideFilteredMessagesMenuText">Nascondi filtrati</string>
     <string name="SendWithSound">Invia con suono</string>
     <string name="PerformanceClass">Classe Prestazioni Dispositivo</string>
     <string name="PerformanceClassHigh">Alta</string>

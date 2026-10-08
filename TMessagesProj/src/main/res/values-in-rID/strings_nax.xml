@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Baca Pesan</string>
     <string name="GhostModeExcludeRead">Kecualikan Pembacaan</string>
     <string name="GhostModeExcludeTyping">Kecualikan Mengetik</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Default</string>
+    <string name="GhostModeExceptionForceBlockRead">Paksa blokir dibaca</string>
+    <string name="GhostModeExceptionForceAllowRead">Paksa izinkan dibaca</string>
+    <string name="GhostModeExceptionForceBlockTyping">Paksa blokir mengetik</string>
+    <string name="GhostModeExceptionForceAllowTyping">Paksa izinkan mengetik</string>
+    <string name="ShowFilteredMessagesMenuText">Tampilkan yang Difilter</string>
+    <string name="HideFilteredMessagesMenuText">Sembunyikan yang Difilter</string>
     <string name="SendWithSound">Kirim dengan Suara</string>
     <string name="PerformanceClass">Kelas Kinerja Perangkat</string>
     <string name="PerformanceClassHigh">Tinggi</string>

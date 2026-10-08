@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Read Message</string>
     <string name="GhostModeExcludeRead">Exclude Read</string>
     <string name="GhostModeExcludeTyping">Exclude Typing</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">افتراضي</string>
+    <string name="GhostModeExceptionForceBlockRead">فرض حظر القراءة</string>
+    <string name="GhostModeExceptionForceAllowRead">فرض السماح بالقراءة</string>
+    <string name="GhostModeExceptionForceBlockTyping">فرض حظر الكتابة</string>
+    <string name="GhostModeExceptionForceAllowTyping">فرض السماح بالكتابة</string>
+    <string name="ShowFilteredMessagesMenuText">إظهار المفلترة</string>
+    <string name="HideFilteredMessagesMenuText">إخفاء المفلترة</string>
     <string name="SendWithSound">Send with Sound</string>
     <string name="PerformanceClass">Device Performance Class</string>
     <string name="PerformanceClassHigh">High</string>

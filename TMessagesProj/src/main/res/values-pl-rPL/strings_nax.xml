@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Czytaj wiadomość w trybie duch</string>
     <string name="GhostModeExcludeRead">Wyklucz czytanie</string>
     <string name="GhostModeExcludeTyping">Wyklucz pisanie</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Domyślny</string>
+    <string name="GhostModeExceptionForceBlockRead">Wymuś blokowanie przeczytania</string>
+    <string name="GhostModeExceptionForceAllowRead">Wymuś zezwolenie na przeczytanie</string>
+    <string name="GhostModeExceptionForceBlockTyping">Wymuś blokowanie pisania</string>
+    <string name="GhostModeExceptionForceAllowTyping">Wymuś zezwolenie na pisanie</string>
+    <string name="ShowFilteredMessagesMenuText">Pokaż przefiltrowane</string>
+    <string name="HideFilteredMessagesMenuText">Ukryj przefiltrowane</string>
     <string name="SendWithSound">Wyślij z dźwiękiem</string>
     <string name="PerformanceClass">Klasa wydajności urządzenia</string>
     <string name="PerformanceClassHigh">Wysoki</string>

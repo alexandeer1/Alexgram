@@ -157,6 +157,14 @@
     <string name="GhostReadMessage">Mesajı Oku</string>
     <string name="GhostModeExcludeRead">Okundu Bilgisini Hariç Tut</string>
     <string name="GhostModeExcludeTyping">Yazıyor Bilgisini Hariç Tut</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Varsayılan</string>
+    <string name="GhostModeExceptionForceBlockRead">Okumayı zorla engelle</string>
+    <string name="GhostModeExceptionForceAllowRead">Okumaya zorla izin ver</string>
+    <string name="GhostModeExceptionForceBlockTyping">Yazmayı zorla engelle</string>
+    <string name="GhostModeExceptionForceAllowTyping">Yazmaya zorla izin ver</string>
+    <string name="ShowFilteredMessagesMenuText">Filtrelenenleri Göster</string>
+    <string name="HideFilteredMessagesMenuText">Filtrelenenleri Gizle</string>
     <string name="SendWithSound">Sesli Gönder</string>
     <string name="PerformanceClass">Cihaz Performans Sınıfı</string>
     <string name="PerformanceClassHigh">Yüksek</string>
