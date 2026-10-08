@@ -70,4 +70,6 @@
     <string name="PeekOnlineSuccess">Онлайн-статус обновлён</string>
     <string name="PeekOnlineUnavailable">Не удалось получить точный онлайн-статус.</string>
     <string name="PeekOnlineRestoreFailed">Не удалось восстановить настройки приватности статуса «Был(а) недавно».</string>
+    <string name="ReplaceBlockedMyInfo">Заменить информацию о пользователях, которые меня заблокировали</string>
+    <string name="ReplaceBlockedMyInfoDescription">Отображать пользователей, которые вас заблокировали, с помощью серого аватара-заглушки.</string>
 </resources>

@@ -70,4 +70,6 @@
     <string name="PeekOnlineSuccess">線上狀態已更新</string>
     <string name="PeekOnlineUnavailable">無法取得精確在線狀態。</string>
     <string name="PeekOnlineRestoreFailed">無法還原「最後上線」隱私設定。</string>
+    <string name="ReplaceBlockedMyInfo">替換封鎖我的使用者資訊</string>
+    <string name="ReplaceBlockedMyInfoDescription">對已將您封鎖的使用者，使用灰色頭像佔位圖進行顯示。</string>
 </resources>

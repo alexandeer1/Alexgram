@@ -70,4 +70,6 @@
     <string name="PeekOnlineSuccess">온라인 상태를 새로고침했습니다.</string>
     <string name="PeekOnlineUnavailable">정확한 온라인 상태를 가져올 수 없습니다.</string>
     <string name="PeekOnlineRestoreFailed">마지막 접속 시간 공개 설정을 복원하지 못했습니다.</string>
+    <string name="ReplaceBlockedMyInfo">나를 차단한 사용자 정보 대체</string>
+    <string name="ReplaceBlockedMyInfoDescription">나를 차단한 사용자의 프로필 사진을 회색 기본 이미지로 표시합니다.</string>
 </resources>

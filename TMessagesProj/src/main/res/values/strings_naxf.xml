@@ -70,4 +70,6 @@
     <string name="PeekOnlineSuccess">Online status refreshed</string>
     <string name="PeekOnlineUnavailable">Could not fetch exact online status.</string>
     <string name="PeekOnlineRestoreFailed">Failed to restore Last Seen privacy.</string>
+    <string name="ReplaceBlockedMyInfo">Replace Info of Users Who Blocked Me</string>
+    <string name="ReplaceBlockedMyInfoDescription">Show users who blocked you with a gray avatar placeholder.</string>
 </resources>

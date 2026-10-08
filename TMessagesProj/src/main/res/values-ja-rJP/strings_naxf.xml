@@ -70,4 +70,6 @@
     <string name="PeekOnlineSuccess">オンライン状態を更新しました</string>
     <string name="PeekOnlineUnavailable">正確なオンライン状態を取得できませんでした。</string>
     <string name="PeekOnlineRestoreFailed">「最終オンライン」プライバシー設定を復元できませんでした。</string>
+    <string name="ReplaceBlockedMyInfo">自分をブロックしたユーザーの情報を置き換える</string>
+    <string name="ReplaceBlockedMyInfoDescription">あなたをブロックしたユーザーを、灰色のプレースホルダーアバターで表示します。</string>
 </resources>

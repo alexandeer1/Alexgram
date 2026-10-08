@@ -28,6 +28,7 @@ import android.text.TextUtils;
 import androidx.core.graphics.ColorUtils;
 
 import org.telegram.messenger.AndroidUtilities;
+import xyz.nextalone.nagram.NaConfig;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
@@ -219,7 +220,18 @@ public class AvatarDrawable extends Drawable {
 
     public void setInfo(int currentAccount, TLRPC.User user) {
         if (user != null) {
-            setInfo(user.id, user.first_name, user.last_name, null, user != null && user.color != null ? UserObject.getColorId(user) : null, UserObject.getPeerColorForAvatar(currentAccount, user));
+            boolean replaceBlockedMyInfo = NaConfig.INSTANCE.getReplaceBlockedMyInfo().Bool() && UserObject.isLikelyBlockedByUser(user);
+            setInfo(
+                    user.id,
+                    user.first_name,
+                    user.last_name,
+                    replaceBlockedMyInfo ? "\uD83E\uDD21" : null,
+                    user.color != null ? UserObject.getColorId(user) : null,
+                    UserObject.getPeerColorForAvatar(currentAccount, user)
+            );
+            if (replaceBlockedMyInfo) {
+                setColor(0xFFBEBEBE);
+            }
             drawDeleted = UserObject.isDeleted(user);
         }
     }

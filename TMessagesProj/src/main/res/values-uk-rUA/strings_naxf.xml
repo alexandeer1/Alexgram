@@ -70,4 +70,6 @@
     <string name="PeekOnlineSuccess">Онлайн-статус оновлено</string>
     <string name="PeekOnlineUnavailable">Не вдалося отримати точний статус.</string>
     <string name="PeekOnlineRestoreFailed">Не вдалося відновити налаштування приватності «Останній візит».</string>
+    <string name="ReplaceBlockedMyInfo">Замінити дані про користувачів, які мене заблокували</string>
+    <string name="ReplaceBlockedMyInfoDescription">Відображати користувачів, які вас заблокували, із сірим типовим аватаром.</string>
 </resources>
