@@ -914,14 +914,6 @@ public class ConnectionsManager extends BaseController {
                 }
                 lastDnsRequestTime = System.currentTimeMillis();
 
-                if (NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_NAX || NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_CUSTOM_DOH) {
-                    FileLog.d("start custom dns txt task");
-                    GoogleDnsLoadTask task = new GoogleDnsLoadTask(currentAccount);
-                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
-                    currentTask = task;
-                    return;
-                }
-
                 if (second == 2) {
                     if (BuildVars.LOGS_ENABLED) {
                         FileLog.d("start mozilla txt task");
@@ -1170,10 +1162,12 @@ public class ConnectionsManager extends BaseController {
                 }
             }
             if (hasIpv6) {
-                if (!hasIpv4 || forceTryIpV6 || NekoConfig.useIPv6.Bool()) {
+                if (forceTryIpV6 || NekoConfig.useIPv6.Bool()) {
                     return USE_IPV6_ONLY;
                 } else if (hasStrangeIpv4) {
                     return USE_IPV4_IPV6_RANDOM;
+                } else if (!hasIpv4) {
+                    return USE_IPV6_ONLY;
                 } else {
                     return USE_IPV4_ONLY;
                 }
@@ -1216,78 +1210,22 @@ public class ConnectionsManager extends BaseController {
         }
 
         protected ResolvedDomain doInBackground(Void... voids) {
-            if (NekoConfig.dnsType.Int() != NekoConfig.DNS_TYPE_DEFAULT) {
+            if (NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_NAX || NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_CUSTOM_DOH) {
                 return dnsFactoryLookup();
             }
-            ByteArrayOutputStream outbuf = null;
-            InputStream httpConnectionStream = null;
-            boolean done = false;
             try {
-                URL downloadUrl = new URL("https://www.google.com/resolve?name=" + currentHostName + "&type=A");
-                URLConnection httpConnection = downloadUrl.openConnection();
-                httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
-                httpConnection.addRequestProperty("Host", "dns.google.com");
-                httpConnection.setConnectTimeout(1000);
-                httpConnection.setReadTimeout(2000);
-                httpConnection.connect();
-                httpConnectionStream = httpConnection.getInputStream();
-
-                outbuf = new ByteArrayOutputStream();
-
-                byte[] data = new byte[1024 * 32];
-                while (true) {
-                    int read = httpConnectionStream.read(data);
-                    if (read > 0) {
-                        outbuf.write(data, 0, read);
-                    } else if (read == -1) {
-                        break;
-                    } else {
-                        break;
+                InetAddress[] resolvedAddresses = InetAddress.getAllByName(currentHostName);
+                if (resolvedAddresses != null && resolvedAddresses.length > 0) {
+                    ArrayList<String> addresses = new ArrayList<>(resolvedAddresses.length);
+                    for (InetAddress address : resolvedAddresses) {
+                        addresses.add(address.getHostAddress());
                     }
+                    return new ResolvedDomain(addresses, SystemClock.elapsedRealtime());
                 }
-
-                JSONObject jsonObject = new JSONObject(new String(outbuf.toByteArray()));
-                if (jsonObject.has("Answer")) {
-                    JSONArray array = jsonObject.getJSONArray("Answer");
-                    int len = array.length();
-                    if (len > 0) {
-                        ArrayList<String> addresses = new ArrayList<>(len);
-                        for (int a = 0; a < len; a++) {
-                            addresses.add(array.getJSONObject(a).getString("data"));
-                        }
-                        return new ResolvedDomain(addresses, SystemClock.elapsedRealtime());
-                    }
-                }
-                done = true;
             } catch (Throwable e) {
                 FileLog.e(e, false);
-            } finally {
-                try {
-                    if (httpConnectionStream != null) {
-                        httpConnectionStream.close();
-                    }
-                } catch (Throwable e) {
-                    FileLog.e(e, false);
-                }
-                try {
-                    if (outbuf != null) {
-                        outbuf.close();
-                    }
-                } catch (Exception ignore) {
-
-                }
             }
-            if (!done) {
-                try {
-                    InetAddress address = InetAddress.getByName(currentHostName);
-                    ArrayList<String> addresses = new ArrayList<>(1);
-                    addresses.add(address.getHostAddress());
-                    return new ResolvedDomain(addresses, SystemClock.elapsedRealtime());
-                } catch (Exception e) {
-                    FileLog.e(e, false);
-                }
-            }
-            return null;
+            return dnsFactoryLookup();
         }
 
         @Override
@@ -1329,11 +1267,11 @@ public class ConnectionsManager extends BaseController {
                 for (int a = 0; a < len; a++) {
                     padding.append(characters.charAt(Utilities.random.nextInt(characters.length())));
                 }
-                URL downloadUrl = new URL("https://dns.google.com/resolve?name=" + domain + "&type=ANY&random_padding=" + padding);
+                URL downloadUrl = new URL("https://dns.google/resolve?name=" + domain + "&type=ANY&random_padding=" + padding);
                 URLConnection httpConnection = downloadUrl.openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
-                httpConnection.setConnectTimeout(5000);
-                httpConnection.setReadTimeout(5000);
+                httpConnection.setConnectTimeout(3000);
+                httpConnection.setReadTimeout(3000);
                 httpConnection.connect();
                 httpConnectionStream = httpConnection.getInputStream();
                 responseDate = (int) (httpConnection.getDate() / 1000);
@@ -1453,8 +1391,8 @@ public class ConnectionsManager extends BaseController {
                 URLConnection httpConnection = downloadUrl.openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
                 httpConnection.addRequestProperty("accept", "application/dns-json");
-                httpConnection.setConnectTimeout(5000);
-                httpConnection.setReadTimeout(5000);
+                httpConnection.setConnectTimeout(3000);
+                httpConnection.setReadTimeout(3000);
                 httpConnection.connect();
                 httpConnectionStream = httpConnection.getInputStream();
                 responseDate = (int) (httpConnection.getDate() / 1000);

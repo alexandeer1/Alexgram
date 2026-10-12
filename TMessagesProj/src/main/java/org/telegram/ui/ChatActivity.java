@@ -22521,14 +22521,14 @@ public class ChatActivity extends BaseFragment implements
                             }
                         }
 
-                        Pair<Integer, Integer> minMaxRes = getMessagesStorage().getMinAndMaxForDialog(dialogId);
+                        Pair<Integer, Integer> minMaxRes = null;
                         if (dialog != null && DialogObject.isUserDialog(dialogId) && (startId == endId && endId == dialog.top_message) && messArr.size() <= 1 && endReached[loadIndex]) { // empty user dialog, so load as much as we can
                             startId = minVal;
                             endId = maxVal;
                         } else if (isChannelComment) { // deleted messages loading in comments
                             startId = threadMaxOutboxReadId == 0 ? minVal : threadMessageId;
                             endId = threadMaxOutboxReadId == 0 ? minVal : threadMaxOutboxReadId;
-                        } else if (dialog != null && (dialog.top_message == endId || (minMaxRes.second == endId && dialog.top_message <= minMaxRes.second)) || topic != null && topic.top_message == endId) { // allows loading messages that are under bottom messages
+                        } else if (dialog != null && (dialog.top_message == endId || ((minMaxRes = getMessagesStorage().getMinAndMaxForDialog(dialogId)).second == endId && dialog.top_message <= minMaxRes.second)) || topic != null && topic.top_message == endId) { // allows loading messages that are under bottom messages
                             endId = maxVal; // startId is the smallest in the current batch
                         } else if (endReached[loadIndex]) {
                             startId = minVal;

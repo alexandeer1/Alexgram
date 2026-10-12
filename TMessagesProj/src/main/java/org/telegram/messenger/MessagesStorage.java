@@ -19259,17 +19259,28 @@ public class MessagesStorage extends BaseController {
 
     // save deleted start
     public Pair<Integer, Integer> getMinAndMaxForDialog(long dialogId) {
-        SQLiteCursor cursor = null;
+        SQLiteCursor cursorMin = null;
+        SQLiteCursor cursorMax = null;
         try {
-            cursor = database.queryFinalized(String.format(Locale.US, "SELECT MIN(mid), MAX(mid) FROM messages_v2 WHERE uid = %d", dialogId));
-            if (cursor.next()) {
-                return new Pair<>(cursor.intValue(0), cursor.intValue(1));
+            int min = 0;
+            int max = 0;
+            cursorMin = database.queryFinalized(String.format(Locale.US, "SELECT mid FROM messages_v2 WHERE uid = %d ORDER BY mid ASC LIMIT 1", dialogId));
+            if (cursorMin.next()) {
+                min = cursorMin.intValue(0);
             }
+            cursorMax = database.queryFinalized(String.format(Locale.US, "SELECT mid FROM messages_v2 WHERE uid = %d ORDER BY mid DESC LIMIT 1", dialogId));
+            if (cursorMax.next()) {
+                max = cursorMax.intValue(0);
+            }
+            return new Pair<>(min, max);
         } catch (Exception e) {
             checkSQLException(e);
         } finally {
-            if (cursor != null) {
-                cursor.dispose();
+            if (cursorMin != null) {
+                cursorMin.dispose();
+            }
+            if (cursorMax != null) {
+                cursorMax.dispose();
             }
         }
         return new Pair<>(0, 0);
