@@ -9,8 +9,14 @@ import org.telegram.tgnet.tl.TL_iv;
 
 public class MessageCustomParamsHelper {
 
+    private static boolean isCommentEncryptionPreparing(TLRPC.Message message) {
+        return message.action instanceof TLRPC.TL_messageActionGramTransfer
+                && ((TLRPC.TL_messageActionGramTransfer) message.action).comment_encrypted_preparing;
+    }
+
     public static boolean isEmpty(TLRPC.Message message) {
         return (
+            !isCommentEncryptionPreparing(message) &&
             message.voiceTranscription == null &&
             message.translatedVoiceTranscription == null &&
             !message.voiceTranscriptionOpen &&
@@ -117,6 +123,7 @@ public class MessageCustomParamsHelper {
             flags = setFlag(flags, FLAG_13, message.translatedButtonsLanguage != null);
             flags = setFlag(flags, FLAG_14, message.translatedButtons != null);
             flags = setFlag(flags, FLAG_15, message.translatedRichMessage != null);
+            flags = setFlag(flags, FLAG_16, isCommentEncryptionPreparing(message));
         }
 
         @Override
@@ -184,6 +191,11 @@ public class MessageCustomParamsHelper {
         @Override
         public void readParams(InputSerializedData stream, boolean exception) {
             flags = stream.readInt32(true);
+            if (message.action instanceof TLRPC.TL_messageActionGramTransfer) {
+                final TLRPC.TL_messageActionGramTransfer action = (TLRPC.TL_messageActionGramTransfer) message.action;
+                // An update may carry ciphertext while storage still has the old local params.
+                action.comment_encrypted_preparing = !action.comment_encrypted && hasFlag(flags, FLAG_16);
+            }
             if ((flags & 1) != 0) {
                 message.voiceTranscription = stream.readString(exception);
             }

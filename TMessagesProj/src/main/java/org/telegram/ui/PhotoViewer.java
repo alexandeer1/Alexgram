@@ -381,6 +381,7 @@ import me.vkryl.core.reference.ReferenceList;
 
 @SuppressLint("WrongConstant")
 @SuppressWarnings("unchecked")
+@OptIn(markerClass = UnstableApi.class)
 public class PhotoViewer implements NotificationCenter.NotificationCenterDelegate, GestureDetector2.OnGestureListener, GestureDetector2.OnDoubleTapListener, IPipSourceDelegate, FactorAnimator.Target {
     private static final boolean centerTitle = NaConfig.INSTANCE.getCenterActionBarTitle().Bool() && NaConfig.INSTANCE.getCenterActionBarTitleType().Int() != 2;
     private static final int ANIMATOR_ID_POLL_ATTACH_BUTTONS_VISIBLE = 0;
@@ -12139,7 +12140,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 } else if (orientation[1] == 2) {
                     matrix.postScale(1, -1);
                 }
-                croppedBitmap = Bitmaps.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(), croppedBitmap.getHeight(), matrix, true);
+                int width = croppedBitmap.getWidth();
+                int height = croppedBitmap.getHeight();
+                croppedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, width, height, matrix, true);
                 recycleCropped = true;
             } else {
                 recycleCropped = false;
@@ -12459,7 +12462,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         } else if (orientation[1] == 2) {
                             matrix.postScale(1, -1);
                         }
-                        croppedBitmap = Bitmaps.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(), croppedBitmap.getHeight(), matrix, true);
+                        int width = croppedBitmap.getWidth();
+                        int height = croppedBitmap.getHeight();
+                        croppedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, width, height, matrix, true);
                         recycleCropped = true;
                     } else {
                         recycleCropped = false;

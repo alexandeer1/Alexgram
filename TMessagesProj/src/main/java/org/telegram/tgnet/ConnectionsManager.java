@@ -827,6 +827,7 @@ public class ConnectionsManager extends BaseController {
         }
     }
 
+    @Keep
     public static void onUnparsedMessageReceived(long address, final int currentAccount, long messageId) {
         try {
             NativeByteBuffer buff = NativeByteBuffer.wrap(address);
