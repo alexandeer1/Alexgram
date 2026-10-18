@@ -120,6 +120,7 @@ public class NotificationCenter {
     public static final int reloadGuestBotHints = totalEvents++;
     public static final int reloadWebappsHints = totalEvents++;
     public static final int newDraftReceived = totalEvents++;
+    public static final int servicesUpdated = totalEvents++;
     public static final int recentDocumentsDidLoad = totalEvents++;
     public static final int needAddArchivedStickers = totalEvents++;
     public static final int archivedStickersCountDidLoad = totalEvents++;

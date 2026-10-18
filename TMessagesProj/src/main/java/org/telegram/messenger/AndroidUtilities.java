@@ -327,6 +327,7 @@ public class AndroidUtilities {
     public final static String TYPEFACE_MERRIWEATHER_BOLD = "fonts/mw_bold.ttf";
     public static final String TYPEFACE_RITALIC = "fonts/ritalic.ttf";
     public static final String TYPEFACE_RCONDENSED_BOLD = "fonts/rcondensedbold.ttf";
+    public static final String TYPEFACE_ROBOTO_REGULAR = "fonts/rregular.ttf";
 
     public static Typeface mediumTypeface;
     public static ThreadLocal<byte[]> readBufferLocal = new ThreadLocal<>();
@@ -351,6 +352,10 @@ public class AndroidUtilities {
             }
         }
         return mediumTypeface;
+    }
+
+    public static Typeface regular() {
+        return getTypeface(TYPEFACE_ROBOTO_REGULAR);
     }
 
     private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();

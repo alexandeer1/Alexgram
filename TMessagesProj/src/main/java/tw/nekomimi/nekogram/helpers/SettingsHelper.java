@@ -76,6 +76,10 @@ public class SettingsHelper {
                 case "t":
                     fragment = nekox_fragment = new NekoTranslatorSettingsActivity();
                     break;
+                case "ai":
+                case "a":
+                    fragment = nekox_fragment = new com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity();
+                    break;
                 case "send_logs":
                     sendLogs(activity, false);
                     return;
@@ -122,6 +126,7 @@ public class SettingsHelper {
         fragments.add(new NekoChatSettingsActivity());
         fragments.add(new NekoExperimentalSettingsActivity());
         fragments.add(new NekoTranslatorSettingsActivity());
+        fragments.add(new com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity());
 
         String n_title = getString(R.string.NekoSettings);
         for (BaseNekoXSettingsActivity fragment: fragments) {

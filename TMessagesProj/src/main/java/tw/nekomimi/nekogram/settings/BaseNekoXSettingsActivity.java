@@ -738,6 +738,9 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
                 case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON:
                     view = new TextCell(mContext);
                     break;
+                case CellGroup.ITEM_TYPE_TEXT_DETAIL_ICON:
+                    view = new TextDetailSettingsCell(mContext);
+                    break;
             }
             return view;
         }

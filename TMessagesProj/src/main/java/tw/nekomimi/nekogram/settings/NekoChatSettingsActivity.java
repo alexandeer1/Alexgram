@@ -63,6 +63,7 @@ import tw.nekomimi.nekogram.config.cell.ConfigCellSelectBox;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheck;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheck2;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheckIcon;
+import tw.nekomimi.nekogram.config.cell.ConfigCellTextDetailIcon;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextInput;
 import tw.nekomimi.nekogram.helpers.TranscribeHelper;
 import tw.nekomimi.nekogram.helpers.remote.EmojiHelper;
@@ -188,6 +189,10 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     private final AbstractConfigCell maxRecentStickerCountRow = cellGroup.appendCell(new ConfigCellCustom("maxRecentStickerCount", CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL, true));
     private final AbstractConfigCell dividerSticker = cellGroup.appendCell(new ConfigCellDivider());
 
+    private final AbstractConfigCell aiChatRow = cellGroup.appendCell(new ConfigCellTextDetailIcon("AIChat", getString(R.string.AIChat), getString(R.string.AIChatInfo), R.drawable.ai_chat, true, () ->
+            presentFragment(new com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity())));
+    private final AbstractConfigCell dividerAiChat = cellGroup.appendCell(new ConfigCellDivider());
+
     // Transcribe
     private final AbstractConfigCell headerTranscribe = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.PremiumPreviewVoiceToText)));
     private final AbstractConfigCell transcribeProviderRow = cellGroup.appendCell(new ConfigCellSelectBox("TranscribeProviderShort", NaConfig.INSTANCE.getTranscribeProvider(), new String[]{
@@ -258,12 +263,6 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
                 add(new ConfigCellTextCheckIcon(NekoConfig.showShareMessages, getString(R.string.ShareMessages), R.drawable.msg_shareout));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showAdminActions, getString(R.string.EditAdminRights), R.drawable.msg_admins));
                 add(new ConfigCellTextCheckIcon(NekoConfig.showChangePermissions, getString(R.string.ChangePermissions), R.drawable.msg_permissions));
-                if (NaConfig.INSTANCE.getEnableAIReply().Bool()) {
-                    add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getEnableAIReply(), getString(R.string.enableAIReply), R.drawable.ic_ai_reply_na));
-                }
-                if (NaConfig.INSTANCE.getEnableSummarizeChat().Bool()) {
-                    add(new ConfigCellTextCheckIcon(NaConfig.INSTANCE.getEnableSummarizeChat(), getString(R.string.enableSummarizeChat), R.drawable.ic_ai_summarize_na));
-                }
             }}))
     ));
     // [Alexgram: Customizable Message Menu] - End

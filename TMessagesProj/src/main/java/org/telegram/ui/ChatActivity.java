@@ -119,11 +119,11 @@ import tw.nekomimi.nekogram.menu.ayugram.AyuGramMenuPopupWrapper;
 import tw.nekomimi.nekogram.filters.AyuFilter;
 // [Alexgram: Advanced Tools] - End
 
-// [Alexgram: AI Reply] - Start
-import org.telegram.ui.Helpers.AIAssistanceHelper;
-import org.telegram.ui.Components.ChatAnimeAssistantView;
-import org.telegram.ui.Components.chat.MiniChatAssistantView;
-// [Alexgram: AI Reply] - End
+import com.exteragram.messenger.ai.AiConfig;
+import com.exteragram.messenger.ai.AiController;
+import com.exteragram.messenger.ai.network.Client;
+import com.exteragram.messenger.ai.ui.GenerateFromMessageBottomSheet;
+import com.exteragram.messenger.ai.ui.ResponseAlert;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -523,10 +523,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int nkbtn_report = 2041;
     private final static int nkbtn_clearDeleted = 2100;
     private final static int nkbtn_viewDeleted = 2101;
-    // [Alexgram: AI Reply] - Start
-    private final static int nkbtn_ai_reply = 2102;
-    private final static int nkbtn_ai_summarize = 2103;
-    // [Alexgram: AI Reply] - End
+    private final static int nkbtn_ai_chat = 2042;
     // [Alexgram: Customizable Message Menu] - Start
     private final static int nkbtn_invert = 2120;
     private final static int nkbtn_custom_reply = 2121;
@@ -618,15 +615,7 @@ public class ChatActivity extends BaseFragment implements
     private ChatListViewPaddingsAnimator chatListViewPaddingsAnimator;
     public ChatListRecyclerView chatListView;
     private ChatListItemAnimator chatListItemAnimator;
-    // [Alexgram: AI Reply] - Start
-    private ChatAnimeAssistantView chatAnimeAssistantView;
-    private MiniChatAssistantView miniChatAssistantView;
-    private boolean assistantQuotaNotified;
-    private boolean assistantLimitNotified;
-    private boolean assistantWaitResponse;
-    private boolean assistantAutoReplyInFlight;
-    private int assistantLastAutoReplyMessageId;
-    // [Alexgram: AI Reply] - End
+
     private GridLayoutManagerFixed chatLayoutManager;
     public ChatActivityAdapter chatAdapter;
     private UnreadCounterTextView bottomOverlayChatText;
@@ -9844,26 +9833,7 @@ public class ChatActivity extends BaseFragment implements
         ViewCompat.setOnApplyWindowInsetsListener(fragmentView, this::onApplyWindowInsets);
         Timer.finish(t);
 
-        // [Alexgram: AI Reply] - Start
-        if (xyz.nextalone.nagram.NaConfig.INSTANCE.getEnableAIReply().Bool()) {
-            chatAnimeAssistantView = new ChatAnimeAssistantView(context, contentView, dialog_id);
-            miniChatAssistantView = new MiniChatAssistantView(context);
-            contentView.addView(chatAnimeAssistantView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-            contentView.addView(miniChatAssistantView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
-            chatAnimeAssistantView.setAssistantRequestDelegate(new ChatAnimeAssistantView.AssistantRequestDelegate() {
-                @Override
-                public void onRequest(String prompt, List<AIAssistanceHelper.HistoryItem> history, ChatAnimeAssistantView.AssistantRequestCallback callback) {
-                    requestAnimeAssistantReply(prompt, history, callback);
-                }
-
-                @Override
-                public void onAction(String action, String argument, ChatAnimeAssistantView.AssistantRequestCallback callback) {
-                    executeAnimeAssistantAction(action, argument, callback);
-                }
-            });
-        }
-        // [Alexgram: AI Reply] - End
 
         if (isMultiChat()) {
             ActionBarMenu abMenu = actionBar.createMenu();
@@ -12101,22 +12071,7 @@ public class ChatActivity extends BaseFragment implements
             sideControlsButtonsLayout.setTranslationY(baseTranslationY2);
         }
 
-        // [Alexgram: AI Reply] - Start
-        if (chatAnimeAssistantView != null) {
-            float baseTranslationY2 = -windowInsetsStateHolder.getAnimatedMaxBottomInset()
-                - (hideBottomForGesture ? 0 : chatInputViewsContainer.getInputBubbleHeight())
-                - getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM)
-                - dp(ChatInputViewsContainer.INPUT_BUBBLE_BOTTOM + 4);
-            chatAnimeAssistantView.setTranslationY(baseTranslationY2);
-        }
-        if (miniChatAssistantView != null) {
-            float baseTranslationY2 = -windowInsetsStateHolder.getAnimatedMaxBottomInset()
-                - (hideBottomForGesture ? 0 : chatInputViewsContainer.getInputBubbleHeight())
-                - getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM)
-                - dp(ChatInputViewsContainer.INPUT_BUBBLE_BOTTOM + 4);
-            miniChatAssistantView.setTranslationY(baseTranslationY2);
-        }
-        // [Alexgram: AI Reply] - End
+
 
         if (suggestEmojiPanel != null) {
             float baseTranslationY2 = -windowInsetsStateHolder.getAnimatedMaxBottomInset()
@@ -47771,10 +47726,7 @@ public class ChatActivity extends BaseFragment implements
                 return "showChangePermissions";
             case nkbtn_detail:
                 return "showMessageDetails";
-            case nkbtn_ai_reply:
-                return "enableAIReply";
-            case nkbtn_ai_summarize:
-                return "enableSummarizeChat";
+
             case nkbtn_special_forward:
                 return "SpecialForward";
             case nkbtn_copy_fref:
@@ -47816,16 +47768,10 @@ public class ChatActivity extends BaseFragment implements
         createUndoView();
         switch (id) {
 
-            // [Alexgram: AI Reply] - Start
-            case nkbtn_ai_reply: {
-                showAiReplyDialog();
+            case nkbtn_ai_chat: {
+                handleAiChat(selectedObject, selectedObjectGroup);
                 break;
             }
-            case nkbtn_ai_summarize: {
-                showSummarizeDialog();
-                break;
-            }
-            // [Alexgram: AI Reply] - End
             case nkbtn_repeat: {
                 repeatMessage(false,false);
                 break;
@@ -50461,15 +50407,10 @@ public class ChatActivity extends BaseFragment implements
         }
 
         if (selectedObject != null && !selectedObject.isSponsored()) {
-            if (!options.contains(nkbtn_ai_reply) && NaConfig.INSTANCE.getEnableAIReply().Bool()) {
-                items.add(LocaleController.getString(R.string.enableAIReply));
-                options.add(nkbtn_ai_reply);
-                icons.add(R.drawable.ic_ai_reply_na);
-            }
-            if (!options.contains(nkbtn_ai_summarize) && NaConfig.INSTANCE.getEnableSummarizeChat().Bool()) {
-                items.add(LocaleController.getString(R.string.enableSummarizeChat));
-                options.add(nkbtn_ai_summarize);
-                icons.add(R.drawable.ic_ai_summarize_na);
+            if (AiController.canUseAI() && !options.contains(nkbtn_ai_chat)) {
+                items.add(LocaleController.getString(R.string.AIChatGenerateFromMessage));
+                options.add(nkbtn_ai_chat);
+                icons.add(R.drawable.ai_chat);
             }
         }
 
@@ -52171,310 +52112,56 @@ public class ChatActivity extends BaseFragment implements
         return null;
     }
 
-    private void startAiGeneration(String userPrompt, MessageObject originalMessage, ChatAnimeAssistantView.AssistantRequestCallback callback) {
-        try {
-            String context = org.telegram.ui.Helpers.AIAssistanceHelper.buildContext(this, currentAccount, dialog_id, originalMessage != null ? new java.util.ArrayList<>(java.util.Collections.singletonList(originalMessage)) : null, false);
-            java.io.File imageFile = null;
-            if (originalMessage != null && originalMessage.isPhoto()) {
-                imageFile = FileLoader.getInstance(currentAccount).getPathToMessage(originalMessage.messageOwner);
-                if (imageFile != null && !imageFile.exists()) {
-                    imageFile = null;
+
+
+    private void handleAiChat(MessageObject selectedObject, MessageObject.GroupedMessages selectedObjectGroup) {
+        if (selectedObject == null) return;
+
+        String messageText = "";
+        if (selectedObjectGroup != null) {
+            for (MessageObject msg : selectedObjectGroup.messages) {
+                if (msg.caption != null && msg.caption.length() > 0) {
+                    messageText = msg.caption.toString();
+                    break;
+                } else if (msg.messageOwner != null && !TextUtils.isEmpty(msg.messageOwner.message)) {
+                    messageText = msg.messageOwner.message;
+                    break;
                 }
             }
-            org.telegram.ui.Helpers.AIAssistanceHelper.requestReply(currentAccount, userPrompt, context, false, imageFile, callback);
-        } catch (Throwable e) {
-            callback.onError("Start Gen Crash: " + e.getMessage());
+        } else {
+            if (selectedObject.caption != null && selectedObject.caption.length() > 0) {
+                messageText = selectedObject.caption.toString();
+            } else if (selectedObject.messageOwner != null && !TextUtils.isEmpty(selectedObject.messageOwner.message)) {
+                messageText = selectedObject.messageOwner.message;
+            }
         }
-    }
 
-    public void showAiReplyDialog() {
-        try {
-            if (selectedObject == null || getParentActivity() == null) {
-                return;
-            }
-            final MessageObject messageToReply = selectedObject;
-
-            final android.widget.EditText inputField = new android.widget.EditText(getParentActivity());
-            inputField.setBackground(Theme.createEditTextDrawable(getParentActivity(), false));
-            inputField.setTextSize(16);
-            inputField.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
-            inputField.setHint("Enter your prompt for AI...");
-            inputField.setHintTextColor(getThemedColor(Theme.key_dialogTextHint));
-            inputField.setPadding(AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4));
-
-            android.widget.LinearLayout container = new android.widget.LinearLayout(getParentActivity());
-            container.setOrientation(android.widget.LinearLayout.VERTICAL);
-            container.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), 0);
-            container.addView(inputField, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle("AI Reply");
-            builder.setView(container);
-            builder.setPositiveButton("Generate", null);
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                try {
-                    String prompt = inputField.getText().toString().trim();
-                    if (android.text.TextUtils.isEmpty(prompt)) {
-                        return;
-                    }
-
-                    final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(getParentActivity());
-                    container.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, android.view.Gravity.CENTER, 0, 16, 0, 0));
-                    inputField.setEnabled(false);
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-
-                    startAiGeneration(prompt, messageToReply, new ChatAnimeAssistantView.AssistantRequestCallback() {
-                        @Override
-                        public void onSuccess(String result) {
-                            AndroidUtilities.runOnUIThread(() -> {
-                                try {
-                                    if (dialog.isShowing()) dialog.dismiss();
-                                } catch (Throwable e) { /* ignore */ }
-
-                                if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
-                                    chatActivityEnterView.getEditField().setText(result);
-                                    chatActivityEnterView.getEditField().setSelection(result.length());
-                                }
-                            });
+        String imagePath = AiController.getPathToMessage(selectedObject);
+        new GenerateFromMessageBottomSheet(messageText, imagePath, ChatActivity.this, getParentActivity(), data -> {
+            Client aiClient = new Client.Builder().build();
+            boolean noForwards = getMessagesController().isPeerNoForwards(getDialogId())
+                    || (selectedObject.messageOwner != null && selectedObject.messageOwner.noforwards);
+            ResponseAlert.showAlert(ChatActivity.this, aiClient, data.prompt(), data.imagePath(), data.useHistory(), noForwards,
+                    urlSpan -> {
+                        didPressMessageUrl(urlSpan, false, selectedObject, null);
+                        return Boolean.TRUE;
+                    },
+                    null,
+                    chatActivityEnterView != null && (currentUser != null || (currentChat != null && ChatObject.canSendMessages(currentChat))) ? (prompt, response) -> {
+                        if (TextUtils.isEmpty(response)) return;
+                        if (AiConfig.insertAsQuote) {
+                            chatActivityEnterView.getEditField().setText(response);
+                            chatActivityEnterView.getEditField().append("\n");
+                            int start = AiConfig.showResponseOnly ? 0 : prompt.length() + 4;
+                            int end = chatActivityEnterView.getEditText().length() - 1;
+                            org.telegram.ui.Components.QuoteSpan.putQuoteToEditable(chatActivityEnterView.getEditText(), start, end, true);
+                        } else {
+                            chatActivityEnterView.getEditField().setText(response);
                         }
-
-                        @Override
-                        public void onError(String error) {
-                            AndroidUtilities.runOnUIThread(() -> {
-                                try {
-                                    container.removeView(progressBar);
-                                    inputField.setEnabled(true);
-                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                                    if (getParentActivity() != null) {
-                                        android.widget.TextView errorView = new android.widget.TextView(getParentActivity());
-                                        errorView.setText(error);
-                                        errorView.setTextSize(16);
-                                        errorView.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
-                                        errorView.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), AndroidUtilities.dp(8));
-                                        errorView.setTextIsSelectable(true);
-
-                                        android.widget.ScrollView scrollView = new android.widget.ScrollView(getParentActivity());
-                                        scrollView.addView(errorView);
-
-                                        AlertDialog.Builder errorBuilder = new AlertDialog.Builder(getParentActivity());
-                                        errorBuilder.setTitle("Error");
-                                        errorBuilder.setView(scrollView);
-                                        errorBuilder.setPositiveButton("OK", null);
-                                        errorBuilder.setNeutralButton("Copy", (d, w) -> {
-                                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getParentActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-                                            android.content.ClipData clip = android.content.ClipData.newPlainText("Error Log", error);
-                                            clipboard.setPrimaryClip(clip);
-                                            android.widget.Toast.makeText(getParentActivity(), "Copied to clipboard", android.widget.Toast.LENGTH_SHORT).show();
-                                        });
-                                        errorBuilder.show();
-                                    }
-                                } catch (Throwable e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                        }
-                    });
-                } catch (Throwable e) {
-                    if (getParentActivity() != null) {
-                        android.widget.Toast.makeText(getParentActivity(), "Crash in Start: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
-                    }
-                    e.printStackTrace();
-                }
-            });
-        } catch (Throwable e) {
-            if (getParentActivity() != null) {
-                android.widget.Toast.makeText(getParentActivity(), "Dialog Crash: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
-            }
-            e.printStackTrace();
-        }
-    }
-
-    public void showSummarizeDialog() {
-        try {
-            if (selectedObject == null || getParentActivity() == null) {
-                return;
-            }
-            final MessageObject messageToSummarize = selectedObject;
-
-            final android.widget.EditText inputField = new android.widget.EditText(getParentActivity());
-            inputField.setBackground(Theme.createEditTextDrawable(getParentActivity(), false));
-            inputField.setTextSize(16);
-            inputField.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
-            inputField.setHint("Check summary instructions (Optional)...");
-            inputField.setHintTextColor(getThemedColor(Theme.key_dialogTextHint));
-            inputField.setPadding(AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4), AndroidUtilities.dp(4));
-
-            android.widget.LinearLayout container = new android.widget.LinearLayout(getParentActivity());
-            container.setOrientation(android.widget.LinearLayout.VERTICAL);
-            container.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), 0);
-            container.addView(inputField, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle("AI Summary");
-            builder.setView(container);
-            builder.setPositiveButton("Summarize", null);
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                try {
-                    String userInstruction = inputField.getText().toString().trim();
-                    String prompt = "Task:\n"
-                            + "Transform the input text and any attached images into a clear, concise, and well-structured summary.\n\n"
-                            + "Strict Rules:\n"
-                            + "- **VISUAL AWARENESS**: If an image is provided, summarize its visual content in detail. Ignore technical tags like [Photo], [Video], or [Premium Emoji] in the text context.\n"
-                            + "- **MEDIA FALLBACK**: If no image file is provided but a [Photo] or [Video] tag is present, summarize the provided text/caption and explicitly note that you were unable to analyze the media directly.\n"
-                            + "- **NO METADATA**: Do NOT mention user names, chat names, or technical tags in the final summary.\n"
-                            + "- **CONTENT ONLY**: Focus exclusively on the message meaning and visual insights.\n"
-                            + "- **FORMATTING**: Use Bold for emphasis, > for quotes of important phrases, and clean bullets (•).\n\n"
-                            + "Formatting Guidelines:\n"
-                            + "- Use **Bold** for key terms and headlines.\n"
-                            + "- Use `> ` for direct quotes or critical insights.\n"
-                            + "- Use • for bullet points.\n"
-                            + "- Use short paragraphs for explanations.\n"
-                            + "- Keep spacing clean for easy scanning.\n\n"
-                            + "Optimization:\n"
-                            + "- Keep sentences sharp, minimal, and impactful.\n"
-                            + "- If input is short, return a tighter refined version.\n"
-                            + "- If input is long, compress aggressively without losing key meaning.\n\n"
-                            + "Output:\n"
-                            + "Return only the final formatted summary. No explanations, no extra text.";
-
-                    if (!android.text.TextUtils.isEmpty(userInstruction)) {
-                        prompt += "\n\nAdditional Instruction: " + userInstruction;
-                    }
-
-                    final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(getParentActivity());
-                    progressBar.setIndeterminate(true);
-                    container.removeAllViews();
-                    container.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, android.view.Gravity.CENTER, 0, 16, 0, 16));
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-
-                    final long dialogIdFinal = dialog_id;
-                    final int currentAccountFinal = currentAccount;
-                    final ArrayList<MessageObject> messageObjectsFinal = new ArrayList<>();
-                    messageObjectsFinal.add(messageToSummarize);
-
-                    String context = AIAssistanceHelper.buildContext(ChatActivity.this, currentAccountFinal, dialogIdFinal, messageObjectsFinal, true);
-                    File imageFile = null;
-                    boolean hasMedia = messageToSummarize.isPhoto() || messageToSummarize.isVideo() || messageToSummarize.isRoundVideo() || messageToSummarize.isGif();
-                    if (messageToSummarize.isPhoto()) {
-                        imageFile = FileLoader.getInstance(currentAccountFinal).getPathToMessage(messageToSummarize.messageOwner);
-                    } else if (messageToSummarize.isVideo() || messageToSummarize.isRoundVideo() || messageToSummarize.isGif()) {
-                        imageFile = FileLoader.getInstance(currentAccountFinal).getPathToMessage(messageToSummarize.messageOwner, true);
-                    }
-                    if (imageFile != null && !imageFile.exists()) {
-                        imageFile = null;
-                    }
-                    if (hasMedia && imageFile == null) {
-                        context += "\n\n[System Note: The media file (Photo/Video) is not available for visual analysis. Please summarize based ONLY on the provided caption/text and mention that media analysis was not possible.]";
-                    }
-                    AIAssistanceHelper.requestReply(currentAccountFinal, prompt, context, true, imageFile, new ChatAnimeAssistantView.AssistantRequestCallback() {
-                        @Override
-                        public void onSuccess(String result) {
-                            AndroidUtilities.runOnUIThread(() -> {
-                                try {
-                                    if (dialog.isShowing()) dialog.dismiss();
-                                } catch (Throwable e) { /* ignore */ }
-
-                                if (getParentActivity() != null) {
-                                    android.widget.TextView summaryView = new android.widget.TextView(getParentActivity());
-                                    String processedResult = result.replaceAll("(?m)^[\\*\\-] ", "• ");
-                                    CharSequence formattedResult = tw.nekomimi.nekogram.helpers.EntitiesHelper.parseMarkdown(processedResult);
-                                    formattedResult = org.telegram.messenger.Emoji.replaceEmoji(formattedResult, summaryView.getPaint().getFontMetricsInt(), false);
-
-                                    summaryView.setText(formattedResult);
-                                    summaryView.setTextSize(16);
-                                    summaryView.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
-                                    summaryView.setLinkTextColor(getThemedColor(Theme.key_chat_messageLinkIn));
-                                    summaryView.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), AndroidUtilities.dp(8));
-                                    summaryView.setTextIsSelectable(true);
-                                    summaryView.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
-                                    summaryView.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
-
-                                    android.widget.ScrollView scrollView = new android.widget.ScrollView(getParentActivity());
-                                    scrollView.addView(summaryView);
-
-                                    AlertDialog.Builder resultBuilder = new AlertDialog.Builder(getParentActivity());
-                                    resultBuilder.setTitle("Summary Result");
-                                    resultBuilder.setView(scrollView);
-                                    resultBuilder.setPositiveButton("Close", null);
-
-                                    android.content.SharedPreferences aiPrefs = org.telegram.messenger.ApplicationLoader.applicationContext.getSharedPreferences("ai_assistant_prefs", android.content.Context.MODE_PRIVATE);
-                                    if (aiPrefs.getBoolean("assistant_enabled", false)) {
-                                        resultBuilder.setNegativeButton("Continue Chat", (d, w) -> {
-                                            if (chatAnimeAssistantView != null) {
-                                                chatAnimeAssistantView.startTopicDiscussion(result);
-                                            }
-                                        });
-                                    }
-                                    resultBuilder.setNeutralButton("Copy", (d, w) -> {
-                                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getParentActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-                                        android.content.ClipData clip = android.content.ClipData.newPlainText("Summary", result);
-                                        clipboard.setPrimaryClip(clip);
-                                        android.widget.Toast.makeText(getParentActivity(), "Copied to clipboard", android.widget.Toast.LENGTH_SHORT).show();
-                                    });
-                                    resultBuilder.show();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            AndroidUtilities.runOnUIThread(() -> {
-                                try {
-                                    container.removeView(progressBar);
-                                    container.addView(inputField, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                                    if (getParentActivity() != null) {
-                                        android.widget.TextView errorView = new android.widget.TextView(getParentActivity());
-                                        errorView.setText(error);
-                                        errorView.setTextSize(16);
-                                        errorView.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
-                                        errorView.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(8), AndroidUtilities.dp(24), AndroidUtilities.dp(8));
-                                        errorView.setTextIsSelectable(true);
-
-                                        android.widget.ScrollView scrollView = new android.widget.ScrollView(getParentActivity());
-                                        scrollView.addView(errorView);
-
-                                        AlertDialog.Builder errorBuilder = new AlertDialog.Builder(getParentActivity());
-                                        errorBuilder.setTitle("Error");
-                                        errorBuilder.setView(scrollView);
-                                        errorBuilder.setPositiveButton("OK", null);
-                                        errorBuilder.setNeutralButton("Copy", (d, w) -> {
-                                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getParentActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-                                            android.content.ClipData clip = android.content.ClipData.newPlainText("Error Log", error);
-                                            clipboard.setPrimaryClip(clip);
-                                            android.widget.Toast.makeText(getParentActivity(), "Copied to clipboard", android.widget.Toast.LENGTH_SHORT).show();
-                                        });
-                                        errorBuilder.show();
-                                    }
-                                } catch (Throwable e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                        }
-                    });
-                } catch (Throwable e) {
-                    if (getParentActivity() != null) {
-                        android.widget.Toast.makeText(getParentActivity(), "Crash in Start: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
-                    }
-                    e.printStackTrace();
-                }
-            });
-        } catch (Throwable e) {
-            if (getParentActivity() != null) {
-                android.widget.Toast.makeText(getParentActivity(), "Dialog Crash: " + e.getMessage(), android.widget.Toast.LENGTH_LONG).show();
-            }
-            e.printStackTrace();
-        }
+                        chatActivityEnterView.getEditField().setSelection(chatActivityEnterView.getEditField().length());
+                        chatActivityEnterView.openKeyboard();
+                    } : null);
+        }).show();
     }
 
     public float getHashtagTabsShownT() {
@@ -52515,26 +52202,6 @@ public class ChatActivity extends BaseFragment implements
     protected void multiChatUpdateTitle() {}
     protected void multiChatUpdateUpDownButtonVisibility() {}
 
-    protected void requestAnimeAssistantReply(String prompt, List<AIAssistanceHelper.HistoryItem> history, ChatAnimeAssistantView.AssistantRequestCallback callback) {
-        try {
-            ArrayList<MessageObject> recentMessages = null;
-            if (messages != null && !messages.isEmpty()) {
-                recentMessages = new ArrayList<>();
-                for (int i = 0; i < Math.min(5, messages.size()); i++) {
-                    MessageObject obj = messages.get(i);
-                    if (obj != null) {
-                        recentMessages.add(obj);
-                    }
-                }
-            }
-            String context = AIAssistanceHelper.buildContext(this, currentAccount, dialog_id, recentMessages, false);
-            AIAssistanceHelper.requestReply(currentAccount, prompt, context, false, null, history, callback);
-        } catch (Throwable e) {
-            if (callback != null) {
-                callback.onError("Assistant error: " + e.getMessage());
-            }
-        }
-    }
-    protected void executeAnimeAssistantAction(String action, String argument, ChatAnimeAssistantView.AssistantRequestCallback callback) {}
+
 }
 
