@@ -2,6 +2,7 @@ package tw.nekomimi.nekogram.tabs;
 
 import android.content.Context;
 
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 
@@ -108,22 +109,97 @@ public enum TabsByTypeEntry {
         this.enabledByDefault = enabledByDefault;
     }
 
+    public String getTitle() {
+        return getTitle(null);
+    }
+
     public String getTitle(Context context) {
+        String key;
+        int resId;
+        String fallback;
         switch (this) {
-            case UNREAD:          return context.getString(R.string.TabsByTypeUnread);
-            case PERSONAL:        return context.getString(R.string.TabsByTypePersonal);
-            case GROUPS:          return context.getString(R.string.TabsByTypeGroups);
-            case CHANNELS:        return context.getString(R.string.TabsByTypeChannels);
-            case BOTS:            return context.getString(R.string.TabsByTypeBots);
-            case ADMIN:           return context.getString(R.string.TabsByTypeAdmin);
-            case OWNER:           return context.getString(R.string.TabsByTypeOwner);
-            case PRIVATE_GROUPS:  return context.getString(R.string.TabsByTypePrivateGroups);
-            case PUBLIC_GROUPS:   return context.getString(R.string.TabsByTypePublicGroups);
-            case MENTIONED_CHATS: return context.getString(R.string.TabsByTypeMentioned);
-            case LIVE_CHATS:      return context.getString(R.string.TabsByTypeLive);
-            case DELETED_USERS:   return context.getString(R.string.TabsByTypeDeleted);
-            case SECRET_CHATS:    return context.getString(R.string.TabsByTypeSecret);
-            default:              return name();
+            case UNREAD:
+                key = "TabsByTypeUnread";
+                resId = R.string.TabsByTypeUnread;
+                fallback = "Unread chats";
+                break;
+            case PERSONAL:
+                key = "TabsByTypePersonal";
+                resId = R.string.TabsByTypePersonal;
+                fallback = "Private chats";
+                break;
+            case GROUPS:
+                key = "TabsByTypeGroups";
+                resId = R.string.TabsByTypeGroups;
+                fallback = "Groups";
+                break;
+            case CHANNELS:
+                key = "TabsByTypeChannels";
+                resId = R.string.TabsByTypeChannels;
+                fallback = "Channels";
+                break;
+            case BOTS:
+                key = "TabsByTypeBots";
+                resId = R.string.TabsByTypeBots;
+                fallback = "Bots";
+                break;
+            case ADMIN:
+                key = "TabsByTypeAdmin";
+                resId = R.string.TabsByTypeAdmin;
+                fallback = "Admin";
+                break;
+            case OWNER:
+                key = "TabsByTypeOwner";
+                resId = R.string.TabsByTypeOwner;
+                fallback = "Owner";
+                break;
+            case PRIVATE_GROUPS:
+                key = "TabsByTypePrivateGroups";
+                resId = R.string.TabsByTypePrivateGroups;
+                fallback = "Private groups";
+                break;
+            case PUBLIC_GROUPS:
+                key = "TabsByTypePublicGroups";
+                resId = R.string.TabsByTypePublicGroups;
+                fallback = "Public groups";
+                break;
+            case MENTIONED_CHATS:
+                key = "TabsByTypeMentioned";
+                resId = R.string.TabsByTypeMentioned;
+                fallback = "Mentioned chats";
+                break;
+            case LIVE_CHATS:
+                key = "TabsByTypeLive";
+                resId = R.string.TabsByTypeLive;
+                fallback = "Live chats";
+                break;
+            case DELETED_USERS:
+                key = "TabsByTypeDeleted";
+                resId = R.string.TabsByTypeDeleted;
+                fallback = "Deleted accounts";
+                break;
+            case SECRET_CHATS:
+                key = "TabsByTypeSecret";
+                resId = R.string.TabsByTypeSecret;
+                fallback = "Secret chats";
+                break;
+            default:
+                return name();
         }
+
+        try {
+            String value = LocaleController.getString(key, resId);
+            if (value != null && !value.startsWith("LOC_ERR:")) {
+                return value;
+            }
+        } catch (Throwable ignored) {
+        }
+        if (context != null) {
+            try {
+                return context.getString(resId);
+            } catch (Throwable ignored) {
+            }
+        }
+        return fallback;
     }
 }

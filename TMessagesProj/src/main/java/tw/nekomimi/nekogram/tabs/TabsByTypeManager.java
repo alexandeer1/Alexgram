@@ -55,12 +55,23 @@ public class TabsByTypeManager {
      */
     public void injectFiltersSync() {
         MessagesController mc = MessagesController.getInstance(account);
+        if (mc.dialogFilters == null) {
+            return;
+        }
         removeVirtualFilters(mc.dialogFilters);
         if (settings.isEnabled(false)) {
             injectVirtualFilters(mc.dialogFilters, false);
         }
         if (settings.isEnabled(true)) {
             injectVirtualFilters(mc.dialogFilters, true);
+        }
+        if (mc.dialogFiltersById != null) {
+            for (int i = 0; i < mc.dialogFilters.size(); i++) {
+                MessagesController.DialogFilter f = mc.dialogFilters.get(i);
+                if (isVirtualFilter(f)) {
+                    mc.dialogFiltersById.put(f.id, f);
+                }
+            }
         }
     }
 
@@ -86,8 +97,10 @@ public class TabsByTypeManager {
 
     /** Remove all previously injected virtual tab-type filters from the list */
     public static void removeVirtualFilters(ArrayList<MessagesController.DialogFilter> filters) {
+        if (filters == null) return;
         for (int i = filters.size() - 1; i >= 0; i--) {
-            if (isVirtualFilter(filters.get(i))) {
+            MessagesController.DialogFilter f = filters.get(i);
+            if (isVirtualFilter(f)) {
                 filters.remove(i);
             }
         }

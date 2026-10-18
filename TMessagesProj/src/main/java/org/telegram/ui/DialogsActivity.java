@@ -12380,10 +12380,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 break;
             }
         }
+        if (defaultFilter == null) {
+            defaultFilter = new MessagesController.DialogFilter();
+            defaultFilter.id = 0;
+            defaultFilter.order = 0;
+            defaultFilter.color = -1;
+            defaultFilter.name = "ALL_CHATS";
+        }
         if (folderId == 0) {
-            if (defaultFilter != null) {
-                activeFilters.add(defaultFilter);
-            }
+            activeFilters.add(defaultFilter);
             boolean hideFolders = tw.nekomimi.nekogram.tabs.TabsByTypeSettings.getInstance().isHideFolders();
             for (int a = 0; a < allFilters.size(); a++) {
                 MessagesController.DialogFilter filter = allFilters.get(a);

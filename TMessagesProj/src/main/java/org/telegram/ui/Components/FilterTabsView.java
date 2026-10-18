@@ -502,11 +502,23 @@ public class FilterTabsView extends FrameLayout {
                     lastLoadedTabId = filter != null ? filter.id : -999999;
                     android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonSize, emoticonSize);
                     if (isVirtual && tabEntry != null) {
-                        icon = getResources().getDrawable(tabEntry.iconResId).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), tabEntry.iconResId);
+                            icon = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            icon = null;
+                        }
                     } else {
-                        icon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.id != getDefaultTabId() ? currentTab.emoticon : "\uD83D\uDCAC")).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), FolderIconHelper.getTabIcon(currentTab.id != getDefaultTabId() ? currentTab.emoticon : "\uD83D\uDCAC"));
+                            icon = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            icon = null;
+                        }
                     }
-                    icon.setBounds(bounds);
+                    if (icon != null) {
+                        icon.setBounds(bounds);
+                    }
                 }
                 if (icon != null) {
                     icon.setTint(textPaint.getColor());
@@ -874,19 +886,43 @@ public class FilterTabsView extends FrameLayout {
                     int emoticonWidth = FolderIconHelper.getIconWidth();
                     android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonWidth, emoticonWidth);
                     if (lastIsVirtual && lastTabEntry != null) {
-                        iconAnimateOutDrawable = getResources().getDrawable(lastTabEntry.iconResId).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), lastTabEntry.iconResId);
+                            iconAnimateOutDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateOutDrawable = null;
+                        }
                     } else {
-                        iconAnimateOutDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(lastEmoticon != null ? lastEmoticon : "\uD83D\uDCAC")).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), FolderIconHelper.getTabIcon(lastEmoticon != null ? lastEmoticon : "\uD83D\uDCAC"));
+                            iconAnimateOutDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateOutDrawable = null;
+                        }
                     }
                     if (currentIsVirtual && currentTabEntry != null) {
-                        iconAnimateInDrawable = getResources().getDrawable(currentTabEntry.iconResId).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), currentTabEntry.iconResId);
+                            iconAnimateInDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateInDrawable = null;
+                        }
                     } else {
-                        iconAnimateInDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon)).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), FolderIconHelper.getTabIcon(currentTab.emoticon));
+                            iconAnimateInDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateInDrawable = null;
+                        }
                     }
-                    iconAnimateOutDrawable.setBounds(bounds);
-                    iconAnimateInDrawable.setBounds(bounds);
-                    iconAnimateOutDrawable.setTint(textPaint.getColor());
-                    iconAnimateInDrawable.setTint(textPaint.getColor());
+                    if (iconAnimateOutDrawable != null) {
+                        iconAnimateOutDrawable.setBounds(bounds);
+                        iconAnimateOutDrawable.setTint(textPaint.getColor());
+                    }
+                    if (iconAnimateInDrawable != null) {
+                        iconAnimateInDrawable.setBounds(bounds);
+                        iconAnimateInDrawable.setTint(textPaint.getColor());
+                    }
                     animateIconChange = true;
                     changed = true;
                 }
