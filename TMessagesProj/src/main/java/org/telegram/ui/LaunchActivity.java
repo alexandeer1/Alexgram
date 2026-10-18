@@ -8904,6 +8904,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         // [Alexgram: Birthday Wishes] - End
 
+        // [Alexgram: Official Channel Welcome Dialog] - Start
+        tw.nekomimi.nekogram.ui.AlexgramWelcomeAlert.checkAndShow(this, 1000);
+        // [Alexgram: Official Channel Welcome Dialog] - End
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ApplicationLoader.canDrawOverlays = Settings.canDrawOverlays(this);
         }

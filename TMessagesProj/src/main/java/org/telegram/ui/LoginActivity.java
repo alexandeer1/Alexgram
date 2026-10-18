@@ -1898,6 +1898,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
                 LocaleController.getInstance().loadRemoteLanguages(currentAccount);
                 RestrictedLanguagesSelectActivity.checkRestrictedLanguages(true);
+                // [Alexgram: Official Channel Welcome Dialog] - Start
+                tw.nekomimi.nekogram.ui.AlexgramWelcomeAlert.checkAndShow(getParentActivity(), 1200);
+                // [Alexgram: Official Channel Welcome Dialog] - End
             }
         } else if (getParentActivity() instanceof ExternalActionActivity) {
             ((ExternalActionActivity) getParentActivity()).onFinishLogin();

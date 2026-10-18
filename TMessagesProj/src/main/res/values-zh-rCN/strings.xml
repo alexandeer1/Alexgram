@@ -60,4 +60,19 @@
     <string name="MessageMenuModeHide">隐藏</string>
     <string name="MessageMenuModeText">文字</string>
     <string name="MessageMenuModeIcon">图标</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">官方社区</string>
+    <string name="AlexgramWelcomeTitle">欢迎使用 Alexgram</string>
+    <string name="AlexgramWelcomeSubtitle">不仅仅是即时通讯</string>
+    <string name="AlexgramWelcomeDescription">加入我们的官方频道，获取独家功能、最新更新与尝鲜体验。</string>
+    <string name="AlexgramWelcomeFeature1Title">极致性能与云同步</string>
+    <string name="AlexgramWelcomeFeature1Desc">极速下载、更佳的流媒体体验与无缝云同步。</string>
+    <string name="AlexgramWelcomeFeature2Title">幽灵模式</string>
+    <string name="AlexgramWelcomeFeature2Desc">隐身查看消息，隐藏在线状态与正在输入。</string>
+    <string name="AlexgramWelcomeFeature3Title">独家功能首发</string>
+    <string name="AlexgramWelcomeFeature3Desc">前沿功能预览、开发者动态与专属实用工具。</string>
+    <string name="AlexgramWelcomeJoinButton">加入官方频道</string>
+    <string name="AlexgramWelcomeOpenButton">打开官方频道</string>
+    <string name="AlexgramWelcomeContinueButton">开始探索 Alexgram</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

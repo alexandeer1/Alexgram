@@ -11815,7 +11815,19 @@
     <string name="CreateManagedBotUsernameBotLimit">This bot already has a Premium username. Remove it before adding another.</string>
     <string name="CreateManagedBotUsernameSuffixMissing">The username must end in %1$s.</string>
     <string name="CreateManagedBotUsernameCheckFailed">Couldn\'t check this username. Please try again.</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">OFFICIAL COMMUNITY</string>
+    <string name="AlexgramWelcomeTitle">Welcome to Alexgram</string>
+    <string name="AlexgramWelcomeSubtitle">More Than Just Messaging</string>
+    <string name="AlexgramWelcomeDescription">Join our official channel for exclusive features, updates, and early access.</string>
+    <string name="AlexgramWelcomeFeature1Title">Peak Performance &amp; Cloud</string>
+    <string name="AlexgramWelcomeFeature1Desc">Ultra-fast downloads, enhanced streaming &amp; cloud sync.</string>
+    <string name="AlexgramWelcomeFeature2Title">Ghost Mode</string>
+    <string name="AlexgramWelcomeFeature2Desc">Read messages privately, hide online status &amp; typing.</string>
+    <string name="AlexgramWelcomeFeature3Title">Exclusive Feature Drops</string>
+    <string name="AlexgramWelcomeFeature3Desc">Early previews, developer updates &amp; exclusive tools.</string>
+    <string name="AlexgramWelcomeJoinButton">Join Official Channel</string>
+    <string name="AlexgramWelcomeOpenButton">Open Official Channel</string>
+    <string name="AlexgramWelcomeContinueButton">Explore Alexgram</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>
-
-
-

@@ -1129,4 +1129,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">OFFICIËLE COMMUNITY</string>
+    <string name="AlexgramWelcomeTitle">Welkom bij Alexgram</string>
+    <string name="AlexgramWelcomeSubtitle">Meer dan alleen berichten sturen</string>
+    <string name="AlexgramWelcomeDescription">Word lid van ons officiële kanaal voor exclusieve functies, updates en vroege toegang.</string>
+    <string name="AlexgramWelcomeFeature1Title">Topprestaties &amp; Cloud</string>
+    <string name="AlexgramWelcomeFeature1Desc">Ultrasnelle downloads, verbeterde streaming &amp; cloudsynchronisatie.</string>
+    <string name="AlexgramWelcomeFeature2Title">Spookmodus</string>
+    <string name="AlexgramWelcomeFeature2Desc">Berichten anoniem lezen, onlinestatus &amp; typen verbergen.</string>
+    <string name="AlexgramWelcomeFeature3Title">Exclusieve functies</string>
+    <string name="AlexgramWelcomeFeature3Desc">Vroege previews, ontwikkelaarsupdates &amp; exclusieve tools.</string>
+    <string name="AlexgramWelcomeJoinButton">Lid worden van officieel kanaal</string>
+    <string name="AlexgramWelcomeOpenButton">Officieel kanaal openen</string>
+    <string name="AlexgramWelcomeContinueButton">Alexgram ontdekken</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

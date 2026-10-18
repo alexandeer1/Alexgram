@@ -1359,4 +1359,19 @@
     <string name="MessageMenuModeHide">Ocultar</string>
     <string name="MessageMenuModeText">Texto</string>
     <string name="MessageMenuModeIcon">Icono</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">COMUNIDAD OFICIAL</string>
+    <string name="AlexgramWelcomeTitle">Bienvenido a Alexgram</string>
+    <string name="AlexgramWelcomeSubtitle">Mucho más que mensajería</string>
+    <string name="AlexgramWelcomeDescription">Únete a nuestro canal oficial para funciones exclusivas, novedades y acceso anticipado.</string>
+    <string name="AlexgramWelcomeFeature1Title">Rendimiento óptimo y nube</string>
+    <string name="AlexgramWelcomeFeature1Desc">Descargas ultrarrápidas, streaming mejorado y sincronización en la nube.</string>
+    <string name="AlexgramWelcomeFeature2Title">Modo fantasma</string>
+    <string name="AlexgramWelcomeFeature2Desc">Lee mensajes de forma privada, oculta estado en línea y escribiendo.</string>
+    <string name="AlexgramWelcomeFeature3Title">Lanzamientos exclusivos</string>
+    <string name="AlexgramWelcomeFeature3Desc">Vistas previas, avances de desarrollo y herramientas exclusivas.</string>
+    <string name="AlexgramWelcomeJoinButton">Unirse al canal oficial</string>
+    <string name="AlexgramWelcomeOpenButton">Abrir canal oficial</string>
+    <string name="AlexgramWelcomeContinueButton">Explorar Alexgram</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>
