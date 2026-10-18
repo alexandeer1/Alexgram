@@ -254,6 +254,7 @@
     <string name="CreateCode">Crear Código</string>
     <string name="CreateCodeLanguage">Idioma</string>
     <string name="NoCaptionForward">Reenviar sin descripción</string>
+    <string name="NoCaptionForwardShort">Sin leyenda</string>
     <string name="PreferCommonGroupsTab">Pestaña Grupos preferidos</string>
     <string name="PreferCommonGroupsTabNotice">Seleccionar automáticamente la pestaña \"Grupos\" en lugar de \"Regalos\" cuando sea posible.</string>
     <string name="GroupedMessageMenu">Menú de mensaje de grupo</string>

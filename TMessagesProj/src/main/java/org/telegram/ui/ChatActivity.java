@@ -4096,6 +4096,7 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public View createView(Context context) {
         Timer t = Timer.create("ChatActivity.createView");
+        ChatsHelper chatsHelper = ChatsHelper.getInstance(currentAccount);
 
         blurredBackgroundColorProvider = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_messagePanelBackground) {
             @Override
@@ -8933,25 +8934,28 @@ public class ChatActivity extends BaseFragment implements
         }
 
         actionsButtonsLayout = new ChatActivityActionsButtonsLayout(context, resourceProvider, blurredBackgroundColorProvider, glassBackgroundDrawableFactory);
-        actionsButtonsLayout.setForwardButtonOnClickListener(v -> openForward(false));
+        // left button action start
+        boolean noForwards = getMessagesController().isChatNoForwards(currentChat) || currentChat != null && currentChat.noforwards;
+        boolean currentLeftButtonNoForwards = isCurrentLeftButtonNoForwards();
+        int leftButtonAction = ChatsHelper.getLeftButtonAction(this, currentLeftButtonNoForwards);
+        actionsButtonsLayout.setReplyButtonTextAndIcon(ChatsHelper.getLeftButtonText(leftButtonAction), ChatsHelper.getLeftButtonDrawable(leftButtonAction));
+        actionsButtonsLayout.setForwardButtonTextAndIcon(LocaleController.getString(R.string.Forward), R.drawable.input_forward, true);
         actionsButtonsLayout.setReplyButtonOnClickListener(v -> {
-            MessageObject messageObject = null;
-            for (int a = 1; a >= 0; a--) {
-                if (messageObject == null && selectedMessagesIds[a].size() != 0) {
-                    messageObject = messagesDict[a].get(selectedMessagesIds[a].keyAt(0));
-                }
-                selectedMessagesIds[a].clear();
-                selectedMessagesCanCopyIds[a].clear();
-                selectedMessagesCanStarIds[a].clear();
-            }
-            hideActionMode();
-            if (messageObject != null && (messageObject.messageOwner.id > 0 || messageObject.messageOwner.id < 0 && currentEncryptedChat != null)) {
-                showFieldPanelForReply(messageObject);
-            }
-            updatePinnedMessageView(true);
-            updateVisibleRows();
-            updateSelectedMessageReactions();
+            chatsHelper.makeReplyButtonClick(this, isCurrentLeftButtonNoForwards());
         });
+        if (!noForwards) {
+            actionsButtonsLayout.setReplyButtonOnLongClickListener(v -> {
+                if (!NekoConfig.disableVibration.Bool()) v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                chatsHelper.makeReplyButtonLongClick(this, isCurrentLeftButtonNoForwards(), getResourceProvider());
+                return false;
+            });
+        }
+        actionsButtonsLayout.setForwardButtonOnClickListener(v -> {
+            noForwardQuote = false;
+            noForwardCaption = false;
+            openForward(false);
+        });
+        // left button action end
         bottomViewsVisibilityController.setViewVisible(MESSAGE_ACTION_CONTAINER, false, false);
         actionsButtonsLayout.setPadding(0, dp(56), 0, 0);
         actionsButtonsLayout.setClipToPadding(false);
@@ -10532,7 +10536,7 @@ public class ChatActivity extends BaseFragment implements
 
     private boolean isSelectableBetweenMessage(MessageObject message, int begin, int end) {
         int msgId = message.getId();
-        if (msgId <= begin || msgId >= end) {
+        if (chatMode != MODE_SCHEDULED && (msgId <= begin || msgId >= end)) {
             return false;
         }
         int index = message.getDialogId() == dialog_id ? 0 : 1;
@@ -10551,13 +10555,15 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public boolean canSelectBetweenMessages() {
-        int[] bounds = ChatsHelper.getSelectBetweenBounds(selectedMessagesIds);
+        int[] bounds = ChatsHelper.getSelectBetweenBounds(messages, selectedMessagesIds, dialog_id, chatMode == MODE_SCHEDULED);
         if (bounds == null) {
             return false;
         }
         int begin = bounds[0];
         int end = bounds[1];
-        for (int i = 0; i < messages.size(); i++) {
+        int startPosition = chatMode == MODE_SCHEDULED ? begin + 1 : 0;
+        int endPosition = chatMode == MODE_SCHEDULED ? end : messages.size();
+        for (int i = startPosition; i < endPosition; i++) {
             if (isSelectableBetweenMessage(messages.get(i), begin, end)) {
                 return true;
             }
@@ -10566,19 +10572,25 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public void performSelectBetweenMessages() {
-        int[] bounds = ChatsHelper.getSelectBetweenBounds(selectedMessagesIds);
+        int[] bounds = ChatsHelper.getSelectBetweenBounds(messages, selectedMessagesIds, dialog_id, chatMode == MODE_SCHEDULED);
         if (bounds == null) {
             return;
         }
         int begin = bounds[0];
         int end = bounds[1];
-        for (int i = 0; i < messages.size(); i++) {
+        int startPosition = chatMode == MODE_SCHEDULED ? begin + 1 : 0;
+        int endPosition = chatMode == MODE_SCHEDULED ? end : messages.size();
+        for (int i = startPosition; i < endPosition; i++) {
             MessageObject message = messages.get(i);
             if (!isSelectableBetweenMessage(message, begin, end)) {
                 continue;
             }
             if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
-                if (message.getId() != begin) {
+                if (chatMode == MODE_SCHEDULED) {
+                    MessageObject endMessage = messages.get(end);
+                    addToSelectedMessages(endMessage, false, false);
+                    addToSelectedMessages(message, true);
+                } else if (message.getId() != begin) {
                     for (int x = 0; x < messages.size(); x++) {
                         MessageObject msg = messages.get(x);
                         if (msg.getId() == begin) {
@@ -20724,22 +20736,34 @@ public class ChatActivity extends BaseFragment implements
                     starItem.setIcon(hasUnfavedSelected ? R.drawable.msg_fave : R.drawable.msg_unfave);
                 }
                 final int newEditVisibility = canEditMessagesCount == 1 && selectedCount == 1 ? View.VISIBLE : View.GONE;
+                boolean canSelectBetween = false;
+                boolean canSelectBetweenComputed = false;
+                boolean hasSelectedAyuDeletedMessage = hasSelectedAyuDeletedMessage();
                 if (actionsButtonsLayout != null) {
                     boolean allowChatActions = true;
                     if (bottomChannelButtonsLayout != null && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE && !bottomOverlayChatWaitsReply ||
-                            currentChat != null && (ChatObject.isNotInChat(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat))) {
+                            currentChat != null && (ChatObject.isNotInChat(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat)) || hasSelectedAyuDeletedMessage) {
                         allowChatActions = false;
                     }
 
                     int newVisibility;
+                    int configuredLeftButtonAction = NaConfig.INSTANCE.getLeftBottomButton().Int();
+                    if (configuredLeftButtonAction == ChatsHelper.LEFT_BUTTON_SELECT_BETWEEN && !canSelectBetweenComputed) {
+                        canSelectBetween = canSelectBetweenMessages();
+                        canSelectBetweenComputed = true;
+                    }
+                    int leftButtonAction = ChatsHelper.getLeftButtonAction(configuredLeftButtonAction, noforwards, canSelectBetween);
+                    updateLeftBottomButton(leftButtonAction);
 
-                    if (chatMode == MODE_SCHEDULED || !allowChatActions || selectedMessagesIds[0].size() != 0 && selectedMessagesIds[1].size() != 0) {
+                    if (leftButtonAction == ChatsHelper.LEFT_BUTTON_SELECT_BETWEEN) {
+                        newVisibility = View.VISIBLE;
+                    } else if ((chatMode == MODE_SCHEDULED || !allowChatActions || selectedMessagesIds[0].size() != 0 && selectedMessagesIds[1].size() != 0) && (leftButtonAction == ChatsHelper.LEFT_BUTTON_REPLY || noforwards)) {
                         newVisibility = View.GONE;
                     } else if (selectedCount == 1) {
                         newVisibility = View.VISIBLE;
                         for (int b = 0, N = selectedMessagesIds[0].size(); b < N; b++) {
                             MessageObject message = selectedMessagesIds[0].valueAt(b);
-                            if (ChatObject.isForum(currentChat) && !canSendMessageToTopic(message)) {
+                            if ((ChatObject.isForum(currentChat) && !canSendMessageToTopic(message)) || (leftButtonAction != ChatsHelper.LEFT_BUTTON_REPLY && !message.canForwardMessage())) {
                                 newVisibility = View.GONE;
                                 break;
                             }
@@ -20751,7 +20775,7 @@ public class ChatActivity extends BaseFragment implements
                             for (int b = 0, N = selectedMessagesIds[a].size(); b < N; b++) {
                                 MessageObject message = selectedMessagesIds[a].valueAt(b);
                                 long groupId = message.getGroupId();
-                                if (groupId == 0 || lastGroupId != 0 && lastGroupId != groupId || (ChatObject.isForum(currentChat) && !canSendMessageToTopic(message))) {
+                                if ((groupId == 0 || lastGroupId != 0 && lastGroupId != groupId || (ChatObject.isForum(currentChat) && !canSendMessageToTopic(message))) && (leftButtonAction == ChatsHelper.LEFT_BUTTON_REPLY || noforwards || !message.canForwardMessage())) {
                                     newVisibility = View.GONE;
                                     break;
                                 }
@@ -20762,7 +20786,7 @@ public class ChatActivity extends BaseFragment implements
                             }
                         }
                     }
-                    if (threadMessageObjects != null && newVisibility == View.VISIBLE) {
+                    if (threadMessageObjects != null && newVisibility == View.VISIBLE && leftButtonAction != ChatsHelper.LEFT_BUTTON_SELECT_BETWEEN) {
                         for (int b = 0, N = selectedMessagesIds[0].size(); b < N; b++) {
                             MessageObject message = selectedMessagesIds[0].valueAt(b);
                             if (threadMessageObjects.contains(message)) {

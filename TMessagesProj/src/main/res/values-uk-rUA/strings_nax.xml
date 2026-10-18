@@ -254,6 +254,7 @@
     <string name="CreateCode">Створити код</string>
     <string name="CreateCodeLanguage">Мова</string>
     <string name="NoCaptionForward">Переслати без підпису</string>
+    <string name="NoCaptionForwardShort">Без підпису</string>
     <string name="PreferCommonGroupsTab">Перевага вкладці \"Групи”</string>
     <string name="PreferCommonGroupsTabNotice">Автоматично вибирати вкладку «Групи» замість «Подарунки», коли це можливо.</string>
     <string name="GroupedMessageMenu">Згрупувати меню повідомлення</string>

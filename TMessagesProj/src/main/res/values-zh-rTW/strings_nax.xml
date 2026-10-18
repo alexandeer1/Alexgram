@@ -254,6 +254,7 @@
     <string name="CreateCode">建立程式碼</string>
     <string name="CreateCodeLanguage">語言</string>
     <string name="NoCaptionForward">無說明轉發</string>
+    <string name="NoCaptionForwardShort">無說明文字</string>
     <string name="PreferCommonGroupsTab">首選群組標籤</string>
     <string name="PreferCommonGroupsTabNotice">在個人資料頁面自動選擇“群組”標籤而不是“禮物”。</string>
     <string name="GroupedMessageMenu">分組訊息選單</string>

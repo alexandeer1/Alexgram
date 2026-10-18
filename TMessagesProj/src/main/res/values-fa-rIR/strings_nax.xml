@@ -254,6 +254,7 @@
     <string name="CreateCode">ایجاد کد</string>
     <string name="CreateCodeLanguage">زبان</string>
     <string name="NoCaptionForward">ارسال بدون زیرنویس</string>
+    <string name="NoCaptionForwardShort">بدون شرح</string>
     <string name="PreferCommonGroupsTab">ترجیح تب گروه‌ها</string>
     <string name="PreferCommonGroupsTabNotice">انتخاب خودکار تب \"گروه‌ها\" به جای \"هدایا\" در صورت امکان.</string>
     <string name="GroupedMessageMenu">منوی پیام‌های گروهی</string>

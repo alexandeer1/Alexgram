@@ -254,6 +254,7 @@
     <string name="CreateCode">Utwórz kod</string>
     <string name="CreateCodeLanguage">Język</string>
     <string name="NoCaptionForward">Brak napisów do przodu</string>
+    <string name="NoCaptionForwardShort">Bez podpisu</string>
     <string name="PreferCommonGroupsTab">Karta Preferuj grupy</string>
     <string name="PreferCommonGroupsTabNotice">Automatycznie-wybieraj zakładkę „Grupy” zamiast „Prezenty”</string>
     <string name="GroupedMessageMenu">Menu wiadomości grupowych</string>

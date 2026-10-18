@@ -254,6 +254,7 @@
     <string name="CreateCode">Kod Oluştur</string>
     <string name="CreateCodeLanguage">Dil</string>
     <string name="NoCaptionForward">Açıklamasız ilet</string>
+    <string name="NoCaptionForwardShort">Açıklamasız</string>
     <string name="PreferCommonGroupsTab">Gruplar Sekmesini Tercih Et</string>
     <string name="PreferCommonGroupsTabNotice">Mümkün olduğunda \"Hediyeler\" yerine \"Gruplar\" sekmesini otomatik seçer.</string>
     <string name="GroupedMessageMenu">Gruplanmış Mesaj Menüsü</string>

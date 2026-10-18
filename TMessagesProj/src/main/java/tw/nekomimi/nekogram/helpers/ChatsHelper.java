@@ -43,6 +43,7 @@ public class ChatsHelper extends BaseController {
     public static final int LEFT_BUTTON_SAVE_MESSAGE = 2;
     public static final int LEFT_BUTTON_DIRECT_SHARE = 3;
     public static final int LEFT_BUTTON_SELECT_BETWEEN = 4;
+    public static final int LEFT_BUTTON_NOCAPTION = 5;
     private static final ChatsHelper[] Instance = new ChatsHelper[UserConfig.MAX_ACCOUNT_COUNT];
     public ChatActivity.ThemeDelegate themeDelegate;
 
@@ -73,7 +74,7 @@ public class ChatsHelper extends BaseController {
             return LEFT_BUTTON_REPLY;
         }
         return switch (action) {
-            case LEFT_BUTTON_REPLY, LEFT_BUTTON_SAVE_MESSAGE, LEFT_BUTTON_DIRECT_SHARE -> action;
+            case LEFT_BUTTON_REPLY, LEFT_BUTTON_SAVE_MESSAGE, LEFT_BUTTON_DIRECT_SHARE, LEFT_BUTTON_NOCAPTION -> action;
             default -> LEFT_BUTTON_NOQUOTE;
         };
     }
@@ -93,7 +94,8 @@ public class ChatsHelper extends BaseController {
             case LEFT_BUTTON_REPLY -> getString(R.string.Reply);
             case LEFT_BUTTON_SAVE_MESSAGE -> getString(R.string.AddToSavedMessages);
             case LEFT_BUTTON_DIRECT_SHARE -> getString(R.string.ShareMessages);
-            case LEFT_BUTTON_SELECT_BETWEEN -> getString(R.string.SelectBetween);
+            case LEFT_BUTTON_SELECT_BETWEEN -> getString(R.string.Select);
+            case LEFT_BUTTON_NOCAPTION -> getString(R.string.NoCaptionForwardShort);
             default -> getString(R.string.NoQuoteForwardShort);
         };
     }
@@ -144,11 +146,22 @@ public class ChatsHelper extends BaseController {
             case LEFT_BUTTON_SELECT_BETWEEN:
                 chatActivity.performSelectBetweenMessages();
                 break;
+            case LEFT_BUTTON_NOCAPTION:
+                ChatActivity.noForwardQuote = true;
+                ChatActivity.noForwardCaption = true;
+                if (chatActivity.messagePreviewParams != null) {
+                    chatActivity.messagePreviewParams.setHideForwardSendersName(true);
+                    chatActivity.messagePreviewParams.hideCaption = true;
+                }
+                chatActivity.openForward(false);
+                break;
             case LEFT_BUTTON_NOQUOTE:
             default:
                 ChatActivity.noForwardQuote = true;
+                ChatActivity.noForwardCaption = false;
                 if (chatActivity.messagePreviewParams != null) {
                     chatActivity.messagePreviewParams.setHideForwardSendersName(true);
+                    chatActivity.messagePreviewParams.hideCaption = false;
                 }
                 chatActivity.openForward(false);
                 break;
@@ -158,9 +171,6 @@ public class ChatsHelper extends BaseController {
     public void makeReplyButtonLongClick(ChatActivity chatActivity, boolean noForwards, Theme.ResourcesProvider resourcesProvider) {
         ArrayList<String> configStringKeys = new ArrayList<>();
         ArrayList<Integer> configValues = new ArrayList<>();
-
-        configStringKeys.add(getString(R.string.NoQuoteForward));
-        configValues.add(LEFT_BUTTON_NOQUOTE);
 
         configStringKeys.add(getString(R.string.Reply));
         configValues.add(LEFT_BUTTON_REPLY);
@@ -173,6 +183,12 @@ public class ChatsHelper extends BaseController {
 
         configStringKeys.add(getString(R.string.SelectBetween));
         configValues.add(LEFT_BUTTON_SELECT_BETWEEN);
+
+        configStringKeys.add(getString(R.string.NoCaptionForward));
+        configValues.add(LEFT_BUTTON_NOCAPTION);
+
+        configStringKeys.add(getString(R.string.NoQuoteForward));
+        configValues.add(LEFT_BUTTON_NOQUOTE);
 
         PopupHelper.show(configStringKeys, getString(R.string.LeftBottomButtonAction), configValues.indexOf(NaConfig.INSTANCE.getLeftBottomButton().Int()), chatActivity.getContext(), i -> {
             NaConfig.INSTANCE.getLeftBottomButton().setConfigInt(configValues.get(i));
@@ -458,5 +474,32 @@ public class ChatsHelper extends BaseController {
             return null;
         }
         return new int[]{min, max};
+    }
+
+    @Nullable
+    public static int[] getScheduledSelectBetweenPositions(ArrayList<MessageObject> messages, SparseArray<MessageObject>[] selectedMessagesIds, long dialogId) {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        for (int i = 0; i < messages.size(); i++) {
+            MessageObject message = messages.get(i);
+            int index = message.getDialogId() == dialogId ? 0 : 1;
+            if (selectedMessagesIds[index].indexOfKey(message.getId()) >= 0) {
+                if (i < min) min = i;
+                if (i > max) max = i;
+            }
+        }
+
+        if (min == Integer.MAX_VALUE || max - min <= 1) {
+            return null;
+        }
+        return new int[]{min, max};
+    }
+
+    @Nullable
+    public static int[] getSelectBetweenBounds(ArrayList<MessageObject> messages, SparseArray<MessageObject>[] selectedMessagesIds, long dialogId, boolean scheduled) {
+        return scheduled
+                ? getScheduledSelectBetweenPositions(messages, selectedMessagesIds, dialogId)
+                : getSelectBetweenBounds(selectedMessagesIds);
     }
 }
