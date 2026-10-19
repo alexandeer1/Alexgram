@@ -19,6 +19,8 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
 
     private int xChannelRow;
     private int desktopChannelRow;
+    private int betaChannelRow;
+    private int nightlyChannelRow;
     private int channelTipsRow;
     private int sourceCodeRow;
     private int datacenterStatusRow;
@@ -29,6 +31,8 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
 
         xChannelRow = addRow();
         desktopChannelRow = addRow();
+        betaChannelRow = addRow();
+        nightlyChannelRow = addRow();
         channelTipsRow = addRow();
         sourceCodeRow = addRow();
         datacenterStatusRow = addRow();
@@ -45,6 +49,10 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
             MessagesController.getInstance(currentAccount).openByUserName("AlexgramApp", NekoAboutActivity.this, 1);
         } else if (position == desktopChannelRow) {
             MessagesController.getInstance(currentAccount).openByUserName("AlexgramDesktop", NekoAboutActivity.this, 1);
+        } else if (position == betaChannelRow) {
+            MessagesController.getInstance(currentAccount).openByUserName("Alexgram_beta", NekoAboutActivity.this, 1);
+        } else if (position == nightlyChannelRow) {
+            MessagesController.getInstance(currentAccount).openByUserName("Alexgram_Nightly", NekoAboutActivity.this, 1);
         } else if (position == channelTipsRow) {
             MessagesController.getInstance(currentAccount).openByUserName("Alexgramtips", NekoAboutActivity.this, 1);
         } else if (position == sourceCodeRow) {
@@ -74,6 +82,10 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
                     textCell.setTextAndValue("Alexgram Channel", "@AlexgramApp", true);
                 } else if (position == desktopChannelRow) {
                     textCell.setTextAndValue("Alexgram Desktop", "@AlexgramDesktop", true);
+                } else if (position == betaChannelRow) {
+                    textCell.setTextAndValue("Alexgram Beta", "@Alexgram_beta", true);
+                } else if (position == nightlyChannelRow) {
+                    textCell.setTextAndValue("Alexgram Nightly", "@Alexgram_Nightly", true);
                 } else if (position == channelTipsRow) {
                     textCell.setTextAndValue("Features Tips Channel", "@Alexgramtips", true);
                 } else if (position == sourceCodeRow) {
