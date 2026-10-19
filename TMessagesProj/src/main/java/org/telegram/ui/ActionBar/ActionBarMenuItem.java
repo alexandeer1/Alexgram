@@ -292,6 +292,18 @@ public class ActionBarMenuItem extends FrameLayout {
         invalidate();
     }
 
+    @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
+        if (visibility == VISIBLE) {
+            setEnabled(true);
+            setClickable(true);
+            if (getAlpha() == 0f) {
+                setAlpha(1f);
+            }
+        }
+    }
+
     public void setVisibility(boolean visibility) {
         this.setVisibility(visibility ? VISIBLE : GONE);
     }

@@ -2535,6 +2535,9 @@ public class ChatActivity extends BaseFragment implements
                     editTextItem.setTag(1);
 
                     if (editTextItem.getVisibility() != View.VISIBLE) {
+                        if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null) {
+                            avatarContainer.getAvatarImageView().setVisibility(View.GONE);
+                        }
                         if (chatMode == MODE_SAVED && getSavedDialogId() == getUserConfig().getClientUserId() || chatMode == 0 && (threadMessageId == 0 || isTopic) && !UserObject.isReplyUser(currentUser) && !isReport()) {
                             editTextItem.setVisibility(View.VISIBLE);
                             checkEditTextItemMenu();
@@ -2557,6 +2560,9 @@ public class ChatActivity extends BaseFragment implements
                                     actionBar.setMenuOffsetSuppressed(true);
                                     checkEditTextItemMenu();
                                     editTextItem.setVisibility(View.VISIBLE);
+                                    if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null) {
+                                        avatarContainer.getAvatarImageView().setVisibility(View.GONE);
+                                    }
                                     menu.translateXItems(AndroidUtilities.dp(48));
                                 }
 
@@ -2576,6 +2582,9 @@ public class ChatActivity extends BaseFragment implements
                 if (editTextItem.getTag() != null) {
                     editTextItem.setTag(null);
                     if (editTextItem.getVisibility() != View.GONE) {
+                        if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null && !avatarContainer.avatarImageIsHidden) {
+                            avatarContainer.getAvatarImageView().setVisibility(View.VISIBLE);
+                        }
                         if (chatMode == MODE_SAVED && getSavedDialogId() == getUserConfig().getClientUserId() || chatMode == 0 && (threadMessageId == 0 || isTopic) && !UserObject.isReplyUser(currentUser) && !isReport()) {
                             editTextItem.setVisibility(View.GONE);
 
@@ -2614,6 +2623,9 @@ public class ChatActivity extends BaseFragment implements
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
                                     editTextItem.setVisibility(View.GONE);
+                                    if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null && !avatarContainer.avatarImageIsHidden) {
+                                        avatarContainer.getAvatarImageView().setVisibility(View.VISIBLE);
+                                    }
                                     menu.translateXItems(0);
 
                                     actionBar.setMenuOffsetSuppressed(false);
@@ -2687,6 +2699,9 @@ public class ChatActivity extends BaseFragment implements
             }
             if (editTextItem != null && !isEditTextItemVisibilitySuppressed) {
                 editTextItem.setVisibility(View.GONE);
+                if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null && !avatarContainer.avatarImageIsHidden) {
+                    avatarContainer.getAvatarImageView().setVisibility(View.VISIBLE);
+                }
             }
             if (chatActivityEnterView != null && chatActivityEnterView.hasText() && TextUtils.isEmpty(chatActivityEnterView.getSlowModeTimer()) && (currentChat == null || ChatObject.canSendPlain(currentChat))) {
                 if (headerItem != null) {
@@ -2721,6 +2736,9 @@ public class ChatActivity extends BaseFragment implements
             }
             if (editTextItem != null && !isEditTextItemVisibilitySuppressed) {
                 editTextItem.setVisibility(View.GONE);
+                if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null && !avatarContainer.avatarImageIsHidden) {
+                    avatarContainer.getAvatarImageView().setVisibility(View.VISIBLE);
+                }
             }
             if (attachItem != null) {
                 attachItem.setVisibility(View.GONE);
@@ -4764,7 +4782,17 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (isTitleCentered()) {
                     if (editTextItem != null && editTextItem.getView() != null && editTextItem.getView().getVisibility() == VISIBLE) {
-                        editTextItem.getView().performClick();
+                        checkEditTextItemMenu();
+                        ActionBarMenuItem item = editTextItem.getView();
+                        if (item != null) {
+                            item.setEnabled(true);
+                            item.setClickable(true);
+                            if (item.hasSubMenu()) {
+                                item.toggleSubMenu();
+                            } else {
+                                item.performClick();
+                            }
+                        }
                         return true;
                     }
                     if (attachItem != null && attachItem.getView() != null && attachItem.getView().getVisibility() == VISIBLE && chatActivityEnterView != null && chatActivityEnterView.hasText() && (currentChat == null || ChatObject.canSendPlain(currentChat))) {
@@ -11976,6 +12004,9 @@ public class ChatActivity extends BaseFragment implements
     // [Alexgram: Text Style Settings] - Start
     private void checkEditTextItemMenu() {
         if (filledEditTextItemMenu || editTextItem == null) {
+            if (filledEditTextItemMenu) {
+                refreshTextStyleMenu();
+            }
             return;
         }
 
@@ -29820,6 +29851,9 @@ public class ChatActivity extends BaseFragment implements
                 if (editTextItem != null) {
                     editTextItem.setVisibility(View.GONE);
                 }
+                if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null && !avatarContainer.avatarImageIsHidden) {
+                    avatarContainer.getAvatarImageView().setVisibility(View.VISIBLE);
+                }
                 if (headerItem != null) {
                     headerItem.setVisibility(isTitleCentered() ? View.GONE : View.VISIBLE);
                 }
@@ -41464,6 +41498,9 @@ public class ChatActivity extends BaseFragment implements
                     editTextItem.setVisibility(View.VISIBLE);
                     checkEditTextItemMenu();
                 }
+                if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null) {
+                    avatarContainer.getAvatarImageView().setVisibility(View.GONE);
+                }
                 if (attachItem != null) {
                     attachItem.setVisibility(View.GONE);
                 }
@@ -41485,6 +41522,9 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (editTextItem != null) {
                     editTextItem.setVisibility(View.GONE);
+                }
+                if (isTitleCentered() && avatarContainer != null && avatarContainer.getAvatarImageView() != null && !avatarContainer.avatarImageIsHidden) {
+                    avatarContainer.getAvatarImageView().setVisibility(View.VISIBLE);
                 }
                 if (attachItem != null) {
                     attachItem.setVisibility(View.VISIBLE);

@@ -130,7 +130,7 @@ public class ActionBarMenu extends LinearLayout {
         ActionBarMenuItem menuItem = new ActionBarMenuItem(getContext(), this, backgroundColor, isActionMode ? parentActionBar.itemsActionModeColor : parentActionBar.itemsColor, text != null, resourcesProvider);
         menuItem.setTag(id);
 
-        if (isCenteredTitle) {
+        if (isCenteredTitle && id != -3) {
             menuItem.setAlpha(0f);
             menuItem.setVisibility(GONE);
             menuItem.setClickable(false);
@@ -232,6 +232,13 @@ public class ActionBarMenu extends LinearLayout {
                 }
                 if (cell != null) {
                     cell.setVisibility(visibility);
+                    if (visibility == VISIBLE) {
+                        cell.setEnabled(true);
+                        cell.setClickable(true);
+                        if (cell.getAlpha() == 0f) {
+                            cell.setAlpha(1f);
+                        }
+                    }
                 }
             }
         }

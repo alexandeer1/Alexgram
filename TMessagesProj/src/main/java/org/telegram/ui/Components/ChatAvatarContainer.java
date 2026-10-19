@@ -98,7 +98,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     private int avatarSizeInDp = 42;
     public BackupImageView avatarImageView;
     private ActionBarMenuItem avatarOptionsMenuItem;
-    private boolean avatarImageIsHidden;
+    public boolean avatarImageIsHidden;
     private SimpleTextView titleTextView;
     private AtomicReference<SimpleTextView> titleTextLargerCopyView = new AtomicReference<>();
     private SimpleTextView subtitleTextView;
