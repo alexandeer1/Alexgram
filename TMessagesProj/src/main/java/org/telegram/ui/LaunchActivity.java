@@ -687,7 +687,14 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (actionBarLayout.getFragmentStack().isEmpty()
                 && (layersActionBarLayout == null || layersActionBarLayout.getFragmentStack().isEmpty())) {
             if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
-                actionBarLayout.addFragmentToStack(getClientNotActivatedFragment());
+                if (AndroidUtilities.isTablet()) {
+                    layersActionBarLayout.addFragmentToStack(getClientNotActivatedFragment());
+                    layersActionBarLayout.getView().setVisibility(View.VISIBLE);
+                    backgroundTablet.setVisibility(View.VISIBLE);
+                    shadowTablet.setBackgroundColor(0x00000000);
+                } else {
+                    actionBarLayout.addFragmentToStack(getClientNotActivatedFragment());
+                }
             } else {
                 MainTabsActivity mainTabsActivity = new MainTabsActivity();
                 actionBarLayout.addFragmentToStack(mainTabsActivity);
@@ -2160,6 +2167,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             if (AndroidUtilities.isTablet()) {
                 layersActionBarLayout.rebuildLogout();
                 rightActionBarLayout.rebuildLogout();
+                backgroundTablet.setVisibility(View.VISIBLE);
+                shadowTablet.setBackgroundColor(0x00000000);
             }
             presentFragment(new IntroActivity().setOnLogout());
         }
@@ -2226,6 +2235,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     private void checkLayout() {
         if (!AndroidUtilities.isTablet() || rightActionBarLayout == null || AndroidUtilities.getWasTablet() != null
                 && AndroidUtilities.getWasTablet() != AndroidUtilities.isTabletForce()) {
+            return;
+        }
+
+        if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
             return;
         }
 
@@ -4506,6 +4519,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         layersActionBarLayout.addFragmentToStack(getClientNotActivatedFragment(),
                                 INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                     }
+                    layersActionBarLayout.getView().setVisibility(View.VISIBLE);
+                    backgroundTablet.setVisibility(View.VISIBLE);
+                    shadowTablet.setBackgroundColor(0x00000000);
                 } else {
                     if (actionBarLayout.getFragmentStack().isEmpty()) {
                         MainTabsActivity mainTabsActivity = new MainTabsActivity();
@@ -10531,6 +10547,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                             backgroundTablet.setVisibility(View.VISIBLE);
                         }
                     }
+                    bindHomeDrawerToDialogs();
                     return false;
                 }
             } else if (fragment instanceof DialogsActivity) {
@@ -10629,7 +10646,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     }
                 }
 
-                if (fragment instanceof LoginActivity && account == -1) {
+                if ((fragment instanceof LoginActivity || fragment instanceof IntroActivity) && account == -1) {
                     backgroundTablet.setVisibility(View.VISIBLE);
                     shadowTablet.setBackgroundColor(0x00000000);
                 } else {
@@ -10665,6 +10682,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                             backgroundTablet.setVisibility(View.VISIBLE);
                         }
                     }
+                    bindHomeDrawerToDialogs();
                     return false;
                 }
             } else if (fragment instanceof ChatActivity && !((ChatActivity) fragment).isInScheduleMode()) {
@@ -10705,7 +10723,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     }
                 }
 
-                if (fragment instanceof LoginActivity && account == -1) {
+                if ((fragment instanceof LoginActivity || fragment instanceof IntroActivity) && account == -1) {
                     backgroundTablet.setVisibility(View.VISIBLE);
                     shadowTablet.setBackgroundColor(0x00000000);
                 } else {
