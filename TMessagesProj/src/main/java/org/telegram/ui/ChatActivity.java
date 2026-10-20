@@ -18492,6 +18492,9 @@ public class ChatActivity extends BaseFragment implements
             }
         }
         returnToMessageId = fromMessageId;
+        if (NekoConfig.rememberAllBackMessages.Bool() && fromMessageId > 0) {
+            returnToMessageIdsStack.push(returnToMessageId);
+        }
         returnToLoadIndex = loadIndex;
         needSelectFromMessageId = select;
     }
@@ -18527,6 +18530,7 @@ public class ChatActivity extends BaseFragment implements
             pagedownButtonShowedByScroll = false;
         } else {
             returnToMessageId = 0;
+            returnToMessageIdsStack.clear();
             newUnreadMessageCount = 0;
         }
 
@@ -22830,7 +22834,9 @@ public class ChatActivity extends BaseFragment implements
                 }
                 if (obj.messageOwner.date != 0) {
                     maxDate[loadIndex] = Math.max(maxDate[loadIndex], obj.messageOwner.date);
-                    minDate[loadIndex] = Math.min(minDate[loadIndex], obj.messageOwner.date);
+                    if (minDate[loadIndex] == 0 || obj.messageOwner.date < minDate[loadIndex]) {
+                        minDate[loadIndex] = obj.messageOwner.date;
+                    }
                 }
 
                 if (!chatWasReset && messageId != 0 && messageId == last_message_id) {
