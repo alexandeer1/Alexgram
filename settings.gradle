@@ -56,6 +56,14 @@ mediaModules.each { name, relPath ->
     if (!rules.exists()) {
         rules.createNewFile()
     }
+    def buildFile = new File(pDir, "build.gradle")
+    if (buildFile.exists()) {
+        def text = buildFile.text
+        def patched = text.replaceAll(/(?m)^(\s*apply\s+plugin:\s*['"](?:kotlin-android|org\.jetbrains\.kotlin\.android)['"])/, '//$1')
+        if (patched != text) {
+            buildFile.text = patched
+        }
+    }
 }
 
 def dummyDir = file('TMessagesProj_Modules/dummy')
