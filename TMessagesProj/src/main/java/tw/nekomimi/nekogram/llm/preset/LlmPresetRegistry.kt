@@ -14,6 +14,11 @@ object LlmPresetRegistry {
     const val OLLAMA_CLOUD = 7
     const val OPENROUTER = 8
     const val VERCEL_AI_GATEWAY = 9
+    const val ZHIPUAI = 10
+    const val MISTRAL = 11
+    const val QWEN = 12
+    const val MOONSHOT = 13
+    const val SILICONFLOW = 14
 
     private val presetBaseUrls = mapOf(
         OPENAI to "https://api.openai.com/v1",
@@ -25,6 +30,11 @@ object LlmPresetRegistry {
         OLLAMA_CLOUD to "https://ollama.com/v1",
         OPENROUTER to "https://openrouter.ai/api/v1",
         VERCEL_AI_GATEWAY to "https://ai-gateway.vercel.sh/v1",
+        ZHIPUAI to "https://open.bigmodel.cn/api/paas/v4",
+        MISTRAL to "https://api.mistral.ai/v1",
+        QWEN to "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        MOONSHOT to "https://api.moonshot.cn/v1",
+        SILICONFLOW to "https://api.siliconflow.cn/v1",
     )
 
     private val defaultModelResIds = mapOf(
@@ -38,6 +48,11 @@ object LlmPresetRegistry {
         OLLAMA_CLOUD to R.string.LlmProviderOllamaCloudModel,
         OPENROUTER to R.string.LlmProviderOpenRouterModel,
         VERCEL_AI_GATEWAY to R.string.LlmProviderVercelAIGatewayModel,
+        ZHIPUAI to R.string.LlmProviderZhipuAIModel,
+        MISTRAL to R.string.LlmProviderMistralModel,
+        QWEN to R.string.LlmProviderQwenModel,
+        MOONSHOT to R.string.LlmProviderMoonshotModel,
+        SILICONFLOW to R.string.LlmProviderSiliconFlowModel,
     )
 
     @JvmStatic

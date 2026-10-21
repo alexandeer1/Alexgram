@@ -35,6 +35,8 @@ import org.telegram.ui.Stories.DarkThemeResourceProvider;
 import org.telegram.ui.Stories.recorder.CaptionContainerView;
 import org.telegram.ui.Stories.recorder.HintView2;
 
+import xyz.nextalone.nagram.NaConfig;
+
 public class CaptionPhotoViewer extends CaptionContainerView {
 
     private boolean addPhotoVisible;
@@ -529,7 +531,7 @@ public class CaptionPhotoViewer extends CaptionContainerView {
 
     private boolean shownAiButton;
     private void showAiButton(boolean show_) {
-        final boolean show = show_;
+        final boolean show = show_ && !NaConfig.INSTANCE.getDisableAiEditor().Bool();
 
         if (shownAiButton == show) return;
         if (show) {

@@ -20,7 +20,15 @@ public class CustomElementHandler implements HTMLTagAttributesHandler.TagHandler
     private static class BlockquoteMarker {
     }
 
-    private record PreMarker(String language) {
+    private static class SpoilerMarker {
+    }
+
+    private static class PreMarker {
+        final String language;
+
+        PreMarker(String language) {
+            this.language = language;
+        }
     }
 
     @Override
@@ -29,9 +37,12 @@ public class CustomElementHandler implements HTMLTagAttributesHandler.TagHandler
             if (opening) {
                 String emojiIdString = HTMLTagAttributesHandler.getValue(attributes, "emoji-id");
                 if (emojiIdString != null) {
-                    long documentId = Long.parseLong(emojiIdString);
-                    output.setSpan(new AnimatedEmojiSpan(documentId, null), output.length(), output.length(), Spanned.SPAN_MARK_MARK);
-                    return true;
+                    try {
+                        long documentId = Long.parseLong(emojiIdString);
+                        output.setSpan(new AnimatedEmojiSpan(documentId, null), output.length(), output.length(), Spanned.SPAN_MARK_MARK);
+                        return true;
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             } else {
                 AnimatedEmojiSpan obj = getLast(output, AnimatedEmojiSpan.class);
@@ -57,6 +68,13 @@ public class CustomElementHandler implements HTMLTagAttributesHandler.TagHandler
             } else {
                 PreMarker marker = getLast(output, PreMarker.class);
                 end(output, PreMarker.class, new HTMLKeeper.PreSpan(marker != null ? marker.language : ""));
+            }
+            return true;
+        } else if (tag.equalsIgnoreCase("q")) {
+            if (opening) {
+                start(output, new SpoilerMarker());
+            } else {
+                end(output, SpoilerMarker.class, new HTMLKeeper.SpoilerSpan());
             }
             return true;
         }

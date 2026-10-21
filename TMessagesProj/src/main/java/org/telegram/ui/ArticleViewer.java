@@ -2868,7 +2868,7 @@ public class ArticleViewer extends IArticleViewer implements NotificationCenter.
         return richText;
     }
 
-    private CharSequence getText(WebpageAdapter adapter, View parentView, TL_iv.RichText parentRichText, TL_iv.RichText richText, TL_iv.PageBlock parentBlock, int maxWidth) {
+    public CharSequence getText(WebpageAdapter adapter, View parentView, TL_iv.RichText parentRichText, TL_iv.RichText richText, TL_iv.PageBlock parentBlock, int maxWidth) {
         return getText(adapter.currentPage, parentView, parentRichText, richText, parentBlock, maxWidth);
     }
     public static CharSequence getText(IArticleViewer parent, WebpageAdapter adapter, View parentView, TL_iv.RichText parentRichText, TL_iv.RichText richText, TL_iv.PageBlock parentBlock, int maxWidth) {
@@ -6231,6 +6231,7 @@ public class ArticleViewer extends IArticleViewer implements NotificationCenter.
     }
 
     public void destroyArticleViewer() {
+        ArticleTransKt.cancelArticleTranslations(this);
         if (parentActivity == null || windowView == null) {
             return;
         }

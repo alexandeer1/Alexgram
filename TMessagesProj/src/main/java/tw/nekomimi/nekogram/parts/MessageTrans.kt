@@ -2,6 +2,7 @@ package tw.nekomimi.nekogram.parts
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.isActive
@@ -18,7 +19,6 @@ import org.telegram.messenger.MessagesStorage
 import org.telegram.messenger.NotificationCenter
 import org.telegram.messenger.TranslateController
 import org.telegram.tgnet.TLRPC
-import org.telegram.tgnet.tl.TL_iv
 import org.telegram.ui.Components.ChatActivityInterface
 import tw.nekomimi.nekogram.NekoConfig
 import tw.nekomimi.nekogram.helpers.MessageHelper
@@ -32,205 +32,54 @@ import xyz.nextalone.nagram.NaConfig
 import java.util.Locale
 import java.util.WeakHashMap
 
-// const val TRANSLATE_MODE_WITH_ORIGINAL_OFF = 0
 const val TRANSLATE_MODE_WITH_ORIGINAL_MANUAL_ONLY = 1
 const val TRANSLATE_MODE_WITH_ORIGINAL_ALL = 2
 
 const val TRANSLATION_SEPARATOR = "\n\n--------\n\n"
 
-object RichMessageTransHelper {
-    private const val MAX_CACHE_SIZE = 2048
-
-    private data class CacheKey(val language: String, val text: String)
-
-    private val cache = object : LinkedHashMap<CacheKey, String>(MAX_CACHE_SIZE, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<CacheKey, String>?): Boolean {
-            return size > MAX_CACHE_SIZE
-        }
-    }
-    private val messageCache = WeakHashMap<TL_iv.RichMessage, MutableMap<CacheKey, String>>()
-
-    @JvmStatic
-    fun isTranslated(messageObject: MessageObject?): Boolean {
-        val message = messageObject?.messageOwner ?: return false
-        return message.rich_message != null &&
-                message.translated &&
-                !message.translatedToLanguage.isNullOrBlank()
-    }
-
-    @JvmStatic
-    fun getTranslatedLanguage(messageObject: MessageObject?): String? {
-        return if (isTranslated(messageObject)) {
-            normalizeLanguage(messageObject?.messageOwner?.translatedToLanguage)
-        } else {
-            null
-        }
-    }
-
-    @JvmStatic
-    fun getCachedTranslation(messageObject: MessageObject?, text: String?): String? {
-        val language = getTranslatedLanguage(messageObject) ?: return null
-        val richMessage = messageObject?.messageOwner?.rich_message
-        if (text.isNullOrEmpty()) return null
-        return getCachedTranslation(richMessage, language, text)
-    }
-
-    fun getCachedTranslation(richMessage: TL_iv.RichMessage?, language: String, text: String): String? {
-        synchronized(cache) {
-            val key = CacheKey(normalizeLanguage(language), text)
-            return richMessage?.let { messageCache[it]?.get(key) } ?: cache[key]
-        }
-    }
-
-    fun putCachedTranslation(richMessage: TL_iv.RichMessage?, language: String, text: String, translated: String) {
-        synchronized(cache) {
-            val key = CacheKey(normalizeLanguage(language), text)
-            cache[key] = translated
-            if (richMessage != null) {
-                messageCache.getOrPut(richMessage) { HashMap() }[key] = translated
-            }
-        }
-    }
-
-    fun hasFullCache(richMessage: TL_iv.RichMessage?, language: String): Boolean {
-        if (richMessage == null) return false
-        val texts = collectPlainTexts(richMessage)
-        if (texts.isEmpty()) return false
-        val normalizedLanguage = normalizeLanguage(language)
-        synchronized(cache) {
-            val currentMessageCache = messageCache.getOrPut(richMessage) { HashMap() }
-            texts.forEach { text ->
-                val key = CacheKey(normalizedLanguage, text)
-                val translated = currentMessageCache[key] ?: cache[key] ?: return false
-                currentMessageCache[key] = translated
-            }
-            return true
-        }
-    }
-
-    @JvmStatic
-    fun hasActiveTranslation(messageObject: MessageObject?): Boolean {
-        val language = getTranslatedLanguage(messageObject) ?: return false
-        return hasFullCache(messageObject?.messageOwner?.rich_message, language)
-    }
-
-    @JvmStatic
-    fun collectPlainTexts(richMessage: TL_iv.RichMessage?): LinkedHashSet<String> {
-        val texts = LinkedHashSet<String>()
-        richMessage?.blocks?.forEach { collectBlock(it, texts) }
-        return texts
-    }
-
-    fun normalizeLanguage(language: String?): String {
-        return language.orEmpty().lowercase()
-    }
-
-    private fun collectCaption(caption: TL_iv.PageCaption?, out: MutableSet<String>) {
-        collectRichText(caption?.text, out)
-        collectRichText(caption?.credit, out)
-    }
-
-    private fun collectBlock(block: TL_iv.PageBlock?, out: MutableSet<String>) {
-        if (block == null) return
-        when (block) {
-            is TL_iv.pageBlockPreformatted -> return
-            is TL_iv.pageBlockBlockquote -> {
-                collectRichText(block.text, out)
-                return
-            }
-            is TL_iv.pageBlockBlockquoteBlocks -> {
-                block.blocks.forEach { collectBlock(it, out) }
-                return
-            }
-        }
-
-        collectRichText(block.text, out)
-        when (block) {
-            is TL_iv.pageBlockAuthorDate -> collectRichText(block.author, out)
-            is TL_iv.pageBlockList -> block.items.forEach { item ->
-                when (item) {
-                    is TL_iv.TL_pageListItemText -> collectRichText(item.text, out)
-                    is TL_iv.TL_pageListItemBlocks -> item.blocks.forEach { collectBlock(it, out) }
-                }
-            }
-            is TL_iv.pageBlockPullquote -> collectRichText(block.caption, out)
-            is TL_iv.pageBlockCover -> collectBlock(block.cover, out)
-            is TL_iv.pageBlockEmbedPost -> {
-                block.blocks.forEach { collectBlock(it, out) }
-                collectCaption(block.caption, out)
-            }
-            is TL_iv.pageBlockCollage -> {
-                block.items.forEach { collectBlock(it, out) }
-                collectCaption(block.caption, out)
-            }
-            is TL_iv.pageBlockSlideshow -> {
-                block.items.forEach { collectBlock(it, out) }
-                collectCaption(block.caption, out)
-            }
-            is TL_iv.pageBlockTable -> {
-                collectRichText(block.title, out)
-                block.rows.forEach { row ->
-                    row.cells.forEach { cell ->
-                        collectRichText(cell.text, out)
-                    }
-                }
-            }
-            is TL_iv.pageBlockOrderedList -> block.items.forEach { item ->
-                when (item) {
-                    is TL_iv.TL_pageListOrderedItemText -> collectRichText(item.text, out)
-                    is TL_iv.TL_pageListOrderedItemBlocks -> item.blocks.forEach { collectBlock(it, out) }
-                }
-            }
-            is TL_iv.pageBlockDetails -> {
-                block.blocks.forEach { collectBlock(it, out) }
-                collectRichText(block.title, out)
-            }
-            is TL_iv.pageBlockRelatedArticles -> collectRichText(block.title, out)
-            else -> collectCaption(block.caption, out)
-        }
-    }
-
-    private fun collectRichText(richText: TL_iv.RichText?, out: MutableSet<String>) {
-        when (richText) {
-            null,
-            is TL_iv.textEmpty,
-            is TL_iv.textEmail,
-            is TL_iv.textPhone,
-            is TL_iv.textMention,
-            is TL_iv.textHashtag,
-            is TL_iv.textBotCommand,
-            is TL_iv.textAutoUrl,
-            is TL_iv.textAutoEmail,
-            is TL_iv.textAutoPhone,
-            is TL_iv.textBankCard,
-            is TL_iv.textMentionName -> return
-            is TL_iv.textPlain -> {
-                val text = richText.text
-                if (!text.isNullOrBlank()) {
-                    out.add(text)
-                }
-            }
-            is TL_iv.textConcat -> richText.texts.forEach { collectRichText(it, out) }
-            else -> collectRichText(richText.text, out)
-        }
-    }
-}
-
 private val ChatActivityInterface.translateController: TranslateController
     get() = messagesController.translateController
 
+private val runningJobs = WeakHashMap<ChatActivityInterface, MutableList<Job>>()
 
-@JvmName("translateMessages")
+fun ChatActivityInterface.cancelTranslations() {
+    synchronized(runningJobs) {
+        runningJobs.remove(this)?.forEach { it.cancel() }
+    }
+}
+
 fun ChatActivityInterface.translateMessagesWithProvider(provider: Int) =
-    translateMessages(provider = provider)
+    translateMessages(
+        targetLocale = NekoConfig.translateToLang.String()?.code2Locale ?: Locale.getDefault(),
+        provider = provider
+    )
 
-@JvmName("translateMessages")
 fun ChatActivityInterface.translateMessagesWithMessages(messages: List<MessageObject>) =
     translateMessages(messages = messages)
 
+fun ChatActivityInterface.translateMessages(provider: Int) =
+    translateMessages(
+        targetLocale = NekoConfig.translateToLang.String()?.code2Locale ?: Locale.getDefault(),
+        provider = provider
+    )
+
+fun ChatActivityInterface.translateMessages(messages: List<MessageObject>) =
+    translateMessages(
+        targetLocale = NekoConfig.translateToLang.String()?.code2Locale ?: Locale.getDefault(),
+        provider = 0,
+        messages = messages
+    )
+
+fun ChatActivityInterface.translateMessages(messages: List<MessageObject>, autoTranslate: Boolean) =
+    translateMessages(
+        targetLocale = NekoConfig.translateToLang.String()?.code2Locale ?: Locale.getDefault(),
+        provider = 0,
+        messages = messages
+    )
+
 @JvmOverloads
 fun ChatActivityInterface.translateMessages(
-    targetLocale: Locale = NekoConfig.translateToLang.String().code2Locale,
+    targetLocale: Locale = NekoConfig.translateToLang.String()?.code2Locale ?: Locale.getDefault(),
     provider: Int = 0,
     messages: List<MessageObject> = messageForTranslate?.let { listOf(it) }
         ?: selectedObjectGroup?.messages
@@ -247,7 +96,7 @@ fun ChatActivityInterface.translateMessages(
         if (msg.isRich) {
             RichMessageTransHelper.hasActiveTranslation(msg)
         } else {
-            msg.isTranslated
+            msg.translatedLocally || msg.isTranslated || msg.messageOwner?.translated == true
         }
     }
     if (allTranslated) {
@@ -269,7 +118,7 @@ fun ChatActivityInterface.translateMessages(
 
     if (messagesToTranslate.isEmpty()) return
 
-    // Mark messages as translating
+    // Mark messages as translating -> triggers native shimmering text selection highlight
     messagesToTranslate.forEach { msg ->
         getMessageHelper().detectLanguageNow(msg)
         translateController.addAsTranslatingItem(msg)
@@ -280,7 +129,7 @@ fun ChatActivityInterface.translateMessages(
     // Perform translations concurrently
     val dispatcher = Dispatchers.IO.limitedParallelism(5)
 
-    AppScope.io.launch {
+    val job = AppScope.io.launch {
         supervisorScope {
             messagesToTranslate.map { msg ->
                 launch(dispatcher) {
@@ -296,6 +145,10 @@ fun ChatActivityInterface.translateMessages(
                 }
             }.joinAll()
         }
+    }
+
+    synchronized(runningJobs) {
+        runningJobs.getOrPut(this) { ArrayList() }.add(job)
     }
 }
 
@@ -317,8 +170,7 @@ private suspend fun ChatActivityInterface.translateSingleMessage(
 
     // Translate summary if needed
     if (needsSummary) {
-        val success =
-            translateSummary(msg, targetLocale, provider, llmContext)
+        val success = translateSummary(msg, targetLocale, provider, llmContext)
         if (!success) return
     }
 
@@ -357,8 +209,9 @@ private suspend fun ChatActivityInterface.translateSummary(
     val translatedSummary = runCatching {
         translateText(targetLocale, summaryText.text, summaryText.entities, provider, llmContext)
     }.getOrElse { e ->
-        handleTranslationError(parentActivity, e, msg, translateController) {
-            translateMessages(targetLocale, provider, listOf(msg))
+        handleTranslationError(parentActivity, e, msg, translateController) { newProvider ->
+            val retryProvider = if (newProvider != 0) newProvider else provider
+            translateMessages(targetLocale, retryProvider, listOf(msg))
         }
         return false
     }
@@ -385,15 +238,16 @@ private suspend fun ChatActivityInterface.translateRichMessageContent(
             texts.map { text ->
                 async(dispatcher) {
                     if (!isActive) return@async
-                    val translated = Translator.translate(target, text, Translator.providerGoogle) // Google Translate is forced here due to rate limits
+                    val translated = Translator.translate(target, text, Translator.providerGoogle)
                     RichMessageTransHelper.putCachedTranslation(richMessage, targetLanguage, text, translated)
                 }
             }.awaitAll()
         }
         RichMessageTransHelper.hasFullCache(richMessage, targetLanguage)
     }.getOrElse { e ->
-        handleTranslationError(parentActivity, e, msg, translateController) {
-            translateMessages(target, 0, listOf(msg))
+        handleTranslationError(parentActivity, e, msg, translateController) { newProvider ->
+            val retryProvider = if (newProvider != 0) newProvider else 0
+            translateMessages(target, retryProvider, listOf(msg))
         }
         false
     }
@@ -410,8 +264,9 @@ private suspend fun ChatActivityInterface.translatePoll(
     val translatedQuestion = runCatching {
         Translator.translate(target, poll.question.text, provider)
     }.getOrElse { e ->
-        handleTranslationError(parentActivity, e, msg, translateController) {
-            translateMessages(target, provider, listOf(msg))
+        handleTranslationError(parentActivity, e, msg, translateController) { newProvider ->
+            val retryProvider = if (newProvider != 0) newProvider else provider
+            translateMessages(target, retryProvider, listOf(msg))
         }
         return false
     }
@@ -422,8 +277,9 @@ private suspend fun ChatActivityInterface.translatePoll(
         val translatedAnswer = runCatching {
             Translator.translate(target, answer.text.text, provider)
         }.getOrElse { e ->
-            handleTranslationError(parentActivity, e, msg, translateController) {
-                translateMessages(target, provider, listOf(msg))
+            handleTranslationError(parentActivity, e, msg, translateController) { newProvider ->
+                val retryProvider = if (newProvider != 0) newProvider else provider
+                translateMessages(target, retryProvider, listOf(msg))
             }
             return false
         }
@@ -480,8 +336,9 @@ private suspend fun ChatActivityInterface.translateMessageContent(
             llmContext
         )
     }.getOrElse { e ->
-        handleTranslationError(parentActivity, e, msg, translateController) {
-            translateMessages(target, provider, listOf(msg))
+        handleTranslationError(parentActivity, e, msg, translateController) { newProvider ->
+            val retryProvider = if (newProvider != 0) newProvider else provider
+            translateMessages(target, retryProvider, listOf(msg))
         }
         return false
     }
@@ -516,7 +373,10 @@ private suspend fun ChatActivityInterface.finalizeTranslation(
     translatorMode: Int
 ) {
     translateController.removeAsTranslatingItem(msg)
+    translateController.addAsManualTranslate(msg)
     msg.messageOwner.translated = true
+    msg.translated = true
+    msg.translatedLocally = true
 
     // Persist translation to storage
     if (!msg.isRich && !BuildVars.LOGS_ENABLED) {
@@ -567,21 +427,56 @@ private fun ChatActivityInterface.hideTranslation(
 ) {
     translateController.removeAsTranslatingItem(msg)
     translateController.removeAsManualTranslate(msg)
-    msg.messageOwner.translated = false
-    msg.messageOwner.translatedMessage = null
+
+    val owner = msg.messageOwner
+    if (owner != null) {
+        owner.translated = false
+        owner.translatedMessage = null
+        owner.translatedText = null
+        owner.translatedPoll = null
+        owner.translatedButtons = null
+        owner.translatedButtonsLanguage = null
+        owner.translatedVoiceTranscription = null
+        owner.translatedSummaryText = null
+        owner.translatedSummaryLanguage = null
+        owner.translatedToLanguage = null
+        if (msg.isPoll) {
+            val media = MessageObject.getMedia(owner) as? TLRPC.TL_messageMediaPoll
+            media?.poll?.translatedQuestion = null
+            media?.poll?.answers?.forEach { it.translatedText = null }
+        }
+    }
+    msg.translated = false
+    msg.translatedLocally = false
+    msg.caption = null
+
+    // Persist cleared state to storage
+    if (!msg.isRich && !BuildVars.LOGS_ENABLED && owner != null) {
+        MessagesStorage.getInstance(getCurrentAccount()).updateMessageCustomParams(
+            msg.dialogId, owner
+        )
+    }
+
     if (msg.isRich) {
         AndroidUtilities.runOnUIThread {
             getMessageHelper().resetMessageContent(getDialogId(), msg)
+            postTranslatedNotification(msg)
+            getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, 0)
         }
         return
     }
 
     AndroidUtilities.runOnUIThread {
-        if ((MessageHelper.shouldKeepOriginalForManualTranslation(translatorMode) && !msg.messageOwner.summarizedOpen) || msg.isPoll) {
-            getMessageHelper().resetMessageContent(getDialogId(), msg)
-        } else {
-            postTranslatedNotification(msg)
+        if (owner != null && !owner.message.isNullOrEmpty()) {
+            msg.applyNewText(owner.message)
+            msg.generateCaption()
         }
+        msg.forceUpdate = true
+        msg.updateTranslation(true)
+        getMessageHelper().resetMessageContent(getDialogId(), msg)
+        postTranslatedNotification(msg)
+        getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, 0)
+        (this as? org.telegram.ui.ChatActivity)?.updateVisibleRows()
     }
 }
 
@@ -610,6 +505,8 @@ private fun ChatActivityInterface.applyCachedTranslations(
             translateController.removeAsTranslatingItem(msg)
             translateController.addAsManualTranslate(msg)
             msg.messageOwner.translated = true
+            msg.translated = true
+            msg.translatedLocally = true
             msg.messageOwner.translatedToLanguage = targetLanguage
             AndroidUtilities.runOnUIThread {
                 getMessageHelper().resetMessageContent(getDialogId(), msg)
@@ -622,6 +519,8 @@ private fun ChatActivityInterface.applyCachedTranslations(
         translateController.removeAsTranslatingItem(msg)
         translateController.addAsManualTranslate(msg)
         msg.messageOwner.translated = true
+        msg.translated = true
+        msg.translatedLocally = true
         msg.messageOwner.translatedMessage = if (!msg.messageOwner.summarizedOpen && msg.messageOwner.translatedText != null) {
             MessageHelper.buildTranslatedDisplayText(
                 msg.messageOwner.message,
@@ -733,33 +632,30 @@ private suspend fun translateText(
     llmContext: String?
 ): TLRPC.TL_textWithEntities {
     val safeEntities = entities ?: ArrayList()
-
-    return if (llmContext != null) {
-        LLMTranslator.withTranslationContext(llmContext) {
-            Translator.translate(target, text, safeEntities, provider)
-        }
-    } else {
-        Translator.translate(target, text, safeEntities, provider)
-    }
+    val contextList = if (!llmContext.isNullOrBlank()) listOf(llmContext) else emptyList()
+    return Translator.translate(target, text, safeEntities, provider, contextList)
 }
 
-private fun handleTranslationError(
+private fun ChatActivityInterface.handleTranslationError(
     parentActivity: Context?,
     throwable: Throwable,
     messageObject: MessageObject,
     controller: TranslateController,
-    retryAction: () -> Unit
+    retryAction: (newProvider: Int) -> Unit
 ) {
     controller.removeAsTranslatingItem(messageObject)
     controller.removeAsManualTranslate(messageObject)
+    AndroidUtilities.runOnUIThread {
+        getMessageHelper().resetMessageContent(getDialogId(), messageObject)
+    }
 
     if (parentActivity != null) {
         AlertUtil.showTransFailedDialog(
             parentActivity,
             throwable is UnsupportedOperationException,
             throwable.message ?: throwable.javaClass.simpleName
-        ) {
-            retryAction()
+        ) { newProvider ->
+            retryAction(newProvider)
         }
     }
 }

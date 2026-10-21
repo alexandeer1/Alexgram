@@ -1,24 +1,19 @@
 package tw.nekomimi.nekogram.translate.source
 
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
-import org.telegram.messenger.LocaleController.getString
+import org.telegram.messenger.LocaleController
 import org.telegram.messenger.R
-import org.telegram.tgnet.TLRPC
-import org.telegram.ui.Components.TranslateAlert2
-import tw.nekomimi.nekogram.translate.HTMLKeeper
 import tw.nekomimi.nekogram.translate.Translator
-import tw.nekomimi.nekogram.utils.HttpClient
-import java.io.IOException
+import xyz.nextalone.nagram.network.NetworkRequestBuilder
 import java.util.Date
 import java.util.UUID
 
 object TranSmartTranslator : Translator {
 
-    private val httpClient = HttpClient.instance
+    private val targetLanguages = listOf(
+        "ar", "fr", "fil", "lo", "ja", "it", "hi", "id", "vi", "de", "km", "ms", "th", "tr", "zh", "ru", "ko", "pt", "es", "en"
+    )
 
     private fun getRandomBrowserVersion(): String {
         val majorVersion = (Math.random() * 17).toInt() + 100
@@ -33,100 +28,60 @@ object TranSmartTranslator : Translator {
         return operatingSystems[randomIndex]
     }
 
-    override suspend fun doTranslate(
-        from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
-    ): TLRPC.TL_textWithEntities {
-
-        if (to.lowercase() !in targetLanguages.map { it.lowercase() }) {
-            throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)
+    override suspend fun doTranslate(from: String, to: String, query: String): String {
+        var targetLang = to
+        if (targetLang !in targetLanguages) {
+            val base = targetLang.split("-", "_")[0]
+            if (base in targetLanguages) {
+                targetLang = base
+            } else {
+                throw UnsupportedOperationException(LocaleController.getString(R.string.TranslateApiUnsupported))
+            }
         }
 
-        val originalText = TLRPC.TL_textWithEntities().apply {
-            this.text = query
-            this.entities = entities
+        val source = JSONArray()
+        for (s in query.split("\n")) {
+            source.put(s)
         }
 
-        val finalString = StringBuilder()
-
-        val textToTranslate = if (entities.isNotEmpty()) HTMLKeeper.entitiesToHtml(
-            query,
-            entities,
-            false
-        ) else query
-
-        val sourceJsonArray = JSONArray()
-        for (s in textToTranslate.split("\n")) {
-            sourceJsonArray.put(s)
-        }
-
-        val requestJsonPayload = JSONObject().apply {
+        val jsonBody = JSONObject().apply {
             put("header", JSONObject().apply {
-                put(
-                    "client_key",
-                    "browser-chrome-${getRandomBrowserVersion()}-${getRandomOperatingSystem()}-${UUID.randomUUID()}-${Date().time}"
-                )
+                put("client_key", "browser-chrome-${getRandomBrowserVersion()}-${getRandomOperatingSystem()}-${UUID.randomUUID()}-${Date().time}")
                 put("fn", "auto_translation")
                 put("session", "")
                 put("user", "")
             })
             put("source", JSONObject().apply {
                 put("lang", if (targetLanguages.contains(from)) from else "en")
-                put("text_list", sourceJsonArray)
+                put("text_list", source)
             })
             put("target", JSONObject().apply {
-                put("lang", to)
+                put("lang", targetLang)
             })
             put("model_category", "normal")
             put("text_domain", "")
             put("type", "plain")
-        }.toString()
-
-        val requestBody = requestJsonPayload.toRequestBody(HttpClient.MEDIA_TYPE_JSON)
-
-        val request = Request.Builder().url("https://transmart.qq.com/api/imt").header(
-            "User-Agent",
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1"
-        ).post(requestBody).build()
-
-        try {
-            val responseString = httpClient.newCall(request).await().use { response ->
-                val bodyString = response.body.string()
-                if (!response.isSuccessful) {
-                    error("HTTP ${response.code} : $bodyString")
-                }
-                bodyString
-            }
-
-            val targetJsonArray: JSONArray =
-                JSONObject(responseString).getJSONArray("auto_translation")
-            for (i in 0 until targetJsonArray.length()) {
-                finalString.append(targetJsonArray.getString(i))
-                if (i != targetJsonArray.length() - 1) {
-                    finalString.append("\n")
-                }
-            }
-        } catch (e: IOException) {
-            error("TranSmart API request failed due to network issue: ${e.message}")
-        } catch (e: JSONException) {
-            error("TranSmart API response parsing failed: ${e.message}")
-        } catch (e: Exception) {
-            error("An unexpected error occurred during translation: ${e.message}")
         }
 
-        var finalText = TLRPC.TL_textWithEntities()
-        if (entities.isNotEmpty()) {
-            val resultPair = HTMLKeeper.htmlToEntities(finalString.toString(), entities, false)
-            finalText.text = resultPair.first
-            finalText.entities = resultPair.second
-            finalText = TranslateAlert2.preprocess(originalText, finalText)
-        } else {
-            finalText.text = finalString.toString()
+        val response = NetworkRequestBuilder.post("https://transmart.qq.com/api/imt") {
+            header("Content-Type", "application/json; charset=UTF-8")
+            header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            setBody(jsonBody.toString())
+        }.execute()
+
+        if (response.statusCode != 200) {
+            error("HTTP ${response.statusCode} : ${response.body}")
         }
 
-        return finalText
+        val target: JSONArray = JSONObject(response.body).getJSONArray("auto_translation")
+        val result = StringBuilder()
+        for (i in 0 until target.length()) {
+            result.append(target.getString(i))
+            if (i != target.length() - 1) {
+                result.append("\n")
+            }
+        }
+
+        return result.toString().trimEnd()
     }
-
-    private val targetLanguages = listOf(
-        "ar", "fr", "fil", "lo", "ja", "it", "hi", "id", "vi", "de", "km", "ms", "th", "tr", "zh", "ru", "ko", "pt", "es"
-    )
 }

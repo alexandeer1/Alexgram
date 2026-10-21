@@ -10,6 +10,7 @@ import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.PopupSwipeBackLayout;
 
 import kotlin.Unit;
+import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.llm.LlmConfig;
 import tw.nekomimi.nekogram.parts.MessageTransKt;
 import tw.nekomimi.nekogram.translate.Translator;
@@ -56,6 +57,7 @@ public class TranslatePopupWrapper {
                         fragment.scrimPopupWindow = null;
                         fragment.scrimPopupWindowItems = null;
                     }
+                    NekoConfig.translationProvider.setConfigInt(provider);
                     MessageTransKt.translateMessages(fragment, provider);
                     return Unit.INSTANCE;
                 }));

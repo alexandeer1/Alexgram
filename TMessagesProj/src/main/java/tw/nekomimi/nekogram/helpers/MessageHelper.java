@@ -153,6 +153,7 @@ public class MessageHelper extends BaseController {
         TLRPC.Message message = messageObject.messageOwner;
 
         MessageObject obj = new MessageObject(currentAccount, message, true, true);
+        obj.applyLocalTranslationState(messageObject);
 
         ArrayList<MessageObject> arrayList = new ArrayList<>();
         arrayList.add(obj);
@@ -163,9 +164,67 @@ public class MessageHelper extends BaseController {
         ArrayList<MessageObject> arrayList = new ArrayList<>();
         for (MessageObject messageObject : messageObjects) {
             MessageObject obj = new MessageObject(currentAccount, messageObject.messageOwner, true, true);
+            obj.applyLocalTranslationState(messageObject);
             arrayList.add(obj);
         }
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialog_id, arrayList, false);
+    }
+
+    public static boolean isLinkOrEmojiOnlyMessage(MessageObject messageObject) {
+        if (messageObject == null || messageObject.messageOwner == null) return false;
+        ArrayList<TLRPC.MessageEntity> entities = messageObject.messageOwner.entities;
+        if (entities != null) {
+            for (TLRPC.MessageEntity entity : entities) {
+                if (entity instanceof TLRPC.TL_messageEntityBotCommand ||
+                    entity instanceof TLRPC.TL_messageEntityEmail ||
+                    entity instanceof TLRPC.TL_messageEntityUrl ||
+                    entity instanceof TLRPC.TL_messageEntityMention ||
+                    entity instanceof TLRPC.TL_messageEntityCashtag ||
+                    entity instanceof TLRPC.TL_messageEntityHashtag ||
+                    entity instanceof TLRPC.TL_messageEntityBankCard ||
+                    entity instanceof TLRPC.TL_messageEntityPhone
+                ) {
+                    if (entity.offset == 0 && messageObject.messageOwner.message != null && entity.length == messageObject.messageOwner.message.length()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return org.telegram.messenger.Emoji.fullyConsistsOfEmojis(messageObject.messageOwner.message);
+    }
+
+    public static boolean isMessageObjectAutoTranslatable(MessageObject messageObject) {
+        if (messageObject == null || messageObject.translated || messageObject.translating || messageObject.isOutOwner()) {
+            return false;
+        }
+        if (messageObject.isPoll()) {
+            return true;
+        }
+        return !TextUtils.isEmpty(messageObject.messageOwner.message) && !isLinkOrEmojiOnlyMessage(messageObject);
+    }
+
+    public static String getMessagePlainText(MessageObject messageObject) {
+        if (messageObject == null || messageObject.messageOwner == null) return null;
+        if (messageObject.isPoll()) {
+            if (messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
+                TLRPC.Poll poll = ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll;
+                if (poll == null) {
+                    return null;
+                }
+                StringBuilder pollText = new StringBuilder(poll.question != null ? poll.question.text : "").append("\n");
+                for (TLRPC.PollAnswer answer : poll.answers) {
+                    if (answer.text != null && answer.text.text != null) {
+                        pollText.append("\n\uD83D\uDD18 ").append(answer.text.text);
+                    }
+                }
+                return pollText.toString();
+            }
+            return null;
+        } else if (messageObject.messageOwner != null && messageObject.messageOwner.voiceTranscriptionOpen) {
+            return messageObject.messageOwner.voiceTranscription;
+        } else {
+            return messageObject.messageOwner.message;
+        }
     }
 
     public interface FilteredMessageCallback {

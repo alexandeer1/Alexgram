@@ -3839,6 +3839,7 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
+        MessageTransKt.cancelTranslations(this);
         if (messageMetricsView != null) {
             messageMetricsView.finish();
         }
@@ -26479,6 +26480,8 @@ public class ChatActivity extends BaseFragment implements
                 pinnedMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
                 pinnedMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
                 pinnedMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
+                pinnedMessageObject.translatedLocally = messageObject.translatedLocally;
+                pinnedMessageObject.translated = messageObject.translated;
                 if (pinnedMessageObject.updateTranslation(true)) {
                     lazyUpdaterList.add(pinnedMessageObject.getId());
                     updatePinnedMessageView(true, 1);
@@ -26523,7 +26526,10 @@ public class ChatActivity extends BaseFragment implements
                     cellMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
                     cellMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
                     cellMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
-                    if (cellMessageObject.updateTranslation(false)) {
+                    cellMessageObject.translatedLocally = messageObject.translatedLocally;
+                    cellMessageObject.translated = messageObject.translated;
+                    boolean force = !messageObject.messageOwner.translated;
+                    if (cellMessageObject.updateTranslation(force) || force) {
                         update = true;
                         ArrayList<Integer> dependentMessages = replyMessageOwners.get(cellMessageObject.getId());
                         if (dependentMessages != null) {
@@ -26550,7 +26556,10 @@ public class ChatActivity extends BaseFragment implements
                     cellMessageObject.replyMessageObject.messageOwner.translatedMessage = messageObject.messageOwner.translatedMessage;
                     cellMessageObject.replyMessageObject.messageOwner.translated = messageObject.messageOwner.translated;
                     cellMessageObject.replyMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
-                    if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
+                    cellMessageObject.replyMessageObject.translatedLocally = messageObject.translatedLocally;
+                    cellMessageObject.replyMessageObject.translated = messageObject.translated;
+                    boolean forceReply = !messageObject.messageOwner.translated;
+                    if (cellMessageObject.replyMessageObject.updateTranslation(forceReply) || forceReply) {
                         lazyUpdaterList.add(cellMessageObject.replyMessageObject.getId());
                         update = true;
                     }
@@ -26593,7 +26602,10 @@ public class ChatActivity extends BaseFragment implements
                 if (cellMessageObject != null && messageIds.contains(cellMessageObject.getId()) && cellMessageObject.replyMessageObject != null && cellMessageObject.replyMessageObject.getId() == translatedReplyMessageObject.getId()) {
                     cellMessageObject.replyMessageObject.messageOwner.translatedText = translatedReplyMessageObject.messageOwner.translatedText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedToLanguage = translatedReplyMessageObject.messageOwner.translatedToLanguage;
-                    if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
+                    cellMessageObject.replyMessageObject.translatedLocally = translatedReplyMessageObject.translatedLocally;
+                    cellMessageObject.replyMessageObject.translated = translatedReplyMessageObject.translated;
+                    boolean forceReply = !translatedReplyMessageObject.messageOwner.translated;
+                    if (cellMessageObject.replyMessageObject.updateTranslation(forceReply) || forceReply) {
                         update = true;
                     }
                 }
@@ -38309,6 +38321,9 @@ public class ChatActivity extends BaseFragment implements
     public static boolean isMessageTranslated(MessageObject msg) {
         if (msg == null) {
             return false;
+        }
+        if (msg.translatedLocally) {
+            return true;
         }
         if (msg.isRich()) {
             return RichMessageTransHelper.hasActiveTranslation(msg);

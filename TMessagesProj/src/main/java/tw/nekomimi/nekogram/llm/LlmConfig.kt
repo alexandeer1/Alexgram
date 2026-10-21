@@ -28,6 +28,11 @@ object LlmConfig {
             PresetRegistry.OLLAMA_CLOUD -> NaConfig.llmProviderOllamaCloudModel.String()
             PresetRegistry.OPENROUTER -> NaConfig.llmProviderOpenRouterModel.String()
             PresetRegistry.VERCEL_AI_GATEWAY -> NaConfig.llmProviderVercelAIGatewayModel.String()
+            PresetRegistry.ZHIPUAI -> NaConfig.llmProviderZhipuAIModel.String()
+            PresetRegistry.MISTRAL -> NaConfig.llmProviderMistralModel.String()
+            PresetRegistry.QWEN -> NaConfig.llmProviderQwenModel.String()
+            PresetRegistry.MOONSHOT -> NaConfig.llmProviderMoonshotModel.String()
+            PresetRegistry.SILICONFLOW -> NaConfig.llmProviderSiliconFlowModel.String()
             else -> NaConfig.llmModelName.String()
         }
         return value?.trim() ?: ""
@@ -46,6 +51,11 @@ object LlmConfig {
             PresetRegistry.OLLAMA_CLOUD -> NaConfig.llmProviderOllamaCloudModel.setConfigString(value)
             PresetRegistry.OPENROUTER -> NaConfig.llmProviderOpenRouterModel.setConfigString(value)
             PresetRegistry.VERCEL_AI_GATEWAY -> NaConfig.llmProviderVercelAIGatewayModel.setConfigString(value)
+            PresetRegistry.ZHIPUAI -> NaConfig.llmProviderZhipuAIModel.setConfigString(value)
+            PresetRegistry.MISTRAL -> NaConfig.llmProviderMistralModel.setConfigString(value)
+            PresetRegistry.QWEN -> NaConfig.llmProviderQwenModel.setConfigString(value)
+            PresetRegistry.MOONSHOT -> NaConfig.llmProviderMoonshotModel.setConfigString(value)
+            PresetRegistry.SILICONFLOW -> NaConfig.llmProviderSiliconFlowModel.setConfigString(value)
             else -> NaConfig.llmModelName.setConfigString(value)
         }
     }
@@ -88,6 +98,11 @@ object LlmConfig {
             PresetRegistry.OLLAMA_CLOUD -> NaConfig.llmProviderOllamaCloudKey
             PresetRegistry.OPENROUTER -> NaConfig.llmProviderOpenRouterKey
             PresetRegistry.VERCEL_AI_GATEWAY -> NaConfig.llmProviderVercelAIGatewayKey
+            PresetRegistry.ZHIPUAI -> NaConfig.llmProviderZhipuAIKey
+            PresetRegistry.MISTRAL -> NaConfig.llmProviderMistralKey
+            PresetRegistry.QWEN -> NaConfig.llmProviderQwenKey
+            PresetRegistry.MOONSHOT -> NaConfig.llmProviderMoonshotKey
+            PresetRegistry.SILICONFLOW -> NaConfig.llmProviderSiliconFlowKey
             else -> NaConfig.llmApiKey
         }
     }
@@ -105,6 +120,9 @@ object LlmConfig {
 
     @JvmStatic
     fun isLLMTranslatorAvailable(): Boolean {
+        if (NaConfig.llmApiKeys.String().isNotBlank()) {
+            return true
+        }
         val llmProvider = NaConfig.llmProviderPreset.Int()
         val keyConfig = when (llmProvider) {
             PresetRegistry.OPENAI -> NaConfig.llmProviderOpenAIKey
@@ -116,6 +134,11 @@ object LlmConfig {
             PresetRegistry.OLLAMA_CLOUD -> NaConfig.llmProviderOllamaCloudKey
             PresetRegistry.OPENROUTER -> NaConfig.llmProviderOpenRouterKey
             PresetRegistry.VERCEL_AI_GATEWAY -> NaConfig.llmProviderVercelAIGatewayKey
+            PresetRegistry.ZHIPUAI -> NaConfig.llmProviderZhipuAIKey
+            PresetRegistry.MISTRAL -> NaConfig.llmProviderMistralKey
+            PresetRegistry.QWEN -> NaConfig.llmProviderQwenKey
+            PresetRegistry.MOONSHOT -> NaConfig.llmProviderMoonshotKey
+            PresetRegistry.SILICONFLOW -> NaConfig.llmProviderSiliconFlowKey
             else -> NaConfig.llmApiKey
         }
         return keyConfig.String().isNotEmpty()
@@ -123,6 +146,7 @@ object LlmConfig {
 
     @JvmStatic
     fun llmIsDefaultProvider(): Boolean {
-        return NekoConfig.translationProvider.Int() == Translator.providerLLMTranslator
+        val provider = NekoConfig.translationProvider.Int()
+        return provider == Translator.providerLLMTranslator || provider == Translator.providerLLM
     }
 }

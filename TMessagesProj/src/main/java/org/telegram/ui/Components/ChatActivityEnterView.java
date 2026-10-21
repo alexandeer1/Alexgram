@@ -6858,7 +6858,7 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     private boolean shownAiButton;
     private void showAiButton(boolean show_) {
-        final boolean show = (show_ || richDraftActive) && parentFragment != null && !parentFragment.isSecretChat();
+        final boolean show = (show_ || richDraftActive) && parentFragment != null && !parentFragment.isSecretChat() && !NaConfig.INSTANCE.getDisableAiEditor().Bool();
 
         if (shownAiButton == show) return;
         if (show) {
@@ -6982,10 +6982,11 @@ public class ChatActivityEnterView extends FrameLayout implements
                 @Override
                 public void onFailed(boolean unsupported, @NotNull String message) {
                     status.dismiss();
-                    AlertUtil.showTransFailedDialog(parentActivity, unsupported, message, () -> {
+                    AlertUtil.showTransFailedDialog(parentActivity, unsupported, message, (newProvider) -> {
+                        int retryProvider = newProvider != 0 ? newProvider : provider;
                         status = AlertUtil.showProgress(parentActivity);
                         status.show();
-                        Translator.translateWithContext(target, origin, new ArrayList<>(), null, provider, this);
+                        Translator.translateWithContext(target, origin, new ArrayList<>(), null, retryProvider, this);
                     });
                 }
             });
@@ -7015,10 +7016,11 @@ public class ChatActivityEnterView extends FrameLayout implements
                 @Override
                 public void onFailed(boolean unsupported, @NotNull String message) {
                     status.dismiss();
-                    AlertUtil.showTransFailedDialog(parentActivity, unsupported, message, () -> {
+                    AlertUtil.showTransFailedDialog(parentActivity, unsupported, message, (newProvider) -> {
+                        int retryProvider = newProvider != 0 ? newProvider : provider;
                         status = AlertUtil.showProgress(parentActivity);
                         status.show();
-                        Translator.translate(target, origin, 0, this);
+                        Translator.translate(target, origin, retryProvider, this);
                     });
                 }
 

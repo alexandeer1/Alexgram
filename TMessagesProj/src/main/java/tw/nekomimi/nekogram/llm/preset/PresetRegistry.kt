@@ -11,6 +11,11 @@ object PresetRegistry {
     const val OLLAMA_CLOUD = LlmPresetRegistry.OLLAMA_CLOUD
     const val OPENROUTER = LlmPresetRegistry.OPENROUTER
     const val VERCEL_AI_GATEWAY = LlmPresetRegistry.VERCEL_AI_GATEWAY
+    const val ZHIPUAI = LlmPresetRegistry.ZHIPUAI
+    const val MISTRAL = LlmPresetRegistry.MISTRAL
+    const val QWEN = LlmPresetRegistry.QWEN
+    const val MOONSHOT = LlmPresetRegistry.MOONSHOT
+    const val SILICONFLOW = LlmPresetRegistry.SILICONFLOW
 
     @JvmStatic
     fun getPresetBaseUrl(preset: Int): String? = LlmPresetRegistry.getPresetBaseUrl(preset)
