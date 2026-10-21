@@ -36310,13 +36310,13 @@ public class ChatActivity extends BaseFragment implements
                 break;
             }
             case OPTION_REPLY: {
-                // [Alexgram: Allow Forwarding/Copying] - Start
-                if (selectedObject != null && selectedObject.messageOwner != null && selectedObject.messageOwner.noforwards && !NaConfig.INSTANCE.getAllowForwardingRestriction().Bool()) {
-                // [Alexgram: Allow Forwarding/Copying] - End
-                    return;
-                }
                 boolean replyInOtherChat = isFeedSearch() || (selectedObject != null && currentChat != null && (!tw.nekomimi.nekogram.helpers.ChatHelper.isEffectivelyInChat(currentChat) && !ChatObject.isMonoForum(currentChat) && !isThreadChat() || ChatObject.isChannel(currentChat) && !ChatObject.canPost(currentChat) && !currentChat.megagroup || !ChatObject.canSendMessages(currentChat)));
                 if (replyInOtherChat) {
+                    // [Alexgram: Allow Forwarding/Copying] - Start
+                    if (selectedObject != null && selectedObject.messageOwner != null && selectedObject.messageOwner.noforwards && !NaConfig.INSTANCE.getAllowForwardingRestriction().Bool()) {
+                    // [Alexgram: Allow Forwarding/Copying] - End
+                        return;
+                    }
                     MessageObject messageObject = selectedObject;
                     if (isFeedSearch()) {
                         messageObject = com.exteragram.messenger.feed.FeedMessageUtils.getForwardingMessageObject(currentAccount, true, messageObject);
