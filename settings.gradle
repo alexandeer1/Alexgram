@@ -62,7 +62,7 @@ def dummyDir = file('TMessagesProj_Modules/dummy')
 if (!dummyDir.exists()) {
     dummyDir.mkdirs()
 }
-['test-utils', 'test-data', 'test-utils-robolectric'].each { name ->
+['test-utils', 'test-data', 'test-utils-robolectric', 'lib-inspector'].each { name ->
     def projectPath = "${modulePrefix}${name}"
     include projectPath
     project(projectPath).projectDir = dummyDir
