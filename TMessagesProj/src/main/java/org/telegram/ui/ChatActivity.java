@@ -4047,11 +4047,15 @@ public class ChatActivity extends BaseFragment implements
             if (chatActivity != null && chatActivity.getDialogId() == UserObject.VERIFY) {
                 return true;
             }
-            return chatActivity == null || !(selectedView != null && selectedView.getMessageObject() != null && selectedView.getMessageObject().messageOwner != null);
-            /*return chatActivity == null || !(
-                chatActivity.getDialogId() < 0 && chatActivity.getMessagesController().isPeerNoForwards(chatActivity.getDialogId()) ||
+            // [Alexgram: Allow Forwarding/Copying] - Start
+            if (NaConfig.INSTANCE.getAllowForwardingRestriction().Bool()) {
+                return true;
+            }
+            // [Alexgram: Allow Forwarding/Copying] - End
+            return chatActivity == null || !(
+                !DialogObject.isEncryptedDialog(chatActivity.getDialogId()) && chatActivity.isPeerNoForwards() ||
                 selectedView != null && selectedView.getMessageObject() != null && (selectedView.getMessageObject().messageOwner != null && selectedView.getMessageObject().messageOwner.noforwards)
-            );*/
+            );
         }
 
         @Override
