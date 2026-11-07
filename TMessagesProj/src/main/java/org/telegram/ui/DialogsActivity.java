@@ -5908,7 +5908,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 contentView.requestLayout();
                 if (!hasFragment()) {
                     invalidateScrollY = true;
-                    fixScrollYAfterArchiveOpened = true;
+                    if (scrollYOffset != 0) {
+                        fixScrollYAfterArchiveOpened = true;
+                    }
                     if (fragmentView != null) {
                         fragmentView.invalidate();
                     }
@@ -7928,6 +7930,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     public void search(String query, boolean animated) {
         showSearch(true, false, animated);
+        if (fragmentSearchFieldWatcher != null) {
+            fragmentSearchFieldWatcher.toggleSearch(true);
+        }
         if (fragmentSearchField != null) {
             fragmentSearchField.editText.setText(query);
             fragmentSearchField.editText.setSelection(query.length());
@@ -7955,6 +7960,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         searchIsShowed = show;
         glassEngine.invalidate();
+        if (!show) {
+            updateFilterTabs(false, animated);
+        }
         if (show) {
             boolean onlyDialogsAdapter;
             if (searchFiltersWasShowed || forceNotOnlyDialogs) {
@@ -9137,7 +9145,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (!isCommunityCell) {
-            ActionBarMenuSubItem markAsUnreadItem = new ActionBarMenuSubItem(getParentActivity(), true, false);
+            ActionBarMenuSubItem markAsUnreadItem = new ActionBarMenuSubItem(getParentActivity(), !hasFolders, false);
             if (cell.getHasUnread()) {
                 markAsUnreadItem.setTextAndIcon(LocaleController.getString(R.string.MarkAsRead), R.drawable.msg_markread);
             } else {
@@ -9215,7 +9223,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (hasPinAction[0]) {
-            ActionBarMenuSubItem unpinItem = new ActionBarMenuSubItem(getParentActivity(), false, false);
+            ActionBarMenuSubItem unpinItem = new ActionBarMenuSubItem(getParentActivity(), !hasFolders && isCommunityCell, false);
             if (isDialogPinned(dialog)) {
                 unpinItem.setTextAndIcon(LocaleController.getString(R.string.UnpinMessage), R.drawable.msg_unpin);
             } else {

@@ -158,10 +158,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.browser.Browser;
-import org.telegram.messenger.pip.PipActivityController;
-import org.telegram.messenger.pip.activity.IPipActivity;
-import org.telegram.messenger.pip.activity.IPipActivityHandler;
-import org.telegram.messenger.pip.activity.IPipActivityListener;
+import org.telegram.utils.pip.PipCoordinator;
 import org.telegram.messenger.utils.FrameMetricsOverlayView;
 import org.telegram.messenger.utils.LeakDetector;
 import org.telegram.messenger.utils.WindowVisibilityManager;
@@ -226,7 +223,6 @@ import org.telegram.ui.Components.PasscodeView;
 import org.telegram.ui.Components.PasscodeViewDialog;
 import org.telegram.ui.Components.PhonebookShareAlert;
 import org.telegram.ui.Components.PipRoundVideoView;
-import org.telegram.ui.Components.PipVideoOverlay;
 import org.telegram.ui.Components.Premium.LimitReachedBottomSheet;
 import org.telegram.ui.Components.Premium.boosts.BoostPagerBottomSheet;
 import org.telegram.ui.Components.Premium.boosts.GiftInfoBottomSheet;
@@ -251,8 +247,8 @@ import org.telegram.ui.Components.UndoView;
 import org.telegram.ui.Components.inset.WindowAnimatedInsetsProvider;
 import org.telegram.ui.Components.poll.PollAttachedMediaPack;
 import org.telegram.ui.Components.spoilers.SpoilerEffect2;
-import org.telegram.ui.Components.voip.RTMPStreamPipOverlay;
 import org.telegram.ui.Components.voip.VoIPHelper;
+import org.telegram.ui.Components.voip.VoIPPiPView;
 import org.telegram.ui.Gifts.GiftSheet;
 import org.telegram.ui.Stars.ISuperRipple;
 import org.telegram.ui.Gifts.AuctionJoinSheet;
@@ -266,7 +262,6 @@ import org.telegram.ui.Stories.StoriesListPlaceProvider;
 import org.telegram.ui.Stories.StoryViewer;
 import org.telegram.ui.Stories.recorder.StoryEntry;
 import org.telegram.ui.Stories.recorder.StoryRecorder;
-import org.telegram.ui.Stories.LiveStoryPipOverlay;
 import org.telegram.ui.TON.TONIntroActivity;
 import org.telegram.ui.Wallet.GramWalletStorageAuth;
 import org.telegram.ui.Wallet.WalletActivity;
@@ -291,6 +286,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -322,8 +318,11 @@ import tw.nekomimi.nekogram.ui.TelegramSplashView;
 import tw.nekomimi.nekogram.ui.IconSplashView;
 
 public class LaunchActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate,
-        NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, IPipActivity {
+        NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
     public final static String EXTRA_FORCE_NOT_INTERNAL_APPS = "force_not_internal_apps";
+    public final static String EXTRA_VOIP_ANSWER_TOKEN = "voip_answer_token";
+    // only our own call notifications know it, so other apps can't answer calls via the exported activity
+    public final static String VOIP_ANSWER_TOKEN = UUID.randomUUID().toString();
     public final static String EXTRA_FORCE_REQUEST = "force_request";
     public final static Pattern PREFIX_T_ME_PATTERN = Pattern.compile("^(?:http(?:s|)://|)([A-z0-9-]+?)\\.t\\.me");
 
@@ -362,9 +361,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     private boolean wasMutedByAdminRaisedHand;
 
-    private boolean isInPictureInPictureMode;
-    private final PipActivityController pipActivityController = new PipActivityController(this);
-    private final IPipActivityHandler pipActivityHandler = pipActivityController.getHandler();
 
     private ThemeRevealView themeSwitchImageView;
     private ImageView themeSwitchSunView;
@@ -560,30 +556,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         frameLayout.setClipChildren(false);
         setContentView(frameLayout);
         rootAnimatedInsetsListener = new WindowAnimatedInsetsProvider(frameLayout);
-        pipActivityController.addPipListener(new IPipActivityListener() {
-            final ActivityVisibilityController activityVisibilityController = createActivityVisibilityController(false);
-
-            @Override
-            public void onCompleteEnterToPip() {
-                isInPictureInPictureMode = true;
-                activityVisibilityController.hide();
-                checkDecorViewVisibility();
-            }
-
-            @Override
-            public void onStartExitFromPip(boolean byActivityStop) {
-                activityVisibilityController.show();
-            }
-
-            @Override
-            public void onCompleteExitFromPip(boolean byActivityStop) {
-                isInPictureInPictureMode = false;
-                checkDecorViewVisibility();
-            }
-        });
-
-        ((ViewGroup) (getWindow().getDecorView())).addView(pipActivityController.getPipContentView());
-        pipActivityController.getPipContentView().bringToFront();
+        PipCoordinator.getInstance().onActivityCreate(this, createActivityVisibilityController(false));
 
         themeSwitchImageView = new ThemeRevealView(this);
         themeSwitchImageView.setVisibility(View.GONE);
@@ -2590,7 +2563,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if ((flags & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
             if (intent != null && intent.getAction() != null && !restore) {
                 if (Intent.ACTION_SEND.equals(intent.getAction())) {
-                    if (SharedConfig.directShare && intent != null && intent.getExtras() != null) {
+                    if (SharedConfig.directShare && intent != null && intent.getExtras() != null && !intent.hasCategory(Intent.CATEGORY_BROWSABLE)) {
                         dialogId = intent.getExtras().getLong("dialogId", 0);
                         String hash = null;
                         if (dialogId == 0) {
@@ -4629,10 +4602,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             }
         }
         if (isVoipAnswerIntent) {
-            if (intent != null && intent.hasExtra("group_call_invite_msg_id")) {
-                VoIPGroupNotification.answer(this, intentAccount[0], intent.getIntExtra("group_call_invite_msg_id", 0));
-            } else {
-                VoIPPreNotificationService.answer(this);
+            if (intent != null && VOIP_ANSWER_TOKEN.equals(intent.getStringExtra(EXTRA_VOIP_ANSWER_TOKEN))) {
+                if (intent.hasExtra("group_call_invite_msg_id")) {
+                    VoIPGroupNotification.answer(this, intentAccount[0], intent.getIntExtra("group_call_invite_msg_id", 0));
+                } else {
+                    VoIPPreNotificationService.answer(this);
+                }
             }
         } else if (isVoipIntent) {
             VoIPFragment.show(this, intentAccount[0]);
@@ -6795,7 +6770,32 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                     FileLog.e(e);
                                 }
                             }
-                        }), ConnectionsManager.RequestFlagFailOnServerErrors);
+                        } else if (error != null && error.text.startsWith("INVITE_HASH_EXPIRED") && getSafeLastFragment() != null) {
+                            BulletinFactory.of(getSafeLastFragment()).createSimpleBulletin(R.raw.linkbroken, LocaleController.getString(R.string.InviteExpired)).show();
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(LaunchActivity.this);
+                            builder.setTitle(LocaleController.getString(R.string.AppName));
+                            if (error.text.startsWith("FLOOD_WAIT")) {
+                                builder.setMessage(LocaleController.getString(R.string.FloodWait));
+                            } else if (error.text.startsWith("INVITE_HASH_EXPIRED")) {
+                                builder.setTitle(LocaleController.getString(R.string.ExpiredLink));
+                                builder.setMessage(LocaleController.getString(R.string.InviteExpired));
+                            } else {
+                                builder.setMessage(LocaleController.getString(R.string.JoinToGroupErrorNotExist));
+                            }
+                            builder.setPositiveButton(LocaleController.getString(R.string.OK), null);
+                            showAlertDialog(builder);
+                        }
+
+                        try {
+                            if (hideProgressDialog) {
+                                dismissLoading.run();
+                            }
+                        } catch (Exception e) {
+                            FileLog.e(e);
+                        }
+                    }
+                }), ConnectionsManager.RequestFlagFailOnServerErrors);
             } else if (state == 1) {
                 TLRPC.TL_messages_importChatInvite req = new TLRPC.TL_messages_importChatInvite();
                 req.hash = group;
@@ -8045,11 +8045,17 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        // a fold / unfold in the background may already have switched isTablet() (the application gets the new
+        // configuration first) while this activity's layouts are still the old ones: switch them before opening anything
+        invalidateTabletMode();
+        checkLayout();
         handleIntent(intent, true, false, false, null, true, true);
     }
 
     public void onNewIntent(Intent intent, Browser.Progress progress) {
         super.onNewIntent(intent);
+        invalidateTabletMode();
+        checkLayout();
         handleIntent(intent, true, false, false, progress, true, false);
     }
 
@@ -8735,7 +8741,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         super.onPause();
         isResumed = false;
         WidgetMedia.onAppPaused(true);
-        pipActivityHandler.onPause();
+        PipCoordinator.getInstance().onActivityPause(this);
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 4096);
         ApplicationLoader.mainInterfacePaused = true;
         int account = currentAccount;
@@ -8772,8 +8778,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         StoryRecorder.onPause();
 
+        // the overlay permission may have changed: the call bubble moves to the right kind of window first
+        VoIPPiPView.checkWindowType(this);
         if (VoIPFragment.getInstance() != null) {
             VoIPFragment.onPause();
+        } else if (VoIPPiPView.getInstance() != null) {
+            VoIPPiPView.getInstance().onPause();
         }
         SpoilerEffect2.pause(true);
         // if (refreshRateController != null && Build.VERSION.SDK_INT >=
@@ -8788,7 +8798,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     protected void onStart() {
         super.onStart();
         isStarted = true;
-        pipActivityHandler.onStart();
+        PipCoordinator.getInstance().onActivityStart(this);
         Browser.bindCustomTabsService(this);
         ApplicationLoader.mainInterfaceStopped = false;
         GroupCallPip.updateVisibility(this);
@@ -8802,7 +8812,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         super.onStop();
         GramWalletStorageAuth.onActivityStopped(this);
         isStarted = false;
-        pipActivityHandler.onStop();
+        PipCoordinator.getInstance().onActivityStop(this);
         if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onStop();
         }
@@ -8816,40 +8826,25 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     public boolean onPictureInPictureRequested() {
-        pipActivityHandler.onPictureInPictureRequested();
+        PipCoordinator.getInstance().onPictureInPictureRequested();
         return super.onPictureInPictureRequested();
-    }
-
-    @Override
-    public void setPictureInPictureParams(@NonNull PictureInPictureParams params) {
-        super.setPictureInPictureParams(params);
-        pipActivityHandler.setPictureInPictureParams(params);
     }
 
     @Override
     public void onPictureInPictureUiStateChanged(@NonNull PictureInPictureUiState pipState) {
         super.onPictureInPictureUiStateChanged(pipState);
-        pipActivityHandler.onPictureInPictureUiStateChanged(pipState);
+        PipCoordinator.getInstance().onPictureInPictureUiStateChanged(pipState);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, @NonNull Configuration newConfig) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
-        pipActivityHandler.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        PipCoordinator.getInstance().onPictureInPictureModeChanged(isInPictureInPictureMode);
 
         if (!isInPictureInPictureMode && !isStarted) {
-            if (RTMPStreamPipOverlay.isVisible()) {
-                RTMPStreamPipOverlay.dismiss();
-            }
-            if (LiveStoryPipOverlay.isVisible()) {
-                LiveStoryPipOverlay.dismiss();
-            }
-            if (PipVideoOverlay.isVisible()) {
-                PipVideoOverlay.dismiss();
-            }
 
-            GroupCallActivity.onLeaveClick(this, null, false, true);
+            // closing a PiP window never ends a call: it goes on with its notification
 
             if (PhotoViewer.getPipInstance() != null) {
                 PhotoViewer.getPipInstance().destroyPhotoViewer();
@@ -8942,6 +8937,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onDestroy() {
         GramWalletStorageAuth.onActivityDestroyed(this);
+        PipCoordinator.getInstance().onActivityDestroy(this);
         isActive = false;
         activeInstanceCount--;
         if (debugThemeReceiver != null) {
@@ -9048,7 +9044,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onUserLeaveHint() {
-        pipActivityHandler.onUserLeaveHint();
+        PipCoordinator.getInstance().onUserLeaveHint();
         for (Runnable callback : onUserLeaveHintListeners) {
             callback.run();
         }
@@ -9064,7 +9060,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         super.onResume();
         WidgetMedia.onAppPaused(false);
         isResumed = true;
-        pipActivityHandler.onResume();
+        PipCoordinator.getInstance().onActivityResume(this);
         if (onResumeStaticCallback != null) {
             onResumeStaticCallback.run();
             onResumeStaticCallback = null;
@@ -9180,8 +9176,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ApplicationLoader.canDrawOverlays = Settings.canDrawOverlays(this);
         }
+        VoIPPiPView.checkWindowType(this);
         if (VoIPFragment.getInstance() != null) {
             VoIPFragment.onResume();
+        } else if (VoIPPiPView.getInstance() != null) {
+            VoIPPiPView.getInstance().onResume();
         }
         invalidateTabletMode();
         SpoilerEffect2.pause(false);
@@ -9273,7 +9272,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         orientationController.update();
         AndroidUtilities.setPreferredMaxRefreshRate(getWindow());
         super.onConfigurationChanged(newConfig);
-        pipActivityHandler.onConfigurationChanged(newConfig);
+        PipCoordinator.getInstance().onConfigurationChanged(newConfig);
         AndroidUtilities.resetTabletFlag();
         invalidateTabletMode();
         checkLayout();
@@ -11495,10 +11494,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         return mainFragmentsStack.size();
     }
 
-    @Override
-    public PipActivityController getPipController() {
-        return pipActivityController;
-    }
 
 
 
