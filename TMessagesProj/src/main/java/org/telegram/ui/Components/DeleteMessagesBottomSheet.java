@@ -1493,4 +1493,15 @@ public class DeleteMessagesBottomSheet extends BottomSheetWithRecyclerListView {
 
         performDelete();
     }
+
+    @Override
+    public void onThemeColorsChanged() {
+        super.onThemeColorsChanged();
+        final int color = getThemedColor(Theme.key_windowBackgroundGray);
+        if (color != lastThemedBackgroundColor) { // setBackgroundColor allocates a color filter
+            lastThemedBackgroundColor = color;
+            setBackgroundColor(color);
+        }
+    }
+    private int lastThemedBackgroundColor;
 }
