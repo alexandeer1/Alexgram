@@ -13465,7 +13465,10 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean canSaveSelectedMessage(MessageObject messageObject) {
-        return !isPeerNoForwards() && !(messageObject.messageOwner != null && messageObject.messageOwner.noforwards) && !messageObject.isRoundOnce() && !messageObject.isVoiceOnce();
+        // [Alexgram: Allow Forwarding/Copying] - Start
+        boolean noforwards = (isPeerNoForwards() || (messageObject.messageOwner != null && messageObject.messageOwner.noforwards)) && !NaConfig.INSTANCE.getAllowForwardingRestriction().Bool();
+        return !noforwards && !messageObject.isRoundOnce() && !messageObject.isVoiceOnce();
+        // [Alexgram: Allow Forwarding/Copying] - End
     }
 
     private boolean hasSelectedNoforwardsMessage() {
