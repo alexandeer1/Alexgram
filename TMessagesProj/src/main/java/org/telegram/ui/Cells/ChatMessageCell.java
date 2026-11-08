@@ -22996,10 +22996,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                             Theme.chat_msgMediaMenuDrawable.setAlpha((int) (oldAlpha * controlsAlpha * (1.0f - checkBoxAnimationProgress)));
                         } else {
                             Theme.chat_msgMediaMenuDrawable.setAlpha((int) (oldAlpha * controlsAlpha));
-                        }*/
+                        }
                         setDrawableBounds(Theme.chat_msgMediaMenuDrawable, otherX = (int) (photoImage.getImageX() + photoImage.getImageWidth() - dp(14)), otherY = (int) (photoImage.getImageY() + dp(8.1f)));
-                        // Theme.chat_msgMediaMenuDrawable.draw(canvas);
-                        // Theme.chat_msgMediaMenuDrawable.setAlpha(oldAlpha);
+                        Theme.chat_msgMediaMenuDrawable.draw(canvas);
+                        Theme.chat_msgMediaMenuDrawable.setAlpha(oldAlpha);
                     }
                 }
 

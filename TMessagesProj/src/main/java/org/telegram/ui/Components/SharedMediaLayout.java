@@ -3732,7 +3732,6 @@ public class SharedMediaLayout extends FrameLayout implements Theme.Colorable, N
                 ThemeBind.selectorBackground(forwardNoQuoteItem, Theme.createSelectorDrawable(getThemedColor(Theme.key_actionBarActionModeDefaultSelector), 5), null, ThemeBind.of(Theme.key_actionBarActionModeDefaultSelector), resourcesProvider);
             }
         }
-        }
     }
     private boolean hasNoforwardsMessage() {
         boolean hasNoforwardsMessage = false;

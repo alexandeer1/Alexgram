@@ -15546,5 +15546,3 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 }
-
-}

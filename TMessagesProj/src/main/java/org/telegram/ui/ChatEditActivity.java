@@ -1212,7 +1212,6 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         } else {
             doneButton = simpleActionBar.createDoneButton(fake_done_button, getString(R.string.Save));
         }
-        }
 
         if (locationCell != null || /*signCell != null ||*/ historyCell != null || typeCell != null || linkedCell != null || forumsCell != null) {
             settingsSectionCell = new TextInfoPrivacyCell(context, 12, resourceProvider);
