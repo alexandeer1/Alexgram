@@ -3940,6 +3940,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         private boolean requestedPasskey = false;
         private boolean requestingPasskey = false;
         private Runnable cancelRequestingPasskey;
+        private void requestPasskey(boolean clickedButton) {
+            requestPasskey(clickedButton, false);
+        }
         private void requestPasskey(boolean clickedButton, boolean force) {
             if (activityMode != MODE_LOGIN) return;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P || !BuildVars.SUPPORTS_PASSKEYS) return;

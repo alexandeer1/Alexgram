@@ -17,6 +17,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
 import org.telegram.ui.Components.AnimatedTextView;
+import org.telegram.ui.Components.NumberTextView;
 import org.telegram.ui.Components.RadioButton;
 import org.telegram.ui.Components.EditTextBoldCursor;
 import org.telegram.ui.Components.RecyclerListView;
@@ -246,6 +247,18 @@ public final class ThemeBind {
 
     public static void textColor(AnimatedTextView view, Spec spec, Theme.ResourcesProvider resourcesProvider) {
         bindText(view, spec.key, spec.key2, spec.op, spec.value, resourcesProvider);
+    }
+
+    public static void textColor(NumberTextView view, int key) {
+        textColor(view, key, null);
+    }
+
+    public static void textColor(NumberTextView view, int key, Theme.ResourcesProvider resourcesProvider) {
+        if (view != null) {
+            final int color = resolve(key, -1, OP_NONE, 0, resourcesProvider);
+            view.setTextColor(color);
+            put(view, TEXT, key, -1, OP_NONE, 0, resourcesProvider, color, null);
+        }
     }
 
     private static void bindText(View view, int key, int key2, int op, float value, Theme.ResourcesProvider resourcesProvider) {
@@ -961,6 +974,8 @@ public final class ThemeBind {
                             ((AnimatedTextView) view).setTextColor(color);
                         }
                     }
+                } else if (view instanceof NumberTextView) {
+                    ((NumberTextView) view).setTextColor(color);
                 } else {
                     return;
                 }

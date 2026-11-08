@@ -30,6 +30,8 @@ import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 
 import android.util.TypedValue;
 import android.view.Gravity;

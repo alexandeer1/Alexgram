@@ -242,6 +242,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     @Override
     public void onResume() {
         super.onResume();
+        if (listView.adapter != null) {
+            listView.adapter.update(false);
+        }
         Bulletin.Delegate delegate = new Bulletin.Delegate() {
             @Override
             public int getBottomOffset(int tag) {
@@ -649,13 +652,6 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (listView.adapter != null) {
-            listView.adapter.update(false);
-        }
-    }
 
     private void setActionBarVisibilityFactor(float factor) {
         simpleActionBar.setTitlesAlpha(factor);

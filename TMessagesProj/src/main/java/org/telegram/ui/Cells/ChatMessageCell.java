@@ -1683,7 +1683,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private float drawTimeY;
     public StaticLayout timeLayout;
     public int timeWidth;
-    int timeTextWidth;
+    public int timeTextWidth;
     public int timeX;
     public int signWidth;
     CharSequence currentTimeString;
@@ -1790,10 +1790,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private final boolean ALPHA_PROPERTY_WORKAROUND = Build.VERSION.SDK_INT == 28;
     private float alphaInternal = 1f;
 
-    public final ChatMessageTransitionParams transitionParams = new ChatMessageTransitionParams();
-    private boolean edited;
+    public final ChatMessageTransitionParams transitionParams = new ChatMessageTransitionParams(this);
+    public boolean edited;
     private boolean ayuDeleted;
-    private boolean imageDrawn;
+    public boolean imageDrawn;
     private boolean photoImageOutOfBounds;
 
     private boolean wouldBeInPip;
@@ -15888,26 +15888,26 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             ((SpannableStringBuilder) timeString).append(" | ").append(String.valueOf(messageObject.messageOwner.id));
         }
-        currentTimeString = new SpannableStringBuilder(timeString);
+        SpannableStringBuilder timeSb = new SpannableStringBuilder(timeString);
         if (signString != null) {
             if (messageObject.messageOwner.via_business_bot_id != 0) {
-                currentTimeString.append(", ");
+                timeSb.append(", ");
             } else if (messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.imported) {
-                currentTimeString.insert(0, " ");
+                timeSb.insert(0, " ");
             } else {
                 String toInsert = edited && !NaConfig.INSTANCE.getUseEditedIcon().Bool() ? ", " : " ";
-                currentTimeString.insert(0, toInsert);
+                timeSb.insert(0, toInsert);
             }
         }
+        currentTimeString = timeSb;
         if (currentMessageObject.isStakedDice()) {
-            currentTimeString = new SpannableStringBuilder(TextUtils.concat("💎", StarsIntroActivity.formatTON(currentMessageObject.getStakedDiceAmount()), "  ", currentTimeString));
+            currentTimeString = TextUtils.concat("💎", StarsIntroActivity.formatTON(currentMessageObject.getStakedDiceAmount()), "  ", currentTimeString);
             currentTimeString = StarsIntroActivity.replaceDiamond(currentTimeString, 0.55f, null, 0, dp(-.33f), 1.05f);
         }
         final long starsPrice = currentMessageObject.getDialogId() < 0 ? getStarsPrice() : 0;
         if (starsPrice > 0) {
-            SpannableStringBuilder starsString = new SpannableStringBuilder("⭐️" + AndroidUtilities.formatWholeNumber((int) starsPrice, 0) + "  ");
-            starsString.append(currentTimeString);
-            currentTimeString = StarsIntroActivity.replaceStars(starsString, 0.8f, null, 0, dp(-.33f), 0.94f);
+            currentTimeString = TextUtils.concat("⭐️", AndroidUtilities.formatWholeNumber((int) starsPrice, 0), "  ", currentTimeString);
+            currentTimeString = StarsIntroActivity.replaceStars(currentTimeString, 0.8f, null, 0, dp(-.33f), 0.94f);
         }
         if (currentMessageObject.messageOwner != null && currentMessageObject.messageOwner.schedule_repeat_period != 0) {
             final int period = currentMessageObject.messageOwner.schedule_repeat_period;
@@ -15930,8 +15930,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 prefix = formatString(R.string.MessageScheduledRepeatSeconds, period);
             }
             if (prefix != null) {
-                currentTimeString.insert(0, ", ");
-                currentTimeString.insert(0, prefix);
+                currentTimeString = TextUtils.concat(prefix, ", ", currentTimeString);
             }
         }
         timeTextWidth = timeWidth = (int) Math.ceil(Theme.chat_timePaint.measureText(currentTimeString, 0, currentTimeString == null ? 0 : currentTimeString.length()));

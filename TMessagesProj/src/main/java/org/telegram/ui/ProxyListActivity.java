@@ -48,6 +48,7 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.ProxyRotationController;
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.utils.proxy.ProxySettings;
 import org.telegram.tgnet.ConnectionsManager;
@@ -417,7 +418,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
         });
 
         // na: action bar menu
-        ActionBarMenu menu = actionBar.createMenu();
+        SimpleActionBarMenu menu = simpleActionBar.createMenu();
         otherItem = menu.addItem(na_menu_other, R.drawable.ic_ab_other);
         otherItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
         otherItem.addSubItem(na_menu_add_input_telegram, LocaleController.getString("AddProxyTelegram", R.string.AddProxyTelegram)).setOnClickListener((v) -> presentFragment(new ProxySettingsActivity()));

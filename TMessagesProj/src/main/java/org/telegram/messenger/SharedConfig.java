@@ -346,6 +346,7 @@ public class SharedConfig {
     public static int emojiInteractionsHintCount;
     public static int dayNightThemeSwitchHintCount;
     public static int callEncryptionHintDisplayedCount;
+    public static boolean shadowsInSections;
     public static boolean debugViewMetrics;
     public static boolean photoHighQualityDefault;
     public static boolean photoLiveDefault;

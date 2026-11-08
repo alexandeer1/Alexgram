@@ -572,6 +572,7 @@ public class ChatActivity extends BaseFragment implements
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderWhite;
 
     private final ReferenceList<View> glassAttachedViews = new ReferenceList<>();
+    private final ReferenceList<BlurredBackgroundDrawable> glassAttachedDrawables = new ReferenceList<>();
     private final @Nullable DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor;
     private final int recommendedAdditionalSizeY;
 
@@ -3022,6 +3023,11 @@ public class ChatActivity extends BaseFragment implements
         glassBackgroundDrawableFactory.setLinkedViewsRef(glassAttachedViews);
         glassBackgroundDrawableFactoryFrosted.setLinkedViewsRef(glassAttachedViews);
         scrimBlur3Factory.setLinkedViewsRef(new ReferenceList<>());
+
+        navbarContentDrawableFactory.setLinkedDrawablesRef(glassAttachedDrawables);
+        glassBackgroundDrawableFactory.setLinkedDrawablesRef(glassAttachedDrawables);
+        glassBackgroundDrawableFactoryFrosted.setLinkedDrawablesRef(glassAttachedDrawables);
+        scrimBlur3Factory.setLinkedDrawablesRef(glassAttachedDrawables);
     }
 
     private NotificationCenter.ObserversGroup observersGroup;
@@ -12423,25 +12429,7 @@ public class ChatActivity extends BaseFragment implements
         Theme.setSelectorDrawableColor(background, Theme.AdaptiveRipple.calcRippleColor(color), true);
     }
 
-    /** Apply NaConfig show/hide settings for each text-style menu item. */
-    private void refreshTextStyleMenu() {
-        if (!filledEditTextItemMenu || editTextItem == null || editTextItem.getView() == null) return;
-        ActionBarMenuItem item = editTextItem.getView();
-        item.setSubItemVisibility(text_transalte,  NaConfig.INSTANCE.getShowTextTranslate().Bool());
-        item.setSubItemVisibility(text_bold,        NaConfig.INSTANCE.getShowTextBold().Bool());
-        item.setSubItemVisibility(text_italic,      NaConfig.INSTANCE.getShowTextItalic().Bool());
-        item.setSubItemVisibility(text_mono,        NaConfig.INSTANCE.getShowTextMono().Bool());
-        item.setSubItemVisibility(text_code,        NaConfig.INSTANCE.getShowTextMonoCode().Bool());
-        item.setSubItemVisibility(text_strike,      NaConfig.INSTANCE.getShowTextStrikethrough().Bool());
-        item.setSubItemVisibility(text_underline,   NaConfig.INSTANCE.getShowTextUnderline().Bool());
-        item.setSubItemVisibility(text_quote,       NaConfig.INSTANCE.getShowTextQuote().Bool() && chatMode == 0);
-        item.setSubItemVisibility(text_spoiler,     NaConfig.INSTANCE.getShowTextSpoiler().Bool());
-        item.setSubItemVisibility(text_link,        NaConfig.INSTANCE.getShowTextCreateLink().Bool());
-        item.setSubItemVisibility(text_mention,     NaConfig.INSTANCE.getShowTextCreateMention().Bool());
-        item.setSubItemVisibility(text_date,        NaConfig.INSTANCE.getShowTextCreateDate().Bool() && currentEncryptedChat == null);
-        item.setSubItemVisibility(text_regular,     NaConfig.INSTANCE.getShowTextRegular().Bool());
-    }
-    // [Alexgram: Text Style Settings] - End
+
 
     private void updatePagedownButtonsPosition() {
         updatePagedownButtonsPosition(shouldHideBottomForGesture());
@@ -14577,6 +14565,10 @@ public class ChatActivity extends BaseFragment implements
         if (chatMode == 0) {
             getMediaDataController().cleanDraft(dialog_id, threadMessageId, true);
         }
+    }
+
+    private boolean isMessagesSearchListVisible() {
+        return messagesSearchListContainer != null && messagesSearchListContainer.getTag() != null;
     }
 
     private void toggleMesagesSearchListView() {

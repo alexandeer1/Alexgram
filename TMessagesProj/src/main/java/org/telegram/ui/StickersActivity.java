@@ -282,7 +282,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
             }
         });
 
-        ActionBarMenu menu = actionBar.createMenu();
+        SimpleActionBarMenu menu = simpleActionBar.createMenu();
 
         ActionBarMenuItem otherItem = menu.addItem(menu_other, R.drawable.ic_ab_other);
 
