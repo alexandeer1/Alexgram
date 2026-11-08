@@ -12422,7 +12422,6 @@ public class ChatActivity extends BaseFragment implements
         Theme.setSelectorDrawableColor(background, color, false);
         Theme.setSelectorDrawableColor(background, Theme.AdaptiveRipple.calcRippleColor(color), true);
     }
-    }
 
     /** Apply NaConfig show/hide settings for each text-style menu item. */
     private void refreshTextStyleMenu() {

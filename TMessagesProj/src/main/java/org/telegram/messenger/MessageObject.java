@@ -4033,8 +4033,6 @@ public class MessageObject {
             updateTranslation(false);
         }
     }
-        }
-    }
 
     public void applyNewText() {
         translated = false;

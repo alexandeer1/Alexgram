@@ -6746,31 +6746,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                                                 ? ((ChatActivity) fragment).themeDelegate
                                                                 : null)));
                                     }
-                                } else {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(LaunchActivity.this);
-                                    builder.setTitle(LocaleController.getString(R.string.NagramX));
-                                    if (error.text.startsWith("FLOOD_WAIT")) {
-                                        builder.setMessage(LocaleController.getString(R.string.FloodWait));
-                                    } else if (error.text.startsWith("INVITE_HASH_EXPIRED")) {
-                                        builder.setTitle(LocaleController.getString(R.string.ExpiredLink));
-                                        builder.setMessage(LocaleController.getString(R.string.InviteExpired));
-                                    } else {
-                                        builder.setMessage(
-                                                LocaleController.getString(R.string.JoinToGroupErrorNotExist));
-                                    }
-                                    builder.setPositiveButton(LocaleController.getString(R.string.OK), null);
-                                    showAlertDialog(builder);
-                                }
-
-                                try {
-                                    if (hideProgressDialog) {
-                                        dismissLoading.run();
-                                    }
-                                } catch (Exception e) {
-                                    FileLog.e(e);
-                                }
-                            }
-                        } else if (error != null && error.text.startsWith("INVITE_HASH_EXPIRED") && getSafeLastFragment() != null) {
+                                } else if (error != null && error.text.startsWith("INVITE_HASH_EXPIRED") && getSafeLastFragment() != null) {
                             BulletinFactory.of(getSafeLastFragment()).createSimpleBulletin(R.raw.linkbroken, LocaleController.getString(R.string.InviteExpired)).show();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(LaunchActivity.this);
