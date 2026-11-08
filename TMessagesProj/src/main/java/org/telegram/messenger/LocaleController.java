@@ -1405,7 +1405,7 @@ public class LocaleController {
             }
             currentLocale = newLocale;
             currentLocaleInfo = localeInfo;
-            // checkLocalizationInternal();
+            checkLocalizationInternal();
             FileLog.d("applyLanguage: currentLocaleInfo is set");
 
             if (!TextUtils.isEmpty(currentLocaleInfo.pluralLangCode)) {
@@ -3275,7 +3275,7 @@ public class LocaleController {
 
                         currentLocale = newLocale;
                         currentLocaleInfo = localeInfo;
-                        // checkLocalizationInternal();
+                        checkLocalizationInternal();
 
                         if (!TextUtils.isEmpty(currentLocaleInfo.pluralLangCode)) {
                             currentPluralRules = allRules.get(currentLocaleInfo.pluralLangCode);

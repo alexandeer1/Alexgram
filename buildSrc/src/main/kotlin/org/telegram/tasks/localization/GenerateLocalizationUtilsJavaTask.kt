@@ -73,11 +73,51 @@ abstract class GenerateLocalizationUtilsJavaTask : DefaultTask() {
                 java.appendLine()
                 java.appendLine("        switch (tag) {")
 
+                val baseLanguages = linkedMapOf<String, String>()
                 for (tag in languageTags) {
+                    if (!tag.contains('-')) {
+                        baseLanguages[tag] = getLocalizationAssetName(tag)
+                    }
+                }
+                for (tag in languageTags) {
+                    if (tag.contains('-')) {
+                        val base = tag.substringBefore('-')
+                        if (!baseLanguages.containsKey(base)) {
+                            baseLanguages[base] = getLocalizationAssetName(tag)
+                        }
+                    }
+                }
+                if (baseLanguages.containsKey("in") && !baseLanguages.containsKey("id")) {
+                    baseLanguages["id"] = baseLanguages["in"]!!
+                } else if (baseLanguages.containsKey("id") && !baseLanguages.containsKey("in")) {
+                    baseLanguages["in"] = baseLanguages["id"]!!
+                }
+                if (baseLanguages.containsKey("iw") && !baseLanguages.containsKey("he")) {
+                    baseLanguages["he"] = baseLanguages["iw"]!!
+                } else if (baseLanguages.containsKey("he") && !baseLanguages.containsKey("iw")) {
+                    baseLanguages["iw"] = baseLanguages["he"]!!
+                }
+
+                val allTags = linkedMapOf<String, String>()
+                for (tag in languageTags) {
+                    allTags[tag] = getLocalizationAssetName(tag)
+                }
+                for ((base, asset) in baseLanguages) {
+                    if (!allTags.containsKey(base)) {
+                        allTags[base] = asset
+                    }
+                }
+                if (allTags.containsKey("in-ID") && !allTags.containsKey("id-ID")) {
+                    allTags["id-ID"] = allTags["in-ID"]!!
+                } else if (allTags.containsKey("id-ID") && !allTags.containsKey("in-ID")) {
+                    allTags["in-ID"] = allTags["id-ID"]!!
+                }
+
+                for ((tag, asset) in allTags) {
                     java.append("            case \"")
                     java.append(escapeJavaString(tag))
                     java.append("\": return \"")
-                    java.append(getLocalizationAssetName(tag))
+                    java.append(asset)
                     java.appendLine("\";")
                 }
 
@@ -87,14 +127,12 @@ abstract class GenerateLocalizationUtilsJavaTask : DefaultTask() {
                 java.appendLine()
                 java.appendLine("        switch (language) {")
 
-                for (tag in languageTags) {
-                    if (!tag.contains('-')) {
-                        java.append("            case \"")
-                        java.append(escapeJavaString(tag))
-                        java.append("\": return \"")
-                        java.append(getLocalizationAssetName(tag))
-                        java.appendLine("\";")
-                    }
+                for ((lang, asset) in baseLanguages) {
+                    java.append("            case \"")
+                    java.append(escapeJavaString(lang))
+                    java.append("\": return \"")
+                    java.append(asset)
+                    java.appendLine("\";")
                 }
 
                 java.appendLine("            default: return null;")
