@@ -9290,12 +9290,15 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
         backButtonFilterColor = applyColorFilter(backButtonView, Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), backButtonFilterColor, PorterDuff.Mode.SRC_ATOP);
         backButtonSelectorColor = applySelectorBackground(backButtonView, Theme.getColor(Theme.key_listSelector), backButtonSelectorColor, Theme.RIPPLE_MASK_CIRCLE_20DP);
 
-        final int proxyColor = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
-        if (proxyColor != proxyDrawableColor || proxyDrawable.getColorFilter() == null) {
-            proxyDrawable.setColorFilter(new PorterDuffColorFilter(proxyColor, PorterDuff.Mode.SRC_IN));
-            proxyDrawableColor = proxyColor;
+        // [Alexgram] proxy button view creation is disabled in createView,
+        if (proxyDrawable != null && proxyButtonView != null) {
+            final int proxyColor = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
+            if (proxyColor != proxyDrawableColor || proxyDrawable.getColorFilter() == null) {
+                proxyDrawable.setColorFilter(new PorterDuffColorFilter(proxyColor, PorterDuff.Mode.SRC_IN));
+                proxyDrawableColor = proxyColor;
+            }
+            proxyButtonSelectorColor = applySelectorBackground(proxyButtonView, Theme.getColor(Theme.key_listSelector), proxyButtonSelectorColor, Theme.RIPPLE_MASK_CIRCLE_20DP);
         }
-        proxyButtonSelectorColor = applySelectorBackground(proxyButtonView, Theme.getColor(Theme.key_listSelector), proxyButtonSelectorColor, Theme.RIPPLE_MASK_CIRCLE_20DP);
 
         if (moreButtonView != null) {
             moreButtonView.setIconColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
