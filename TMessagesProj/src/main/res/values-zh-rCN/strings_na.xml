@@ -325,4 +325,7 @@
     <string name="DeepLFormalityMore">更正式</string>
     <string name="DeepLFormalityLess">较不正式</string>
     <string name="LLMSettings">大模型设置</string>
+    <string name="SegHide">隐藏</string>
+    <string name="SegText">文本</string>
+    <string name="SegIcon">图标</string>
 </resources>

@@ -108,11 +108,13 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
+import xyz.nextalone.nagram.helper.MessageMenuCompact;
 
 // [Alexgram: Advanced Tools] - Start
 import xyz.nextalone.nagram.ui.VoiceChangerSelectAlert;
@@ -501,47 +503,47 @@ public class ChatActivity extends BaseFragment implements
     private final static int nkheaderbtn_hide_title = 2029;
 
     // shared with actionbar
-    private final static int nkbtn_translate = 2008;
-    private final static int nkbtn_hide = 2009;
-    private final static int nkbtn_savemessage = 2010;
-    private final static int nkbtn_forward_noquote = 2011;
+    public final static int nkbtn_translate = 2008;
+    public final static int nkbtn_hide = 2009;
+    public final static int nkbtn_savemessage = 2010;
+    public final static int nkbtn_forward_noquote = 2011;
     // [Alexgram: Special Forward] - Start
-    private final static int nkbtn_special_forward = 2060;
+    public final static int nkbtn_special_forward = 2060;
     // [Alexgram: Special Forward] - End
-    private final static int nkbtn_sharemessage = 2030;
+    public final static int nkbtn_sharemessage = 2030;
     // [Alexgram: Templates Message Share Action] - Start
-    private final static int nkbtn_save_to_templates = 2130;
+    public final static int nkbtn_save_to_templates = 2130;
     // [Alexgram: Templates Message Share Action] - End
 
     // chat click menu buttons
-    private final static int nkbtn_detail = 2012;
-    private final static int nkbtn_deldlcache = 2013;
-    private final static int nkbtn_view_history = 2014;
-    private final static int nkbtn_repeat = 2015;
-    private final static int nkbtn_stickerdl = 2016;
+    public final static int nkbtn_detail = 2012;
+    public final static int nkbtn_deldlcache = 2013;
+    public final static int nkbtn_view_history = 2014;
+    public final static int nkbtn_repeat = 2015;
+    public final static int nkbtn_stickerdl = 2016;
     private final static int nkbtn_unpin = 2017;
     private final static int nkbtn_view_in_chat = 2018;
-    private final static int nkbtn_editAdmin = 2019;
-    private final static int nkbtn_editPermission = 2020;
-    private final static int nkbtn_copy_link_in_pm = 2025;
-    private final static int nkbtn_copy_fref = 2032;
-    private final static int nkbtn_repeatascopy = 2028;
-    private final static int nkbtn_setReminder = 2029;
-    private final static int nkbtn_reply_private = 2033;
-    private final static int nkbtn_translate_llm = 2034;
+    public final static int nkbtn_editAdmin = 2019;
+    public final static int nkbtn_editPermission = 2020;
+    public final static int nkbtn_copy_link_in_pm = 2025;
+    public final static int nkbtn_copy_fref = 2032;
+    public final static int nkbtn_repeatascopy = 2028;
+    public final static int nkbtn_setReminder = 2029;
+    public final static int nkbtn_reply_private = 2033;
+    public final static int nkbtn_translate_llm = 2034;
     private final static int nkbtn_forward_nocaption = 2035;
     private final static int nkbtn_translateVoice = 2037;
     private final static int nkbtn_transcriptionRetry = 2038;
-    private final static int nkbtn_bookmark = 2039;
+    public final static int nkbtn_bookmark = 2039;
     private final static int nkbtn_bookmarks_manager = 2040;
     private final static int nkbtn_report = 2041;
     private final static int nkbtn_clearDeleted = 2100;
     private final static int nkbtn_viewDeleted = 2101;
-    private final static int nkbtn_ai_chat = 2042;
+    public final static int nkbtn_ai_chat = 2042;
     // [Alexgram: Customizable Message Menu] - Start
-    private final static int nkbtn_invert = 2120;
-    private final static int nkbtn_custom_reply = 2121;
-    private final static int nkbtn_go_to_message = 2140;
+    public final static int nkbtn_invert = 2120;
+    public final static int nkbtn_custom_reply = 2121;
+    public final static int nkbtn_go_to_message = 2140;
     // [Alexgram: Customizable Message Menu] - End
 
     public int shareAlertDebugMode = DEBUG_SHARE_ALERT_MODE_NORMAL;
@@ -1499,9 +1501,9 @@ public class ChatActivity extends BaseFragment implements
     public final static int OPTION_WELCOME_REVERT = 116;
     public final static int OPTION_SEND_MONEY = 117;
 
-    private final static int OPTION_COPY_PHOTO = 150;
-    private final static int OPTION_COPY_PHOTO_AS_STICKER = 151;
-    private final static int OPTION_COPY_FRAME = 152;
+    public final static int OPTION_COPY_PHOTO = 150;
+    public final static int OPTION_COPY_PHOTO_AS_STICKER = 151;
+    public final static int OPTION_COPY_FRAME = 152;
     public final static int OPTION_CHANGE_SENDER_NAME = 160;
     public final static int OPTION_LOCAL_EDITOR_PLUS = 170;
 
@@ -34703,65 +34705,116 @@ public class ChatActivity extends BaseFragment implements
                         popupLayout.addView(new ActionBarPopupWindow.GapView(contentView.getContext(), themeDelegate), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
                     }
                 }
-                // [Alexgram: Customizable Message Menu] - Start
-                // Filter context menu options (Hide, Text, Icon)
-                ArrayList<CharSequence> textItems = new ArrayList<>();
-                ArrayList<Integer> textIcons = new ArrayList<>();
-                ArrayList<Integer> textOptions = new ArrayList<>();
-
-                ArrayList<CharSequence> gridItems = new ArrayList<>();
-                ArrayList<Integer> gridIcons = new ArrayList<>();
-                ArrayList<Integer> gridOptions = new ArrayList<>();
-                HashSet<Integer> seenGridOptions = new HashSet<>();
-
+                // === Strip hidden options before building popup (Nagram) ===
+                for (int a = items.size() - 1; a >= 0; a--) {
+                    if (MessageMenuCompact.isHidden(options.get(a))) {
+                        items.remove(a);
+                        options.remove(a);
+                        icons.remove(a);
+                    }
+                }
+                // === Compact icon bar pre-pass (Nagram) ===
+                final HashSet<Integer> compactIndices = new HashSet<>();
                 for (int a = 0, N = items.size(); a < N; a++) {
-                    CharSequence item = items.get(a);
-                    int icon = icons.get(a);
-                    int option = options.get(a);
+                    if (MessageMenuCompact.isCompact(options.get(a))) {
+                        compactIndices.add(a);
+                    }
+                }
+                GridLayout compactIconBar = null;
+                if (!compactIndices.isEmpty()) {
+                    int n = compactIndices.size();
+                    int cols = MessageMenuCompact.pickCols(n);
+                    GridLayout grid = new GridLayout(getParentActivity());
+                    grid.setColumnCount(cols);
+                    grid.setUseDefaultMargins(false);
+                    grid.setMinimumWidth(AndroidUtilities.dp(200));
+                    int cellSize = AndroidUtilities.dp(44);
+                    int iconPad = AndroidUtilities.dp(10);
+                    for (int a = 0, N = items.size(); a < N; a++) {
+                        if (!compactIndices.contains(a)) continue;
+                        ImageView iv = new ImageView(getParentActivity());
+                        iv.setImageResource(icons.get(a));
+                        int iconColor = options.get(a) == OPTION_DELETE ? getThemedColor(Theme.key_text_RedRegular) : getThemedColor(Theme.key_actionBarDefaultSubmenuItemIcon);
+                        iv.setColorFilter(new PorterDuffColorFilter(iconColor, PorterDuff.Mode.MULTIPLY));
+                        iv.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_dialogButtonSelector), Theme.RIPPLE_MASK_CIRCLE_AUTO));
+                        iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                        iv.setPadding(iconPad, iconPad, iconPad, iconPad);
+                        iv.setContentDescription(items.get(a));
+                        final int idx = a;
+                        final int opt = options.get(a);
+                        iv.setOnClickListener(v1 -> {
+                            if (selectedObject == null || idx >= options.size()) return;
+                            processSelectedOption(options.get(idx));
+                        });
+                        iv.setOnLongClickListener(v2 -> {
+                            if (selectedObject == null || idx >= options.size()) return false;
+                            if (opt == OPTION_REPLY && this.lastMessageMenuStatus.allowReplyPm) {
+                                var replyPopupWrapper = new ReplyPopupWrapper(this, popupLayout.getSwipeBack(), this::processSelectedOption, getResourceProvider());
+                                int swipeBackIndex = popupLayout.addViewToSwipeBack(replyPopupWrapper.windowLayout);
+                                popupLayout.getSwipeBack().openForeground(swipeBackIndex);
+                                return true;
+                            }
+                            if (opt == OPTION_COPY || opt == OPTION_COPY_PHOTO) {
+                                var isPrivate = !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && currentUser != null && selectedObject.getDialogId() != mergeDialogId;
+                                var copyPopupWrapper = new CopyPopupWrapper(this, selectedObject, opt, isPrivate, popupLayout.getSwipeBack(), this::processSelectedOption, getResourceProvider());
+                                int swipeBackIndex = popupLayout.addViewToSwipeBack(copyPopupWrapper.windowLayout);
+                                popupLayout.getSwipeBack().openForeground(swipeBackIndex);
+                                return true;
+                            }
+                            if (opt == OPTION_FORWARD) {
+                                var forwardPopupWrapper = new ForwardPopupWrapper(this, selectedObject, selectedObjectGroup, popupLayout.getSwipeBack(), this::processSelectedOption, getResourceProvider());
+                                int swipeBackIndex = popupLayout.addViewToSwipeBack(forwardPopupWrapper.windowLayout);
+                                popupLayout.getSwipeBack().openForeground(swipeBackIndex);
+                                return true;
+                            }
+                            int r = processSelectedOptionLongClick(v2, options.get(idx));
+                            if (r == 2) {
+                                if (scrimPopupWindow != null) {
+                                    scrimPopupWindow.dismiss();
+                                }
+                            }
+                            return r > 0;
+                        });
+                        GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
+                        lp.width = 0;
+                        lp.height = cellSize;
+                        lp.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, GridLayout.FILL, 1f);
+                        lp.rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
+                        grid.addView(iv, lp);
+                    }
+                    compactIconBar = grid;
+                }
+                int firstVisibleIndex = -1, lastVisibleIndex = -1;
+                for (int a = 0, N = items.size(); a < N; a++) {
+                    if (compactIndices.contains(a)) continue;
+                    if (firstVisibleIndex == -1) firstVisibleIndex = a;
+                    lastVisibleIndex = a;
+                }
+                final boolean compactBarTop = false;
+                final boolean hasTextItems = firstVisibleIndex != -1;
+                if (compactIconBar != null && compactBarTop) {
+                    popupLayout.addView(compactIconBar, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+                    if (hasTextItems) {
+                        popupLayout.addView(new ActionBarPopupWindow.GapView(contentView.getContext(), themeDelegate), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
+                    }
+                }
+
+                scrimPopupWindowItems = new ActionBarMenuSubItem[items.size()];
+                scrimPopupRedItem = null;
+                for (int a = 0, N = items.size(); a < N; a++) {
+                    final Integer option = options.get(a);
                     if (option == OPTION_DELETE && showWelcomeMessageRevertOption(selectedObject)) {
                         continue;
                     }
 
-                    String key = getConfigKeyForOption(option);
-                    if (key != null) {
-                        boolean defVal = getDefaultValueForOption(option);
-                        int mode = tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity.getMessageMenuMode(key, defVal);
-                        if (mode == 0) {
-                            // Hide
-                            continue;
-                        } else if (mode == 2) {
-                            // Icon
-                            if (!seenGridOptions.contains(option)) {
-                                seenGridOptions.add(option);
-                                gridItems.add(item);
-                                gridIcons.add(icon);
-                                gridOptions.add(option);
-                            }
-                            continue;
-                        }
+                    if (compactIndices.contains(a)) {
+                        scrimPopupWindowItems[a] = null;
+                        continue;
                     }
-                    // Text
-                    textItems.add(item);
-                    textIcons.add(icon);
-                    textOptions.add(option);
-                }
 
-                items.clear();
-                items.addAll(textItems);
-                icons.clear();
-                icons.addAll(textIcons);
-                options.clear();
-                options.addAll(textOptions);
-                // [Alexgram: Customizable Message Menu] - End
-
-                scrimPopupWindowItems = new ActionBarMenuSubItem[items.size()];
-                scrimPopupRedItem = null;
-                final boolean hasBottomIcons = !gridOptions.isEmpty();
-                for (int a = 0, N = items.size(); a < N; a++) {
-                    ActionBarMenuSubItem cell = new ActionBarMenuSubItem(getParentActivity(), a == 0, a == N - 1 && !hasBottomIcons, themeDelegate);
+                    ActionBarMenuSubItem cell = new ActionBarMenuSubItem(getParentActivity(), a == firstVisibleIndex, a == lastVisibleIndex && compactIconBar == null, themeDelegate);
                     cell.setMinimumWidth(AndroidUtilities.dp(200));
                     cell.setTextAndIcon(items.get(a), icons.get(a));
-                    int option = options.get(a);
 
 
                     if (option == OPTION_WELCOME_REVERT) {
@@ -35057,7 +35110,7 @@ public class ChatActivity extends BaseFragment implements
                             return false;
                         }
 
-                        int r = processSelectedOptionLongClick(cell, options.get(i));
+                        int r = processSelectedOptionLongClick(v1, options.get(i));
 
                         if (r == 2) {
                             if (scrimPopupWindow != null) {
@@ -35129,53 +35182,11 @@ public class ChatActivity extends BaseFragment implements
                     layout.addView(infoText, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.FILL));
                     popupLayout.addView(layout);
                 }
-                if (!gridOptions.isEmpty()) {
-                    if (items.size() > 0) {
+                if (compactIconBar != null && !compactBarTop) {
+                    if (hasTextItems) {
                         popupLayout.addView(new ActionBarPopupWindow.GapView(contentView.getContext(), themeDelegate), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
                     }
-                    android.widget.LinearLayout currentRow = null;
-                    for (int g = 0; g < gridOptions.size(); g++) {
-                        if (g % 4 == 0) {
-                            currentRow = new android.widget.LinearLayout(getParentActivity());
-                            currentRow.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-                            currentRow.setWeightSum(4.0f);
-                            popupLayout.addView(currentRow, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 4));
-                        }
-                        final int opt = gridOptions.get(g);
-                        int icRes = gridIcons.get(g);
-                        ImageView imageView = new ImageView(getParentActivity());
-                        imageView.setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
-                        imageView.setScaleType(ImageView.ScaleType.CENTER);
-                        try {
-                            imageView.setImageDrawable(ContextCompat.getDrawable(getParentActivity(), icRes).mutate());
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                        imageView.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), Theme.RIPPLE_MASK_CIRCLE_20DP));
-                        int iconColor = opt == OPTION_DELETE ? getThemedColor(Theme.key_text_RedRegular) : getThemedColor(Theme.key_actionBarDefaultSubmenuItemIcon);
-                        imageView.setColorFilter(new PorterDuffColorFilter(iconColor, PorterDuff.Mode.MULTIPLY));
-                        ScaleStateListAnimator.apply(imageView, .1f, 1.5f);
-
-                        imageView.setOnClickListener(v1 -> {
-                            processSelectedOption(opt);
-                        });
-                        imageView.setOnLongClickListener(v1 -> {
-                            int r = processSelectedOptionLongClick(null, opt);
-                            if (r == 2) {
-                                if (scrimPopupWindow != null) {
-                                    scrimPopupWindow.dismiss();
-                                }
-                            }
-                            return r > 0;
-                        });
-
-                        android.widget.FrameLayout cell = new android.widget.FrameLayout(getParentActivity());
-                        cell.addView(imageView, LayoutHelper.createFrame(44, 44, Gravity.CENTER));
-
-                        if (currentRow != null) {
-                            currentRow.addView(cell, new android.widget.LinearLayout.LayoutParams(0, LayoutHelper.WRAP_CONTENT, 1.0f));
-                        }
-                    }
+                    popupLayout.addView(compactIconBar, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
                 }
 
                 if (selectedObject != null && selectedObject.isEphemeral() && chatMode != MODE_WELCOME_MESSAGES && !showWelcomeMessageRevertOption(selectedObject)) {
@@ -35565,10 +35576,15 @@ public class ChatActivity extends BaseFragment implements
                     finalReactionsLayout.startEnterAnimation(true);
                 }
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (scrimPopupWindowItems != null && scrimPopupWindowItems.length > 0 && scrimPopupWindowItems[0] != null) {
-                        scrimPopupWindowItems[0].requestFocus();
-                        scrimPopupWindowItems[0].performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
-                        scrimPopupWindowItems[0].sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+                    if (scrimPopupWindowItems != null) {
+                        for (int a = 0; a < scrimPopupWindowItems.length; a++) {
+                            if (scrimPopupWindowItems[a] != null) {
+                                scrimPopupWindowItems[a].requestFocus();
+                                scrimPopupWindowItems[a].performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
+                                scrimPopupWindowItems[a].sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+                                break;
+                            }
+                        }
                     }
                 }, 420);
             };
@@ -37912,7 +37928,7 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    private int processSelectedOptionLongClick(ActionBarMenuSubItem cell, int option) {
+    private int processSelectedOptionLongClick(View cell, int option) {
         switch (option) {
             case nkbtn_translateVoice:
             case nkbtn_translate_llm:
@@ -48195,128 +48211,7 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    // [Alexgram: Customizable Message Menu] - Start
-    private String getConfigKeyForOption(int optionId) {
-        switch (optionId) {
-            case OPTION_REPLY:
-                return "MessageMenuReply";
-            case nkbtn_reply_private:
-                return "ReplyInPrivate";
-            case OPTION_COPY:
-                return "MessageMenuCopy";
-            case nkbtn_copy_link_in_pm:
-            case OPTION_COPY_LINK:
-                return "CopyLink";
-            case OPTION_FORWARD:
-                return "MessageMenuForward";
-            case nkbtn_forward_noquote:
-                return "NoQuoteForward";
-            case OPTION_DELETE:
-                return "MessageMenuDelete";
-            case OPTION_EDIT:
-                return "MessageMenuEdit";
-            case OPTION_PIN:
-            case OPTION_UNPIN:
-                return "MessageMenuPin";
-            case OPTION_SAVE_TO_GALLERY:
-            case OPTION_SAVE_TO_GALLERY2:
-            case OPTION_ADD_TO_GIFS:
-            case OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC:
-            case AyuConstants.OPTION_TTL_SAVE:
-                return "MessageMenuSaveToGallery";
-            case OPTION_SHARE:
-                return "MessageMenuShare";
-            case OPTION_COPY_FRAME:
-                return "MessageMenuCopyFrame";
-            case OPTION_COPY_PHOTO:
-                return "CopyPhoto";
-            case OPTION_COPY_PHOTO_AS_STICKER:
-                return "CopyPhotoAsSticker";
-            case OPTION_ADD_TO_STICKERS_OR_MASKS:
-                return "AddToStickers";
-            case OPTION_ADD_STICKER_TO_FAVORITES:
-                return "AddToFavorites";
-            case nkbtn_setReminder:
-                return "SetReminder";
-            case nkbtn_savemessage:
-                return "showAddToSavedMessages";
-            case nkbtn_bookmark:
-                return "ShowAddToBookmark";
-            case nkbtn_repeat:
-                return "showRepeat";
-            case nkbtn_repeatascopy:
-                return "RepeatAsCopy";
-            case nkbtn_invert:
-                return "showInvert";
-            case nkbtn_custom_reply:
-                return "showCustomReply";
-            case nkbtn_deldlcache:
-                return "showDeleteDownloadedFile";
-            case nkbtn_view_history:
-            case AyuConstants.OPTION_HISTORY:
-                return "showViewHistory";
-            case AyuConstants.OPTION_READ_MESSAGE:
-                return "GhostReadMessage";
-            case AyuConstants.OPTION_TTL:
-                return "BurnTtlMessage";
-            case nkbtn_translate:
-            case OPTION_TRANSLATE:
-                return "showTranslate";
-            case nkbtn_translate_llm:
-                return "TranslateMessageLLM";
-            case nkbtn_sharemessage:
-                return "showShareMessages";
-            // [Alexgram: Templates Message Share Action] - Start
-            case nkbtn_save_to_templates:
-                return "showSaveToTemplates";
-            // [Alexgram: Templates Message Share Action] - End
-            case nkbtn_hide:
-                return "showMessageHide";
-            case nkbtn_report:
-            case OPTION_REPORT_CHAT:
-                return "showReport";
-            case nkbtn_editAdmin:
-                return "showAdminActions";
-            case nkbtn_editPermission:
-                return "showChangePermissions";
-            case nkbtn_detail:
-                return "showMessageDetails";
 
-            case nkbtn_special_forward:
-                return "SpecialForward";
-            case nkbtn_copy_fref:
-                return "showCopyFileRef";
-            default:
-                return null;
-        }
-    }
-
-    private boolean getDefaultValueForOption(int optionId) {
-        switch (optionId) {
-            case nkbtn_forward_noquote:
-            case nkbtn_repeatascopy:
-            case nkbtn_invert:
-            case nkbtn_custom_reply:
-            case OPTION_COPY_FRAME:
-            case OPTION_COPY_PHOTO:
-            case OPTION_COPY_PHOTO_AS_STICKER:
-            case OPTION_ADD_TO_STICKERS_OR_MASKS:
-            case OPTION_ADD_STICKER_TO_FAVORITES:
-            case nkbtn_setReminder:
-            case nkbtn_deldlcache:
-            case nkbtn_hide:
-            case nkbtn_report:
-            case nkbtn_sharemessage:
-            case nkbtn_editAdmin:
-            case nkbtn_editPermission:
-            case nkbtn_special_forward:
-            case nkbtn_copy_fref:
-                return false;
-            default:
-                return true;
-        }
-    }
-    // [Alexgram: Customizable Message Menu] - End
 
     private void nkbtn_onclick(int id) {
         // from "items"

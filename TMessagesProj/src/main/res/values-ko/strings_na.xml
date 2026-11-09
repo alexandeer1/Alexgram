@@ -307,4 +307,7 @@
     <string name="DeepLFormalityMore">더 격식있게</string>
     <string name="DeepLFormalityLess">덜 격식있게</string>
     <string name="LLMSettings">LLM 설정</string>
+    <string name="SegHide">숨기기</string>
+    <string name="SegText">텍스트</string>
+    <string name="SegIcon">아이콘</string>
 </resources>

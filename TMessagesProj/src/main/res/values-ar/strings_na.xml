@@ -325,4 +325,7 @@
     <string name="DeepLFormalityMore">أكثر رسمية</string>
     <string name="DeepLFormalityLess">أقل رسمية</string>
     <string name="LLMSettings">إعدادات LLM</string>
+    <string name="SegHide">إخفاء</string>
+    <string name="SegText">نص</string>
+    <string name="SegIcon">أيقونة</string>
 </resources>

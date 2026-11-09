@@ -307,4 +307,7 @@
     <string name="DeepLFormalityMore">Lebih formal</string>
     <string name="DeepLFormalityLess">Kurang formal</string>
     <string name="LLMSettings">Pengaturan LLM</string>
+    <string name="SegHide">Sembunyikan</string>
+    <string name="SegText">Teks</string>
+    <string name="SegIcon">Ikon</string>
 </resources>

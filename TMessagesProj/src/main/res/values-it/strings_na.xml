@@ -307,4 +307,7 @@
     <string name="DeepLFormalityMore">Più formale</string>
     <string name="DeepLFormalityLess">Meno formale</string>
     <string name="LLMSettings">Impostazioni LLM</string>
+    <string name="SegHide">Nascondi</string>
+    <string name="SegText">Testo</string>
+    <string name="SegIcon">Icona</string>
 </resources>

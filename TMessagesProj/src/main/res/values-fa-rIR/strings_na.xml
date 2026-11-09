@@ -307,4 +307,7 @@
     <string name="DeepLFormalityMore">رسمی‌تر</string>
     <string name="DeepLFormalityLess">غیررسمی‌تر</string>
     <string name="LLMSettings">تنظیمات LLM</string>
+    <string name="SegHide">پنهان کردن</string>
+    <string name="SegText">متن</string>
+    <string name="SegIcon">آیکون</string>
 </resources>

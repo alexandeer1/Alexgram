@@ -307,4 +307,7 @@
     <string name="DeepLFormalityMore">更正式</string>
     <string name="DeepLFormalityLess">較不正式</string>
     <string name="LLMSettings">大語言模型設定</string>
+    <string name="SegHide">隱藏</string>
+    <string name="SegText">文字</string>
+    <string name="SegIcon">圖示</string>
 </resources>

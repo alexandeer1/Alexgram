@@ -307,4 +307,7 @@
     <string name="DeepLFormalityMore">Daha resmi</string>
     <string name="DeepLFormalityLess">Daha az resmi</string>
     <string name="LLMSettings">LLM Ayarları</string>
+    <string name="SegHide">Gizle</string>
+    <string name="SegText">Metin</string>
+    <string name="SegIcon">Simge</string>
 </resources>
