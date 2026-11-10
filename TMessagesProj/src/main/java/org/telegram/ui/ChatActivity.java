@@ -30133,7 +30133,7 @@ public class ChatActivity extends BaseFragment implements
         menu.add(android.R.id.paste, android.R.id.paste, order.getAndIncrement(), android.R.string.paste);
         menu.add(android.R.id.selectAll, android.R.id.selectAll, order.getAndIncrement(), android.R.string.selectAll);
         menu.add(android.R.id.autofill, android.R.id.autofill, order.getAndIncrement(), android.R.string.autofill);
-        menu.add(android.R.id.shareText, android.R.id.shareText, order.getAndIncrement(), R.string.ShareFile);
+        menu.add(android.R.id.shareText, android.R.id.shareText, order.getAndIncrement(), LocaleController.getString(R.string.ShareFile));
     }
 
     private void updateScheduledInterface(boolean animated) {
