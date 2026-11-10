@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">Mevcut UnifiedPush uç noktası: %1$s</string>
     <string name="PlayOnce">Bir kez oynat</string>
     <string name="StorageSettings">Depolama</string>
+    <string name="MainTabs">Ana Sekmeler</string>
+    <string name="MainTabsVisibility">Görünürlük</string>
+    <string name="MainTabsAlways">Her zaman</string>
+    <string name="MainTabsHideOnScroll">Kaydırırken gizle</string>
+    <string name="HideMainTabsTitles">Başlıkları gizle</string>
+    <string name="HideContactsTab">«Kişiler» sekmesini gizle</string>
+    <string name="Hidden">Gizli</string>
     <string name="MainTabsSettingsHeader">Ana Sekmeler</string>
     <string name="MainTabsHideTitles">Başlıkları Gizle</string>
     <string name="DoubleTapOnChatsToFilterUnread">Okunmayanları Filtrelemek İçin Sohbetlere Çift Dokunun</string>

@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">The current UnifiedPush endpoint is: %1$s</string>
     <string name="PlayOnce">Play once</string>
     <string name="StorageSettings">Storage</string>
+    <string name="MainTabs">تب‌های اصلی</string>
+    <string name="MainTabsVisibility">نحوه نمایش</string>
+    <string name="MainTabsAlways">همیشه</string>
+    <string name="MainTabsHideOnScroll">پنهان کردن هنگام اسکرول</string>
+    <string name="HideMainTabsTitles">پنهان کردن عنوان‌ها</string>
+    <string name="HideContactsTab">پنهان کردن تب «مخاطبین»</string>
+    <string name="Hidden">پنهان</string>
     <string name="MainTabsSettingsHeader">Main Tabs</string>
     <string name="MainTabsHideTitles">Hide Titles</string>
     <string name="DoubleTapOnChatsToFilterUnread">دو بار ضربه روی گفتگوها برای فیلتر خوانده‌نشده‌ها</string>

@@ -21,11 +21,14 @@ import tw.nekomimi.nekogram.NekoConfig;
 import tw.nekomimi.nekogram.config.CellGroup;
 import tw.nekomimi.nekogram.config.cell.AbstractConfigCell;
 import tw.nekomimi.nekogram.config.cell.ConfigCellCustom;
+import tw.nekomimi.nekogram.config.cell.ConfigCellDivider;
 import tw.nekomimi.nekogram.config.cell.ConfigCellHeader;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheck;
 import tw.nekomimi.nekogram.config.cell.ConfigCellTextCheckIcon;
 import tw.nekomimi.nekogram.config.cell.ConfigCellSelectBox;
+import tw.nekomimi.nekogram.helpers.MainTabs;
 import tw.nekomimi.nekogram.ui.cells.AvatarCornersPreviewCell;
+import tw.nekomimi.nekogram.ui.cells.MainTabsPreviewCell;
 import xyz.nextalone.nagram.NaConfig;
 
 @SuppressLint("RtlHardcoded")
@@ -34,6 +37,7 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
 
     private ListAdapter listAdapter;
     private AvatarCornersPreviewCell avatarCornersPreviewCell;
+    private MainTabsPreviewCell mainTabsPreviewCell;
 
     @Override
     protected RecyclerListView.SelectionAdapter getListAdapter() {
@@ -62,6 +66,40 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
             )
     );
     private final AbstractConfigCell avatarCornersInfoRow = cellGroup.appendCell(new ConfigCellCustom("SingleCornerRadiusInfo", CellGroup.ITEM_TYPE_TEXT, false));
+
+    // [Alexgram: Main Tabs Settings] - Start
+    private final AbstractConfigCell headerMainTabs = cellGroup.appendCell(new ConfigCellHeader(LocaleController.getString("MainTabs", R.string.MainTabs)));
+    private final AbstractConfigCell mainTabsPreviewRow = cellGroup.appendCell(new ConfigCellCustom("MainTabsPreview", ConfigCellCustom.CUSTOM_ITEM_MainTabsPreview, false));
+    private final AbstractConfigCell mainTabsVisibilityRow = cellGroup.appendCell(
+            new ConfigCellSelectBox(
+                    "MainTabsVisibility",
+                    NaConfig.INSTANCE.getMainTabsVisibility(),
+                    new String[]{
+                            LocaleController.getString("MainTabsAlways", R.string.MainTabsAlways),
+                            LocaleController.getString("MainTabsHideOnScroll", R.string.MainTabsHideOnScroll),
+                            LocaleController.getString("Hidden", R.string.Hidden)
+                    },
+                    new int[]{MainTabs.ALWAYS, MainTabs.HIDE_ON_SCROLL, MainTabs.HIDDEN},
+                    null
+            )
+    );
+    private final AbstractConfigCell hideTitlesRow = cellGroup.appendCell(
+            new ConfigCellTextCheck(
+                    NaConfig.INSTANCE.getMainTabsHideTitles(),
+                    null,
+                    LocaleController.getString("HideMainTabsTitles", R.string.HideMainTabsTitles)
+            )
+    );
+    private final AbstractConfigCell hideContactsRow = cellGroup.appendCell(
+            new ConfigCellTextCheck(
+                    NaConfig.INSTANCE.getHideContacts(),
+                    null,
+                    LocaleController.getString("HideContactsTab", R.string.HideContactsTab)
+            )
+    );
+    private final AbstractConfigCell dividerMainTabs = cellGroup.appendCell(new ConfigCellDivider());
+    // [Alexgram: Main Tabs Settings] - End
+
     private final AbstractConfigCell headerCustomization = cellGroup.appendCell(new ConfigCellHeader(LocaleController.getString("Customization", R.string.Customization)));
     private final AbstractConfigCell pillStackRow = cellGroup.appendCell(
             new ConfigCellTextCheckIcon(null, "PillStack", getString(R.string.PillStackPills), R.drawable.ic_ab_search, false, () ->
@@ -187,6 +225,45 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
         if (!NekoConfig.showSenderNameOnSticker.Bool()) {
             cellGroup.rows.remove(showSenderNameOnGifRow);
         }
+        if (MainTabs.isHidden()) {
+            cellGroup.rows.remove(hideTitlesRow);
+            cellGroup.rows.remove(hideContactsRow);
+        }
+        addRowsToMap(cellGroup);
+    }
+
+    private void checkMainTabsRows() {
+        boolean isHidden = MainTabs.isHidden();
+        if (listAdapter == null) {
+            if (isHidden) {
+                cellGroup.rows.remove(hideTitlesRow);
+                cellGroup.rows.remove(hideContactsRow);
+            }
+            return;
+        }
+        if (!isHidden) {
+            if (!cellGroup.rows.contains(hideTitlesRow)) {
+                int index = cellGroup.rows.indexOf(mainTabsVisibilityRow) + 1;
+                cellGroup.rows.add(index, hideTitlesRow);
+                listAdapter.notifyItemInserted(index);
+            }
+            if (!cellGroup.rows.contains(hideContactsRow)) {
+                int index = cellGroup.rows.indexOf(hideTitlesRow) + 1;
+                cellGroup.rows.add(index, hideContactsRow);
+                listAdapter.notifyItemInserted(index);
+            }
+        } else {
+            if (cellGroup.rows.contains(hideContactsRow)) {
+                int index = cellGroup.rows.indexOf(hideContactsRow);
+                cellGroup.rows.remove(hideContactsRow);
+                listAdapter.notifyItemRemoved(index);
+            }
+            if (cellGroup.rows.contains(hideTitlesRow)) {
+                int index = cellGroup.rows.indexOf(hideTitlesRow);
+                cellGroup.rows.remove(hideTitlesRow);
+                listAdapter.notifyItemRemoved(index);
+            }
+        }
         addRowsToMap(cellGroup);
     }
 
@@ -202,7 +279,35 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
         setupDefaultListeners();
 
         cellGroup.callBackSettingsChanged = (key, newValue) -> {
-            if (key.equals(NaConfig.INSTANCE.getSingleCornerRadius().getKey())) {
+            if (key.equals("MainTabsVisibility") || key.equals(NaConfig.INSTANCE.getMainTabsVisibility().getKey())) {
+                int which = (Integer) newValue;
+                MainTabs.setVisibility(which);
+                if (which != MainTabs.HIDE_ON_SCROLL) {
+                    getNotificationCenter().postNotificationName(NotificationCenter.setTabsVisible, true);
+                }
+                getNotificationCenter().postNotificationName(NotificationCenter.mainTabsLayoutChanged);
+                checkMainTabsRows();
+                if (mainTabsPreviewCell != null) {
+                    mainTabsPreviewCell.updateVisibility();
+                }
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
+            } else if (key.equals(NaConfig.INSTANCE.getMainTabsHideTitles().getKey())) {
+                if (mainTabsPreviewCell != null) {
+                    mainTabsPreviewCell.updateTitles();
+                }
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
+            } else if (key.equals(NaConfig.INSTANCE.getHideContacts().getKey())) {
+                if (mainTabsPreviewCell != null) {
+                    mainTabsPreviewCell.updateContactsTab();
+                }
+                if (getParentLayout() != null) {
+                    getParentLayout().rebuildAllFragmentViews(false, false);
+                }
+            } else if (key.equals(NaConfig.INSTANCE.getSingleCornerRadius().getKey())) {
                 reloadAvatarCorners();
             } else if (key.equals(NekoConfig.showQuickEditIconInChatList.getKey())) {
                 if ((boolean) newValue) {
@@ -329,6 +434,12 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                         NekoCustomizationSettingsActivity.this::reloadAvatarCorners
                 );
                 return avatarCornersPreviewCell;
+            } else if (viewType == ConfigCellCustom.CUSTOM_ITEM_MainTabsPreview) {
+                mainTabsPreviewCell = new MainTabsPreviewCell(
+                        mContext,
+                        NekoCustomizationSettingsActivity.this
+                );
+                return mainTabsPreviewCell;
             }
             return null;
         }

@@ -35,6 +35,16 @@ import me.vkryl.android.util.ClickHelper;
 
 @SuppressLint("ViewConstructor")
 public class MainTabsLayout extends AnimatedLinearLayout {
+    private float compact;
+
+    public void setCompact(float compact) {
+        this.compact = compact;
+        for (int a = 0, N = getChildCount(); a < N; a++) {
+            ((GlassTabView) getChildAt(a)).setCompact(compact);
+        }
+        skipNextAnimation = true;
+        requestLayout();
+    }
 
     private final Theme.ResourcesProvider resourcesProvider;
 
@@ -132,13 +142,14 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             }
         }
 
+        final float compactTabWidth = Math.max(dp(24 + PASS_PADDINGS_DP[0] * 2), Math.min(dp(240), maxTotalWidthForTabs) / (float) visibleChildCount);
         int l = 0;
         for (int a = 0, N = getChildCount(); a < N; a++) {
             if (!isViewVisible(getChildAt(a))) {
                 continue;
             }
 
-            tabsWidth[a] = Math.round(tabsTextWidthWithMargin[a]);
+            tabsWidth[a] = Math.round(lerp(tabsTextWidthWithMargin[a], compactTabWidth, compact));
             tabsLeftPos[a] = l;
             l += tabsWidth[a];
         }

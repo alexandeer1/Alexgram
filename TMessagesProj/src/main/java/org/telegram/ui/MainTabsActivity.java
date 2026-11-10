@@ -472,7 +472,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         contentView.addView(fadeView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 0, Gravity.BOTTOM));
 
         tabsViewWrapper = new FrameLayout(context);
-        tabsViewWrapper.setOnClickListener(v -> {});
 
         tabsBarContainer = new LinearLayout(context);
         tabsBarContainer.setOrientation(LinearLayout.HORIZONTAL);
@@ -480,6 +479,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsBarContainer.setClipChildren(false);
         tabsBarContainer.setClipToPadding(false);
         tabsBarContainer.setPadding(dp(2), 0, dp(2), 0);
+        tabsBarContainer.setOnClickListener(v -> {});
         tabsView.setTranslationX(0f);
         tabsBarContainer.addView(tabsView, LayoutHelper.createLinear(dp(MainTabsHelper.getTabsViewWidth()), DialogsActivity.MAIN_TABS_HEIGHT_WITH_MARGINS));
 
@@ -532,6 +532,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         updateLayout();
         checkUnreadCount(false);
+        checkUi_tabsPosition();
+        checkUi_fadeView();
         return contentView;
     }
 
@@ -1264,6 +1266,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             checkUi_fadeView();
             repositionSearchButton();
         } else if (id == NotificationCenter.mainTabsLayoutChanged) {
+            checkUi_tabsPosition();
+            checkUi_fadeView();
             updateSearchTabButtonVisibility();
         }
     }
@@ -1319,7 +1323,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void checkUi_fadeView() {
-        if (viewPager == null || fadeView == null || NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
+        if (viewPager == null || fadeView == null) {
+            return;
+        }
+        if (isBottomBarHidden()) {
+            fadeView.setVisibility(View.GONE);
             return;
         }
 
@@ -1338,7 +1346,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void checkUi_tabsPosition() {
         if (tabsView == null) return;
-        if (NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
+        if (isBottomBarHidden()) {
+            if (tabsViewWrapper != null) {
+                tabsViewWrapper.setVisibility(View.GONE);
+            }
             tabsView.setVisibility(View.GONE);
             if (searchTabButton != null) {
                 searchTabButton.setVisibility(View.GONE);
@@ -1353,9 +1364,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final float factor = animatorTabsVisible.getFloatValue();
         final float scale = lerp(0.85f, 1f, factor);
 
-        tabsViewWrapper.setTranslationY(lerp(hiddenY, normalY, factor));
-        tabsView.setClickable(factor > 1);
-        tabsView.setEnabled(factor > 1);
+        if (tabsViewWrapper != null) {
+            tabsViewWrapper.setTranslationY(lerp(hiddenY, normalY, factor));
+            tabsViewWrapper.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
+        }
+        tabsView.setClickable(factor >= 1.0f);
+        tabsView.setEnabled(factor >= 1.0f);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
 

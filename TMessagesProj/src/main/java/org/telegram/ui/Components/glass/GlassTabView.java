@@ -53,6 +53,14 @@ import me.vkryl.android.animator.BoolAnimator;
 import me.vkryl.android.animator.FactorAnimator;
 
 public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, FactorAnimator.Target, Theme.Colorable {
+    public void setCompact(float compact) {
+        textView.setAlpha(1f - compact);
+        imageView.setTranslationY(-dp(2) * compact);
+        if (backupImageView != null) {
+            backupImageView.setTranslationY(-dp(2) * compact);
+        }
+    }
+
     private final TextView textView;
     private final RLottieImageView imageView;
     private BackupImageView backupImageView;

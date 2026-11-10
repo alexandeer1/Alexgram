@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">O endpoint atual do UnifiedPush é: %1$s</string>
     <string name="PlayOnce">Reproduzir uma vez</string>
     <string name="StorageSettings">Armazenamento</string>
+    <string name="MainTabs">Abas principais</string>
+    <string name="MainTabsVisibility">Visibilidade</string>
+    <string name="MainTabsAlways">Sempre</string>
+    <string name="MainTabsHideOnScroll">Ocultar ao rolar</string>
+    <string name="HideMainTabsTitles">Ocultar títulos</string>
+    <string name="HideContactsTab">Ocultar aba «Contatos»</string>
+    <string name="Hidden">Oculto</string>
     <string name="MainTabsSettingsHeader">Abas principais</string>
     <string name="MainTabsHideTitles">Ocultar títulos</string>
     <string name="DoubleTapOnChatsToFilterUnread">Toque duplo nos chats para filtrar não lidos</string>

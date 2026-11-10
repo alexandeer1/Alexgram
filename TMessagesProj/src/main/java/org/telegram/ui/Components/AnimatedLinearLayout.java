@@ -57,7 +57,7 @@ public class AnimatedLinearLayout extends LinearLayout {
         setViewVisible(child, visible, true);
     }
 
-    private boolean skipNextAnimation;
+    protected boolean skipNextAnimation;
 
     public void setViewVisible(View child, boolean visible, boolean animated) {
         if (child == null) {

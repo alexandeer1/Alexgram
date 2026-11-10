@@ -4839,7 +4839,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 if (changed && scrollUpdated && (goingDown || scrollingManually)) {
                                     hideFloatingButton(goingDown);
                                     // [Alexgram: Hide Navigation Bar on Scroll] - Start
-                                    if (NaConfig.INSTANCE.getHideTabsOnScroll().Bool()) {
+                                    if (tw.nekomimi.nekogram.helpers.MainTabs.isHideOnScroll()) {
                                         NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.setTabsVisible, !goingDown);
                                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.setTabsVisible, !goingDown);
                                     }
@@ -11278,6 +11278,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (id == NotificationCenter.updateSearchSettings) {
             refreshSearchSettingsUi();
         } else if (id == NotificationCenter.mainTabsLayoutChanged) {
+            refreshSearchSettingsUi();
+            updateFloatingButtonOffset();
             checkUi_itemSearchVisibility();
         } else if (id == NotificationCenter.replyMessagesDidLoad) {
             updateVisibleRows(MessagesController.UPDATE_MASK_MESSAGE_TEXT);

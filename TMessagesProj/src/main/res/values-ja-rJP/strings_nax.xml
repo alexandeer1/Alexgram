@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">現在の UnifiedPush エンドポイントは：%1$s</string>
     <string name="PlayOnce">ワンショット</string>
     <string name="StorageSettings">ストレージ</string>
+    <string name="MainTabs">メインタブ</string>
+    <string name="MainTabsVisibility">表示</string>
+    <string name="MainTabsAlways">常に表示</string>
+    <string name="MainTabsHideOnScroll">スクロール時に非表示</string>
+    <string name="HideMainTabsTitles">タイトルを非表示</string>
+    <string name="HideContactsTab">「連絡先」タブを非表示</string>
+    <string name="Hidden">非表示</string>
     <string name="MainTabsSettingsHeader">メインタブ</string>
     <string name="MainTabsHideTitles">タイトルを非表示</string>
     <string name="DoubleTapOnChatsToFilterUnread">チャットをダブルタップして未読をフィルタリング</string>

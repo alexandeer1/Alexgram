@@ -1798,6 +1798,12 @@ object NaConfig {
             ConfigItem.configTypeInt,
             1 // 0: Classic, 1: Spring, 2: Predictive Back
         )
+    val mainTabsVisibility =
+        addConfig(
+            "MainTabsVisibility",
+            ConfigItem.configTypeInt,
+            0 // 0: ALWAYS, 1: HIDE_ON_SCROLL, 2: HIDDEN
+        )
     val mainTabsHideTitles =
         addConfig(
             "MainTabsHideTitles",
@@ -1846,7 +1852,7 @@ object NaConfig {
         addConfig(
             "HideTabsOnScroll",
             ConfigItem.configTypeBool,
-            true
+            false
         )
     val searchEngineInSearchBar =
         addConfig(
@@ -2004,6 +2010,14 @@ object NaConfig {
     private fun fixConfig() {
         if (ApplicationLoader.applicationContext == null) {
             return
+        }
+        if (!getPreferences().contains(mainTabsVisibility.key)) {
+            val hideBottom = getPreferences().getBoolean(hideBottomNavigationBar.key, false)
+            val hideOnScroll = getPreferences().contains(hideTabsOnScroll.key) && getPreferences().getBoolean(hideTabsOnScroll.key, false)
+            val initial = if (hideBottom) 2 else if (hideOnScroll) 1 else 0
+            mainTabsVisibility.setConfigInt(initial)
+            hideBottomNavigationBar.setConfigBool(initial == 2)
+            hideTabsOnScroll.setConfigBool(initial == 1)
         }
         if (!translatorModeWithOriginalMigrated.Bool()) {
             if (getPreferences().contains(translatorMode.key)) {

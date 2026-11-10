@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">Titik akhir UnifiedPush saat ini adalah: %1$s</string>
     <string name="PlayOnce">Putar sekali</string>
     <string name="StorageSettings">Penyimpanan</string>
+    <string name="MainTabs">Tab Utama</string>
+    <string name="MainTabsVisibility">Visibilitas</string>
+    <string name="MainTabsAlways">Selalu</string>
+    <string name="MainTabsHideOnScroll">Sembunyikan saat menggulir</string>
+    <string name="HideMainTabsTitles">Sembunyikan judul</string>
+    <string name="HideContactsTab">Sembunyikan tab \"Kontak\"</string>
+    <string name="Hidden">Tersembunyi</string>
     <string name="MainTabsSettingsHeader">Tab Utama</string>
     <string name="MainTabsHideTitles">Sembunyikan Judul</string>
     <string name="DoubleTapOnChatsToFilterUnread">Ketuk Ganda Pada Obrolan Untuk Memfilter Obrolan Belum Dibaca</string>

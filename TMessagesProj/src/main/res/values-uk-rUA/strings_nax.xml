@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">Поточна кінцева точка UnifiedPush: %1$s</string>
     <string name="PlayOnce">Відтворити один раз</string>
     <string name="StorageSettings">Сховище</string>
+    <string name="MainTabs">Головні вкладки</string>
+    <string name="MainTabsVisibility">Відображення</string>
+    <string name="MainTabsAlways">Завжди</string>
+    <string name="MainTabsHideOnScroll">Ховати під час прокручування</string>
+    <string name="HideMainTabsTitles">Приховати підписи</string>
+    <string name="HideContactsTab">Приховати вкладку «Контакти»</string>
+    <string name="Hidden">Приховано</string>
     <string name="MainTabsSettingsHeader">Основні вкладки</string>
     <string name="MainTabsHideTitles">Приховати заголовки</string>
     <string name="DoubleTapOnChatsToFilterUnread">Подвійне натискання на чати для фільтрації непрочитаних</string>

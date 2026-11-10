@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">Текущая конечная точка UnifiedPush: %1$s</string>
     <string name="PlayOnce">Играть один раз</string>
     <string name="StorageSettings">Хранилище</string>
+    <string name="MainTabs">Нижняя панель вкладок</string>
+    <string name="MainTabsVisibility">Отображение</string>
+    <string name="MainTabsAlways">Всегда</string>
+    <string name="MainTabsHideOnScroll">Скрывать при прокрутке</string>
+    <string name="HideMainTabsTitles">Скрыть подписи</string>
+    <string name="HideContactsTab">Скрыть вкладку «Контакты»</string>
+    <string name="Hidden">Скрыта</string>
     <string name="MainTabsSettingsHeader">Основные вкладки</string>
     <string name="MainTabsHideTitles">Скрыть заголовки</string>
     <string name="DoubleTapOnChatsToFilterUnread">Двойное нажатие на чаты для фильтрации непрочитанных</string>

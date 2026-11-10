@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">当前的 UnifiedPush 端点是：%1$s</string>
     <string name="PlayOnce">播放一次</string>
     <string name="StorageSettings">存储</string>
+    <string name="MainTabs">主标签栏</string>
+    <string name="MainTabsVisibility">显示方式</string>
+    <string name="MainTabsAlways">始终显示</string>
+    <string name="MainTabsHideOnScroll">滚动时隐藏</string>
+    <string name="HideMainTabsTitles">隐藏标题</string>
+    <string name="HideContactsTab">隐藏“联系人”标签</string>
+    <string name="Hidden">隐藏</string>
     <string name="MainTabsSettingsHeader">主标签页</string>
     <string name="MainTabsHideTitles">隐藏标题</string>
     <string name="DoubleTapOnChatsToFilterUnread">双击聊天列表以过滤未读聊天</string>

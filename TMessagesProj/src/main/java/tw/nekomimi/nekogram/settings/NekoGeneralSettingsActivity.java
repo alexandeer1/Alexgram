@@ -179,6 +179,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     // Dialogs
     private final AbstractConfigCell headerDialogs = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.DialogsSettings)));
     private final AbstractConfigCell sortByUnreadRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSortByUnread()));
+    private final AbstractConfigCell doubleTapOnChatsToFilterUnreadRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDoubleTapOnChatsToFilterUnread()));
     private final AbstractConfigCell disableDialogsFloatingButtonRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDisableDialogsFloatingButton()));
     private final AbstractConfigCell disableBotOpenButtonRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDisableBotOpenButton()));
     private final AbstractConfigCell mediaPreviewRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.mediaPreview));
@@ -242,15 +243,6 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     private final AbstractConfigCell chatBlurAlphaValueRow = cellGroup.appendCell(new ConfigCellCustom("ChatBlurAlphaValue", ConfigCellCustom.CUSTOM_ITEM_CharBlurAlpha, NekoConfig.forceBlurInChat.Bool()));
     private final AbstractConfigCell dividerBlur = cellGroup.appendCell(new ConfigCellDivider());
 
-    // Main Tabs
-    private final AbstractConfigCell headerMainTabs = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.MainTabsSettingsHeader)));
-    private final AbstractConfigCell hideTitlesRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getMainTabsHideTitles()));
-    private final AbstractConfigCell hideBottomNavigationBarRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHideBottomNavigationBar()));
-    private final AbstractConfigCell hideTabsOnScrollRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHideTabsOnScroll()));
-    private final AbstractConfigCell hideContactsRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHideContacts()));
-    private final AbstractConfigCell doubleTapOnChatsToFilterUnreadRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDoubleTapOnChatsToFilterUnread()));
-    private final AbstractConfigCell dividerMainTabs = cellGroup.appendCell(new ConfigCellDivider());
-
     // Privacy
     private final AbstractConfigCell headerPrivacy = cellGroup.appendCell(new ConfigCellHeader(getString(R.string.PrivacyTitle)));
     // [Alexgram: Important Announcement] - Start
@@ -295,7 +287,6 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
         checkCustomTitleRows();
         checkPushServiceTypeRows();
         checkOpenArchiveOnPullRows();
-        checkMainTabsRows();
         addRowsToMap(cellGroup);
     }
 
@@ -405,17 +396,6 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             } else if (key.equals(NaConfig.INSTANCE.getSaveToChatSubfolder().getKey())) {
                 listAdapter.notifyItemChanged(cellGroup.rows.indexOf(customSavePathRow));
-            } else if (key.equals(NaConfig.INSTANCE.getMainTabsHideTitles().getKey())) {
-                parentLayout.rebuildAllFragmentViews(false, false);
-            } else if (key.equals(NaConfig.INSTANCE.getHideBottomNavigationBar().getKey())) {
-                checkMainTabsRows();
-                parentLayout.rebuildAllFragmentViews(false, false);
-            } else if (key.equals(NaConfig.INSTANCE.getHideContacts().getKey())) {
-                AppRestartHelper.triggerRebirth(ApplicationLoader.applicationContext, new Intent(ApplicationLoader.applicationContext, LaunchActivity.class));
-            } else if (key.equals(NaConfig.INSTANCE.getHideTabsOnScroll().getKey())) {
-                if (!(boolean) newValue) {
-                    getNotificationCenter().postNotificationName(NotificationCenter.setTabsVisible, true);
-                }
             } else if (key.equals(NaConfig.INSTANCE.getSearchEngineInSearchBar().getKey())) {
                 tooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
             // [Alexgram: Accounts Settings] - maxActiveAccounts handler moved to AccountsSettingsActivity
@@ -686,48 +666,6 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
             }
         }
         addRowsToMap(cellGroup);
-    }
-
-    private void checkMainTabsRows() {
-        boolean hideBottomNavigationBar = NaConfig.INSTANCE.getHideBottomNavigationBar().Bool();
-        if (listAdapter == null) {
-            if (hideBottomNavigationBar) {
-                cellGroup.rows.remove(hideTitlesRow);
-                cellGroup.rows.remove(hideTabsOnScrollRow);
-            }
-            return;
-        }
-        boolean changed = false;
-        if (!hideBottomNavigationBar) {
-            if (!cellGroup.rows.contains(hideTitlesRow)) {
-                int index = cellGroup.rows.indexOf(hideBottomNavigationBarRow);
-                cellGroup.rows.add(index, hideTitlesRow);
-                listAdapter.notifyItemInserted(index);
-                changed = true;
-            }
-            if (!cellGroup.rows.contains(hideTabsOnScrollRow)) {
-                int index = cellGroup.rows.indexOf(hideBottomNavigationBarRow);
-                cellGroup.rows.add(index + 1, hideTabsOnScrollRow);
-                listAdapter.notifyItemInserted(index + 1);
-                changed = true;
-            }
-        } else {
-            int rowIndex = cellGroup.rows.indexOf(hideTitlesRow);
-            if (rowIndex != -1) {
-                cellGroup.rows.remove(hideTitlesRow);
-                listAdapter.notifyItemRemoved(rowIndex);
-                changed = true;
-            }
-            int rowIndex2 = cellGroup.rows.indexOf(hideTabsOnScrollRow);
-            if (rowIndex2 != -1) {
-                cellGroup.rows.remove(hideTabsOnScrollRow);
-                listAdapter.notifyItemRemoved(rowIndex2);
-                changed = true;
-            }
-        }
-        if (changed) {
-            addRowsToMap(cellGroup);
-        }
     }
 
     private boolean shouldShowPersian() {

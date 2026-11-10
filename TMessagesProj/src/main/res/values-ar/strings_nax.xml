@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">The current UnifiedPush endpoint is: %1$s</string>
     <string name="PlayOnce">Play once</string>
     <string name="StorageSettings">Storage</string>
+    <string name="MainTabs">التبويبات الرئيسية</string>
+    <string name="MainTabsVisibility">الظهور</string>
+    <string name="MainTabsAlways">دائمًا</string>
+    <string name="MainTabsHideOnScroll">إخفاء عند التمرير</string>
+    <string name="HideMainTabsTitles">إخفاء العناوين</string>
+    <string name="HideContactsTab">إخفاء تبويب «جهات الاتصال»</string>
+    <string name="Hidden">مخفي</string>
     <string name="MainTabsSettingsHeader">Main Tabs</string>
     <string name="MainTabsHideTitles">Hide Titles</string>
     <string name="DoubleTapOnChatsToFilterUnread">انقر نقرًا مزدوجًا على الدردشات لتصفية غير المقروءة</string>

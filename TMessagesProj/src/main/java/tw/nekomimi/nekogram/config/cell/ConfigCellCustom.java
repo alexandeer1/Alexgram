@@ -14,6 +14,7 @@ public class ConfigCellCustom extends AbstractConfigCell implements WithKey {
     public static final int CUSTOM_ITEM_Temperature = 995;
     public static final int CUSTOM_ITEM_BlurIntensity = 994;
     public static final int CUSTOM_ITEM_AvatarCorners = 993;
+    public static final int CUSTOM_ITEM_MainTabsPreview = 992;
     public static final int CUSTOM_ITEM_AiChatTemperature = 982;
 
     public final int type;

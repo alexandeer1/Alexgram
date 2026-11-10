@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">Aktualny punkt końcowy UnifiedPush to: %1$s</string>
     <string name="PlayOnce">Zagraj raz</string>
     <string name="StorageSettings">Pamięć</string>
+    <string name="MainTabs">Główne karty</string>
+    <string name="MainTabsVisibility">Widoczność</string>
+    <string name="MainTabsAlways">Zawsze</string>
+    <string name="MainTabsHideOnScroll">Ukrywaj podczas przewijania</string>
+    <string name="HideMainTabsTitles">Ukryj tytuły</string>
+    <string name="HideContactsTab">Ukryj kartę „Kontakty”</string>
+    <string name="Hidden">Ukryta</string>
     <string name="MainTabsSettingsHeader">Główne zakładki</string>
     <string name="MainTabsHideTitles">Ukryj tytuły</string>
     <string name="DoubleTapOnChatsToFilterUnread">Kliknij dwukrotnie czaty, aby przefiltrować nieprzeczytane</string>

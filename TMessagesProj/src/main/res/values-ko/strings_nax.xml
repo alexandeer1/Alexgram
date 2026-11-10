@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">The current UnifiedPush endpoint is: %1$s</string>
     <string name="PlayOnce">Play once</string>
     <string name="StorageSettings">Storage</string>
+    <string name="MainTabs">메인 탭</string>
+    <string name="MainTabsVisibility">표시</string>
+    <string name="MainTabsAlways">항상 표시</string>
+    <string name="MainTabsHideOnScroll">스크롤 시 숨기기</string>
+    <string name="HideMainTabsTitles">제목 숨기기</string>
+    <string name="HideContactsTab">\"연락처\" 탭 숨기기</string>
+    <string name="Hidden">숨김</string>
     <string name="MainTabsSettingsHeader">Main Tabs</string>
     <string name="MainTabsHideTitles">Hide Titles</string>
     <string name="DoubleTapOnChatsToFilterUnread">Double-Tap On Chats To Filter Unread Chats</string>

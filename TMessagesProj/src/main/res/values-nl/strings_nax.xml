@@ -377,6 +377,13 @@
     <string name="UnifiedPushCurrentEndpoint">The current UnifiedPush endpoint is: %1$s</string>
     <string name="PlayOnce">Play once</string>
     <string name="StorageSettings">Storage</string>
+    <string name="MainTabs">Hoofdtabbladen</string>
+    <string name="MainTabsVisibility">Zichtbaarheid</string>
+    <string name="MainTabsAlways">Altijd</string>
+    <string name="MainTabsHideOnScroll">Verbergen bij scrollen</string>
+    <string name="HideMainTabsTitles">Titels verbergen</string>
+    <string name="HideContactsTab">Tabblad «Contacten» verbergen</string>
+    <string name="Hidden">Verborgen</string>
     <string name="MainTabsSettingsHeader">Main Tabs</string>
     <string name="MainTabsHideTitles">Hide Titles</string>
     <string name="DoubleTapOnChatsToFilterUnread">Double-Tap On Chats To Filter Unread Chats</string>
