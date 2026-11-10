@@ -129,13 +129,6 @@ public class BookmarkManagerActivity extends BaseFragment {
     private final RectF blur3PositionActionBar = new RectF();
     private final RectF blur3PositionTabs = new RectF();
 
-    private int getTopContentOffset() {
-        if (actionBar == null) {
-            return 0;
-        }
-        return ActionBar.getCurrentActionBarHeight() + (actionBar.getOccupyStatusBar() ? AndroidUtilities.statusBarHeight : 0);
-    }
-
     private void updateBlur3Capture() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || scrollableViewNoiseSuppressor == null || viewPages == null) {
             blur3Capture = null;
@@ -330,10 +323,9 @@ public class BookmarkManagerActivity extends BaseFragment {
         emptyView.setTextSize(15);
         emptyView.setGravity(Gravity.CENTER);
         emptyView.setPadding(dp(24), dp(24), dp(24), dp(24));
-        final int topContentOffset = getTopContentOffset();
         final int tabsHeight = dp(TABS_CONTAINER_HEIGHT_DP);
-        contentLayout.addView(emptyView, LayoutHelper.createFrameMarginPx(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, topContentOffset + tabsHeight, 0, 0));
-        contentLayout.addView(tabsContainer, LayoutHelper.createFrameMarginPx(LayoutHelper.MATCH_PARENT, TABS_CONTAINER_HEIGHT_DP, Gravity.TOP, dp(4), topContentOffset, dp(4), 0));
+        contentLayout.addView(emptyView, LayoutHelper.createFrameMarginPx(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, tabsHeight, 0, 0));
+        contentLayout.addView(tabsContainer, LayoutHelper.createFrameMarginPx(LayoutHelper.MATCH_PARENT, TABS_CONTAINER_HEIGHT_DP, Gravity.TOP, dp(4), 0, dp(4), 0));
         updateTabsStyle();
         setPageTab(viewPages[0], selectedTabId, false);
         updateBlur3Capture();
@@ -844,7 +836,7 @@ public class BookmarkManagerActivity extends BaseFragment {
             listView.setSelectorType(2);
             listView.setScrollingTouchSlop(RecyclerView.TOUCH_SLOP_PAGING);
             listView.setClipToPadding(false);
-            listView.setPadding(0, dp(TABS_CONTAINER_HEIGHT_DP) + getTopContentOffset(), 0, 0);
+            listView.setPadding(0, dp(TABS_CONTAINER_HEIGHT_DP), 0, 0);
             listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -907,11 +899,10 @@ public class BookmarkManagerActivity extends BaseFragment {
         }
 
         final int additional = dp(48);
-        final int topContentOffset = getTopContentOffset();
         final int tabsHeight = dp(TABS_CONTAINER_HEIGHT_DP);
 
         blur3PositionActionBar.set(0, -additional, width, actionBarHeight + additional);
-        blur3PositionTabs.set(0, topContentOffset, width, topContentOffset + tabsHeight);
+        blur3PositionTabs.set(0, 0, width, tabsHeight);
         if (!LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)) {
             blur3PositionTabs.bottom += dp(48);
         }
