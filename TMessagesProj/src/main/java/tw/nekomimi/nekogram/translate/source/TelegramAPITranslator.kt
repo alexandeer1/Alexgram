@@ -1,6 +1,7 @@
 package tw.nekomimi.nekogram.translate.source
 
 import android.text.TextUtils
+import kotlinx.coroutines.InternalCoroutinesApi
 import org.telegram.messenger.FileLog
 import org.telegram.messenger.UserConfig
 import org.telegram.tgnet.ConnectionsManager
@@ -9,8 +10,6 @@ import org.telegram.tgnet.TLRPC
 import org.telegram.tgnet.TLRPC.TL_error
 import org.telegram.tgnet.TLRPC.TL_messages_translateResult
 import org.telegram.tgnet.TLRPC.TL_messages_translateText
-import org.telegram.ui.Components.TranslateAlert2
-import tw.nekomimi.nekogram.translate.HTMLKeeper
 import tw.nekomimi.nekogram.translate.Translator
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -19,59 +18,31 @@ import kotlin.coroutines.suspendCoroutine
 
 object TelegramAPITranslator : Translator {
 
-    override suspend fun doTranslate(
-        from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
-    ): TLRPC.TL_textWithEntities {
-
-        return suspendCoroutine { continuation ->
-            val originalText = TLRPC.TL_textWithEntities()
-            originalText.text = query
-            originalText.entities = entities
-
-            val textToTranslate = if (entities.isNotEmpty()) HTMLKeeper.entitiesToHtml(
-                query,
-                entities,
-                false
-            ) else query
-
+    @OptIn(InternalCoroutinesApi::class)
+    override suspend fun doTranslate(from: String, to: String, query: String): String {
+        return suspendCoroutine {
             val req = TL_messages_translateText()
             req.peer = null
             req.flags = req.flags or 2
             req.text.add(TLRPC.TL_textWithEntities().apply {
-                text = textToTranslate
+                text = query
             })
             req.to_lang = to
 
             try {
-                ConnectionsManager.getInstance(UserConfig.selectedAccount)
-                    .sendRequest(req) { res: TLObject?, err: TL_error? ->
-                        if (res is TL_messages_translateResult && res.result.isNotEmpty()) {
-                            val apiResult = res.result[0]
-
-                            var finalText = TLRPC.TL_textWithEntities()
-
-                            if (entities.isNotEmpty()) {
-                                val resultPair =
-                                    HTMLKeeper.htmlToEntities(apiResult.text, entities, false)
-                                finalText.text = resultPair.first
-                                finalText.entities = resultPair.second
-
-                                finalText = TranslateAlert2.preprocess(originalText, finalText)
-                            } else {
-                                finalText.text = apiResult.text
-                            }
-
-                            continuation.resume(finalText)
-                        } else {
-                            if (err?.text != null && err.text!!.isNotEmpty()) {
-                                FileLog.e(err.text)
-                            }
-                            continuation.resumeWithException(RuntimeException("An unexpected error occurred during Telegram API call: ${err?.text ?: "Unknown error"}"))
+                ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(req) { res: TLObject?, err: TL_error? ->
+                    if (res is TL_messages_translateResult && res.result.isNotEmpty()) {
+                        it.resume(res.result[0].text)
+                    } else {
+                        if (err?.text != null && err.text.isNotEmpty()) {
+                            FileLog.e(err.text)
                         }
+                        it.resumeWithException(RuntimeException("Failed to translate by Telegram API"))
                     }
+                }
             } catch (e: Exception) {
                 FileLog.e(e)
-                continuation.resumeWithException(e)
+                it.resumeWithException(e)
             }
         }
     }
@@ -106,5 +77,6 @@ object TelegramAPITranslator : Translator {
         "my", "hmn", "xh", "zu", "ne", "no", "pa", "pt", "ps", "ny", "ja", "sv", "sm",
         "sr", "st", "si", "eo", "sk", "sl", "sw", "gd", "ceb", "so", "tg", "te", "ta",
         "th", "tr", "cy", "ur", "uk", "uz", "es", "iw", "el", "haw", "sd", "hu", "sn",
-        "hy", "ig", "it", "yi", "hi", "su", "id", "jw", "en", "yo", "vi", "zh-TW", "zh-CN", "zh")
+        "hy", "ig", "it", "yi", "hi", "su", "id", "jw", "en", "yo", "vi", "zh-TW", "zh-CN", "zh"
+    )
 }

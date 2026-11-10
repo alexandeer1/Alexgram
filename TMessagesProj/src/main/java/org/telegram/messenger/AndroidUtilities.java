@@ -148,13 +148,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.android.internal.telephony.ITelephony;
-import com.google.android.exoplayer2.util.Consumer;
 import com.google.android.gms.auth.api.phone.SmsRetriever;
 import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
 import com.google.android.gms.tasks.Task;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.browser.Browser;
+import org.telegram.utils.proxy.ProxySettings;
 import org.telegram.messenger.utils.CustomHtml;
 import org.telegram.messenger.utils.DebugRecordingCanvas;
 import org.telegram.tgnet.ConnectionsManager;
@@ -165,6 +165,7 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.ActionBar.ThemeBind;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.ChatBackgroundDrawable;
 import org.telegram.ui.Components.AlertsCreator;
@@ -214,7 +215,6 @@ import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.IDN;
 import java.nio.ByteBuffer;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -328,6 +328,7 @@ public class AndroidUtilities {
     public final static String TYPEFACE_MERRIWEATHER_BOLD = "fonts/mw_bold.ttf";
     public static final String TYPEFACE_RITALIC = "fonts/ritalic.ttf";
     public static final String TYPEFACE_RCONDENSED_BOLD = "fonts/rcondensedbold.ttf";
+    public static final String TYPEFACE_ROBOTO_REGULAR = "fonts/rregular.ttf";
 
     public static Typeface mediumTypeface;
     public static ThreadLocal<byte[]> readBufferLocal = new ThreadLocal<>();
@@ -354,9 +355,16 @@ public class AndroidUtilities {
         return mediumTypeface;
     }
 
+    public static Typeface regular() {
+        return getTypeface(TYPEFACE_ROBOTO_REGULAR);
+    }
+
     private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
     public static float touchSlop;
     private static int prevOrientation = -10;
+    private static int pendingUnlockOrientation = -10;
+    private static int pendingLockedOrientation = -10;
+    private static WeakReference<Activity> pendingUnlockActivity;
     private static boolean waitingForSms = false;
     private static boolean waitingForCall = false;
     private static final Object smsLock = new Object();
@@ -385,8 +393,12 @@ public class AndroidUtilities {
     public static boolean usingHardwareInput;
     public static boolean isInMultiwindow;
 
-    public static int roundPlayingMessageSize(boolean withSidemenu) {
-        return withSidemenu ? roundSidePlayingMessageSize : roundPlayingMessageSize;
+    public static int roundPlayingMessageSize(boolean withSidemenu, boolean compact) {
+        if (withSidemenu) {
+            return roundSidePlayingMessageSize;
+        }
+        // compact mode: a playing round video keeps the 16dp edge and a column for its side buttons
+        return compact ? roundPlayingMessageSize - dp(16 + 40 - 28 / 2) : roundPlayingMessageSize;
     }
 
     public static DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
@@ -818,6 +830,61 @@ public class AndroidUtilities {
         return spannableStringBuilder;
     }
 
+    /** like replaceSingleLink(str, color, onClick), but the link color is read from the theme on every draw */
+    public static SpannableStringBuilder replaceSingleLinkKey(String str, int colorKey, Theme.ResourcesProvider resourcesProvider, Runnable onClick) {
+        return replaceSingleLinkKey(str, colorKey, resourcesProvider, onClick, false);
+    }
+
+    /** like replaceSingleLinkBold(str, color, onClick), but the link color is read from the theme on every draw */
+    public static SpannableStringBuilder replaceSingleLinkBoldKey(String str, int colorKey, Theme.ResourcesProvider resourcesProvider, Runnable onClick) {
+        return replaceSingleLinkKey(str, colorKey, resourcesProvider, onClick, true);
+    }
+
+    private static SpannableStringBuilder replaceSingleLinkKey(String str, int colorKey, Theme.ResourcesProvider resourcesProvider, Runnable onClick, boolean bold) {
+        int startIndex = str.indexOf("**");
+        int endIndex = str.indexOf("**", startIndex + 1);
+        str = str.replace("**", "");
+        int index = -1;
+        int len = 0;
+        if (startIndex >= 0 && endIndex >= 0 && endIndex - startIndex > 2) {
+            len = endIndex - startIndex - 2;
+            index = startIndex;
+        }
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(str);
+        if (index >= 0) {
+            if (onClick != null) {
+                spannableStringBuilder.setSpan(new ClickableSpan() {
+                    @Override
+                    public void updateDrawState(@NonNull TextPaint ds) {
+                        super.updateDrawState(ds);
+                        ds.setUnderlineText(false);
+                        if (bold) {
+                            ds.setTypeface(AndroidUtilities.bold());
+                        }
+                        ds.setColor(Theme.getColor(colorKey, resourcesProvider));
+                    }
+
+                    @Override
+                    public void onClick(@NonNull View view) {
+                        onClick.run();
+                    }
+                }, index, index + len, 0);
+            } else {
+                spannableStringBuilder.setSpan(new CharacterStyle() {
+                    @Override
+                    public void updateDrawState(@NonNull TextPaint ds) {
+                        ds.setUnderlineText(false);
+                        if (bold) {
+                            ds.setTypeface(AndroidUtilities.bold());
+                        }
+                        ds.setColor(Theme.getColor(colorKey, resourcesProvider));
+                    }
+                }, index, index + len, 0);
+            }
+        }
+        return spannableStringBuilder;
+    }
+
     public static SpannableStringBuilder replaceSingleLinkBold(String str, int color) {
         return replaceSingleLinkBold(str, color, null);
     }
@@ -1138,7 +1205,7 @@ public class AndroidUtilities {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         PixelCopy.request(surfaceView, surfaceBitmap, copyResult -> {
             countDownLatch.countDown();
-        }, Utilities.searchQueue.getHandler());
+        }, Utilities.searchQueue.getHandlerSync());
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
@@ -1164,7 +1231,7 @@ public class AndroidUtilities {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         PixelCopy.request(surface, surfaceBitmap, copyResult -> {
             countDownLatch.countDown();
-        }, Utilities.searchQueue.getHandler());
+        }, Utilities.searchQueue.getHandlerSync());
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
@@ -1185,7 +1252,7 @@ public class AndroidUtilities {
         PixelCopy.request(window, bitmap, copyResult -> {
             success[0] = copyResult == PixelCopy.SUCCESS;
             countDownLatch.countDown();
-        }, Utilities.searchQueue.getHandler());
+        }, Utilities.searchQueue.getHandlerSync());
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
@@ -1576,7 +1643,7 @@ public class AndroidUtilities {
             return 0;
         }
         try {
-            Bitmap b = Bitmaps.createScaledBitmap(bitmap, 1, 1, true);
+            Bitmap b = Bitmap.createScaledBitmap(bitmap, 1, 1, true);
             if (b != null) {
                 int bitmapColor = b.getPixel(0, 0);
                 if (bitmap != b) {
@@ -2010,7 +2077,8 @@ public class AndroidUtilities {
             return;
         }
         try {
-            prevOrientation = activity.getRequestedOrientation();
+            prevOrientation = getPendingUnlockOrientation(activity);
+            clearPendingOrientationUnlock();
             WindowManager manager = (WindowManager) activity.getSystemService(Activity.WINDOW_SERVICE);
             if (manager != null && manager.getDefaultDisplay() != null) {
                 int rotation = manager.getDefaultDisplay().getRotation();
@@ -2054,7 +2122,8 @@ public class AndroidUtilities {
             return;
         }
         try {
-            prevOrientation = activity.getRequestedOrientation();
+            prevOrientation = getPendingUnlockOrientation(activity);
+            clearPendingOrientationUnlock();
             activity.setRequestedOrientation(orientation);
         } catch (Exception e) {
             FileLog.e(e);
@@ -2068,9 +2137,53 @@ public class AndroidUtilities {
         }
         try {
             if (prevOrientation != -10) {
+                final int lockedOrientation = activity.getRequestedOrientation();
                 activity.setRequestedOrientation(prevOrientation);
+                if (isLargeScreen(activity)) {
+                    // a lock taken on a foldable's small screen: the large screen ignores the request, so apply it again on the next small one
+                    pendingUnlockOrientation = prevOrientation;
+                    pendingLockedOrientation = lockedOrientation;
+                    pendingUnlockActivity = new WeakReference<>(activity);
+                }
                 prevOrientation = -10;
             }
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+    }
+
+    private static boolean isLargeScreen(Activity activity) {
+        return activity.getResources().getConfiguration().smallestScreenWidthDp >= 600;
+    }
+
+    private static int getPendingUnlockOrientation(Activity activity) {
+        if (pendingUnlockOrientation != -10 && pendingUnlockActivity != null && pendingUnlockActivity.get() == activity) {
+            return pendingUnlockOrientation;
+        }
+        return activity.getRequestedOrientation();
+    }
+
+    // any other orientation request replaces the one the pending unlock would restore
+    public static void clearPendingOrientationUnlock() {
+        pendingUnlockOrientation = -10;
+        pendingLockedOrientation = -10;
+        pendingUnlockActivity = null;
+    }
+
+    public static void applyPendingOrientationUnlock(Activity activity) {
+        if (activity == null || pendingUnlockOrientation == -10 || prevOrientation != -10 || isLargeScreen(activity)) {
+            return;
+        }
+        if (pendingUnlockActivity == null || pendingUnlockActivity.get() != activity) {
+            return;
+        }
+        final int locked = pendingLockedOrientation;
+        final int unlocked = pendingUnlockOrientation;
+        clearPendingOrientationUnlock();
+        try {
+            // Activity skips a request equal to its last one, so restate the lock the system still holds first
+            activity.setRequestedOrientation(locked);
+            activity.setRequestedOrientation(unlocked);
         } catch (Exception e) {
             FileLog.e(e);
         }
@@ -3117,6 +3230,16 @@ public class AndroidUtilities {
         }
     }
 
+    public static int getAccountInProduction() {
+        if (UserConfig.getInstance(UserConfig.selectedAccount).isClientActivated() && !ConnectionsManager.getInstance(UserConfig.selectedAccount).isTestBackend())
+            return UserConfig.selectedAccount;
+        for (int i = 0; i < UserConfig.MAX_ACCOUNT_COUNT; ++i) {
+            if (UserConfig.getInstance(i).isClientActivated() && !ConnectionsManager.getInstance(i).isTestBackend())
+                return i;
+        }
+        return UserConfig.selectedAccount;
+    }
+
     public static float getPixelsInCM(float cm, boolean isX) {
         return (cm / 2.54f) * (isX ? displayMetrics.xdpi : displayMetrics.ydpi);
     }
@@ -3288,13 +3411,9 @@ public class AndroidUtilities {
     }*/
 
     private static Runnable unregisterRunnable;
-    private static boolean hasCallPermissions = Build.VERSION.SDK_INT >= 23;
 
     @SuppressWarnings("unchecked")
     public static void endIncomingCall() {
-        if (!hasCallPermissions) {
-            return;
-        }
         try {
             TelephonyManager tm = (TelephonyManager) ApplicationLoader.applicationContext.getSystemService(Context.TELEPHONY_SERVICE);
             Class c = Class.forName(tm.getClass().getName());
@@ -3310,9 +3429,6 @@ public class AndroidUtilities {
     }
 
     public static String obtainLoginPhoneCall(String pattern) {
-        if (!hasCallPermissions) {
-            return null;
-        }
         String order;
         Bundle selectionArgs;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -3366,32 +3482,13 @@ public class AndroidUtilities {
         return true;
     }
 
-    private static Field mAttachInfoField;
-    private static Field mStableInsetsField;
-
     public static int getViewInset(View view) {
         if (view == null || view.getHeight() == AndroidUtilities.displaySize.y || view.getHeight() == AndroidUtilities.displaySize.y - statusBarHeight) {
             return 0;
         }
         try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                WindowInsets insets = view.getRootWindowInsets();
-                return insets != null ? insets.getStableInsetBottom() : 0;
-            } else {
-                if (mAttachInfoField == null) {
-                    mAttachInfoField = View.class.getDeclaredField("mAttachInfo");
-                    mAttachInfoField.setAccessible(true);
-                }
-                Object mAttachInfo = mAttachInfoField.get(view);
-                if (mAttachInfo != null) {
-                    if (mStableInsetsField == null) {
-                        mStableInsetsField = mAttachInfo.getClass().getDeclaredField("mStableInsets");
-                        mStableInsetsField.setAccessible(true);
-                    }
-                    Rect insets = (Rect) mStableInsetsField.get(mAttachInfo);
-                    return insets.bottom;
-                }
-            }
+            WindowInsets insets = view.getRootWindowInsets();
+            return insets != null ? insets.getStableInsetBottom() : 0;
         } catch (Exception e) {
             FileLog.e(e);
         }
@@ -3910,7 +4007,7 @@ public class AndroidUtilities {
                 Build.VERSION.SDK_INT >= 33 &&
                 ApplicationLoader.applicationContext.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED
             ) || (
-                Build.VERSION.SDK_INT >= 23 && Build.VERSION.SDK_INT <= 33 &&
+                Build.VERSION.SDK_INT <= 33 &&
                 ApplicationLoader.applicationContext.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
             )
         ) {
@@ -4852,57 +4949,9 @@ public class AndroidUtilities {
             }
             Uri data = intent.getData();
             if (data != null) {
-                String user = null;
-                String password = null;
-                String port = null;
-                String address = null;
-                String secret = null;
-                String scheme = data.getScheme();
-                if (scheme != null) {
-                    if ((scheme.equals("http") || scheme.equals("https"))) {
-                        String host = data.getHost().toLowerCase();
-                        if (host.equals("telegram.me") || host.equals("t.me") || host.equals("telegram.dog")) {
-                            String path = data.getPath();
-                            if (path != null) {
-                                if (path.startsWith("/socks") || path.startsWith("/proxy")) {
-                                    address = data.getQueryParameter("server");
-                                    if (AndroidUtilities.checkHostForPunycode(address)) {
-                                        address = IDN.toASCII(address, IDN.ALLOW_UNASSIGNED);
-                                    }
-                                    port = data.getQueryParameter("port");
-                                    user = data.getQueryParameter("user");
-                                    password = data.getQueryParameter("pass");
-                                    secret = data.getQueryParameter("secret");
-                                }
-                            }
-                        }
-                    } else if (scheme.equals("tg")) {
-                        String url = data.toString();
-                        if (url.startsWith("tg:proxy") || url.startsWith("tg://proxy") || url.startsWith("tg:socks") || url.startsWith("tg://socks")) {
-                            url = url.replace("tg:proxy", "tg://telegram.org").replace("tg://proxy", "tg://telegram.org").replace("tg://socks", "tg://telegram.org").replace("tg:socks", "tg://telegram.org");
-                            data = Uri.parse(url);
-                            address = data.getQueryParameter("server");
-                            if (AndroidUtilities.checkHostForPunycode(address)) {
-                                address = IDN.toASCII(address, IDN.ALLOW_UNASSIGNED);
-                            }
-                            port = data.getQueryParameter("port");
-                            user = data.getQueryParameter("user");
-                            password = data.getQueryParameter("pass");
-                            secret = data.getQueryParameter("secret");
-                        }
-                    }
-                }
-                if (!TextUtils.isEmpty(address) && !TextUtils.isEmpty(port)) {
-                    if (user == null) {
-                        user = "";
-                    }
-                    if (password == null) {
-                        password = "";
-                    }
-                    if (secret == null) {
-                        secret = "";
-                    }
-                    if (invoked) showProxyAlert(activity, address, port, user, password, secret);
+                final ProxySettings proxySettings = ProxySettings.fromUri(data);
+                if (proxySettings != null && proxySettings.isValid()) {
+                    if (invoked) showProxyAlert(activity, proxySettings);
                     return true;
                 }
             }
@@ -4939,7 +4988,17 @@ public class AndroidUtilities {
         return true;
     }
 
-    public static void showProxyAlert(Activity activity, final String address, final String port, final String user, final String password, final String secret) {
+    public static void showProxyAlert(Activity activity, final ProxySettings settings) {
+        if (settings == null || !settings.isValid()) {
+            return;
+        }
+
+        final String address = settings.getAddress();
+        final int port = settings.getPort();
+        final String user = settings.getUser();
+        final String password = settings.getPassword();
+        final String secret = settings.getSecret();
+
         final BottomSheet.Builder builder = new BottomSheet.Builder(activity);
         builder.setApplyTopPadding(false);
         builder.setApplyBottomPadding(false);
@@ -4959,8 +5018,8 @@ public class AndroidUtilities {
         if (!TextUtils.isEmpty(address)) {
             tableView.addRow(getString(R.string.UseProxyAddress), address);
         }
-        if (!TextUtils.isEmpty(port)) {
-            tableView.addRow(getString(R.string.UseProxyPort), port);
+        if (port != 0) {
+            tableView.addRow(getString(R.string.UseProxyPort), Integer.toString(port));
         }
         if (!TextUtils.isEmpty(secret)) {
             tableView.addRow(getString(R.string.UseProxySecret), secret);
@@ -4987,18 +5046,20 @@ public class AndroidUtilities {
                 statusTextView[0].setText(getString(R.string.ProxyBottomSheetChecking) + "...");
                 statusTextView[0].clear();
                 try {
-                    ConnectionsManager.getInstance(UserConfig.selectedAccount).checkProxy(address, Integer.parseInt(port), user, password, secret, time -> AndroidUtilities.runOnUIThread(() -> {
+                    ConnectionsManager.getInstance(UserConfig.selectedAccount).checkProxy(settings, time -> AndroidUtilities.runOnUIThread(() -> {
+                        checking[0] = false;
                         if (time == -1) {
                             statusTextView[0].setText(getString(R.string.Unavailable));
-                            statusTextView[0].setTextColor(Theme.getColor(Theme.key_text_RedRegular));
+                            ThemeBind.textColor(statusTextView[0], Theme.key_text_RedRegular);
                         } else {
                             statusTextView[0].setText(LocaleController.formatString(R.string.Ping2, time));
-                            statusTextView[0].setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGreenText));
+                            ThemeBind.textColor(statusTextView[0], Theme.key_windowBackgroundWhiteGreenText);
                         }
                     }));
                 } catch (NumberFormatException ignored) {
+                    checking[0] = false;
                     statusTextView[0].setText(getString(R.string.Unavailable));
-                    statusTextView[0].setTextColor(Theme.getColor(Theme.key_text_RedRegular));
+                    ThemeBind.textColor(statusTextView[0], Theme.key_text_RedRegular);
                 }
             };
 
@@ -5030,35 +5091,13 @@ public class AndroidUtilities {
         buttonView.setOnClickListener(v -> {
             SharedPreferences.Editor editor = MessagesController.getGlobalMainSettings().edit();
             editor.putBoolean("proxy_enabled", true);
-            editor.putString("proxy_ip", address);
-            int p = Utilities.parseInt(port);
-            editor.putInt("proxy_port", p);
-
-            SharedConfig.ProxyInfo info;
-            if (TextUtils.isEmpty(secret)) {
-                editor.remove("proxy_secret");
-                if (TextUtils.isEmpty(password)) {
-                    editor.remove("proxy_pass");
-                } else {
-                    editor.putString("proxy_pass", password);
-                }
-                if (TextUtils.isEmpty(user)) {
-                    editor.remove("proxy_user");
-                } else {
-                    editor.putString("proxy_user", user);
-                }
-                info = new SharedConfig.ProxyInfo(address, p, user, password, "");
-            } else {
-                editor.remove("proxy_pass");
-                editor.remove("proxy_user");
-                editor.putString("proxy_secret", secret);
-                info = new SharedConfig.ProxyInfo(address, p, "", "", secret);
-            }
+            settings.toSharedPreferences(editor);
             editor.commit();
 
+            final SharedConfig.ProxyInfo info = new SharedConfig.ProxyInfo(settings);
             SharedConfig.currentProxy = SharedConfig.addProxy(info);
 
-            ConnectionsManager.setProxySettings(true, address, p, user, password, secret);
+            ConnectionsManager.setProxySettings(true, settings);
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged);
             if (activity instanceof LaunchActivity) {
                 INavigationLayout layout = ((LaunchActivity) activity).getActionBarLayout();
@@ -5645,15 +5684,13 @@ public class AndroidUtilities {
 
 
     public static void setLightStatusBar(Window window, boolean enable) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            final View decorView = window.getDecorView();
-            changeSetSystemUiVisibility(decorView, View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR, enable);
+        final View decorView = window.getDecorView();
+        changeSetSystemUiVisibility(decorView, View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR, enable);
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                final int statusBarColor = Color.TRANSPARENT;
-                if (window.getStatusBarColor() != statusBarColor) {
-                    window.setStatusBarColor(statusBarColor);
-                }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            final int statusBarColor = Color.TRANSPARENT;
+            if (window.getStatusBarColor() != statusBarColor) {
+                window.setStatusBarColor(statusBarColor);
             }
         }
     }
@@ -5864,20 +5901,10 @@ public class AndroidUtilities {
     }
 
     public static boolean checkInlinePermissions(Context context) {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context);
+        return Settings.canDrawOverlays(context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static boolean checkPipPermissions(Context context) {
-        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
-            return false;
-        }
-        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_PICTURE_IN_PICTURE, android.os.Process.myUid(), context.getPackageName());
-
-        return mode == AppOpsManager.MODE_ALLOWED;
-    }
-
     public static boolean isInPictureInPictureMode(Activity activity) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInPictureInPictureMode();
     }
@@ -6236,20 +6263,11 @@ public class AndroidUtilities {
 
     // detect Error NO SPaCe left on device :(
     public static boolean isENOSPC(Exception e) {
-        return (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-                        e instanceof IOException &&
-                        (e.getCause() instanceof ErrnoException &&
-                                ((ErrnoException) e.getCause()).errno == OsConstants.ENOSPC) ||
-                        (e.getMessage() != null && e.getMessage().equalsIgnoreCase("no space left on device"))
-        );
+        return e instanceof IOException && e.getCause() instanceof ErrnoException && ((ErrnoException) e.getCause()).errno == OsConstants.ENOSPC || e.getMessage() != null && e.getMessage().equalsIgnoreCase("no space left on device");
     }
 
     public static boolean isEROFS(Exception e) {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && e instanceof IOException &&
-                (e.getCause() instanceof ErrnoException && ((ErrnoException) e.getCause()).errno == OsConstants.EROFS) ||
-                (e.getMessage() != null && e.getMessage().toLowerCase().contains("read-only file system"))
-        );
+        return e instanceof IOException && e.getCause() instanceof ErrnoException && ((ErrnoException) e.getCause()).errno == OsConstants.EROFS || e.getMessage() != null && e.getMessage().toLowerCase().contains("read-only file system");
     }
 
     public static SpannableStringBuilder replaceCharSequence(String what, CharSequence from, CharSequence obj) {
@@ -6655,33 +6673,33 @@ public class AndroidUtilities {
         return new Pair<>(0, 0);
     }
 
-    public static void forEachViews(View view, Consumer<View> consumer) {
+    public static void forEachViews(View view, Utilities.Callback<View> consumer) {
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
-                consumer.accept(view);
+                consumer.run(view);
                 forEachViews(viewGroup.getChildAt(i), consumer);
             }
         } else {
-            consumer.accept(view);
+            consumer.run(view);
         }
     }
 
-    public static void forEachViews(RecyclerView recyclerView, Consumer<View> consumer) {
+    public static void forEachViews(RecyclerView recyclerView, Utilities.Callback<View> consumer) {
         if (recyclerView == null) {
             return;
         }
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            consumer.accept(recyclerView.getChildAt(i));
+            consumer.run(recyclerView.getChildAt(i));
         }
         for (int i = 0; i < recyclerView.getCachedChildCount(); i++) {
-            consumer.accept(recyclerView.getCachedChildAt(i));
+            consumer.run(recyclerView.getCachedChildAt(i));
         }
         for (int i = 0; i < recyclerView.getHiddenChildCount(); i++) {
-            consumer.accept(recyclerView.getHiddenChildAt(i));
+            consumer.run(recyclerView.getHiddenChildAt(i));
         }
         for (int i = 0; i < recyclerView.getAttachedScrapChildCount(); i++) {
-            consumer.accept(recyclerView.getAttachedScrapChildAt(i));
+            consumer.run(recyclerView.getAttachedScrapChildAt(i));
         }
     }
 
@@ -6974,6 +6992,10 @@ public class AndroidUtilities {
         return false;
     }
 
+    public static String getHelloWorld() {
+        return "Hello World!";
+    }
+
     public static String getBuildVersionInfo() {
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
@@ -7000,14 +7022,25 @@ public class AndroidUtilities {
         return null;
     }
 
+    public static StackTraceElement[] dumpStackTrace() {
+        return Thread.currentThread().getStackTrace();
+    }
 
     public static void printStackTrace(String tag) {
         if (!BuildConfig.DEBUG) {
             return;
         }
 
-        final String t = "[" + tag + "]";
         StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        printStackTrace(elements, tag);
+    }
+
+    public static void printStackTrace(StackTraceElement[] elements, String tag) {
+        if (!BuildConfig.DEBUG_PRIVATE_VERSION) {
+            return;
+        }
+
+        final String t = "[" + tag + "]";
         for (int a = 3, N = Math.min(elements.length, 14); a < N; a++) {
             FileLog.d(t + " " + elements[a]);
         }
@@ -7157,7 +7190,9 @@ public class AndroidUtilities {
 
     public static Insets getDefaultWindowInsets(WindowInsetsCompat insets, boolean withIme) {
         final int insetsType = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
-        final Insets systemInsets = insets.getInsetsIgnoringVisibility(insetsType);
+        final Insets systemInsets = Insets.max(
+            insets.getInsetsIgnoringVisibility(insetsType),
+            insets.getInsets(insetsType));
 
         if (withIme) {
             final Insets imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
@@ -7246,9 +7281,7 @@ public class AndroidUtilities {
         if (context instanceof Activity) {
             final Activity activity = (Activity) context;
             if (activity.isFinishing()) return false;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                if (activity.isDestroyed()) return false;
-            }
+            if (activity.isDestroyed()) return false;
             return true;
         }
         if (context instanceof ContextWrapper) {

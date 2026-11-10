@@ -146,20 +146,32 @@ public class AyuGhostUtils {
 
     public static InterceptResult interceptRequest(TLObject object, RequestDelegate onCompleteOrig) {
         Long dialogId = extractDialogId(object);
-        boolean readExcluded = dialogId != null && AyuGhostPreferences.getGhostModeReadExclusion(dialogId);
-        boolean typingExcluded = dialogId != null && AyuGhostPreferences.getGhostModeTypingExclusion(dialogId);
+        int readType = dialogId != null ? AyuGhostPreferences.getReadException(dialogId) : AyuGhostPreferences.TYPE_DEFAULT;
+        int typingType = dialogId != null ? AyuGhostPreferences.getTypingException(dialogId) : AyuGhostPreferences.TYPE_DEFAULT;
 
         // Block typing if disabled
-        if (!NekoConfig.sendUploadProgress.Bool() && (object instanceof TLRPC.TL_messages_setTyping || object instanceof TLRPC.TL_messages_setEncryptedTyping)) {
-            if (!typingExcluded) {
+        if (object instanceof TLRPC.TL_messages_setTyping || object instanceof TLRPC.TL_messages_setEncryptedTyping) {
+            boolean block;
+            if (!NekoConfig.sendUploadProgress.Bool()) {
+                block = AyuGhostPreferences.shouldBlockWhenGlobalDisabled(typingType);
+            } else {
+                block = AyuGhostPreferences.shouldBlockWhenGlobalEnabled(typingType);
+            }
+            if (block) {
                 FileLog.d("GhostMode: Blocking typing status request.");
                 return InterceptResult.Blocked(onCompleteOrig);
             }
         }
 
         // Block read receipts if disabled
-        if (!NekoConfig.sendReadMessagePackets.Bool() && (isReadMessageRequest(object))) {
-            if (!AyuState.getAllowReadPacket() && !readExcluded) {
+        if (isReadMessageRequest(object)) {
+            boolean block;
+            if (!NekoConfig.sendReadMessagePackets.Bool()) {
+                block = !AyuState.getAllowReadPacket() && AyuGhostPreferences.shouldBlockWhenGlobalDisabled(readType);
+            } else {
+                block = AyuGhostPreferences.shouldBlockWhenGlobalEnabled(readType);
+            }
+            if (block) {
                 // TL_messages_getMessagesViews expects TL_messages_messageViews in its callback.
                 // Sending TL_messages_affectedMessages (the generic fake) causes ClassCastException
                 // in MessagesController.updateTimerProc. Instead, call with null — the callback
@@ -182,8 +194,14 @@ public class AyuGhostUtils {
                 return InterceptResult.Blocked(onCompleteOrig);
             }
         }
-        if (!NekoConfig.sendReadStoriesPackets.Bool() && isReadStoriesRequest(object)) {
-            if (!readExcluded) {
+        if (isReadStoriesRequest(object)) {
+            boolean block;
+            if (!NekoConfig.sendReadStoriesPackets.Bool()) {
+                block = AyuGhostPreferences.shouldBlockWhenGlobalDisabled(readType);
+            } else {
+                block = AyuGhostPreferences.shouldBlockWhenGlobalEnabled(readType);
+            }
+            if (block) {
                 FileLog.d("GhostMode: Blocking story read request.");
                 return InterceptResult.Blocked(onCompleteOrig);
             }
@@ -210,7 +228,7 @@ public class AyuGhostUtils {
 
             if (peer != null) {
                 var dialogId = AyuGhostUtils.getDialogId(peer);
-                if (AyuGhostPreferences.getGhostModeReadExclusion(dialogId)) {
+                if (AyuGhostPreferences.getReadException(dialogId) == AyuGhostPreferences.TYPE_FORCE_ALLOW) {
                     return;
                 }
                 getMessagesStorage().getStorageQueue().postRunnable(() ->
@@ -225,7 +243,7 @@ public class AyuGhostUtils {
     private static RequestDelegate handleOfflineAfterSend(TLObject object, RequestDelegate onCompleteOrig) {
         if (NekoConfig.sendOfflinePacketAfterOnline.Bool() && isMessageSendRequest(object)) {
             TLRPC.InputPeer peer = extractPeerFromSendObject(object);
-            if (peer != null && AyuGhostPreferences.getGhostModeTypingExclusion(getDialogId(peer))) {
+            if (peer != null && AyuGhostPreferences.getTypingException(getDialogId(peer)) == AyuGhostPreferences.TYPE_FORCE_ALLOW) {
                 return onCompleteOrig;
             }
             FileLog.d("GhostMode: Wrapping callback for offline-after-send.");

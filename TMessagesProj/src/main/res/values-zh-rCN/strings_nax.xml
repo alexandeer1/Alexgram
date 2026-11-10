@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">模型提供商</string>
     <string name="LlmProviderCustom">自定义</string>
     <string name="LlmProviderOpenAIKey">OpenAI API 密钥</string>
     <string name="LlmProviderGeminiKey">Gemini API 密钥</string>
+    <string name="LlmProviderZhipuAIKey">智谱 AI API 密钥</string>
+    <string name="LlmProviderMistralKey">Mistral API 密钥</string>
+    <string name="LlmProviderQwenKey">通义千问 API 密钥</string>
+    <string name="LlmProviderMoonshotKey">月之暗面 API 密钥</string>
+    <string name="LlmProviderSiliconFlowKey">硅基流动 API 密钥</string>
+    <string name="DisableAiEditor">禁用 AI 编辑器</string>
     <string name="LlmSystemPrompt">系统提示词</string>
     <string name="LlmSystemPromptHint">您是一名专业的译者。</string>
     <string name="LlmSystemPromptNotice">定义 AI 的角色和行为。\n\n该提示词决定 AI 的语调、个性和限制。试着描述 AI 应该成为何种类型的助手。</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">标记已读</string>
     <string name="GhostModeExcludeRead">排除已读</string>
     <string name="GhostModeExcludeTyping">排除输入</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">默认</string>
+    <string name="GhostModeExceptionForceBlockRead">强制阻断已读</string>
+    <string name="GhostModeExceptionForceAllowRead">强制放行已读</string>
+    <string name="GhostModeExceptionForceBlockTyping">强制阻断输入</string>
+    <string name="GhostModeExceptionForceAllowTyping">强制放行输入</string>
+    <string name="ShowFilteredMessagesMenuText">显示过滤消息</string>
+    <string name="HideFilteredMessagesMenuText">隐藏过滤消息</string>
     <string name="SendWithSound">有声发送</string>
     <string name="PerformanceClass">设备性能等级</string>
     <string name="PerformanceClassHigh">高</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">创建代码</string>
     <string name="CreateCodeLanguage">语言</string>
     <string name="NoCaptionForward">无说明转发</string>
+    <string name="NoCaptionForwardShort">无说明</string>
     <string name="PreferCommonGroupsTab">首选群组标签</string>
     <string name="PreferCommonGroupsTabNotice">在个人资料页面自动选择“群组”标签而不是“礼物”。</string>
     <string name="GroupedMessageMenu">分组消息菜单</string>

@@ -1,83 +1,69 @@
 package tw.nekomimi.nekogram.translate.source
 
-import org.telegram.messenger.LocaleController.getString
+import org.json.JSONArray
+import org.telegram.messenger.LocaleController
 import org.telegram.messenger.R
-import org.telegram.tgnet.TLRPC
-import org.telegram.ui.Components.TranslateAlert2
-import tw.nekomimi.nekogram.translate.HTMLKeeper
 import tw.nekomimi.nekogram.translate.Translator
-import tw.nekomimi.nekogram.translate.source.raw.BingTranslatorRaw
-import java.io.IOException
+import xyz.nextalone.nagram.network.ContentType
+import xyz.nextalone.nagram.network.NetworkRequestBuilder
+import java.util.Arrays
 
 object MicrosoftTranslator : Translator {
 
-    private val rawTranslator = BingTranslatorRaw()
-
-    override suspend fun doTranslate(
-        from: String,
-        to: String,
-        query: String,
-        entities: ArrayList<TLRPC.MessageEntity>
-    ): TLRPC.TL_textWithEntities {
-
-        val fromLang = if (from == "auto") "auto-detect" else from
-        val toLang = when {
-            to.equals("zh", ignoreCase = true) ||
-                to.equals("zh-CN", ignoreCase = true) ||
-                to.equals("zh-Hans", ignoreCase = true) -> "zh-Hans"
-            to.equals("zh-TW", ignoreCase = true) ||
-                to.equals("zh-HK", ignoreCase = true) ||
-                to.equals("zh-Hant", ignoreCase = true) -> "zh-Hant"
-            else -> to
-        }
-
-        if (toLang.lowercase() !in targetLanguages.map { it.lowercase() }) {
-            throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)
-        }
-
-        val originalText = TLRPC.TL_textWithEntities()
-        originalText.text = query
-        originalText.entities = entities
-
-        val finalString = StringBuilder()
-
-        val textToTranslate = if (entities.isNotEmpty()) HTMLKeeper.entitiesToHtml(
-            query,
-            entities,
-            false
-        ) else query
-
-        if (textToTranslate.length > 3000) {
-            error("Text length exceeds the limit of 3000 characters. text length: " + query.length)
-        }
-
-        try {
-            val translatedText = rawTranslator.translate(textToTranslate, fromLang, toLang)
-            finalString.append(translatedText)
-
-            var finalText = TLRPC.TL_textWithEntities()
-            if (entities.isNotEmpty()) {
-                val resultPair = HTMLKeeper.htmlToEntities(finalString.toString(), entities, false)
-                finalText.text = resultPair.first
-                finalText.entities = resultPair.second
-                finalText = TranslateAlert2.preprocess(originalText, finalText)
-            } else {
-                finalText.text = finalString.toString()
-            }
-
-            return finalText
-        } catch (e: IOException) {
-            error(e.message ?: "Failed to translate")
-        }
-    }
-
-    private val targetLanguages = listOf(
-        "af", "sq", "am", "ar", "hy", "az", "bn", "bs", "bg", "ca", "zh-Hans", "zh-Hant",
-        "hr", "cs", "da", "prs", "nl", "en", "et", "fil", "fi", "fr", "de", "el", "gu",
-        "ht", "he", "hi", "hu", "is", "id", "iu", "ga", "it", "ja", "kn", "kk", "km",
-        "ko", "ku", "lo", "lv", "lt", "mg", "ms", "ml", "mt", "mr", "my", "mi", "ne",
-        "nb", "or", "ps", "fa", "pl", "pt", "pt-PT", "pa", "ro", "ru", "sm", "sr-Cyrl",
-        "sr-Latn", "sk", "sl", "es", "sw", "sv", "ta", "te", "th", "to", "tr", "uk",
-        "ur", "vi", "cy"
+    private val targetLanguages = Arrays.asList(
+        "ar", "as", "bn", "bs", "bg", "yue", "ca", "zh", "zh-Hans", "zh-Hant",
+        "hr", "cs", "da", "prs", "nl", "en", "et", "fj", "fil", "fi",
+        "fr", "de", "el", "gu", "ht", "he", "hi", "mww", "hu", "is",
+        "id", "ga", "it", "ja", "kn", "kk", "tlh", "ko", "ku", "kmr",
+        "lv", "lt", "mg", "ms", "ml", "mt", "mi", "mr", "nb", "or", "ps",
+        "fa", "pl", "pt", "pa", "otq", "ro", "ru", "sm", "sr", "sk", "sl",
+        "es", "sw", "sv", "ty", "ta", "te", "th", "to", "tr", "uk", "ur",
+        "vi", "cy", "yua"
     )
+
+    override suspend fun doTranslate(from: String, to: String, query: String): String {
+        var targetLang = to
+        if (targetLang !in targetLanguages) {
+            val base = targetLang.split("-", "_")[0]
+            if (base in targetLanguages) {
+                targetLang = base
+            } else {
+                throw UnsupportedOperationException(LocaleController.getString(R.string.TranslateApiUnsupported))
+            }
+        }
+
+        val source = JSONArray()
+        for (s in query.split("\n")) {
+            source.put(s)
+        }
+
+        val response = NetworkRequestBuilder.post("https://edge.microsoft.com/translate/translatetext") {
+            contentType(ContentType.Application.Json)
+            parameter("from", "")
+            parameter("to", targetLang)
+            parameter("isEnterpriseClient", "false")
+            setBody(source.toString())
+        }.execute()
+
+        if (response.statusCode != 200) {
+            error("HTTP ${response.statusCode} : ${response.body}")
+        }
+
+        val target = JSONArray(response.body)
+        val result = StringBuilder()
+        for (i in 0 until target.length()) {
+            val obj = target.getJSONObject(i)
+            val tra = obj.getJSONArray("translations")
+            if (tra.length() >= 1) {
+                val traObj = tra.getJSONObject(0)
+                val text = traObj.getString("text")
+                result.append(text)
+                if (i != target.length() - 1) {
+                    result.append("\n")
+                }
+            }
+        }
+
+        return result.toString()
+    }
 }

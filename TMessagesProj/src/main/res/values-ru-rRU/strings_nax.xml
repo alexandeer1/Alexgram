@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Поставщик модели</string>
     <string name="LlmProviderCustom">Пользовательский</string>
     <string name="LlmProviderOpenAIKey">Ключ API OpenAI</string>
     <string name="LlmProviderGeminiKey">Ключ API Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Ключ API Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Ключ API Mistral</string>
+    <string name="LlmProviderQwenKey">Ключ API Qwen</string>
+    <string name="LlmProviderMoonshotKey">Ключ API Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Ключ API SiliconFlow</string>
+    <string name="DisableAiEditor">Отключить AI Редактор</string>
     <string name="LlmSystemPrompt">Системный промпт</string>
     <string name="LlmSystemPromptHint">Ты профессиональный переводчик.</string>
     <string name="LlmSystemPromptNotice">Определите роль и поведение ИИ.\n\nЭтот промпт задаёт тон, индивидуальность и ограничения для ИИ. Подумайте о том, каким типом помощника должен быть ИИ.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Прочитать сообщение</string>
     <string name="GhostModeExcludeRead">Исключить прочтение</string>
     <string name="GhostModeExcludeTyping">Исключить ввод текста</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">По умолчанию</string>
+    <string name="GhostModeExceptionForceBlockRead">Принудительно блокировать прочтение</string>
+    <string name="GhostModeExceptionForceAllowRead">Принудительно разрешить прочтение</string>
+    <string name="GhostModeExceptionForceBlockTyping">Принудительно блокировать ввод текста</string>
+    <string name="GhostModeExceptionForceAllowTyping">Принудительно разрешить ввод текста</string>
+    <string name="ShowFilteredMessagesMenuText">Показывать отфильтрованные</string>
+    <string name="HideFilteredMessagesMenuText">Скрывать отфильтрованные</string>
     <string name="SendWithSound">Отправить со звуком</string>
     <string name="PerformanceClass">Класс производительности устройства</string>
     <string name="PerformanceClassHigh">Высокий</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Создать код</string>
     <string name="CreateCodeLanguage">Язык</string>
     <string name="NoCaptionForward">Переслать без подписи</string>
+    <string name="NoCaptionForwardShort">Без подписи</string>
     <string name="PreferCommonGroupsTab">Предпочитать вкладку «Группы»</string>
     <string name="PreferCommonGroupsTabNotice">Автоматически выбирать вкладку «Группы» вместо «Подарки», когда это возможно.</string>
     <string name="GroupedMessageMenu">Группировать меню сообщений</string>

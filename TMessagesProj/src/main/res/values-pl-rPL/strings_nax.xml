@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Dostawca modelu</string>
     <string name="LlmProviderCustom">Personalizacja</string>
     <string name="LlmProviderOpenAIKey">Klucz API OpenAI</string>
     <string name="LlmProviderGeminiKey">Klucz API Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Klucz API Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Klucz API Mistral</string>
+    <string name="LlmProviderQwenKey">Klucz API Qwen</string>
+    <string name="LlmProviderMoonshotKey">Klucz API Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Klucz API SiliconFlow</string>
+    <string name="DisableAiEditor">Wyłącz edytor AI</string>
     <string name="LlmSystemPrompt">System podpowiedzi</string>
     <string name="LlmSystemPromptHint">Jesteś profesjonalnym tłumaczem.</string>
     <string name="LlmSystemPromptNotice">Zdefiniuj rolę i zachowanie sztucznej inteligencji AI.\n\nTo pole określa charakter, osobowość i ograniczenia sztucznej inteligencji. Rozważ opisanie, jakim typem asystenta powinna być sztuczna inteligencja.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Czytaj wiadomość w trybie duch</string>
     <string name="GhostModeExcludeRead">Wyklucz czytanie</string>
     <string name="GhostModeExcludeTyping">Wyklucz pisanie</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Domyślny</string>
+    <string name="GhostModeExceptionForceBlockRead">Wymuś blokowanie przeczytania</string>
+    <string name="GhostModeExceptionForceAllowRead">Wymuś zezwolenie na przeczytanie</string>
+    <string name="GhostModeExceptionForceBlockTyping">Wymuś blokowanie pisania</string>
+    <string name="GhostModeExceptionForceAllowTyping">Wymuś zezwolenie na pisanie</string>
+    <string name="ShowFilteredMessagesMenuText">Pokaż przefiltrowane</string>
+    <string name="HideFilteredMessagesMenuText">Ukryj przefiltrowane</string>
     <string name="SendWithSound">Wyślij z dźwiękiem</string>
     <string name="PerformanceClass">Klasa wydajności urządzenia</string>
     <string name="PerformanceClassHigh">Wysoki</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Utwórz kod</string>
     <string name="CreateCodeLanguage">Język</string>
     <string name="NoCaptionForward">Brak napisów do przodu</string>
+    <string name="NoCaptionForwardShort">Bez podpisu</string>
     <string name="PreferCommonGroupsTab">Karta Preferuj grupy</string>
     <string name="PreferCommonGroupsTabNotice">Automatycznie-wybieraj zakładkę „Grupy” zamiast „Prezenty”</string>
     <string name="GroupedMessageMenu">Menu wiadomości grupowych</string>

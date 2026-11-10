@@ -1,58 +1,18 @@
 package tw.nekomimi.nekogram.translate.source
 
-import org.telegram.messenger.LocaleController.getString
-import org.telegram.messenger.R
-import org.telegram.tgnet.TLRPC
-import org.telegram.ui.Components.TranslateAlert2
-import tw.nekomimi.nekogram.translate.HTMLKeeper
-import tw.nekomimi.nekogram.translate.Translator
-import tw.nekomimi.nekogram.translate.source.fallback.DeepLTranslatorNeko
-import java.util.Locale
+import xyz.nextalone.nagram.NaConfig
 
-object DeepLTranslator : Translator {
+/**
+ * Official DeepL Pro API translator (https://api.deepl.com).
+ */
+object DeepLTranslator : DeepLOfficialTranslatorBase() {
 
-    override suspend fun doTranslate(
-        from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
-    ): TLRPC.TL_textWithEntities {
-        if (to.isEmpty()) {
-            throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)
-        }
+    override val logTag: String = "DeepL"
 
-        try {
-            val originalText = TLRPC.TL_textWithEntities().apply {
-                this.text = query
-                this.entities = entities
-            }
+    override val baseUrl: String = "https://api.deepl.com"
 
-            val textToTranslate = if (entities.isNotEmpty()) HTMLKeeper.entitiesToHtml(
-                query, entities, false
-            ) else query
+    override val displayName: String = "DeepL"
 
-            val translatedText = DeepLTranslatorNeko.translate(
-                textToTranslate,
-                from,
-                when (to.lowercase(Locale.ROOT)) {
-                    "zh", "zh-cn", "zh-hans" -> "zh-CN"
-                    "zh-tw", "zh-hk", "zh-hant" -> "zh-TW"
-                    else -> to
-                }
-            )
-
-            val finalString = StringBuilder().append(translatedText)
-            var finalText = TLRPC.TL_textWithEntities()
-            if (entities.isNotEmpty()) {
-                val resultPair = HTMLKeeper.htmlToEntities(finalString.toString(), entities, false)
-                finalText.text = resultPair.first
-                finalText.entities = resultPair.second
-                finalText = TranslateAlert2.preprocess(originalText, finalText)
-            } else {
-                finalText.text = finalString.toString()
-            }
-
-            return finalText
-        } catch (e: Exception) {
-            error("DeepL API request failed: ${e.message}")
-        }
-    }
-
+    override val apiKey: String?
+        get() = NaConfig.deepLApiKey.String()
 }

@@ -170,6 +170,7 @@ public class SnowflakesEffect {
         if (parent == null || canvas == null || (!force && !LiteMode.isEnabled(LiteMode.FLAG_CHAT_BACKGROUND))) {
             return;
         }
+        updateColors(); // cheap (cached), follows theme switches: owners never call it
 
         if (batchParticlesBuffer != null) {
             final int count = Math.min(maxCount, particles.size());

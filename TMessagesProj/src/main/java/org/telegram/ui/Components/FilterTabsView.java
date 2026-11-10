@@ -67,6 +67,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.ActionBar.ThemeBind;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 import org.telegram.ui.Stories.recorder.HintView2;
 
@@ -502,11 +503,23 @@ public class FilterTabsView extends FrameLayout {
                     lastLoadedTabId = filter != null ? filter.id : -999999;
                     android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonSize, emoticonSize);
                     if (isVirtual && tabEntry != null) {
-                        icon = getResources().getDrawable(tabEntry.iconResId).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), tabEntry.iconResId);
+                            icon = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            icon = null;
+                        }
                     } else {
-                        icon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.id != getDefaultTabId() ? currentTab.emoticon : "\uD83D\uDCAC")).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), FolderIconHelper.getTabIcon(currentTab.id != getDefaultTabId() ? currentTab.emoticon : "\uD83D\uDCAC"));
+                            icon = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            icon = null;
+                        }
                     }
-                    icon.setBounds(bounds);
+                    if (icon != null) {
+                        icon.setBounds(bounds);
+                    }
                 }
                 if (icon != null) {
                     icon.setTint(textPaint.getColor());
@@ -874,19 +887,43 @@ public class FilterTabsView extends FrameLayout {
                     int emoticonWidth = FolderIconHelper.getIconWidth();
                     android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonWidth, emoticonWidth);
                     if (lastIsVirtual && lastTabEntry != null) {
-                        iconAnimateOutDrawable = getResources().getDrawable(lastTabEntry.iconResId).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), lastTabEntry.iconResId);
+                            iconAnimateOutDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateOutDrawable = null;
+                        }
                     } else {
-                        iconAnimateOutDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(lastEmoticon != null ? lastEmoticon : "\uD83D\uDCAC")).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), FolderIconHelper.getTabIcon(lastEmoticon != null ? lastEmoticon : "\uD83D\uDCAC"));
+                            iconAnimateOutDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateOutDrawable = null;
+                        }
                     }
                     if (currentIsVirtual && currentTabEntry != null) {
-                        iconAnimateInDrawable = getResources().getDrawable(currentTabEntry.iconResId).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), currentTabEntry.iconResId);
+                            iconAnimateInDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateInDrawable = null;
+                        }
                     } else {
-                        iconAnimateInDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon)).mutate();
+                        try {
+                            android.graphics.drawable.Drawable d = ContextCompat.getDrawable(getContext(), FolderIconHelper.getTabIcon(currentTab.emoticon));
+                            iconAnimateInDrawable = d != null ? d.mutate() : null;
+                        } catch (Exception e) {
+                            iconAnimateInDrawable = null;
+                        }
                     }
-                    iconAnimateOutDrawable.setBounds(bounds);
-                    iconAnimateInDrawable.setBounds(bounds);
-                    iconAnimateOutDrawable.setTint(textPaint.getColor());
-                    iconAnimateInDrawable.setTint(textPaint.getColor());
+                    if (iconAnimateOutDrawable != null) {
+                        iconAnimateOutDrawable.setBounds(bounds);
+                        iconAnimateOutDrawable.setTint(textPaint.getColor());
+                    }
+                    if (iconAnimateInDrawable != null) {
+                        iconAnimateInDrawable.setBounds(bounds);
+                        iconAnimateInDrawable.setTint(textPaint.getColor());
+                    }
                     animateIconChange = true;
                     changed = true;
                 }
@@ -1236,7 +1273,7 @@ public class FilterTabsView extends FrameLayout {
         listView.setItemAnimator(itemAnimator);
         listView.setSelectorType(9);
         listView.setSelectorRadius(6);
-        listView.setSelectorDrawableColor(Theme.getColor(selectorColorKey, resourcesProvider));
+        ThemeBind.listSelectorColor(listView, selectorColorKey, resourcesProvider);
         listView.setLayoutManager(layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) {
 
             @Override
@@ -1513,7 +1550,7 @@ public class FilterTabsView extends FrameLayout {
         activeTextColorKey = active;
         unactiveTextColorKey = unactive;
         selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
-        listView.setSelectorDrawableColor(Theme.getColor(selector, resourcesProvider));
+        ThemeBind.listSelectorColor(listView, selector, resourcesProvider);
 
         listView.invalidateViews();
         listView.invalidate();
@@ -1529,7 +1566,7 @@ public class FilterTabsView extends FrameLayout {
         aUnactiveTextColorKey = unactive;
         aBackgroundColorKey = background;
         selectorColorKey = selector;
-        listView.setSelectorDrawableColor(Theme.getColor(selectorColorKey, resourcesProvider));
+        ThemeBind.listSelectorColor(listView, selectorColorKey, resourcesProvider);
 
         colorChangeAnimator = new AnimatorSet();
         colorChangeAnimator.playTogether(ObjectAnimator.ofFloat(this, COLORS, 0.0f, 1.0f));
@@ -1926,8 +1963,9 @@ public class FilterTabsView extends FrameLayout {
                 invalidated = true;
                 requestLayout();
                 allTabsWidth = 0;
-                if (!NekoConfig.hideAllTab.Bool()) {
-                    findDefaultTab().setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
+                final FilterTabsView.Tab defaultTab = findDefaultTab();
+                if (!NekoConfig.hideAllTab.Bool() && defaultTab != null) {
+                    defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
                 }
                 for (int b = 0; b < N; b++) {
                     allTabsWidth += tabs.get(b).getWidth(true) + dp(FolderIconHelper.getTabPadding());
@@ -1957,10 +1995,13 @@ public class FilterTabsView extends FrameLayout {
             invalidated = true;
             requestLayout();
             listView.setItemAnimator(itemAnimator);
-            adapter.notifyDataSetChanged();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
             allTabsWidth = 0;
-            if (!NekoConfig.hideAllTab.Bool()) {
-                findDefaultTab().setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
+            final FilterTabsView.Tab defaultTab = findDefaultTab();
+            if (!NekoConfig.hideAllTab.Bool() && defaultTab != null) {
+                defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
             }
             for (int b = 0, N = tabs.size(); b < N; b++) {
                 allTabsWidth += tabs.get(b).getWidth(true) + dp(FolderIconHelper.getTabPadding());
@@ -2167,7 +2208,7 @@ public class FilterTabsView extends FrameLayout {
             if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
                 listView.cancelClickRunnables(false);
                 viewHolder.itemView.setPressed(true);
-                viewHolder.itemView.setBackgroundColor(Theme.getColor(backgroundColorKey, resourcesProvider));
+                ThemeBind.backgroundColor(viewHolder.itemView, backgroundColorKey, resourcesProvider);
             } else {
                 AndroidUtilities.cancelRunOnUIThread(resetDefaultPosition);
                 AndroidUtilities.runOnUIThread(resetDefaultPosition, 320);

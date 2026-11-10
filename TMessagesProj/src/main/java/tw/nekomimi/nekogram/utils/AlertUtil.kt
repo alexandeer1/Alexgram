@@ -137,8 +137,16 @@ object AlertUtil {
 
     }
 
+    fun interface RetryCallback {
+        fun onRetry(newProvider: Int)
+    }
+
     @JvmStatic
-    fun showTransFailedDialog(ctx: Context, noRetry: Boolean, message: String, retryRunnable: Runnable) = AndroidUtilities.runOnUIThread {
+    fun showTransFailedDialog(ctx: Context, noRetry: Boolean, message: String, retryRunnable: Runnable) =
+        showTransFailedDialog(ctx, noRetry, message) { retryRunnable.run() }
+
+    @JvmStatic
+    fun showTransFailedDialog(ctx: Context, noRetry: Boolean, message: String, onRetry: RetryCallback) = AndroidUtilities.runOnUIThread {
         ctx.setTheme(R.style.Theme_TMessages)
         val reference = AtomicReference<AlertDialog>()
 
@@ -151,20 +159,30 @@ object AlertUtil {
             val popup = PopupBuilder(view, true)
             val providers = listOf(
                 ProviderInfo(Translator.providerGoogle, R.string.ProviderGoogleTranslate),
-                ProviderInfo(Translator.providerYandex, R.string.ProviderYandexTranslate), 
+                ProviderInfo(Translator.providerGoogleCN, R.string.ProviderGoogleTranslateCN),
+                ProviderInfo(Translator.providerGoogle2, R.string.ProviderGoogleTranslate),
                 ProviderInfo(Translator.providerLingo, R.string.ProviderLingocloud),
                 ProviderInfo(Translator.providerMicrosoft, R.string.ProviderMicrosoftTranslator),
-                ProviderInfo(Translator.providerRealMicrosoft, R.string.ProviderRealMicrosoftTranslator),
-                ProviderInfo(Translator.providerDeepL, R.string.ProviderDeepLTranslate),
+                ProviderInfo(Translator.providerVolcengine, R.string.ProviderVolcengineTranslate),
+                ProviderInfo(Translator.providerDeepL, R.string.ProviderDeepLxTranslate),
                 ProviderInfo(Translator.providerTelegram, R.string.ProviderTelegramAPI),
                 ProviderInfo(Translator.providerTranSmart, R.string.ProviderTranSmartTranslate),
-                ProviderInfo(Translator.providerLLMTranslator, R.string.ProviderLLMTranslator)
+                ProviderInfo(Translator.providerLLM, R.string.ProviderLLMTranslate),
+                ProviderInfo(Translator.providerDeepLOfficial, R.string.ProviderDeepLTranslate),
+                ProviderInfo(Translator.providerDeepLFree, R.string.ProviderDeepLFreeTranslate)
             )
-            val itemNames = providers.map { getString(it.nameResId) }
+            val itemNames = providers.map {
+                if (it.providerConstant == Translator.providerGoogle2) {
+                    getString(it.nameResId) + " 2"
+                } else {
+                    getString(it.nameResId)
+                }
+            }
             popup.setItems(itemNames.toTypedArray()) { index, _ ->
                 reference.get().dismiss()
-                NekoConfig.translationProvider.setConfigInt(providers[index].providerConstant)
-                retryRunnable.run()
+                val selectedProvider = providers[index].providerConstant
+                NekoConfig.translationProvider.setConfigInt(selectedProvider)
+                onRetry.onRetry(selectedProvider)
             }
             popup.show()
         }
@@ -176,7 +194,7 @@ object AlertUtil {
         } else {
             builder.setPositiveButton(getString(R.string.Retry)) { _, _ ->
                 reference.get().dismiss()
-                retryRunnable.run()
+                onRetry.onRetry(0)
             }
             builder.setNegativeButton(getString(R.string.Cancel)) { _, _ ->
                 reference.get().dismiss()

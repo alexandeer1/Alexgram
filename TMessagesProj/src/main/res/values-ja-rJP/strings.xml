@@ -60,4 +60,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">公式コミュニティ</string>
+    <string name="AlexgramWelcomeTitle">Alexgram へようこそ</string>
+    <string name="AlexgramWelcomeSubtitle">メッセージングの枠を超えた体験</string>
+    <string name="AlexgramWelcomeDescription">限定機能、最新アップデート、先行アクセスを公式チャンネルでお届けします。</string>
+    <string name="AlexgramWelcomeFeature1Title">圧倒的なパフォーマンスとクラウド</string>
+    <string name="AlexgramWelcomeFeature1Desc">超高速ダウンロード、強化されたストリーミング、シームレスな同期。</string>
+    <string name="AlexgramWelcomeFeature2Title">ゴーストモード</string>
+    <string name="AlexgramWelcomeFeature2Desc">既読を付けずにメッセージを閲覧、オンライン状態と入力中を非表示。</string>
+    <string name="AlexgramWelcomeFeature3Title">限定機能の先行公開</string>
+    <string name="AlexgramWelcomeFeature3Desc">先行プレビュー、開発者ノート、専用ツール。</string>
+    <string name="AlexgramWelcomeJoinButton">公式チャンネルに参加</string>
+    <string name="AlexgramWelcomeOpenButton">公式チャンネルを開く</string>
+    <string name="AlexgramWelcomeContinueButton">Alexgram を始める</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

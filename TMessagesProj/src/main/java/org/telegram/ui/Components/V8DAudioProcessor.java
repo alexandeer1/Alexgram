@@ -1,11 +1,14 @@
 package org.telegram.ui.Components;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.audio.AudioProcessor;
-import com.google.android.exoplayer2.audio.BaseAudioProcessor;
+import androidx.annotation.OptIn;
+import androidx.media3.common.C;
+import androidx.media3.common.audio.AudioProcessor;
+import androidx.media3.common.audio.BaseAudioProcessor;
+import androidx.media3.common.util.UnstableApi;
 import java.nio.ByteBuffer;
 import xyz.nextalone.nagram.NaConfig;
 
+@OptIn(markerClass = UnstableApi.class)
 public class V8DAudioProcessor extends BaseAudioProcessor {
 
     private float angle = 0;

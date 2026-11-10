@@ -110,6 +110,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }, null));
     // [Alexgram: Accounts Settings] - maxActiveAccountsRow moved to AccountsSettingsActivity
     private final AbstractConfigCell searchEngineInSearchBarRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getSearchEngineInSearchBar(), getString(R.string.SearchEngineInSearchBarDescription)));
+    private final AbstractConfigCell disableAiEditorRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDisableAiEditor()));
     private final AbstractConfigCell dividerGeneral = cellGroup.appendCell(new ConfigCellDivider());
 
     // Storage
@@ -256,6 +257,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     private final AbstractConfigCell getImportantAnnouncementFromAlexgramRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getGetImportantAnnouncementFromAlexgram()));
     // [Alexgram: Important Announcement] - End
     private final AbstractConfigCell hidePhoneRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.hidePhone));
+    private final AbstractConfigCell replaceBlockedMyInfoRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getReplaceBlockedMyInfo(), getString(R.string.ReplaceBlockedMyInfoDescription)));
     private final AbstractConfigCell disableSystemAccountRow = cellGroup.appendCell(new ConfigCellTextCheck(NekoConfig.disableSystemAccount));
     private final AbstractConfigCell disableCrashlyticsCollectionRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getDisableCrashlyticsCollection()));
     private final AbstractConfigCell allowForwardingRestrictionRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getAllowForwardingRestriction(), getString(R.string.AllowForwardingRestrictionDescription)));

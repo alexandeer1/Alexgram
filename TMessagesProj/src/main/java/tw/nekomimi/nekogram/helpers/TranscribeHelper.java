@@ -61,7 +61,18 @@ public class TranscribeHelper {
     public static final int TRANSCRIBE_WORKERSAI = 2;
     public static final int TRANSCRIBE_GEMINI = 3;
     public static final int TRANSCRIBE_OPENAI = 4;
-    private static final String GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/" + getString(R.string.LlmModelNameDefault) + ":generateContent?key=%s";
+    private static String getGeminiEndpoint(String apiKey) {
+        String model = NaConfig.INSTANCE.getLlmProviderGeminiModel().String().trim();
+        if (model.isEmpty()) {
+            try {
+                model = getString(R.string.LlmProviderGeminiModel);
+            } catch (Exception ignore) {}
+            if (TextUtils.isEmpty(model)) {
+                model = "gemini-flash-latest";
+            }
+        }
+        return "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + apiKey;
+    }
     private static final String GEMINI_PROMPT = """
     Your task is to create a detailed, verbatim transcription of the provided audio, formatted like closed captions for the hard of hearing. Follow these instructions strictly:
 
@@ -227,7 +238,7 @@ public class TranscribeHelper {
         if (button != null) {
             button.setOnClickListener(v -> {
                 var apiKey = editTextApiKey.getText();
-                if (!TextUtils.isEmpty(apiKey) && (apiKey.length() != 39 || !apiKey.toString().startsWith("AIzaSy"))) {
+                if (!TextUtils.isEmpty(apiKey) && apiKey.length() < 39) {
                     AndroidUtilities.shakeViewSpring(editTextApiKey, -6);
                     BotWebViewVibrationEffect.APP_ERROR.vibrate();
                     return;
@@ -443,11 +454,12 @@ public class TranscribeHelper {
             try (var response = client.newCall(request.build()).execute()) {
                 var body = response.body().string();
                 var whisperResponse = gson.fromJson(body, WhisperResponse.class);
-                if (whisperResponse.success && whisperResponse.result != null) {
+                if (whisperResponse != null && Boolean.TRUE.equals(whisperResponse.success) && whisperResponse.result != null) {
                     callback.accept(whisperResponse.result.text, null);
                 } else {
-                    var errors = whisperResponse.errors;
-                    callback.accept(null, new Exception(errors.size() == 1 ? errors.get(0).message : errors.toString()));
+                    var errors = whisperResponse != null ? whisperResponse.errors : null;
+                    String errorMsg = errors != null && !errors.isEmpty() ? (errors.size() == 1 ? errors.get(0).message : errors.toString()) : "Cloudflare AI request failed (HTTP " + response.code() + ")";
+                    callback.accept(null, new Exception(errorMsg));
                 }
             } catch (Exception e) {
                 callback.accept(null, e);
@@ -497,7 +509,7 @@ public class TranscribeHelper {
                 OkHttpClient client = getOkHttpClient();
                 RequestBody requestBody = RequestBody.create(jsonRequest, HttpClient.MEDIA_TYPE_JSON);
                 Request request = new Request.Builder()
-                        .url(String.format(GEMINI_API_ENDPOINT, finalApiKey))
+                        .url(getGeminiEndpoint(finalApiKey))
                         .post(requestBody)
                         .build();
                 try (Response response = client.newCall(request).execute()) {
@@ -591,7 +603,7 @@ public class TranscribeHelper {
                 RequestBody requestBody = RequestBody.create(jsonRequest, HttpClient.MEDIA_TYPE_JSON);
                 Request request = new Request.Builder()
                         .url(endpointUrl)
-                        .header("Authorization", "Bearer " + apiKey)
+                        .header("Authorization", "Bearer " + apiKey.trim())
                         .header("Content-Type", "application/json")
                         .post(requestBody)
                         .build();

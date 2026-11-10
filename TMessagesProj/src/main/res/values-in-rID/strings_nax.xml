@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Penyedia Model</string>
     <string name="LlmProviderCustom">Khusus</string>
     <string name="LlmProviderOpenAIKey">Kunci API OpenAI</string>
     <string name="LlmProviderGeminiKey">Kunci API Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Kunci API Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Kunci API Mistral</string>
+    <string name="LlmProviderQwenKey">Kunci API Qwen</string>
+    <string name="LlmProviderMoonshotKey">Kunci API Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Kunci API SiliconFlow</string>
+    <string name="DisableAiEditor">Nonaktifkan Editor AI</string>
     <string name="LlmSystemPrompt">Perintah Sistem</string>
     <string name="LlmSystemPromptHint">Anda adalah seorang penerjemah profesional.</string>
     <string name="LlmSystemPromptNotice">Tentukan peran dan perilaku AI.\n\nPerintah ini menentukan gaya, kepribadian, dan batasan AI. Pertimbangkan untuk mendeskripsikan jenis asisten seperti apa yang seharusnya dimiliki oleh AI.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Baca Pesan</string>
     <string name="GhostModeExcludeRead">Kecualikan Pembacaan</string>
     <string name="GhostModeExcludeTyping">Kecualikan Mengetik</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Default</string>
+    <string name="GhostModeExceptionForceBlockRead">Paksa blokir dibaca</string>
+    <string name="GhostModeExceptionForceAllowRead">Paksa izinkan dibaca</string>
+    <string name="GhostModeExceptionForceBlockTyping">Paksa blokir mengetik</string>
+    <string name="GhostModeExceptionForceAllowTyping">Paksa izinkan mengetik</string>
+    <string name="ShowFilteredMessagesMenuText">Tampilkan yang Difilter</string>
+    <string name="HideFilteredMessagesMenuText">Sembunyikan yang Difilter</string>
     <string name="SendWithSound">Kirim dengan Suara</string>
     <string name="PerformanceClass">Kelas Kinerja Perangkat</string>
     <string name="PerformanceClassHigh">Tinggi</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Buat Kode</string>
     <string name="CreateCodeLanguage">Bahasa</string>
     <string name="NoCaptionForward">Teruskan Tanpa Teks</string>
+    <string name="NoCaptionForwardShort">Tanpa Teks</string>
     <string name="PreferCommonGroupsTab">Lebih suka Tab Grup</string>
     <string name="PreferCommonGroupsTabNotice">Pilih otomatis tab \"Grup\" alih-alih \"Hadiah\" bila memungkinkan.</string>
     <string name="GroupedMessageMenu">Menu Pesan Grup</string>

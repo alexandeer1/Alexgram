@@ -1182,4 +1182,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">공식 커뮤니티</string>
+    <string name="AlexgramWelcomeTitle">Alexgram에 오신 것을 환영합니다</string>
+    <string name="AlexgramWelcomeSubtitle">메시징을 넘어선 새로운 경험</string>
+    <string name="AlexgramWelcomeDescription">공식 채널에 참여하여 독점 기능, 최신 업데이트 및 얼리 액세스를 경험해 보세요.</string>
+    <string name="AlexgramWelcomeFeature1Title">최고의 성능 &amp; 클라우드</string>
+    <string name="AlexgramWelcomeFeature1Desc">초고속 다운로드, 향상된 스트리밍 및 원활한 클라우드 동기화.</string>
+    <string name="AlexgramWelcomeFeature2Title">고스트 모드</string>
+    <string name="AlexgramWelcomeFeature2Desc">읽음 표시 없이 비밀리에 확인, 온라인 상태 및 입력 중 숨김.</string>
+    <string name="AlexgramWelcomeFeature3Title">독점 기능 프리뷰</string>
+    <string name="AlexgramWelcomeFeature3Desc">사전 기능 공개, 개발 소식 및 전용 유틸리티 도구 제공.</string>
+    <string name="AlexgramWelcomeJoinButton">공식 채널 참여하기</string>
+    <string name="AlexgramWelcomeOpenButton">공식 채널 열기</string>
+    <string name="AlexgramWelcomeContinueButton">Alexgram 둘러보기</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

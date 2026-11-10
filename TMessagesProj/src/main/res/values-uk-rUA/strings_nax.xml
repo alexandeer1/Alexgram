@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Провайдер моделі</string>
     <string name="LlmProviderCustom">Користувацька</string>
     <string name="LlmProviderOpenAIKey">Ключ API OpenAI</string>
     <string name="LlmProviderGeminiKey">Ключ API Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Ключ API Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Ключ API Mistral</string>
+    <string name="LlmProviderQwenKey">Ключ API Qwen</string>
+    <string name="LlmProviderMoonshotKey">Ключ API Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Ключ API SiliconFlow</string>
+    <string name="DisableAiEditor">Вимкнути AI Редактор</string>
     <string name="LlmSystemPrompt">Системний Промпт</string>
     <string name="LlmSystemPromptHint">Ти професійний перекладач.</string>
     <string name="LlmSystemPromptNotice">Визначте роль і поведінку AI.\n\nЦей промпт задає тон, індивідуальність і обмеження для AI. Подумайте про те, яким типом помічника має бути AI.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Прочитати повідомлення</string>
     <string name="GhostModeExcludeRead">Виключити читання</string>
     <string name="GhostModeExcludeTyping">Виключити введення тексту</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">За замовчуванням</string>
+    <string name="GhostModeExceptionForceBlockRead">Примусово блокувати читання</string>
+    <string name="GhostModeExceptionForceAllowRead">Примусово дозволяти читання</string>
+    <string name="GhostModeExceptionForceBlockTyping">Примусово блокувати введення тексту</string>
+    <string name="GhostModeExceptionForceAllowTyping">Примусово дозволяти введення тексту</string>
+    <string name="ShowFilteredMessagesMenuText">Показувати відфільтровані</string>
+    <string name="HideFilteredMessagesMenuText">Приховувати відфільтровані</string>
     <string name="SendWithSound">Надіслати зі звуком</string>
     <string name="PerformanceClass">Клас продуктивності пристрою</string>
     <string name="PerformanceClassHigh">Високий</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Створити код</string>
     <string name="CreateCodeLanguage">Мова</string>
     <string name="NoCaptionForward">Переслати без підпису</string>
+    <string name="NoCaptionForwardShort">Без підпису</string>
     <string name="PreferCommonGroupsTab">Перевага вкладці \"Групи”</string>
     <string name="PreferCommonGroupsTabNotice">Автоматично вибирати вкладку «Групи» замість «Подарунки», коли це можливо.</string>
     <string name="GroupedMessageMenu">Згрупувати меню повідомлення</string>

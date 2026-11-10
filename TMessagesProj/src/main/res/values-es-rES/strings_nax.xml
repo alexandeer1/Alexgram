@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Proveedores de modelos</string>
     <string name="LlmProviderCustom">Personalizado</string>
     <string name="LlmProviderOpenAIKey">Clave de API de OpenAI</string>
     <string name="LlmProviderGeminiKey">Clave de API Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Clave API de Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Clave API de Mistral</string>
+    <string name="LlmProviderQwenKey">Clave API de Qwen</string>
+    <string name="LlmProviderMoonshotKey">Clave API de Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Clave API de SiliconFlow</string>
+    <string name="DisableAiEditor">Desactivar editor de IA</string>
     <string name="LlmSystemPrompt">Prompt del sistema</string>
     <string name="LlmSystemPromptHint">Eres un traductor profesional.</string>
     <string name="LlmSystemPromptNotice">Define el rol y el comportamiento de la IA.\n\nEsta instrucción define el tono, la personalidad y las limitaciones de la IA. Considera describir qué tipo de asistente debería ser la IA.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Leer mensajes</string>
     <string name="GhostModeExcludeRead">Excluir leídos</string>
     <string name="GhostModeExcludeTyping">Excluir escritura</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Predeterminado</string>
+    <string name="GhostModeExceptionForceBlockRead">Bloquear lectura forzadamente</string>
+    <string name="GhostModeExceptionForceAllowRead">Permitir lectura forzadamente</string>
+    <string name="GhostModeExceptionForceBlockTyping">Bloquear escritura forzadamente</string>
+    <string name="GhostModeExceptionForceAllowTyping">Permitir escritura forzadamente</string>
+    <string name="ShowFilteredMessagesMenuText">Mostrar filtrados</string>
+    <string name="HideFilteredMessagesMenuText">Ocultar filtrados</string>
     <string name="SendWithSound">Enviar con sonido</string>
     <string name="PerformanceClass">Clase de Rendimiento del dispositivo</string>
     <string name="PerformanceClassHigh">Alto</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Crear Código</string>
     <string name="CreateCodeLanguage">Idioma</string>
     <string name="NoCaptionForward">Reenviar sin descripción</string>
+    <string name="NoCaptionForwardShort">Sin leyenda</string>
     <string name="PreferCommonGroupsTab">Pestaña Grupos preferidos</string>
     <string name="PreferCommonGroupsTabNotice">Seleccionar automáticamente la pestaña \"Grupos\" en lugar de \"Regalos\" cuando sea posible.</string>
     <string name="GroupedMessageMenu">Menú de mensaje de grupo</string>

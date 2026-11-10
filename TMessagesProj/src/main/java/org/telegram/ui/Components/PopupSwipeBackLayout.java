@@ -139,9 +139,36 @@ public class PopupSwipeBackLayout extends FrameLayout {
         onSwipeBackProgressListeners.add(onSwipeBackProgressListener);
     }
 
+    /**
+     * On glass (a menu bubble) the pages have no background: the main page fades out and the nested one fades
+     * in instead of covering it with the menu's color.
+     */
+    private boolean foregroundOnGlass;
+
+    public void setForegroundOnGlass(boolean onGlass) {
+        if (foregroundOnGlass != onGlass) {
+            foregroundOnGlass = onGlass;
+            invalidate();
+        }
+    }
+
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         int i = indexOfChild(child);
+        if (foregroundOnGlass) {
+            // the main page is gone by the middle of the slide, so the two never read over each other
+            final float alpha = i == 0 ? 1f - Math.min(1f, transitionProgress * 2f) : Math.max(0f, transitionProgress * 2f - 1f);
+            if (alpha <= 0) {
+                return false;
+            }
+            if (alpha >= 1) {
+                return super.drawChild(canvas, child, drawingTime);
+            }
+            final int s = canvas.saveLayerAlpha(child.getX(), child.getY(), child.getX() + child.getWidth(), child.getY() + child.getHeight(), (int) (0xFF * alpha));
+            final boolean b = super.drawChild(canvas, child, drawingTime);
+            canvas.restoreToCount(s);
+            return b;
+        }
         int s = canvas.save();
         if (i != backgroundViewIndex) {
             if (foregroundColor == 0) {
@@ -331,11 +358,14 @@ public class PopupSwipeBackLayout extends FrameLayout {
                 if (f <= 0) {
                     if (backgroundViewIndex != 0) {
                         currentForegroundIndex = backgroundViewIndex;
+                        overrideForegroundHeight = overrideHeightIndex.get(backgroundViewIndex);
                         backgroundViewIndex = 0;
                         transitionProgress = 1.0f;
                     } else {
                         currentForegroundIndex = -1;
+                        overrideForegroundHeight = 0;
                     }
+                    requestLayout();
                 }
                 invalidateTransforms();
                 isAnimationInProgress = false;
@@ -370,6 +400,7 @@ public class PopupSwipeBackLayout extends FrameLayout {
         }
         currentForegroundIndex = viewIndex;
         overrideForegroundHeight = overrideHeightIndex.get(viewIndex);
+        requestLayout();
         animateToState(1, 0);
     }
 
@@ -382,8 +413,17 @@ public class PopupSwipeBackLayout extends FrameLayout {
             return;
         }
         if (!animated) {
-            currentForegroundIndex = -1;
-            transitionProgress = 0;
+            if (backgroundViewIndex != 0) {
+                currentForegroundIndex = backgroundViewIndex;
+                overrideForegroundHeight = overrideHeightIndex.get(backgroundViewIndex);
+                backgroundViewIndex = 0;
+                transitionProgress = 1.0f;
+            } else {
+                currentForegroundIndex = -1;
+                overrideForegroundHeight = 0;
+                transitionProgress = 0;
+            }
+            requestLayout();
             invalidateTransforms();
             return;
         } else {
@@ -394,6 +434,91 @@ public class PopupSwipeBackLayout extends FrameLayout {
     public boolean stickToRight;
     public void setStickToRight(boolean right) {
         stickToRight = right;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final int count = getChildCount();
+        final boolean matchWidth = MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY;
+        final boolean matchHeight = MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY;
+        final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        final int paddingWidth = getPaddingLeft() + getPaddingRight();
+        final int paddingHeight = getPaddingTop() + getPaddingBottom();
+        int maxWidth = matchWidth ? widthSize : paddingWidth;
+        int maxHeight = matchHeight ? heightSize : paddingHeight;
+        int measuredState = 0;
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
+            if (child.getVisibility() == GONE) {
+                continue;
+            }
+            if (i != backgroundViewIndex && i != currentForegroundIndex) {
+                continue;
+            }
+            LayoutParams lp;
+            if (child.getLayoutParams() instanceof LayoutParams) {
+                lp = (LayoutParams) child.getLayoutParams();
+            } else {
+                measureChild(child, widthMeasureSpec, heightMeasureSpec);
+                maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
+                maxHeight = Math.max(maxHeight, child.getMeasuredHeight());
+                continue;
+            }
+            int childWidthSpec;
+            if (lp.width == LayoutParams.MATCH_PARENT) {
+                if (matchWidth) {
+                    childWidthSpec = MeasureSpec.makeMeasureSpec(widthSize - paddingWidth - lp.leftMargin - lp.rightMargin, MeasureSpec.EXACTLY);
+                } else {
+                    childWidthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+                }
+            } else {
+                childWidthSpec = getChildMeasureSpec(widthMeasureSpec, paddingWidth + lp.leftMargin + lp.rightMargin, lp.width);
+            }
+            int childHeightSpec;
+            if (matchHeight && lp.height == LayoutParams.MATCH_PARENT) {
+                childHeightSpec = MeasureSpec.makeMeasureSpec(heightSize - paddingHeight - lp.topMargin - lp.bottomMargin, MeasureSpec.EXACTLY);
+            } else {
+                childHeightSpec = getChildMeasureSpec(heightMeasureSpec, paddingHeight + lp.topMargin + lp.bottomMargin, lp.height);
+            }
+            child.measure(childWidthSpec, childHeightSpec);
+            measuredState = combineMeasuredStates(measuredState, child.getMeasuredState());
+            maxWidth = Math.max(maxWidth, child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+            maxHeight = Math.max(maxHeight, child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin);
+        }
+        maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+        maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
+        int width = resolveSizeAndState(maxWidth, widthMeasureSpec, measuredState);
+        if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) {
+            width = Math.max(paddingWidth, Math.min(width, AndroidUtilities.displaySize.x - AndroidUtilities.dp(40)));
+        }
+        int height = resolveSizeAndState(maxHeight, heightMeasureSpec, measuredState << MEASURED_HEIGHT_STATE_SHIFT);
+        if (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY || MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY) {
+            for (int i = 0; i < count; i++) {
+                View child = getChildAt(i);
+                if (child.getVisibility() == GONE) {
+                    continue;
+                }
+                if (i != backgroundViewIndex && i != currentForegroundIndex) {
+                    continue;
+                }
+                if (!(child.getLayoutParams() instanceof LayoutParams)) {
+                    continue;
+                }
+                LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.width != LayoutParams.MATCH_PARENT && lp.height != LayoutParams.MATCH_PARENT) {
+                    continue;
+                }
+                int childWidthSpec = lp.width == LayoutParams.MATCH_PARENT
+                        ? MeasureSpec.makeMeasureSpec(Math.max(0, width - paddingWidth - lp.leftMargin - lp.rightMargin), MeasureSpec.EXACTLY)
+                        : getChildMeasureSpec(widthMeasureSpec, paddingWidth + lp.leftMargin + lp.rightMargin, lp.width);
+                int childHeightSpec = lp.height == LayoutParams.MATCH_PARENT
+                        ? MeasureSpec.makeMeasureSpec(Math.max(0, height - paddingHeight - lp.topMargin - lp.bottomMargin), MeasureSpec.EXACTLY)
+                        : getChildMeasureSpec(heightMeasureSpec, paddingHeight + lp.topMargin + lp.bottomMargin, lp.height);
+                child.measure(childWidthSpec, childHeightSpec);
+            }
+        }
+        setMeasuredDimension(width, height);
     }
 
     @Override

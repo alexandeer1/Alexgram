@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">モデルプロバイダ</string>
     <string name="LlmProviderCustom">カスタム</string>
     <string name="LlmProviderOpenAIKey">OpenAI API キー</string>
     <string name="LlmProviderGeminiKey">Gemini API キー</string>
+    <string name="LlmProviderZhipuAIKey">Zhipu AI API キー</string>
+    <string name="LlmProviderMistralKey">Mistral API キー</string>
+    <string name="LlmProviderQwenKey">Qwen API キー</string>
+    <string name="LlmProviderMoonshotKey">Moonshot API キー</string>
+    <string name="LlmProviderSiliconFlowKey">SiliconFlow API キー</string>
+    <string name="DisableAiEditor">AI エディターを無効にする</string>
     <string name="LlmSystemPrompt">システムプロンプト</string>
     <string name="LlmSystemPromptHint">あなたはプロの翻訳者です。</string>
     <string name="LlmSystemPromptNotice">AI の役割と行動指針を定義します。\n\nこのプロンプトは、AI の口調や個性、制約などを設定するものです。どのようなアシスタントとして振る舞ってほしいかを記述してください。</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">既読をつける</string>
     <string name="GhostModeExcludeRead">既読を除外</string>
     <string name="GhostModeExcludeTyping">入力を除外</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">デフォルト</string>
+    <string name="GhostModeExceptionForceBlockRead">既読を強制ブロック</string>
+    <string name="GhostModeExceptionForceAllowRead">既読を強制許可</string>
+    <string name="GhostModeExceptionForceBlockTyping">入力を強制ブロック</string>
+    <string name="GhostModeExceptionForceAllowTyping">入力を強制許可</string>
+    <string name="ShowFilteredMessagesMenuText">フィルタリングされたメッセージを表示</string>
+    <string name="HideFilteredMessagesMenuText">フィルタリングされたメッセージを隠す</string>
     <string name="SendWithSound">通知音ありで送信</string>
     <string name="PerformanceClass">デバイスのパフォーマンスクラス</string>
     <string name="PerformanceClassHigh">ハイエンド</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">コードを作成</string>
     <string name="CreateCodeLanguage">言語</string>
     <string name="NoCaptionForward">説明文なしで転送</string>
+    <string name="NoCaptionForwardShort">説明文なし</string>
     <string name="PreferCommonGroupsTab">グループタブを優先</string>
     <string name="PreferCommonGroupsTabNotice">可能な場合、\"ギフト\"の代わりに\"グループ\"タブを自動選択します。</string>
     <string name="GroupedMessageMenu">メッセージメニューをグループ化</string>

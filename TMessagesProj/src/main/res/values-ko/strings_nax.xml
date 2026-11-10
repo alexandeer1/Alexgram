@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Model Provider</string>
     <string name="LlmProviderCustom">Custom</string>
     <string name="LlmProviderOpenAIKey">OpenAI API Key</string>
     <string name="LlmProviderGeminiKey">Gemini API Key</string>
+    <string name="LlmProviderZhipuAIKey">Zhipu AI API 키</string>
+    <string name="LlmProviderMistralKey">Mistral API 키</string>
+    <string name="LlmProviderQwenKey">Qwen API 키</string>
+    <string name="LlmProviderMoonshotKey">Moonshot API 키</string>
+    <string name="LlmProviderSiliconFlowKey">SiliconFlow API 키</string>
+    <string name="DisableAiEditor">AI 편집기 비활성화</string>
     <string name="LlmSystemPrompt">System Prompt</string>
     <string name="LlmSystemPromptHint">You are a professional translator.</string>
     <string name="LlmSystemPromptNotice">Define the AI\'s role and behavior.\n\nThis prompt sets the tone, personality, and limitations for the AI. Consider describing what type of assistant the AI should be.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Read Message</string>
     <string name="GhostModeExcludeRead">Exclude Read</string>
     <string name="GhostModeExcludeTyping">Exclude Typing</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">기본값</string>
+    <string name="GhostModeExceptionForceBlockRead">읽음 표시 강제 차단</string>
+    <string name="GhostModeExceptionForceAllowRead">읽음 표시 강제 허용</string>
+    <string name="GhostModeExceptionForceBlockTyping">입력 중 표시 강제 차단</string>
+    <string name="GhostModeExceptionForceAllowTyping">입력 중 표시 강제 허용</string>
+    <string name="ShowFilteredMessagesMenuText">필터링된 메시지 표시</string>
+    <string name="HideFilteredMessagesMenuText">필터링된 메시지 숨기기</string>
     <string name="SendWithSound">Send with Sound</string>
     <string name="PerformanceClass">Device Performance Class</string>
     <string name="PerformanceClassHigh">High</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Create Code</string>
     <string name="CreateCodeLanguage">Language</string>
     <string name="NoCaptionForward">NoCaption forward</string>
+    <string name="NoCaptionForwardShort">캡션 없음</string>
     <string name="PreferCommonGroupsTab">Prefer Groups Tab</string>
     <string name="PreferCommonGroupsTabNotice">Auto-select \"Groups\" tab instead of \"Gifts\" when possible.</string>
     <string name="GroupedMessageMenu">Group Message Menu</string>

@@ -30,10 +30,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Model Sağlayıcı</string>
     <string name="LlmProviderCustom">Özel</string>
     <string name="LlmProviderOpenAIKey">OpenAI API Anahtarı</string>
     <string name="LlmProviderGeminiKey">Gemini API Anahtarı</string>
+    <string name="LlmProviderZhipuAIKey">Zhipu AI API Anahtarı</string>
+    <string name="LlmProviderMistralKey">Mistral API Anahtarı</string>
+    <string name="LlmProviderQwenKey">Qwen API Anahtarı</string>
+    <string name="LlmProviderMoonshotKey">Moonshot API Anahtarı</string>
+    <string name="LlmProviderSiliconFlowKey">SiliconFlow API Anahtarı</string>
+    <string name="DisableAiEditor">Yapay Zeka Düzenleyicisini Devre Dışı Bırak</string>
     <string name="LlmSystemPrompt">Sistem İstemi</string>
     <string name="LlmSystemPromptHint">Sen profesyonel bir çevirmensin.</string>
     <string name="LlmSystemPromptNotice">Yapay zekanın rolünü ve davranışını tanımlayın.\n\nBu istem, yapay zeka için üslup, kişilik ve sınırları belirler. Yapay zekanın ne tür bir asistan olması gerektiğini açıklamayı düşünebilirsiniz.</string>
@@ -157,6 +168,14 @@
     <string name="GhostReadMessage">Mesajı Oku</string>
     <string name="GhostModeExcludeRead">Okundu Bilgisini Hariç Tut</string>
     <string name="GhostModeExcludeTyping">Yazıyor Bilgisini Hariç Tut</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Varsayılan</string>
+    <string name="GhostModeExceptionForceBlockRead">Okumayı zorla engelle</string>
+    <string name="GhostModeExceptionForceAllowRead">Okumaya zorla izin ver</string>
+    <string name="GhostModeExceptionForceBlockTyping">Yazmayı zorla engelle</string>
+    <string name="GhostModeExceptionForceAllowTyping">Yazmaya zorla izin ver</string>
+    <string name="ShowFilteredMessagesMenuText">Filtrelenenleri Göster</string>
+    <string name="HideFilteredMessagesMenuText">Filtrelenenleri Gizle</string>
     <string name="SendWithSound">Sesli Gönder</string>
     <string name="PerformanceClass">Cihaz Performans Sınıfı</string>
     <string name="PerformanceClassHigh">Yüksek</string>
@@ -246,6 +265,7 @@
     <string name="CreateCode">Kod Oluştur</string>
     <string name="CreateCodeLanguage">Dil</string>
     <string name="NoCaptionForward">Açıklamasız ilet</string>
+    <string name="NoCaptionForwardShort">Açıklamasız</string>
     <string name="PreferCommonGroupsTab">Gruplar Sekmesini Tercih Et</string>
     <string name="PreferCommonGroupsTabNotice">Mümkün olduğunda \"Hediyeler\" yerine \"Gruplar\" sekmesini otomatik seçer.</string>
     <string name="GroupedMessageMenu">Gruplanmış Mesaj Menüsü</string>

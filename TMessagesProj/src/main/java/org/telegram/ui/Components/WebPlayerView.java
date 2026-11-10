@@ -43,9 +43,9 @@ import android.widget.ImageView;
 
 import androidx.annotation.Keep;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import androidx.media3.common.C;
+import androidx.media3.exoplayer.ExoPlayer;
+import org.telegram.ui.AspectRatioFrameLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -2070,6 +2070,13 @@ public class WebPlayerView extends ViewGroup implements VideoPlayer.VideoPlayerD
 
     public boolean isInitied() {
         return initied;
+    }
+
+    /** Same as the inline button while the player is shown in the floating window. */
+    public void exitFromInlineMode() {
+        if (isInline && inlineButton != null) {
+            inlineButton.callOnClick();
+        }
     }
 
     public boolean isInline() {
