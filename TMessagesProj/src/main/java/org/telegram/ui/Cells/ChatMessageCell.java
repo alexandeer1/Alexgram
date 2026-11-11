@@ -9002,6 +9002,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                             location.currentMapProvider = 2;
                         } else if (NekoConfig.mapPreviewProvider.Int() == 1) {
                             location.currentMapProvider = 1;
+                        } else if (NekoConfig.mapPreviewProvider.Int() == 2) {
+                            location.currentMapProvider = 4;
                         } else {
                             location.currentMapProvider = -1;
                         }

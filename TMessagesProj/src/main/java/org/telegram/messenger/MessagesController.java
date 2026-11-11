@@ -1712,6 +1712,17 @@ public class MessagesController extends BaseController implements NotificationCe
         mapProvider = mainPreferences.getInt("mapProvider", 0);
         availableMapProviders = mainPreferences.getInt("availableMapProviders", 3);
         mapKey = mainPreferences.getString("pk", null);
+        int mapPreviewOverride = tw.nekomimi.nekogram.NekoConfig.mapPreviewProvider.Int();
+        if (mapPreviewOverride == 0) {
+            mapProvider = 2;
+        } else if (mapPreviewOverride == 1) {
+            mapProvider = 1;
+        } else if (mapPreviewOverride == 2) {
+            mapProvider = 4;
+            mapKey = "AIzaSyB0y3zA4LbA04ZPaHKsr_Xt5ZQWbMftj8I";
+        } else if (mapPreviewOverride == 3) {
+            mapProvider = -1;
+        }
         installReferer = mainPreferences.getString("installReferer", null);
         revokeTimeLimit = mainPreferences.getInt("revokeTimeLimit", 2147483647);
         revokeTimePmLimit = mainPreferences.getInt("revokeTimePmLimit", 2147483647);

@@ -83,7 +83,7 @@ import org.telegram.messenger.LocationController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
-import org.telegram.messenger.OSMDroidMapsProvider;
+import org.telegram.messenger.MapLibreMapsProvider;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserObject;
@@ -143,7 +143,6 @@ import java.util.List;
 import java.util.Locale;
 
 import tw.nekomimi.nekogram.NekoConfig;
-import tw.nekomimi.nekogram.location.NekoLocation;
 
 public class LocationActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -463,10 +462,9 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
         SimpleActionBarMenu menu = simpleActionBar.createMenu();
         mapTypeButton = menu.addItem(0, R.drawable.msg_map_type);
-        if (ApplicationLoader.getMapsProvider() instanceof OSMDroidMapsProvider) {
-            mapTypeButton.addSubItem(map_list_menu_map, R.drawable.msg_map, "Standard OSM");
-            mapTypeButton.addSubItem(map_list_menu_satellite, R.drawable.msg_map, "Wikimedia");
-            mapTypeButton.addSubItem(map_list_menu_hybrid, R.drawable.msg_map, "Carto Dark");
+        if (ApplicationLoader.getMapsProvider() instanceof MapLibreMapsProvider) {
+            mapTypeButton.addSubItem(map_list_menu_map, R.drawable.msg_map, getString(R.string.Map));
+            mapTypeButton.addSubItem(map_list_menu_satellite, R.drawable.msg_satellite, getString(R.string.Satellite));
         } else {
             mapTypeButton.addSubItem(map_list_menu_map, R.drawable.msg_map, getString(R.string.Map));
             mapTypeButton.addSubItem(map_list_menu_satellite, R.drawable.msg_satellite, getString(R.string.Satellite));
@@ -2401,9 +2399,6 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             for (int i = providers.size() - 1; i >= 0; i--) {
                 l = lm.getLastKnownLocation(providers.get(i));
                 if (l != null) {
-                    if (NekoConfig.fixDriftingForGoogleMaps()) {
-                        NekoLocation.transform(l);
-                    }
                     break;
                 }
             }

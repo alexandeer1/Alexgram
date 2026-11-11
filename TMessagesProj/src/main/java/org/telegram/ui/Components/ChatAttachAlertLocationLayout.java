@@ -59,7 +59,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.LocationController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
-import org.telegram.messenger.OSMDroidMapsProvider;
+import org.telegram.messenger.MapLibreMapsProvider;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
@@ -91,7 +91,6 @@ import java.util.regex.Pattern;
 
 import kotlin.Unit;
 import tw.nekomimi.nekogram.NekoConfig;
-import tw.nekomimi.nekogram.location.NekoLocation;
 import tw.nekomimi.nekogram.ui.BottomBuilder;
 
 public class ChatAttachAlertLocationLayout extends ChatAttachAlert.AttachAlertLayout implements Theme.Colorable, NotificationCenter.NotificationCenterDelegate {
@@ -123,7 +122,6 @@ public class ChatAttachAlertLocationLayout extends ChatAttachAlert.AttachAlertLa
     private AvatarDrawable avatarDrawable;
     private ActionBarMenuItem otherItem;
 
-    private TextView attributionOverlay;
 
     private boolean currentMapStyleDark;
 
@@ -351,14 +349,13 @@ public class ChatAttachAlertLocationLayout extends ChatAttachAlert.AttachAlertLa
         mapTypeButton.setSubMenuOpenSide(2);
         mapTypeButton.setAdditionalXOffset(AndroidUtilities.dp(10));
         mapTypeButton.setAdditionalYOffset(-AndroidUtilities.dp(10));
-        if (false) {
+        if (ApplicationLoader.getMapsProvider() instanceof MapLibreMapsProvider) {
+            mapTypeButton.addSubItem(map_list_menu_map, R.drawable.msg_map, LocaleController.getString(R.string.Map), resourcesProvider);
+            mapTypeButton.addSubItem(map_list_menu_satellite, R.drawable.msg_satellite, LocaleController.getString(R.string.Satellite), resourcesProvider);
+        } else {
             mapTypeButton.addSubItem(map_list_menu_map, R.drawable.msg_map, LocaleController.getString(R.string.Map), resourcesProvider);
             mapTypeButton.addSubItem(map_list_menu_satellite, R.drawable.msg_satellite, LocaleController.getString(R.string.Satellite), resourcesProvider);
             mapTypeButton.addSubItem(map_list_menu_hybrid, R.drawable.msg_hybrid, LocaleController.getString(R.string.Hybrid), resourcesProvider);
-        } else {
-            mapTypeButton.addSubItem(map_list_menu_map, R.drawable.msg_map, "Standard OSM", resourcesProvider);
-            mapTypeButton.addSubItem(map_list_menu_satellite, R.drawable.msg_map, "Wikimedia", resourcesProvider);
-            mapTypeButton.addSubItem(map_list_menu_hybrid, R.drawable.msg_map, "Carto Dark", resourcesProvider);
         }
         mapTypeButton.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
         Drawable drawable = Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(40), getThemedColor(Theme.key_location_actionBackground), getThemedColor(Theme.key_location_actionPressedBackground));
@@ -381,43 +378,6 @@ public class ChatAttachAlertLocationLayout extends ChatAttachAlert.AttachAlertLa
                 map.setMapType(IMapsProvider.MAP_TYPE_HYBRID);
             }
         });
-        /*
-        *         mapTypeButton.setDelegate(id -> {
-            if (mapView == null) {
-                return;
-            }
-            if (id == map_list_menu_osm) {
-                attributionOverlay.setText(Html.fromHtml("© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"));
-                mapView.setTileSource(TileSourceFactory.MAPNIK);
-            } else if (id == map_list_menu_wiki) {
-                // Create a custom tile source
-                ITileSource tileSource = new XYTileSource(
-                        "Wikimedia", 0, 19,
-                        256, ".png",
-                        new String[]{"https://maps.wikimedia.org/osm-intl/"},
-                        "© OpenStreetMap contributors");
-                attributionOverlay.setText(Html.fromHtml("© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"));
-                mapView.setTileSource(tileSource);
-            } else if (id == map_list_menu_cartodark) {
-                // Create a custom tile source
-                ITileSource tileSource = new XYTileSource(
-                        "Carto Dark", 0, 20,
-                        256, ".png",
-                        new String[]{
-                                "https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/",
-                                "https://cartodb-basemaps-b.global.ssl.fastly.net/dark_all/",
-                                "https://cartodb-basemaps-c.global.ssl.fastly.net/dark_all/",
-                                "https://cartodb-basemaps-d.global.ssl.fastly.net/dark_all/"},
-                        "© OpenStreetMap contributors, © CARTO");
-                attributionOverlay.setText(Html.fromHtml("© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, © <a href=\"https://carto.com/attributions\">CARTO</a>"));
-                mapView.setTileSource(tileSource);
-            }
-        });
-        *
-        * */
-        if (ApplicationLoader.getMapsProvider() instanceof OSMDroidMapsProvider) {
-            mapViewClip.addView(getAttributionOverlay(context), LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.BOTTOM, LocaleController.isRTL ? 0 : 4, 0, LocaleController.isRTL ? 4 : 0, 20));
-        }
         locationButton = new ImageView(context);
         drawable = Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(40), getThemedColor(Theme.key_location_actionBackground), getThemedColor(Theme.key_location_actionPressedBackground));
         ScaleStateListAnimator.apply(locationButton);
@@ -1454,9 +1414,6 @@ public class ChatAttachAlertLocationLayout extends ChatAttachAlert.AttachAlertLa
             for (int i = providers.size() - 1; i >= 0; i--) {
                 l = lm.getLastKnownLocation(providers.get(i));
                 if (l != null) {
-                    if (NekoConfig.fixDriftingForGoogleMaps()) {
-                        NekoLocation.transform(l);
-                    }
                     break;
                 }
             }
@@ -1687,15 +1644,6 @@ public class ChatAttachAlertLocationLayout extends ChatAttachAlert.AttachAlertLa
         return themeDescriptions;
     }
 
-    // NekoX: OpenStreetMap
-    private TextView getAttributionOverlay(Context context) {
-        attributionOverlay = new TextView(context);
-        attributionOverlay.setText(Html.fromHtml("© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"));
-        attributionOverlay.setShadowLayer(1, -1, -1, Color.WHITE);
-        attributionOverlay.setLinksClickable(true);
-        attributionOverlay.setMovementMethod(LinkMovementMethod.getInstance());
-        return attributionOverlay;
-    }
 
     @Override
     public void onPanTransitionStart(boolean keyboardVisible, int contentHeight) {

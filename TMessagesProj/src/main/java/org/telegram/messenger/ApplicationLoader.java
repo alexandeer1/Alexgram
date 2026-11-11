@@ -59,6 +59,7 @@ import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import tw.nekomimi.nekogram.NekoConfig;
+import org.maplibre.android.MapLibre;
 import xyz.nextalone.nagram.NaConfig;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -134,13 +135,17 @@ public class ApplicationLoader extends Application {
 
     public static IMapsProvider getMapsProvider() {
         if (mapsProvider == null) {
-            if (NekoConfig.useOSMDroidMap.Bool())
-                mapsProvider = new OSMDroidMapsProvider();
-            else {
+            if (NekoConfig.useOpenFreeMap.Bool()) {
+                mapsProvider = new MapLibreMapsProvider();
+            } else {
                 mapsProvider = new GoogleMapsProvider();
             }
         }
         return mapsProvider;
+    }
+
+    public static void resetMapsProvider() {
+        mapsProvider = null;
     }
 
     /*protected IMapsProvider onCreateMapsProvider() {
@@ -454,8 +459,9 @@ public class ApplicationLoader extends Application {
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
-        org.osmdroid.config.Configuration.getInstance().setUserAgentValue("Telegram-FOSS ( NekoX ) " + BuildConfig.VERSION_NAME);
-        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(new File(ApplicationLoader.applicationContext.getCacheDir(), "osmdroid"));
+        if (NekoConfig.useOpenFreeMap.Bool()) {
+            MapLibre.getInstance(applicationContext);
+        }
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
         ProxyRotationController.init();
