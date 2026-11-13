@@ -161,6 +161,20 @@ public class AyuData {
         return size;
     }
 
+    public static long backupDeletedCount, backupEditedCount;
+
+    public static void loadBackupCounts(NekoExperimentalSettingsActivity bf) {
+        Utilities.globalQueue.postRunnable(() -> {
+            try {
+                backupDeletedCount = getDeletedMessageDao().countAll();
+                backupEditedCount = getEditedMessageDao().countAll();
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+            AndroidUtilities.runOnUIThread(bf::refreshBackupCounts, 500);
+        });
+    }
+
     public static long getAttachmentsDirSize() {
         long size = 0;
         try {

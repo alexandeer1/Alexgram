@@ -38,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.radolyn.ayugram.database.AyuData;
+import com.radolyn.ayugram.database.AyuMessagesBackup;
 import com.radolyn.ayugram.messages.AyuMessagesController;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -181,6 +182,10 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     // [Alexgram: Deleted Icon Color Row] - Start
     private final AbstractConfigCell deletedIconColorRow = cellGroup.appendCell(new ConfigCellText("DeletedIconColor", null));
     // [Alexgram: Deleted Icon Color Row] - End
+    // [Alexgram: Messages Backup Rows] - Start
+    private final AbstractConfigCell exportMessagesHistoryRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ExportMessagesHistory", null, null, R.drawable.ic_export_chat_na, false, () -> AyuMessagesBackup.showExportDialog(this)));
+    private final AbstractConfigCell importMessagesHistoryRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ImportMessagesHistory", null, null, R.drawable.ic_import_chat_na, false, () -> AyuMessagesBackup.showImportDialog(this)));
+    // [Alexgram: Messages Backup Rows] - End
     private final AbstractConfigCell clearMessageDatabaseRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ClearMessageDatabase", null, AyuData.totalSize > 0 ? AndroidUtilities.formatFileSize(AyuData.totalSize) : "...", R.drawable.msg_clear_solar, false, () -> new AlertDialog.Builder(getContext(), getResourceProvider())
             .setTitle(getString(R.string.ClearMessageDatabase))
             .setMessage(getString(R.string.AreYouSure))
@@ -290,7 +295,20 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
         AyuData.loadSizes(this);
+        AyuData.loadBackupCounts(this);
         return true;
+    }
+
+    @Override
+    public void onActivityResultFragment(int requestCode, int resultCode, android.content.Intent data) {
+        if (AyuMessagesBackup.handleActivityResult(this, requestCode, resultCode, data)) {
+            if (resultCode == android.app.Activity.RESULT_OK) {
+                AyuData.loadSizes(this);
+                AyuData.loadBackupCounts(this);
+            }
+            return;
+        }
+        super.onActivityResultFragment(requestCode, resultCode, data);
     }
 
     @Override
@@ -935,6 +953,22 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
             listAdapter.notifyItemChanged(cellGroup.rows.indexOf(clearMessageDatabaseRow));
         }
     }
+
+    // [Alexgram: Messages Backup Rows] - Start
+    public void refreshBackupCounts() {
+        if (listAdapter != null) {
+            String value = null;
+            if (AyuData.backupDeletedCount > 0 || AyuData.backupEditedCount > 0) {
+                value = LocaleController.formatString(R.string.MessagesBackupCountsValue, AyuData.backupDeletedCount, AyuData.backupEditedCount);
+            }
+            ((ConfigCellTextCheckIcon) exportMessagesHistoryRow).setValue(value);
+            int index = cellGroup.rows.indexOf(exportMessagesHistoryRow);
+            if (index >= 0) {
+                listAdapter.notifyItemChanged(index);
+            }
+        }
+    }
+    // [Alexgram: Messages Backup Rows] - End
 
     // [Alexgram: Home Drawer] - Start
     private void checkDrawerElementsRow() {

@@ -27,6 +27,15 @@ public interface EditedMessageDao {
     @Query("SELECT * FROM editedmessage WHERE userId = :userId AND dialogId = :dialogId AND messageId = :messageId ORDER BY entityCreateDate DESC LIMIT 1")
     EditedMessage getLastRevision(long userId, long dialogId, long messageId);
 
+    @Query("SELECT * FROM editedmessage WHERE fakeId > :afterId ORDER BY fakeId LIMIT :limit")
+    List<EditedMessage> getMessagesAfter(long afterId, int limit);
+
+    @Query("SELECT COUNT(*) FROM editedmessage")
+    int countAll();
+
+    @Query("SELECT EXISTS(SELECT * FROM editedmessage WHERE userId = :userId AND dialogId = :dialogId AND messageId = :messageId AND entityCreateDate = :entityCreateDate AND text IS :text)")
+    boolean existsRevision(long userId, long dialogId, int messageId, int entityCreateDate, String text);
+
     @Query("SELECT EXISTS(SELECT * FROM editedmessage WHERE userId = :userId AND dialogId = :dialogId AND messageId = :messageId)")
     boolean hasAnyRevisions(long userId, long dialogId, long messageId);
 

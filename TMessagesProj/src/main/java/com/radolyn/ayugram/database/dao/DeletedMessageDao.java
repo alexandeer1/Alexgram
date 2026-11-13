@@ -50,6 +50,13 @@ public interface DeletedMessageDao {
     List<DeletedMessageFull> getMessagesByDialog(long dialogId);
 
     @Transaction
+    @Query("SELECT * FROM deletedmessage WHERE fakeId > :afterId ORDER BY fakeId LIMIT :limit")
+    List<DeletedMessageFull> getFullMessagesAfter(long afterId, int limit);
+
+    @Query("SELECT COUNT(*) FROM deletedmessage")
+    int countAll();
+
+    @Transaction
     @Query("SELECT * FROM deletedmessage WHERE userId = :userId AND dialogId = :dialogId ORDER BY messageId DESC LIMIT :limit")
     List<DeletedMessageFull> getLatestMessages(long userId, long dialogId, int limit);
 
@@ -76,6 +83,9 @@ public interface DeletedMessageDao {
 
     @Query("SELECT EXISTS(SELECT * FROM deletedmessage WHERE userId = :userId AND dialogId = :dialogId AND topicId = :topicId AND messageId = :msgId)")
     boolean exists(long userId, long dialogId, long topicId, int msgId);
+
+    @Query("SELECT EXISTS(SELECT * FROM deletedmessage WHERE userId = :userId AND dialogId = :dialogId AND messageId = :msgId)")
+    boolean existsByMessageId(long userId, long dialogId, int msgId);
 
     @Query("DELETE FROM deletedmessage WHERE userId = :userId AND dialogId = :dialogId AND messageId = :msgId")
     void delete(long userId, long dialogId, int msgId);
