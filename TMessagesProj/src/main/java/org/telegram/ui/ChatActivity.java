@@ -19150,6 +19150,9 @@ public class ChatActivity extends BaseFragment implements
 
         public ChatActivityFragmentView(Context context, INavigationLayout parentLayout) {
             super(context, parentLayout);
+            // [Alexgram: Live Video Wallpaper] - Start
+            setCanPlayVideo(true);
+            // [Alexgram: Live Video Wallpaper] - End
             adjustPanLayoutHelper = new AdjustPanLayoutHelper(this) {
 
                 @Override
@@ -27032,6 +27035,13 @@ public class ChatActivity extends BaseFragment implements
             }
         }
         // --- AyuGram hook (ayuDeleted)
+        // [Alexgram: Live Video Wallpaper] - Start
+        if (id == NotificationCenter.reloadInterface) {
+            if (contentView != null) {
+                contentView.setCanPlayVideo(true);
+            }
+        }
+        // [Alexgram: Live Video Wallpaper] - End
     }
 
     private int calculateFirstMessageGroupHeight(int startRow) {

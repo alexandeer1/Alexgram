@@ -1382,7 +1382,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
             uploadImageRow = rowCount++;
             setColorRow = rowCount++;
             setVideoWallpaperRow = rowCount++;
-            sectionRow = rowCount++;
+            sectionRow = -1;
             galleryRow = -1;
             galleryHintRow = -1;
         } else if (currentType == TYPE_CHANNEL_PATTERNS) {
@@ -1916,7 +1916,7 @@ public class WallpapersListActivity extends BaseFragment implements Notification
                     wallpaperCell.setParams(columnsCount, position == 0, position / columnsCount == totalWallpaperRows - 1);
                     for (int a = 0; a < columnsCount; a++) {
                         int p = position + a;
-                        Object object = p < wallPapers.size() ? wallPapers.get(p) : null;
+                        Object object = p >= 0 && p < wallPapers.size() ? wallPapers.get(p) : null;
                         Object selectedWallpaper;
                         long id;
                         if (NaConfig.INSTANCE.getEnableLiveVideoWallpaper().Bool()) {
