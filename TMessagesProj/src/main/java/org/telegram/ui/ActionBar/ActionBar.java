@@ -348,6 +348,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                 && searchFactor == 0 && getActionModeFactor() == 0 && !glassDrawableMenu.getBounds().isEmpty()) {
             out.set(glassDrawableMenu.getBounds());
             out.inset(p, p);
+            if (chatAvatarContainer != null && chatAvatarContainer.isCentered()) {
+                return false;
+            }
             return true;
         }
         final int s = dp(46);

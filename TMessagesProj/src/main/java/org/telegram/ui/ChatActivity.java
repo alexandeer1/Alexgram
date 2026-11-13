@@ -4687,18 +4687,7 @@ public class ChatActivity extends BaseFragment implements
             avatarContainer = new ChatAvatarContainer(context, this, currentEncryptedChat != null, themeDelegate) {
             @Override
             protected boolean onAvatarClick() {
-                if (currentUser != null && currentUser.linked_community_id != 0) {
-                    showDialog(new CommunitySheet(ChatActivity.this, currentUser.linked_community_id));
-                    return true;
-                } else if (currentChat != null && currentChat.linked_community_id != 0) {
-                    showDialog(new CommunitySheet(ChatActivity.this, currentChat.linked_community_id));
-                    return true;
-                }
-                if (dialog_id == TemplatesManager.getInstance(currentAccount).getTemplatesChannelId()) {
-                    return true;
-                }
                 if (isTitleCentered()) {
-
                     if (attachItem != null && attachItem.getView() != null && attachItem.getView().getVisibility() == VISIBLE && chatActivityEnterView != null && chatActivityEnterView.hasText() && (currentChat == null || ChatObject.canSendPlain(currentChat))) {
                         attachItem.getView().performClick();
                         return true;
@@ -4711,6 +4700,16 @@ public class ChatActivity extends BaseFragment implements
                         }
                         return true;
                     }
+                }
+                if (currentUser != null && currentUser.linked_community_id != 0) {
+                    showDialog(new CommunitySheet(ChatActivity.this, currentUser.linked_community_id));
+                    return true;
+                } else if (currentChat != null && currentChat.linked_community_id != 0) {
+                    showDialog(new CommunitySheet(ChatActivity.this, currentChat.linked_community_id));
+                    return true;
+                }
+                if (dialog_id == TemplatesManager.getInstance(currentAccount).getTemplatesChannelId()) {
+                    return true;
                 }
                 return super.onAvatarClick();
             }

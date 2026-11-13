@@ -248,7 +248,7 @@ public class SimpleActionBarMenuOverlay extends FrameLayout {
         startAnimation();
         bar.setMenuOverlay(this, item);
         computeStartRect();
-        if (!startFromPill && item != null) {
+        if (!startFromPill && item != null && hasVisibleIcon(item)) {
             item.getIconView().setAlpha(0f); // the overlay draws it (a pill is left to the overlay as a whole)
         }
         // the keys (back, menu) come to the focused overlay; a text field keeps its focus and its keyboard,
@@ -298,7 +298,9 @@ public class SimpleActionBarMenuOverlay extends FrameLayout {
             wasBar.setMenuOverlay(null, null);
         }
         if (wasItem != null) {
-            wasItem.getIconView().setAlpha(1f);
+            if (hasVisibleIcon(wasItem)) {
+                wasItem.getIconView().setAlpha(1f);
+            }
             wasItem.onOverlayMenuClosed();
         }
         if (onClosed != null) {
@@ -657,8 +659,8 @@ public class SimpleActionBarMenuOverlay extends FrameLayout {
         // the buttons (the whole pill, or just this button) fade and shrink away inside the shape (the first ~30%),
         // come back while the items are still fading out on closing
         final float ia = 1f - Utilities.clamp01(m / (opened ? 0.3f : 0.7f));
-        final View icon = startFromPill ? bar.getMenuView() : item.getIconView();
-        if (ia > 0.004f && icon != null) {
+        final View icon = startFromPill ? bar.getMenuView() : (item != null ? item.getIconView() : null);
+        if (ia > 0.004f && icon != null && hasVisibleIcon(item)) {
             computeViewRect(icon, tmpRect);
             final float s = 1f - 0.15f * Utilities.clamp01(m / 0.3f);
             saveFaded(canvas, tmpRect.left, tmpRect.top, tmpRect.right, tmpRect.bottom, ia);
@@ -745,6 +747,16 @@ public class SimpleActionBarMenuOverlay extends FrameLayout {
     private void computeViewRect(View view, RectF out) {
         computeOffset(view);
         out.set(offset[0], offset[1], offset[0] + view.getWidth(), offset[1] + view.getHeight());
+    }
+
+    private boolean hasVisibleIcon(@Nullable ActionBarMenuItem item) {
+        if (item == null || item.getVisibility() != VISIBLE || item.getAlpha() <= 0) {
+            return false;
+        }
+        if (item.getParent() instanceof ActionBarMenu && ((ActionBarMenu) item.getParent()).isCenteredTitle()) {
+            return false;
+        }
+        return true;
     }
 
     /* Touches and keys */
