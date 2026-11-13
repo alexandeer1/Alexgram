@@ -368,7 +368,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView = new MainTabsLayout(context, resourceProvider);
         tabsView.setClipChildren(false);
         final int paddingH = dp(mainTabsMargin + 4);
-        final int paddingV = dp(mainTabsMargin + 4);
+        final int paddingV = dp(mainTabsMargin + (compact ? 0 : 4));
         tabsView.setPadding(paddingH, paddingV, paddingH, paddingV);
 
         tabs = new GlassTabView[6];
@@ -442,6 +442,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         checkUi_callTabVisible(getUserConfig().showCallsTab, false);
         tabsView.setViewVisible(tabs[INDEX_CONTACTS], !hideContacts, false);
         tabsView.setViewVisible(tabs[INDEX_FEED], MainTabsHelper.isFeedTabShown(), false);
+        tabsView.setCompact(compact ? 1f : 0f);
 
         selectTab(viewPager.getCurrentPosition(), false);
 
@@ -481,13 +482,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsBarContainer.setPadding(dp(2), 0, dp(2), 0);
         tabsBarContainer.setOnClickListener(v -> {});
         tabsView.setTranslationX(0f);
-        tabsBarContainer.addView(tabsView, LayoutHelper.createLinear(dp(MainTabsHelper.getTabsViewWidth()), DialogsActivity.MAIN_TABS_HEIGHT_WITH_MARGINS));
+        tabsBarContainer.addView(tabsView, LayoutHelper.createLinear(dp(MainTabsHelper.getTabsViewWidth()), dp(MainTabsHelper.getMainTabsHeightWithMargins())));
 
         searchTabButton = new FrameLayout(context);
         searchTabButton.setClipChildren(false);
         searchTabButton.setClipToPadding(false);
         searchTabButtonBackground = iBlur3FactoryGlass.create(searchTabButton, BlurredBackgroundProviderImpl.mainTabs(resourceProvider));
-        searchTabButtonBackground.setRadius(dp(28));
+        searchTabButtonBackground.setRadius(dp(MainTabsHelper.getMainTabsHeight() / 2f));
         searchTabButtonBackground.setPadding(dp(0.334f));
         searchTabButton.setBackground(searchTabButtonBackground);
 
@@ -505,12 +506,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             onSearchTabButtonLongClicked();
             return true;
         });
-        int searchBtnSize = dp(56);
+        int searchBtnSize = dp(MainTabsHelper.getMainTabsHeight());
         LinearLayout.LayoutParams searchBtnLp = new LinearLayout.LayoutParams(searchBtnSize, searchBtnSize);
         searchBtnLp.setMarginStart(-dp(10));
         searchBtnLp.setMarginEnd(dp(4));
         tabsBarContainer.addView(searchTabButton, searchBtnLp);
-        tabsViewWrapper.addView(tabsBarContainer, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, DialogsActivity.MAIN_TABS_HEIGHT_WITH_MARGINS, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
+        tabsViewWrapper.addView(tabsBarContainer, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, dp(MainTabsHelper.getMainTabsHeightWithMargins()), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
 
         tabsViewWrapper.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -1164,7 +1165,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         {
             int bottomMargin = isUpdateLayoutVisible ? (navigationBarHeight + updateLayoutHeight) : 0;
             if (tabletLayout) {
-                bottomMargin = Math.max(bottomMargin, navigationBarHeight + dp(DialogsActivity.MAIN_TABS_HEIGHT_WITH_MARGINS));
+                bottomMargin = Math.max(bottomMargin, navigationBarHeight + dp(MainTabsHelper.getMainTabsHeightWithMargins()));
             }
             lp = (ViewGroup.MarginLayoutParams) viewPager.getLayoutParams();
             if (lp.bottomMargin != bottomMargin || lp.leftMargin != systemInsets.left || lp.rightMargin != systemInsets.right) {
@@ -1266,9 +1267,29 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             checkUi_fadeView();
             repositionSearchButton();
         } else if (id == NotificationCenter.mainTabsLayoutChanged) {
+            final boolean compact = MainTabsHelper.isMainTabsHideTitleStyle();
+            final int mainTabsMargin = MainTabsHelper.getMainTabsMargin();
+            if (tabsView != null) {
+                tabsView.setCompact(compact ? 1f : 0f);
+                final int paddingH = dp(mainTabsMargin + 4);
+                final int paddingV = dp(mainTabsMargin + (compact ? 0 : 4));
+                tabsView.setPadding(paddingH, paddingV, paddingH, paddingV);
+            }
+            if (tabs != null) {
+                for (GlassTabView tab : tabs) {
+                    if (tab != null) {
+                        tab.setMainTabsCompact(compact);
+                    }
+                }
+            }
+            if (tabsViewBackground != null) {
+                tabsViewBackground.setRadius(dp(MainTabsHelper.getMainTabsHeight() / 2f));
+                tabsViewBackground.setPadding(dp(mainTabsMargin - 0.334f));
+            }
             checkUi_tabsPosition();
             checkUi_fadeView();
             updateSearchTabButtonVisibility();
+            repositionSearchButton();
         }
     }
 
@@ -1477,7 +1498,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 accountSwitchHint.setCloseButton(true);
                 accountSwitchHint.setText(getString(R.string.SwitchAccountHint));
                 accountSwitchHint.setJoint(1, -translate + 7.33f);
-                contentView.addView(accountSwitchHint, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 100, Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0, 0, DialogsActivity.MAIN_TABS_HEIGHT_WITH_MARGINS));
+                contentView.addView(accountSwitchHint, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 100, Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0, 0, dp(MainTabsHelper.getMainTabsHeightWithMargins())));
                 accountSwitchHint.setOnHiddenListener(() -> AndroidUtilities.removeFromParent(accountSwitchHint));
                 accountSwitchHint.setDuration(8000);
                 accountSwitchHint.show();
@@ -1717,22 +1738,36 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         ViewGroup.LayoutParams tabsBaseLp = tabsView.getLayoutParams();
         LinearLayout.LayoutParams tabsLp;
+        int baseTabsHeight = dp(MainTabsHelper.getMainTabsHeightWithMargins());
+        int baseTabsWidth = dp(MainTabsHelper.getTabsViewWidth());
         if (tabsBaseLp instanceof LinearLayout.LayoutParams) {
             tabsLp = (LinearLayout.LayoutParams) tabsBaseLp;
         } else {
-            tabsLp = new LinearLayout.LayoutParams(dp(MainTabsHelper.getTabsViewWidth()), dp(DialogsActivity.MAIN_TABS_HEIGHT_WITH_MARGINS));
+            tabsLp = new LinearLayout.LayoutParams(baseTabsWidth, baseTabsHeight);
             tabsView.setLayoutParams(tabsLp);
         }
 
         ViewGroup.LayoutParams searchBaseLp = searchTabButton.getLayoutParams();
         LinearLayout.LayoutParams searchLp;
+        int searchBtnSize = dp(MainTabsHelper.getMainTabsHeight());
         if (searchBaseLp instanceof LinearLayout.LayoutParams) {
             searchLp = (LinearLayout.LayoutParams) searchBaseLp;
         } else {
-            int searchBtnSize = dp(56);
             searchLp = new LinearLayout.LayoutParams(searchBtnSize, searchBtnSize);
             searchLp.setMarginStart(-dp(10));
             searchTabButton.setLayoutParams(searchLp);
+        }
+        if (searchLp.width != searchBtnSize || searchLp.height != searchBtnSize) {
+            searchLp.width = searchBtnSize;
+            searchLp.height = searchBtnSize;
+            searchTabButton.setLayoutParams(searchLp);
+        }
+        if (searchTabButtonBackground != null) {
+            searchTabButtonBackground.setRadius(dp(MainTabsHelper.getMainTabsHeight() / 2f));
+        }
+
+        if (tabsBarContainer.getLayoutParams() != null && tabsBarContainer.getLayoutParams().height != baseTabsHeight) {
+            tabsBarContainer.getLayoutParams().height = baseTabsHeight;
         }
 
         tabsView.setTranslationX(0f);
@@ -1740,7 +1775,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsBarContainer.setTranslationX(0f);
 
         if (!show) {
-            int baseTabsWidth = dp(MainTabsHelper.getTabsViewWidth());
             int wrapperWidth = tabsViewWrapper.getWidth();
             if (wrapperWidth > 0) {
                 int containerPadding = tabsBarContainer.getPaddingLeft() + tabsBarContainer.getPaddingRight();
@@ -1748,8 +1782,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 int maxTabsWidth = Math.max(0, wrapperWidth - containerPadding - outerInset * 2);
                 baseTabsWidth = Math.min(baseTabsWidth, maxTabsWidth);
             }
-            if (tabsLp.width != baseTabsWidth) {
+            if (tabsLp.width != baseTabsWidth || tabsLp.height != baseTabsHeight) {
                 tabsLp.width = baseTabsWidth;
+                tabsLp.height = baseTabsHeight;
                 tabsView.setLayoutParams(tabsLp);
             }
             searchTabButton.setVisibility(View.GONE);
@@ -1758,7 +1793,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         int searchBtnWidth = searchTabButton.getWidth();
         if (searchBtnWidth <= 0) {
-            searchBtnWidth = searchLp.width > 0 ? searchLp.width : dp(56);
+            searchBtnWidth = searchLp.width > 0 ? searchLp.width : searchBtnSize;
         }
         int gap = searchLp.getMarginStart();
         int endInset = searchLp.getMarginEnd();
@@ -1768,8 +1803,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         int containerPadding = tabsBarContainer.getPaddingLeft() + tabsBarContainer.getPaddingRight();
         int outerInset = dp(Math.min(DialogsActivity.MAIN_TABS_MARGIN, 6));
         int maxTabsWidth = Math.max(0, wrapperWidth - containerPadding - searchBtnWidth - gap - endInset - outerInset * 2);
-        if (tabsLp.width != maxTabsWidth) {
-            tabsLp.width = maxTabsWidth;
+        int targetTabsWidth = Math.min(baseTabsWidth, maxTabsWidth);
+        if (tabsLp.width != targetTabsWidth || tabsLp.height != baseTabsHeight) {
+            tabsLp.width = targetTabsWidth;
+            tabsLp.height = baseTabsHeight;
             tabsView.setLayoutParams(tabsLp);
         }
         final float factor = animatorTabsVisible.getFloatValue();

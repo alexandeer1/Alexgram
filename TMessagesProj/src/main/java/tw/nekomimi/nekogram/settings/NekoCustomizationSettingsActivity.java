@@ -294,6 +294,7 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     getParentLayout().rebuildAllFragmentViews(false, false);
                 }
             } else if (key.equals(NaConfig.INSTANCE.getMainTabsHideTitles().getKey())) {
+                getNotificationCenter().postNotificationName(NotificationCenter.mainTabsLayoutChanged);
                 if (mainTabsPreviewCell != null) {
                     mainTabsPreviewCell.updateTitles();
                 }
@@ -301,6 +302,7 @@ public class NekoCustomizationSettingsActivity extends BaseNekoXSettingsActivity
                     getParentLayout().rebuildAllFragmentViews(false, false);
                 }
             } else if (key.equals(NaConfig.INSTANCE.getHideContacts().getKey())) {
+                getNotificationCenter().postNotificationName(NotificationCenter.mainTabsLayoutChanged);
                 if (mainTabsPreviewCell != null) {
                     mainTabsPreviewCell.updateContactsTab();
                 }
