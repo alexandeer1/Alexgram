@@ -367,7 +367,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
             }
 
             if ((gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.CENTER_HORIZONTAL) {
-                offsetX = (width - textWidth) / 2 - (int) layout.getLineLeft(0);
+                offsetX = Math.max(0, (width - textWidth) / 2) - (int) layout.getLineLeft(0);
             } else if ((gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.LEFT) {
                 if (firstLineLayout != null) {
                     offsetX = -(int) firstLineLayout.getLineLeft(0);

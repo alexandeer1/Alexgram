@@ -85,7 +85,7 @@ public:
     void reconnect(int32_t datacentrId, int32_t connectionType);
     void failNotRunningRequest(int32_t token);
     void receivedIntegrityCheckClassic(int32_t requestToken, std::string nonce, std::string token);
-    void receivedCaptchaResult(int32_t requestTokensCount, int32_t* requestTokens, std::string token);
+    void receivedCaptchaResult(int32_t requestToken, int32_t generation, std::string token);
     void moveToDatacenter(uint32_t datacenterId);
 
 private:
@@ -104,7 +104,7 @@ private:
     void requestSaltsForDatacenter(Datacenter *datacenter, bool media, bool useTempConnection);
     void clearRequestsForDatacenter(Datacenter *datacenter, HandshakeType type);
     void registerForInternalPushUpdates();
-    void processRequestQueue(uint32_t connectionType, uint32_t datacenterId);
+    void processRequestQueue(uint32_t connectionType, uint32_t datacenterId, Connection *connectedDownload = nullptr);
     void authorizeOnMovingDatacenter();
     void authorizedOnMovingDatacenter();
     Datacenter *getDatacenterWithId(uint32_t datacenterId);
@@ -126,6 +126,7 @@ private:
     void attachConnection(ConnectionSocket *connection);
     void detachConnection(ConnectionSocket *connection);
     TLObject *TLdeserialize(TLObject *request, uint32_t bytes, NativeByteBuffer *data);
+    TLObject *TLdeserializeInternal(TLObject *request, uint32_t bytes, NativeByteBuffer *data);
     TLObject *getRequestWithMessageId(int64_t messageId);
     void onDatacenterHandshakeComplete(Datacenter *datacenter, HandshakeType type, int32_t timeDiff);
     void onDatacenterExportAuthorizationComplete(Datacenter *datacenter);
@@ -184,6 +185,7 @@ private:
     std::map<int32_t, int32_t> guidsByRequests;
     std::map<int64_t, int64_t> resendRequests;
     Datacenter *deserializingDatacenter;
+    uint32_t deserializeDepth = 0;
 
     std::string proxyUser = "";
     std::string proxyPassword = "";

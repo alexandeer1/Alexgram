@@ -1,16 +1,141 @@
 package com.exteragram.messenger.plugins.models;
 
-/**
- * Minimal compatibility stub of exteraGram's {@code CustomSetting} so plugins that import it and
- * reference {@code CustomSetting.Factory} load. Full custom-setting rendering relies on the
- * class-proxy (DexMaker) layer, which is not implemented in ZaStoGram — subclassing the Factory
- * therefore does not render, but the import and class reference resolve.
- */
-public class CustomSetting {
+import android.view.View;
 
-    public Object object;
+import com.chaquo.python.PyObject;
+import com.exteragram.messenger.plugins.Plugin;
 
-    public static class Factory {
-        // Intentionally empty stub (see class javadoc).
+import org.telegram.ui.Components.UItem;
+
+public class CustomSetting extends SettingItem {
+    public UItem item;
+    public Factory<?> factory;
+    public PyObject factoryArgs;
+    public PyObject onClickCallback;
+    public PyObject createSubFragmentCallback;
+
+    private CustomSetting(PyObject onClickCallback, PyObject createSubFragmentCallback, PyObject onLongClickCallback, String linkAlias) {
+        super("custom", null, onLongClickCallback, linkAlias);
+        this.onClickCallback = onClickCallback;
+        this.createSubFragmentCallback = createSubFragmentCallback;
+    }
+
+    public CustomSetting(UItem item, PyObject onClickCallback, PyObject createSubFragmentCallback, PyObject onLongClickCallback, String linkAlias) {
+        this(onClickCallback, createSubFragmentCallback, onLongClickCallback, linkAlias);
+        this.item = item;
+    }
+
+    public CustomSetting(Factory<?> factory, PyObject onClickCallback, PyObject createSubFragmentCallback, PyObject onLongClickCallback, String linkAlias) {
+        this(onClickCallback, createSubFragmentCallback, onLongClickCallback, linkAlias);
+        this.factory = factory;
+    }
+
+    public CustomSetting(Factory<?> factory, PyObject factoryArgs, PyObject onClickCallback, PyObject createSubFragmentCallback, PyObject onLongClickCallback, String linkAlias) {
+        this(factory, onClickCallback, createSubFragmentCallback, onLongClickCallback, linkAlias);
+        this.factoryArgs = factoryArgs;
+    }
+
+    public CustomSetting(View view, PyObject onClickCallback, PyObject createSubFragmentCallback, PyObject onLongClickCallback, String linkAlias) {
+        this(UItem.asCustom(view), onClickCallback, createSubFragmentCallback, onLongClickCallback, linkAlias);
+    }
+
+    @Override
+    public void cleanup() {
+        super.cleanup();
+        closeCallback(onClickCallback);
+        closeCallback(createSubFragmentCallback);
+        closeCallback(factoryArgs);
+        onClickCallback = null;
+        createSubFragmentCallback = null;
+        factoryArgs = null;
+    }
+
+    public UItem getItem() {
+        return item;
+    }
+
+    public void setItem(UItem item) {
+        this.item = item;
+    }
+
+    public Factory<?> getFactory() {
+        return factory;
+    }
+
+    public void setFactory(Factory<?> factory) {
+        this.factory = factory;
+    }
+
+    public PyObject getFactoryArgs() {
+        return factoryArgs;
+    }
+
+    public void setFactoryArgs(PyObject factoryArgs) {
+        this.factoryArgs = factoryArgs;
+    }
+
+    public PyObject getOnClickCallback() {
+        return onClickCallback;
+    }
+
+    public void setOnClickCallback(PyObject onClickCallback) {
+        this.onClickCallback = onClickCallback;
+    }
+
+    public PyObject getCreateSubFragmentCallback() {
+        return createSubFragmentCallback;
+    }
+
+    public void setCreateSubFragmentCallback(PyObject createSubFragmentCallback) {
+        this.createSubFragmentCallback = createSubFragmentCallback;
+    }
+
+    public static abstract class Factory<V extends View> extends UItem.UItemFactory<V> {
+        public boolean isShadowValue;
+        public boolean isClickableValue = true;
+
+        public boolean isShadowValue() {
+            return isShadowValue;
+        }
+
+        public void setShadowValue(boolean shadowValue) {
+            isShadowValue = shadowValue;
+        }
+
+        public boolean isClickableValue() {
+            return isClickableValue;
+        }
+
+        public void setClickableValue(boolean clickableValue) {
+            isClickableValue = clickableValue;
+        }
+
+        public boolean getIsShadowValue() {
+            return isShadowValue;
+        }
+
+        public boolean getIsClickableValue() {
+            return isClickableValue;
+        }
+
+        public UItem create(Plugin plugin, CustomSetting customSetting, PyObject factoryArgs) {
+            return null;
+        }
+
+        public void onClick(Plugin plugin, UItem item, View view) {
+        }
+
+        public void onLongClick(Plugin plugin, UItem item, View view) {
+        }
+
+        @Override
+        public boolean isShadow() {
+            return isShadowValue;
+        }
+
+        @Override
+        public boolean isClickable() {
+            return isClickableValue;
+        }
     }
 }

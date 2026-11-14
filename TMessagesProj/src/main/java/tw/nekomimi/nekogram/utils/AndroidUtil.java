@@ -190,8 +190,9 @@ public class AndroidUtil {
 
     @SuppressWarnings("ConstantValue")
     public static String getVersionText() {
-        String versionName = "release".equals(BuildConfig.BUILD_TYPE) && !BuildVars.LOGS_ENABLED ? BuildConfig.VERSION_NAME.split("-")[0] : BuildConfig.VERSION_NAME;
-        return "Alexgram v" + versionName + "(" + BuildConfig.VERSION_CODE + ") " + Build.SUPPORTED_ABIS[0].toLowerCase(Locale.ROOT) + " " + BuildConfig.BUILD_TYPE + (BuildVars.LOGS_ENABLED ? " " + BuildConfig.BUILD_TIMESTAMP : "");
+        String tier = BuildConfig.DEBUG ? "debug" : (!TextUtils.isEmpty(BuildConfig.APP_TIER) ? BuildConfig.APP_TIER : BuildConfig.BUILD_TYPE);
+        String versionName = "release".equalsIgnoreCase(tier) && !BuildVars.LOGS_ENABLED ? BuildConfig.VERSION_NAME.split("-")[0] : BuildConfig.VERSION_NAME;
+        return "Alexgram v" + versionName + "(" + BuildConfig.VERSION_CODE + ") " + Build.SUPPORTED_ABIS[0].toLowerCase(Locale.ROOT) + " " + tier + (BuildVars.LOGS_ENABLED ? " " + BuildConfig.BUILD_TIMESTAMP : "");
     }
 
     /*<!-- Controls the navigation bar interaction mode:

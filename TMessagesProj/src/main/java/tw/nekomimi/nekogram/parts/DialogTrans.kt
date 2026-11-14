@@ -40,7 +40,7 @@ fun startTrans(
     val scope = CoroutineScope(Dispatchers.IO + job)
     scope.launch {
         runCatching {
-            val result = Translator.translate(finalToLang, text, finalProvider)
+            val result = Translator.translate(finalToLang, finalProvider, text)
             if (!canceled.get()) {
                 withContext(Dispatchers.Main) {
                     dialog.uDismiss()
@@ -55,8 +55,9 @@ fun startTrans(
                 if (!canceled.get()) {
                     AlertUtil.showTransFailedDialog(
                         ctx, e is UnsupportedOperationException, e.message ?: e.javaClass.simpleName
-                    ) {
-                        startTrans(ctx, text, toLang, finalProvider)
+                    ) { newProvider ->
+                        val retryProvider = if (newProvider != 0) newProvider else finalProvider
+                        startTrans(ctx, text, toLang, retryProvider)
                     }
                 }
             }

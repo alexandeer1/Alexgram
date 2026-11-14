@@ -216,6 +216,18 @@ object NaConfig {
             ConfigItem.configTypeBool,
             true
         )
+    val compactMessageMenuOptions =
+        addConfig(
+            "CompactMessageMenuOptions",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val hiddenMessageMenuOptions =
+        addConfig(
+            "HiddenMessageMenuOptions",
+            ConfigItem.configTypeString,
+            ""
+        )
     val customTitle =
         addConfig(
             "CustomTitle",
@@ -281,6 +293,12 @@ object NaConfig {
             "ShowOnlineStatus",
             ConfigItem.configTypeBool,
             true
+        )
+    val replaceBlockedMyInfo =
+        addConfig(
+            "ReplaceBlockedMyInfo",
+            ConfigItem.configTypeBool,
+            false
         )
     val showFullAbout =
         addConfig(
@@ -960,6 +978,66 @@ object NaConfig {
             ConfigItem.configTypeString,
             ""
         )
+    val llmProviderZhipuAIKey =
+        addConfig(
+            "LlmProviderZhipuAIKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderZhipuAIModel =
+        addConfig(
+            "LlmProviderZhipuAIModel",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderMistralKey =
+        addConfig(
+            "LlmProviderMistralKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderMistralModel =
+        addConfig(
+            "LlmProviderMistralModel",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderQwenKey =
+        addConfig(
+            "LlmProviderQwenKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderQwenModel =
+        addConfig(
+            "LlmProviderQwenModel",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderMoonshotKey =
+        addConfig(
+            "LlmProviderMoonshotKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderMoonshotModel =
+        addConfig(
+            "LlmProviderMoonshotModel",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderSiliconFlowKey =
+        addConfig(
+            "LlmProviderSiliconFlowKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmProviderSiliconFlowModel =
+        addConfig(
+            "LlmProviderSiliconFlowModel",
+            ConfigItem.configTypeString,
+            ""
+        )
     val llmTemperature =
         addConfig(
             "LlmTemperature",
@@ -981,6 +1059,138 @@ object NaConfig {
     val llmUseContextInAutoTranslate =
         addConfig(
             "LlmUseContextInAutoTranslate",
+            ConfigItem.configTypeBool,
+            false
+        )
+    val llmProvider =
+        addConfig(
+            "LLMProvider",
+            ConfigItem.configTypeInt,
+            0
+        )
+    val llmApiFormat =
+        addConfig(
+            "LLMApiFormat",
+            ConfigItem.configTypeInt,
+            0
+        )
+    val llmApiKeys =
+        addConfig(
+            "LLMApiKeys",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmOpenAIModel =
+        addConfig(
+            "LLMOpenAIModel",
+            ConfigItem.configTypeString,
+            "gpt-4.1-mini"
+        )
+    val llmGeminiModel =
+        addConfig(
+            "LLMGeminiModel",
+            ConfigItem.configTypeString,
+            "gemini-2.5-flash"
+        )
+    val llmGroqModel =
+        addConfig(
+            "LLMGroqModel",
+            ConfigItem.configTypeString,
+            "llama-3.3-70b-versatile"
+        )
+    val llmDeepSeekModel =
+        addConfig(
+            "LLMDeepSeekModel",
+            ConfigItem.configTypeString,
+            "deepseek-chat"
+        )
+    val llmXAIModel =
+        addConfig(
+            "LLMXAIModel",
+            ConfigItem.configTypeString,
+            "grok-3-mini-fast"
+        )
+    val llmZhipuAIModel =
+        addConfig(
+            "LLMZhipuAIModel",
+            ConfigItem.configTypeString,
+            "GLM-4-Flash"
+        )
+    val llmMistralModel =
+        addConfig(
+            "LLMMistralModel",
+            ConfigItem.configTypeString,
+            "mistral-small-latest"
+        )
+    val llmOpenRouterModel =
+        addConfig(
+            "LLMOpenRouterModel",
+            ConfigItem.configTypeString,
+            "meta-llama/llama-3.3-70b-instruct"
+        )
+    val llmQwenModel =
+        addConfig(
+            "LLMQwenModel",
+            ConfigItem.configTypeString,
+            "qwen-turbo-latest"
+        )
+    val llmMoonshotModel =
+        addConfig(
+            "LLMMoonshotModel",
+            ConfigItem.configTypeString,
+            "moonshot-v1-8k"
+        )
+    val llmSiliconFlowModel =
+        addConfig(
+            "LLMSiliconFlowModel",
+            ConfigItem.configTypeString,
+            "Qwen/Qwen2.5-7B-Instruct"
+        )
+    val llmCustomModel =
+        addConfig(
+            "LLMCustomModel",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val llmTranslationPrompt =
+        addConfig(
+            "LLMTranslationPrompt",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val deepLxCustomApi =
+        addConfig(
+            "DeepLxCustomApi",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val deepLFormality =
+        addConfig(
+            "DeepLFormality",
+            ConfigItem.configTypeInt,
+            0
+        )
+    val deepLApiKey =
+        addConfig(
+            "DeepLApiKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val deepLFreeApiKey =
+        addConfig(
+            "DeepLFreeApiKey",
+            ConfigItem.configTypeString,
+            ""
+        )
+    val keepFormatting =
+        addConfig(
+            "KeepFormatting",
+            ConfigItem.configTypeBool,
+            true
+        )
+    val hideOriginAfterTranslation =
+        addConfig(
+            "HideOriginAfterTranslation",
             ConfigItem.configTypeBool,
             false
         )
@@ -1328,6 +1538,12 @@ object NaConfig {
             ConfigItem.configTypeBool,
             false
         )
+    val disableAiEditor =
+        addConfig(
+            "DisableAiEditor",
+            ConfigItem.configTypeBool,
+            false
+        )
     val shortcutsAdministrators =
         addConfig(
             "ChannelAdministrators",
@@ -1582,6 +1798,12 @@ object NaConfig {
             ConfigItem.configTypeInt,
             1 // 0: Classic, 1: Spring, 2: Predictive Back
         )
+    val mainTabsVisibility =
+        addConfig(
+            "MainTabsVisibility",
+            ConfigItem.configTypeInt,
+            0 // 0: ALWAYS, 1: HIDE_ON_SCROLL, 2: HIDDEN
+        )
     val mainTabsHideTitles =
         addConfig(
             "MainTabsHideTitles",
@@ -1630,7 +1852,7 @@ object NaConfig {
         addConfig(
             "HideTabsOnScroll",
             ConfigItem.configTypeBool,
-            true
+            false
         )
     val searchEngineInSearchBar =
         addConfig(
@@ -1645,60 +1867,6 @@ object NaConfig {
             0
         )
 
-    val enableAIReply =
-        addConfig(
-            "enableAIReply",
-            ConfigItem.configTypeBool,
-            false
-        )
-    val enableSummarizeChat =
-        addConfig(
-            "enableSummarizeChat",
-            ConfigItem.configTypeBool,
-            false
-        )
-    val usePollinationsAi =
-        addConfig(
-            "usePollinationsAi",
-            ConfigItem.configTypeBool,
-            false
-        )
-    val aiModelUrl =
-        addConfig(
-            "aiModelUrl",
-            ConfigItem.configTypeString,
-            ""
-        )
-    val aiApiKey =
-        addConfig(
-            "aiApiKey",
-            ConfigItem.configTypeString,
-            ""
-        )
-    val aiModelUrl2 =
-        addConfig(
-            "aiModelUrl2",
-            ConfigItem.configTypeString,
-            ""
-        )
-    val aiApiKey2 =
-        addConfig(
-            "aiApiKey2",
-            ConfigItem.configTypeString,
-            ""
-        )
-    val aiAssistantPersona =
-        addConfig(
-            "aiAssistantPersona",
-            ConfigItem.configTypeString,
-            ""
-        )
-    val aiAssistantIntensity =
-        addConfig(
-            "aiAssistantIntensity",
-            ConfigItem.configTypeInt,
-            70
-        )
 
     // [Alexgram: Default Schedule Delay] - Start
     val defaultScheduledTime =
@@ -1842,6 +2010,14 @@ object NaConfig {
     private fun fixConfig() {
         if (ApplicationLoader.applicationContext == null) {
             return
+        }
+        if (!getPreferences().contains(mainTabsVisibility.key)) {
+            val hideBottom = getPreferences().getBoolean(hideBottomNavigationBar.key, false)
+            val hideOnScroll = getPreferences().contains(hideTabsOnScroll.key) && getPreferences().getBoolean(hideTabsOnScroll.key, false)
+            val initial = if (hideBottom) 2 else if (hideOnScroll) 1 else 0
+            mainTabsVisibility.setConfigInt(initial)
+            hideBottomNavigationBar.setConfigBool(initial == 2)
+            hideTabsOnScroll.setConfigBool(initial == 1)
         }
         if (!translatorModeWithOriginalMigrated.Bool()) {
             if (getPreferences().contains(translatorMode.key)) {

@@ -26,6 +26,7 @@ import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.SimpleActionBarMenu;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
@@ -124,7 +125,7 @@ public class RegexFiltersSettingActivity extends BaseNekoSettingsActivity {
     public View createView(Context context) {
         View v = super.createView(context);
 
-        ActionBarMenu menu = actionBar.createMenu();
+        SimpleActionBarMenu menu = simpleActionBar.createMenu();
         ActionBarMenuItem menuItem = menu.addItem(0, R.drawable.ic_ab_other);
         menuItem.addSubItem(1, R.drawable.msg_photo_settings_solar, getString(R.string.RegexFiltersImport));
         menuItem.addSubItem(2, R.drawable.msg_instant_link_solar, getString(R.string.RegexFiltersExport));
@@ -134,7 +135,7 @@ public class RegexFiltersSettingActivity extends BaseNekoSettingsActivity {
         clearSub.setColors(red, red);
         clearSub.setSelectorColor(Theme.multAlpha(red, .12f));
 
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onItemClick(int id) {

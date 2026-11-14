@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.GradientDrawable;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -21,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,8 +30,9 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
-import org.telegram.ui.AIAssistanceSettingsActivity;
-import org.telegram.ui.Plugins.PluginsActivity;
+import com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity;
+import com.exteragram.messenger.plugins.PluginsController;
+import com.exteragram.messenger.plugins.ui.PluginsActivity;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -100,6 +101,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
     private int cardBg;
     private int cardBorder;
     private int dividerColor;
+    private org.telegram.ui.Components.RecyclerListView searchListView;
 
     private int headerRow;
     private int quickSettingsHeaderRow;
@@ -172,24 +174,18 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         AlexgramSettingsHeaderView backgroundView = new AlexgramSettingsHeaderView(context);
         frameLayout.addView(backgroundView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(LocaleController.getString("ASettings", R.string.ASettings));
-        actionBar.setBackgroundColor(Color.TRANSPARENT);
-        actionBar.setCastShadows(false);
-        actionBar.setAddToContainer(false);
-        
-        int color = isDark ? Color.WHITE : 0xFF1A1A2E;
-        actionBar.setItemsColor(color, false);
-        actionBar.setTitleColor(color);
+        // [Alexgram: Glass Header] Telegram glass header: back arrow in a glass circle
+        simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+        simpleActionBar.setTitle(LocaleController.getString("NekoSettings", R.string.NekoSettings));
         
         final FrameLayout searchContainer = new FrameLayout(context);
         searchContainer.setVisibility(View.GONE);
         searchContainer.setAlpha(0.0f);
         
-        org.telegram.ui.Components.RecyclerListView searchListView = new org.telegram.ui.Components.RecyclerListView(context);
+        searchListView = new org.telegram.ui.Components.RecyclerListView(context);
         searchListView.setLayoutManager(new LinearLayoutManager(context));
-        searchListView.setPadding(0, AndroidUtilities.dp(64) + (AndroidUtilities.isTablet() ? 0 : AndroidUtilities.statusBarHeight), 0, AndroidUtilities.dp(16));
-        searchListView.setClipToPadding(true);
+        searchListView.setPadding(0, AndroidUtilities.dp(64) + (AndroidUtilities.isTablet() ? 0 : AndroidUtilities.statusBarHeight), 0, AndroidUtilities.dp(20));
+        searchListView.setClipToPadding(false);
         
         final SearchAdapter searchAdapter = new SearchAdapter(context);
         searchListView.setAdapter(searchAdapter);
@@ -197,7 +193,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         
         final int search_id = 1;
         final int cloud_id = 2;
-        org.telegram.ui.ActionBar.ActionBarMenu menu = actionBar.createMenu();
+        org.telegram.ui.ActionBar.SimpleActionBarMenu menu = simpleActionBar.createMenu();
         org.telegram.ui.ActionBar.ActionBarMenuItem searchItem = menu.addItem(search_id, R.drawable.ic_ab_search_solar);
         searchItem.setIsSearchField(true).setActionBarMenuItemSearchListener(new org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemSearchListener() {
             @Override
@@ -223,10 +219,8 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         searchItem.setSearchFieldHint("Search anything...");
         
         org.telegram.ui.ActionBar.ActionBarMenuItem cloudItem = menu.addItem(cloud_id, R.drawable.cloud_sync);
-        if (searchItem != null) searchItem.setIconColor(color);
-        if (cloudItem != null) cloudItem.setIconColor(color);
         
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
@@ -237,7 +231,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
             }
         });
 
-        actionBar.getTitleTextView().setAlpha(0.0f);
+        simpleActionBar.setTitlesAlpha(0.0f);
         
         listView = new org.telegram.ui.Components.BlurredRecyclerView(context);
         listView.disableBlurTopPadding = true;
@@ -253,15 +247,23 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 int scrollY = recyclerView.computeVerticalScrollOffset();
                 float alpha = Math.max(0, Math.min(1.0f, (scrollY - AndroidUtilities.dp(100)) / (float) AndroidUtilities.dp(60)));
-                actionBar.getTitleTextView().setAlpha(alpha);
-                actionBar.setBackgroundColor(ColorUtils.setAlphaComponent(isDark ? 0xFF1E2732 : Color.WHITE, (int) (alpha * 255)));
+                simpleActionBar.setTitlesAlpha(alpha);
             }
         });
         
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        frameLayout.addView(searchContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));  frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        frameLayout.addView(searchContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));  // the glass header (SimpleActionBar) is added on top by the framework
 
         return fragmentView;
+    }
+
+    @Override
+    public void onInsets(int left, int top, int right, int bottom) {
+        super.onInsets(left, top, right, bottom);
+        if (searchListView != null) {
+            searchListView.setPadding(0, AndroidUtilities.dp(64) + (AndroidUtilities.isTablet() ? 0 : top), 0, bottom + AndroidUtilities.dp(20));
+            searchListView.setClipToPadding(false);
+        }
     }
 
     @Override
@@ -349,7 +351,33 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
 
     @Override
     protected String getActionBarTitle() {
-        return LocaleController.getString("ASettings", R.string.ASettings);
+        return LocaleController.getString("NekoSettings", R.string.NekoSettings);
+    }
+
+    private String getQuickSettingTitle(QuickSettingEntry entry) {
+        if (entry == null) return "";
+        if (!TextUtils.isEmpty(entry.key)) {
+            String localized = LocaleController.getString(entry.key);
+            if (localized != null && !localized.startsWith("LOC_ERR")) {
+                return localized;
+            }
+        }
+        return entry.title != null ? entry.title : "";
+    }
+
+    private String getQuickSettingSubtitle(QuickSettingEntry entry) {
+        if (entry == null) return null;
+        if (!TextUtils.isEmpty(entry.key)) {
+            String localized = LocaleController.getString(entry.key + "Info");
+            if (localized != null && !localized.startsWith("LOC_ERR")) {
+                return localized;
+            }
+            localized = LocaleController.getString(entry.key + "Desc");
+            if (localized != null && !localized.startsWith("LOC_ERR")) {
+                return localized;
+            }
+        }
+        return entry.subtitle;
     }
 
     private class ListAdapter extends BaseListAdapter {
@@ -383,10 +411,10 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                 ((BrandingHeaderView) holder.itemView).update();
             } else if (viewType == 1) {
                 SectionHeaderCell cell = (SectionHeaderCell) holder.itemView;
-                if (position == quickSettingsHeaderRow) cell.setText("QUICK SETTINGS");
-                else if (position == privacyHeaderRow) cell.setText("PRIVACY");
-                else if (position == coreHeaderRow) cell.setText("CORE SETTINGS");
-                else if (position == advancedHeaderRow) cell.setText("ADVANCED");
+                if (position == quickSettingsHeaderRow) cell.setText(LocaleController.getString("QuickSettings", R.string.QuickSettings));
+                else if (position == privacyHeaderRow) cell.setText(LocaleController.getString("PrivacyTitle", R.string.PrivacyTitle));
+                else if (position == coreHeaderRow) cell.setText(LocaleController.getString("CoreSettings", R.string.CoreSettings));
+                else if (position == advancedHeaderRow) cell.setText(LocaleController.getString("NekoAdvancedSettings", R.string.NekoAdvancedSettings));
             } else if (viewType == 6) {
                 CardSwitchCell cell = (CardSwitchCell) holder.itemView;
                 QuickSettingEntry entry = QuickSettingsController.getInstance().getQuickSettings().get(position - quickSettingsStartRow);
@@ -395,7 +423,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                 if (resId == 0) resId = R.drawable.msg_settings;
                 
                 boolean isLast = position == quickSettingsEndRow - 1;
-                cell.setData(entry.title, null, resId, config != null && config.Bool(), isChecked -> {
+                cell.setData(getQuickSettingTitle(entry), null, resId, config != null && config.Bool(), isChecked -> {
                     if ("music_graph".equals(entry.key) && isChecked && android.os.Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                         android.content.SharedPreferences prefs = org.telegram.messenger.MessagesController.getGlobalMainSettings();
                         if (prefs.getBoolean("asked_mic_music_graph", false) || !getParentActivity().shouldShowRequestPermissionRationale(android.Manifest.permission.RECORD_AUDIO)) {
@@ -428,20 +456,24 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                         subtitle = config.String();
                     }
                 }
+                if (subtitle == null || subtitle.equals(entry.subtitle)) {
+                    String localizedSub = getQuickSettingSubtitle(entry);
+                    if (localizedSub != null) subtitle = localizedSub;
+                }
                 
                 boolean isLast = position == quickSettingsEndRow - 1;
-                cell.setData(entry.title, subtitle, resId, 0xFF2196F3, v -> onItemClick(cell, position, 0, 0), position == quickSettingsStartRow, isLast);
+                cell.setData(getQuickSettingTitle(entry), subtitle, resId, 0xFF2196F3, v -> onItemClick(cell, position, 0, 0), position == quickSettingsStartRow, isLast);
             } else if (viewType == 2) {
                 CardSwitchCell cell = (CardSwitchCell) holder.itemView;
                 if (position == hideContactsRow) {
-                    cell.setData("Hide Contacts", "Hide contacts tab", R.drawable.msg_contacts, NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
+                    cell.setData(LocaleController.getString("HideContacts", R.string.HideContacts), LocaleController.getString("HideContactsDesc", R.string.HideContactsDesc), R.drawable.msg_contacts, NaConfig.INSTANCE.getHideContacts().Bool(), isChecked -> {
                         NaConfig.INSTANCE.getHideContacts().setConfigBool(isChecked);
                         AppRestartHelper.triggerRebirth(mContext, new Intent(mContext, LaunchActivity.class));
                     }, true, false);
                 } else if (position == ghostModeRow) {
-                    cell.setData("Ghost Mode", "Read silently", R.drawable.msg_secret, NekoConfig.isGhostModeActive(), isChecked -> NekoConfig.setGhostMode(isChecked), false, false);
+                    cell.setData(LocaleController.getString("GhostMode", R.string.GhostMode), LocaleController.getString("GhostModeDesc", R.string.GhostModeDesc), R.drawable.msg_secret, NekoConfig.isGhostModeActive(), isChecked -> NekoConfig.setGhostMode(isChecked), false, false);
                 } else if (position == musicGraphRow) {
-                    cell.setData("Music Graph", "Visualizer in player", R.drawable.baseline_music_note_24, NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
+                    cell.setData(LocaleController.getString("MusicGraph", R.string.MusicGraph), LocaleController.getString("MusicGraphDesc", R.string.MusicGraphDesc), R.drawable.baseline_music_note_24, NaConfig.INSTANCE.getMusicGraph().Bool(), isChecked -> {
                         if (isChecked && android.os.Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                             android.content.SharedPreferences prefs = org.telegram.messenger.MessagesController.getGlobalMainSettings();
                             if (prefs.getBoolean("asked_mic_music_graph", false) || !getParentActivity().shouldShowRequestPermissionRationale(android.Manifest.permission.RECORD_AUDIO)) {
@@ -456,12 +488,12 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                         NaConfig.INSTANCE.getMusicGraph().setConfigBool(isChecked);
                     }, false, false);
                 } else if (position == saveDeletedRow) {
-                    cell.setData("Save Deleted", "Save deleted messages", R.drawable.msg_delete_solar, NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), isChecked -> NaConfig.INSTANCE.getEnableSaveDeletedMessages().setConfigBool(isChecked), false, true);
+                    cell.setData(LocaleController.getString("EnableSaveDeletedMessages", R.string.EnableSaveDeletedMessages), LocaleController.getString("SaveDeletedDesc", R.string.SaveDeletedDesc), R.drawable.msg_delete_solar, NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool(), isChecked -> NaConfig.INSTANCE.getEnableSaveDeletedMessages().setConfigBool(isChecked), false, true);
                 }
             } else if (viewType == 3) {
                 CardItemCell cell = (CardItemCell) holder.itemView;
                 if (position == hiddenChatsRow) {
-                    cell.setData("Hidden Chats", "Private conversations", R.drawable.msg_secret, 0xFF2196F3, v -> {
+                    cell.setData(LocaleController.getString("HiddenChats", R.string.HiddenChats), LocaleController.getString("HiddenAccountsDesc", R.string.HiddenAccountsDesc), R.drawable.msg_secret, 0xFF2196F3, v -> {
                         tw.nekomimi.nekogram.helpers.HiddenChatsController controller = tw.nekomimi.nekogram.helpers.HiddenChatsController.getInstance();
                         if (controller.hasPasscode()) {
                             presentFragment(new tw.nekomimi.nekogram.ui.HiddenChatsPasscodeActivity(tw.nekomimi.nekogram.ui.HiddenChatsPasscodeActivity.MODE_UNLOCK_SETTINGS));
@@ -470,7 +502,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                         }
                     }, true, false);
                 } else if (position == analyticsRow) {
-                    cell.setData("Analytics & Control", "Usage stats, chat lock & focus mode", R.drawable.msg_stats_solar, 0xFF2196F3, v -> {
+                    cell.setData(LocaleController.getString("AnalyticsTitle", R.string.AnalyticsTitle), LocaleController.getString("AnalyticsDesc", R.string.AnalyticsDesc), R.drawable.msg_stats_solar, 0xFF2196F3, v -> {
                         Intent intent = new Intent(getParentActivity(), xyz.nextalone.nagram.analytics.ui.AnalyticsDashboardActivity.class);
                         getParentActivity().startActivity(intent);
                     }, false, true);
@@ -478,22 +510,24 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                 } else if (position == coreSettingsRow) {
                     List<CoreItem> items = new ArrayList<>();
                     // [Alexgram: Accounts Settings] - Start
-                    items.add(new CoreItem("Accounts", "Limits, Startup & Performance", R.drawable.msg_contacts, 0xFF3F51B5, v -> presentFragment(new AccountsSettingsActivity())));
+                    items.add(new CoreItem(LocaleController.getString("AccountsSettings", R.string.AccountsSettings), LocaleController.getString("AccountsDesc", R.string.AccountsDesc), R.drawable.msg_contacts, 0xFF3F51B5, v -> presentFragment(new AccountsSettingsActivity())));
                     // [Alexgram: Accounts Settings] - End
-                    items.add(new CoreItem("General", "Appearance, Language, Behavior", R.drawable.msg_settings, 0xFF2196F3, v -> presentFragment(new NekoGeneralSettingsActivity())));
-                    items.add(new CoreItem(LocaleController.getString("Customization", R.string.Customization), "Icons, Styles, Theme & Decoration", R.drawable.msg_theme, 0xFFFF9C00, v -> presentFragment(new NekoCustomizationSettingsActivity())));
-                    items.add(new CoreItem("Translator", "Messages, Languages, Engine", R.drawable.ic_translate, 0xFF9C27B0, v -> presentFragment(new NekoTranslatorSettingsActivity())));
-                    items.add(new CoreItem("AI Assistance", "Alexgram assistant behavior & animations", R.drawable.settings_chat, 0xFF8E44AD, v -> presentFragment(new AIAssistanceSettingsActivity())));
-                    items.add(new CoreItem("Chats", "UI, Privacy, Media", R.drawable.msg_discussion, 0xFF4CAF50, v -> presentFragment(new NekoChatSettingsActivity())));
-                    items.add(new CoreItem("Plugins", "Manage Python Plugins", R.drawable.msg_fave, 0xFF009688, v -> presentFragment(new PluginsActivity())));
+                    items.add(new CoreItem(LocaleController.getString("General", R.string.General), LocaleController.getString("GeneralDesc", R.string.GeneralDesc), R.drawable.msg_settings, 0xFF2196F3, v -> presentFragment(new NekoGeneralSettingsActivity())));
+                    items.add(new CoreItem(LocaleController.getString("Customization", R.string.Customization), LocaleController.getString("CustomizationDesc", R.string.CustomizationDesc), R.drawable.msg_theme, 0xFFFF9C00, v -> presentFragment(new NekoCustomizationSettingsActivity())));
+                    items.add(new CoreItem(LocaleController.getString("TranslatorSettings", R.string.TranslatorSettings), LocaleController.getString("TranslatorDesc", R.string.TranslatorDesc), R.drawable.ic_translate, 0xFF9C27B0, v -> presentFragment(new NekoTranslatorSettingsActivity())));
+                    items.add(new CoreItem(LocaleController.getString(R.string.AIChat), LocaleController.getString(R.string.AIChatInfo), R.drawable.ai_chat, 0xFF8E44AD, v -> presentFragment(new AiPreferencesActivity())));
+                    items.add(new CoreItem(LocaleController.getString("Chats", R.string.Chats), LocaleController.getString("ChatsDesc", R.string.ChatsDesc), R.drawable.msg_discussion, 0xFF4CAF50, v -> presentFragment(new NekoChatSettingsActivity())));
+                    if (PluginsController.isPluginEngineSupported()) {
+                        items.add(new CoreItem(LocaleController.getString("Plugins", R.string.Plugins), LocaleController.getString("PluginsDesc", R.string.PluginsDesc), R.drawable.msg_plugins, 0xFF009688, v -> presentFragment(new PluginsActivity())));
+                    }
                     if (!PasscodeHelper.isSettingsHidden()) {
-                        items.add(new CoreItem("Passcode", "Security & Fingerprint", R.drawable.msg_permissions, 0xFFF44336, v -> presentFragment(new NekoPasscodeSettingsActivity())));
+                        items.add(new CoreItem(LocaleController.getString("Passcode", R.string.Passcode), LocaleController.getString("PasscodeDesc", R.string.PasscodeDesc), R.drawable.msg_permissions, 0xFFF44336, v -> presentFragment(new NekoPasscodeSettingsActivity())));
                     }
                     cell.setMultiData(items.toArray(new CoreItem[0]));
                 } else if (position == advancedSettingsRow) {
                     cell.setMultiData(new CoreItem[]{
-                            new CoreItem("Cloud Settings", "Sync, backup, and restore", R.drawable.cloud_sync, 0xFF00BCD4, v -> CloudSettingsHelper.getInstance().showDialog(NekoSettingsActivity.this)),
-                            new CoreItem("Experimental", "Beta Tools & Features", R.drawable.msg_fave, 0xFF673AB7, v -> presentFragment(new NekoExperimentalSettingsActivity()))
+                            new CoreItem(LocaleController.getString("CloudConfig", R.string.CloudConfig), LocaleController.getString("CloudSettingsDesc", R.string.CloudSettingsDesc), R.drawable.cloud_sync, 0xFF00BCD4, v -> CloudSettingsHelper.getInstance().showDialog(NekoSettingsActivity.this)),
+                            new CoreItem(LocaleController.getString("Experimental", R.string.Experimental), LocaleController.getString("ExperimentalDesc", R.string.ExperimentalDesc), R.drawable.msg_fave, 0xFF673AB7, v -> presentFragment(new NekoExperimentalSettingsActivity()))
                     });
                 }
             } else if (viewType == 4) {
@@ -601,7 +635,9 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
             textView.setTextColor(isDark ? 0x88FFFFFF : 0x885C6B7F);
             addView(textView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         }
-        public void setText(String text) { textView.setText(text); }
+        public void setText(String text) {
+            textView.setText(text != null ? text.toUpperCase(java.util.Locale.getDefault()) : "");
+        }
     }
 
     private class CardSwitchCell extends FrameLayout {
@@ -778,13 +814,13 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         public void update() {
             removeAllViews();
             int color = isDark ? Color.WHITE : 0xFF1A1A2E;
-            addView(createAction(getContext(), "Export", R.drawable.msg_share, color, v -> SettingsBackupHelper.backupSettings(getParentActivity(), resourcesProvider)), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
+            addView(createAction(getContext(), LocaleController.getString("ExportTheme", R.string.ExportTheme), R.drawable.msg_share, color, v -> SettingsBackupHelper.backupSettings(getParentActivity(), resourcesProvider)), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
             addView(new View(getContext()), LayoutHelper.createLinear(dp(8), 1));
-            addView(createAction(getContext(), "Reset", R.drawable.msg_reset, color, v -> resetSettings()), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
+            addView(createAction(getContext(), LocaleController.getString("Reset", R.string.Reset), R.drawable.msg_reset, color, v -> resetSettings()), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
             addView(new View(getContext()), LayoutHelper.createLinear(dp(8), 1));
-            addView(createAction(getContext(), "Restart", R.drawable.msg_retry, color, v -> AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class))), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
+            addView(createAction(getContext(), LocaleController.getString("BotUnblockNoCaps", R.string.BotUnblockNoCaps), R.drawable.msg_retry, color, v -> AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class))), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
             addView(new View(getContext()), LayoutHelper.createLinear(dp(8), 1));
-            addView(createAction(getContext(), "About", R.drawable.msg_info, color, v -> presentFragment(new NekoAboutActivity())), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
+            addView(createAction(getContext(), LocaleController.getString("About", R.string.About), R.drawable.msg_info, color, v -> presentFragment(new NekoAboutActivity())), LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1.0f));
         }
         private View createAction(Context ctx, String text, int iconRes, int textColor, View.OnClickListener listener) {
             LinearLayout btn = new LinearLayout(ctx);
@@ -838,7 +874,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
             textView.setTextColor(0xFFF44336);
             textView.setGravity(Gravity.CENTER);
             textView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-            textView.setText("Clear All Recent Searches");
+            textView.setText(LocaleController.getString("ClearSearchAlertTitle", R.string.ClearSearchAlertTitle));
             textView.setPadding(0, dp(16), 0, dp(16));
             addView(textView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
             
@@ -947,7 +983,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                     addToRecentSearches(item.key);
                     try {
                         if (item.fragmentClass == NekoSettingsActivity.class) {
-                            actionBar.closeSearchField();
+                            simpleActionBar.closeSearchField();
                             scrollToRow(item.key, null);
                         } else {
                             BaseFragment fragment = item.fragmentClass.getConstructor().newInstance();
@@ -977,5 +1013,4 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                     AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
                 });
     }
-}
-// [Alexgram: A-Settings UI] - End
+}// [Alexgram: A-Settings UI] - End

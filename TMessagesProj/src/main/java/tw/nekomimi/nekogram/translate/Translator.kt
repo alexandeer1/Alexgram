@@ -1,41 +1,46 @@
 package tw.nekomimi.nekogram.translate
 
-import android.text.TextUtils
+import android.content.Context
 import android.view.View
-import androidx.core.content.edit
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import org.telegram.messenger.AndroidUtilities
 import org.telegram.messenger.LocaleController
-import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.messenger.TranslateController
 import org.telegram.tgnet.TLRPC
 import tw.nekomimi.nekogram.NekoConfig
+import tw.nekomimi.nekogram.parts.MessageTransText
+import tw.nekomimi.nekogram.translate.TranslateDb.Companion.currentTarget
 import tw.nekomimi.nekogram.translate.source.*
 import tw.nekomimi.nekogram.ui.PopupBuilder
-import tw.nekomimi.nekogram.utils.AppScope
+import tw.nekomimi.nekogram.utils.AlertUtil.showCopyAlert
+import tw.nekomimi.nekogram.utils.AlertUtil.showProgress
+import tw.nekomimi.nekogram.utils.AlertUtil.showTransFailedDialog
+import tw.nekomimi.nekogram.utils.UIUtil
+import tw.nekomimi.nekogram.utils.receive
 import tw.nekomimi.nekogram.utils.receiveLazy
 import xyz.nextalone.nagram.NaConfig
-import java.io.IOException
-import java.util.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.Arrays
+import java.util.Locale
 
 val String.code2Locale: Locale by receiveLazy<String, Locale> {
-    val ret: Locale = if (this.isBlank()) {
-        LocaleController.getInstance().currentLocale
+    var ret: Locale
+    if (this == null || this.isBlank()) {
+        ret = LocaleController.getInstance().currentLocale
     } else {
-        Locale.forLanguageTag(replace('_', '-'))
+        val args = replace('-', '_').split('_')
+        if (args.size == 1) {
+            ret = Locale(args[0])
+        } else {
+            ret = Locale(args[0], args[1])
+        }
     }
     ret
 }
 
 val Locale.locale2code by receiveLazy<Locale, String> {
-    if (TextUtils.isEmpty(country)) {
+    if (country.isNullOrBlank()) {
         language
     } else {
         "$language-$country"
@@ -44,316 +49,124 @@ val Locale.locale2code by receiveLazy<Locale, String> {
 
 val LocaleController.LocaleInfo.locale by receiveLazy<LocaleController.LocaleInfo, Locale> { pluralLangCode.code2Locale }
 
-@Suppress("ConstPropertyName")
 interface Translator {
 
-    suspend fun doTranslate(
-        from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
-    ): TLRPC.TL_textWithEntities
+    suspend fun doTranslate(from: String, to: String, query: String): String
+
+    suspend fun doTranslate(from: String, to: String, query: String, context: List<String>): String {
+        return doTranslate(from, to, query)
+    }
 
     companion object {
 
-        const val providerGoogle = 1
-        const val providerGoogleCN = 2 // deprecated
-        const val providerYandex = 3
-        const val providerLingo = 4
-        const val providerMicrosoft = 5
-        const val providerRealMicrosoft = 6
-        const val providerDeepL = 7
-        const val providerTelegram = 8
-        const val providerTranSmart = 9
-        const val providerLLMTranslator = 10
-
-        @JvmStatic
-        fun getInputTranslateLangForChat(chatId: Long): String {
-            val key = "translateInputLang_$chatId"
-            return NekoConfig.getPreferences().getString(key, null)
-                ?: NekoConfig.translateInputLang.String()
-        }
-
-        @JvmStatic
-        fun setInputTranslateLangForChat(chatId: Long, langCode: String) {
-            val key = "translateInputLang_$chatId"
-            NekoConfig.getPreferences().edit {
-                putString(key, langCode)
-            }
-        }
-
-        @JvmStatic
-        fun getInputTranslateLangLocaleForChat(chatId: Long): Locale {
-            return getInputTranslateLangForChat(chatId).code2Locale
-        }
-
         @Throws(Exception::class)
-        suspend fun translate(to: Locale, query: String, provider: Int = 0): String {
-            val result: TLRPC.TL_textWithEntities = translateBase(to, query, ArrayList(), provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int())
-            return result.text.toString()
-        }
-
-        @Throws(Exception::class)
-        suspend fun translate(to: Locale, query: String, entities: ArrayList<TLRPC.MessageEntity>, provider: Int = 0): TLRPC.TL_textWithEntities {
-            val result: TLRPC.TL_textWithEntities = translateBase(to, query, entities, provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int())
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        fun translate(
-            to: Locale = NekoConfig.translateToLang.String()?.code2Locale
-                ?: LocaleController.getInstance().currentLocale,
-            query: String,
-            provider: Int = 0,
-            translateCallBack: TranslateCallBack
-        ) {
-
-            AppScope.io.launch {
-                runCatching {
-                    val result: String = translate(to, query, provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int())
-
-                    AndroidUtilities.runOnUIThread {
-                        translateCallBack.onSuccess(result)
-                    }
-                }.onFailure {
-                    AndroidUtilities.runOnUIThread {
-                        translateCallBack.onFailed(
-                            it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
-                        )
-                    }
-                }
-            }
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        fun translate(
-            to: Locale = NekoConfig.translateToLang.String()?.code2Locale
-                ?: LocaleController.getInstance().currentLocale,
-            query: String,
-            entities: ArrayList<TLRPC.MessageEntity>,
-            translateCallBack: TranslateCallBack2
-        ) {
-
-            AppScope.io.launch {
-                runCatching {
-                    val result = translateBase(
-                        to, query, entities, NekoConfig.translationProvider.Int()
-                    )
-
-                    AndroidUtilities.runOnUIThread { translateCallBack.onSuccess(result) }
-                }.onFailure {
-                    AndroidUtilities.runOnUIThread {
-                        translateCallBack.onFailed(
-                            it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
-                        )
-                    }
-                }
-            }
-        }
-
-        @JvmStatic
-        fun translateWithContext(
-            to: Locale,
-            query: String,
-            entities: ArrayList<TLRPC.MessageEntity>,
-            context: String?,
-            translateCallBack: TranslateCallBack2
-        ) {
-            translateWithContext(to, query, entities, context, 0, translateCallBack)
-        }
-
-        @JvmStatic
-        fun translateWithContext(
-            to: Locale,
-            query: String,
-            entities: ArrayList<TLRPC.MessageEntity>,
-            context: String?,
-            provider: Int,
-            translateCallBack: TranslateCallBack2
-        ) {
-            AppScope.io.launch {
-                runCatching {
-                    val effectiveProvider = provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int()
-                    val result = LLMTranslator.withTranslationContext(context) {
-                        translateBase(to, query, entities, effectiveProvider)
-                    }
-                    AndroidUtilities.runOnUIThread { translateCallBack.onSuccess(result) }
-                }.onFailure {
-                    AndroidUtilities.runOnUIThread {
-                        translateCallBack.onFailed(
-                            it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
-                        )
-                    }
-                }
-            }
-        }
-
-        @JvmStatic
-        fun translatePoll(
-            to: Locale = NekoConfig.translateToLang.String()?.code2Locale
-                ?: LocaleController.getInstance().currentLocale,
-            query: TranslateController.PollText,
-            translateCallBack: TranslateCallBack3
-        ) {
-
-            AppScope.io.launch {
-                runCatching {
-                    var translatedPoll = TranslateController.PollText()
-                    if (query.question != null) {
-                        translatedPoll.question = translateBase(
-                            to, query.question.text, ArrayList(), NekoConfig.translationProvider.Int()
-                        )
-                    }
-                    for (answer in query.answers) {
-                        var translatedAnswer = TLRPC.TL_pollAnswer()
-                        translatedAnswer.text = translateBase(
-                            to, answer.text.text, ArrayList(), NekoConfig.translationProvider.Int()
-                        )
-                        translatedAnswer.option = answer.option
-                        translatedPoll.answers.add(translatedAnswer)
-                    }
-                    if (query.solution != null) {
-                        translatedPoll.solution = translateBase(
-                            to, query.solution.text, ArrayList(), NekoConfig.translationProvider.Int()
-                        )
-                    }
-
-                    AndroidUtilities.runOnUIThread { translateCallBack.onSuccess(translatedPoll) }
-                }.onFailure {
-                    AndroidUtilities.runOnUIThread {
-                        translateCallBack.onFailed(
-                            it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
-                        )
-                    }
-                }
-            }
-        }
- 
-        @Throws(Exception::class)
-        suspend fun translateArticle(query: String) = translateArticle(
+        suspend fun translate(query: String) = translate(
             NekoConfig.translateToLang.String()?.code2Locale
                 ?: LocaleController.getInstance().currentLocale, query
         )
 
         @Throws(Exception::class)
-        suspend fun translateArticle(to: Locale, query: String): String {
-            val provider = if (NaConfig.enableSeparateArticleTranslator.Bool()) {
-                NaConfig.articleTranslationProvider.Int()
-            } else {
-                NekoConfig.translationProvider.Int()
-            }
-            val result: TLRPC.TL_textWithEntities = translateBase(to, query, ArrayList(), provider)
-            return result.text.toString()
+        suspend fun translateArticle(query: String) = translate(query)
+
+        const val providerGoogle = 1
+        const val providerGoogleCN = 2
+        const val providerGoogle2 = 3
+        const val providerLingo = 4
+        const val providerMicrosoft = 5
+        const val providerVolcengine = 6
+        const val providerDeepL = 7 // DeepLX
+        const val providerTelegram = 8
+        const val providerTranSmart = 9
+        const val providerLLM = 10
+        const val providerDeepLOfficial = 11
+        const val providerDeepLFree = 12
+
+        // Backwards compatibility aliases
+        const val providerLLMTranslator = providerLLM
+        const val providerRealMicrosoft = providerMicrosoft
+        const val providerYandex = providerGoogle
+
+        @Throws(Exception::class)
+        suspend fun translate(to: Locale, query: String): String = translate(to, query, emptyList())
+
+        @Throws(Exception::class)
+        suspend fun translate(to: Locale, provider: Int, query: String, context: List<String> = emptyList()): String {
+            val oldProvider = NekoConfig.translationProvider.Int()
+            val effectiveProvider = if (provider in 1..12) provider else oldProvider
+            return translateWithProvider(to, query, context, effectiveProvider)
         }
 
         @Throws(Exception::class)
-        private suspend fun translateBase(
-            to: Locale, query: String, entities: ArrayList<TLRPC.MessageEntity>, provider: Int
-        ): TLRPC.TL_textWithEntities {
+        suspend fun translate(to: Locale, query: String, context: List<String>): String {
+            val provider = NekoConfig.translationProvider.Int()
+            return translateWithProvider(to, query, context, provider)
+        }
+
+        @Throws(Exception::class)
+        private suspend fun translateWithProvider(to: Locale, query: String, context: List<String>, provider: Int): String {
             var language = to.language
             var country = to.country
 
             if (language == "in") language = "id"
-            if (country.lowercase() == "duang") country = "CN"
-
-            val countryUpperCase = country.uppercase(Locale.ROOT)
+            if (country.lowercase(Locale.getDefault()) == "duang") country = "CN"
 
             when (provider) {
-                providerDeepL -> language = when {
-                    language == "en" && (countryUpperCase == "GB" || countryUpperCase == "US") ->
-                        "en-$countryUpperCase"
-                    language == "pt" && (countryUpperCase == "BR" || countryUpperCase == "PT") ->
-                        "pt-$countryUpperCase"
-                    language == "zh" && countryUpperCase == "CN" -> "zh-CN"
-                    language == "zh" && (countryUpperCase == "TW" || countryUpperCase == "HK") ->
-                        "zh-TW"
-                    else -> language
-                }
-                providerYandex -> if (language == "pt" && countryUpperCase == "BR") {
-                    language = "pt-BR"
-                }
-                providerMicrosoft, providerRealMicrosoft, providerGoogle -> {
-                    if (language == "zh") {
-                        if (countryUpperCase == "CN") {
-                            language =
-                                if (provider == providerMicrosoft || provider == providerRealMicrosoft) "zh-Hans" else "zh-CN"
-                        } else if (countryUpperCase == "TW" || countryUpperCase == "HK") {
-                            language =
-                                if (provider == providerMicrosoft || provider == providerRealMicrosoft) "zh-Hant" else "zh-TW"
-                        }
-                    } else if (
-                        language == "pt" && countryUpperCase == "PT" &&
-                        (provider == providerMicrosoft || provider == providerRealMicrosoft)
-                    ) {
-                        language = "pt-PT"
+                providerDeepL,
+                providerDeepLOfficial,
+                providerDeepLFree -> language = AbstractDeepLTranslator.convertLanguageCode(language, country)
+                providerVolcengine,
+                providerMicrosoft,
+                providerGoogle,
+                providerGoogle2,
+                providerGoogleCN -> if (language == "zh") {
+                    val countryUpperCase = country.uppercase(Locale.getDefault())
+                    if (countryUpperCase == "CN" || countryUpperCase == "DUANG") {
+                        language = if (provider == providerMicrosoft || provider == providerVolcengine) "zh-Hans" else "zh-CN"
+                    } else if (countryUpperCase == "TW" || countryUpperCase == "HK") {
+                        language = if (provider == providerMicrosoft || provider == providerVolcengine) "zh-Hant" else "zh-TW"
                     }
                 }
-
-                providerTelegram -> language =
-                    TelegramAPITranslator.convertLanguageCode(language, country)
+                providerTelegram -> language = TelegramAPITranslator.convertLanguageCode(language, country)
             }
-            val translator = when (provider) {
-                providerGoogle -> GoogleAppTranslator
-                providerYandex -> YandexTranslator
+
+            val translator: Translator = when (provider) {
+                providerGoogle, providerGoogleCN -> GoogleAppTranslator
+                providerGoogle2 -> GoogleCloud2Translator
                 providerLingo -> LingoTranslator
                 providerMicrosoft -> MicrosoftTranslator
-                providerRealMicrosoft -> RealMicrosoftTranslator
-                providerDeepL -> DeepLTranslator
+                providerVolcengine -> VolcengineTranslator
+                providerDeepL -> DeepLXTranslator
+                providerDeepLOfficial -> DeepLTranslator
+                providerDeepLFree -> DeepLFreeTranslator
                 providerTelegram -> TelegramAPITranslator
                 providerTranSmart -> TranSmartTranslator
-                providerLLMTranslator -> LLMTranslator
-                else -> throw IllegalArgumentException()
+                providerLLM -> LLMTranslator
+                else -> GoogleAppTranslator
             }
 
-            return translator.doTranslate("auto", language, query, entities)
+            val result = translator.doTranslate("auto", language, query, context).also {
+                if (context.isEmpty()) {
+                    to.transDb.save(query, it)
+                }
+            }
+
+            return result
         }
 
-        private val availableLocaleList: Array<Locale> = Locale.getAvailableLocales().also {
+        val availableLocaleList: Array<Locale> = Locale.getAvailableLocales().also {
             Arrays.sort(it, Comparator.comparing(Locale::toString))
-        }
-
-        data class ProviderInfo(val providerConstant: Int, val nameResId: Int) {
-            companion object {
-                val PROVIDERS = arrayOf(
-                    ProviderInfo(providerGoogle, R.string.ProviderGoogleTranslate),
-                    ProviderInfo(providerYandex, R.string.ProviderYandexTranslate),
-                    ProviderInfo(providerLingo, R.string.ProviderLingocloud),
-                    ProviderInfo(providerMicrosoft, R.string.ProviderMicrosoftTranslator),
-                    ProviderInfo(providerRealMicrosoft, R.string.ProviderRealMicrosoftTranslator),
-                    ProviderInfo(providerDeepL, R.string.ProviderDeepLTranslate),
-                    ProviderInfo(providerTelegram, R.string.ProviderTelegramAPI),
-                    ProviderInfo(providerTranSmart, R.string.ProviderTranSmartTranslate),
-                    ProviderInfo(providerLLMTranslator, R.string.ProviderLLMTranslator),
-                )
-            }
-        }
-
-        @JvmStatic
-        fun showProviderSelect(anchor: View, callback: (Int) -> Unit) {
-            val builder = PopupBuilder(anchor)
-            val itemNames = ProviderInfo.PROVIDERS.map { getString(it.nameResId) }.toTypedArray()
-            builder.setItems(itemNames.map { it as CharSequence }.toTypedArray()) { index, _ ->
-                callback(ProviderInfo.PROVIDERS[index].providerConstant)
-            }
-            builder.show()
         }
 
         @JvmStatic
         @JvmOverloads
-        fun showTargetLangSelect(
-            anchor: View, input: Boolean = false, full: Boolean = false, callback: (Locale) -> Unit
-        ) {
+        fun showTargetLangSelect(anchor: View, input: Boolean = false, full: Boolean = false, callback: (Locale) -> Unit) {
             val builder = PopupBuilder(anchor)
 
-            // Get built-in language list
             val locales: MutableList<Locale> = if (full) {
                 availableLocaleList.filter { it.variant.isBlank() }.toMutableList()
             } else {
                 LocaleController.getInstance().languages.asSequence().map { it.pluralLangCode }.toSet()
-                    .filter { !it.lowercase().contains("duang") }.map { it.code2Locale }
+                    .filter { !it.lowercase(Locale.getDefault()).contains("duang") }.map { it.code2Locale }
                     .toMutableList()
             }
 
@@ -366,7 +179,6 @@ interface Translator {
             locales.remove(firstLocale)
             locales.add(0, firstLocale)
 
-            // Get preferred languages and insert after first position
             val preferredLocales = NaConfig.preferredTranslateTargetLangList.mapNotNull { lang ->
                 try {
                     lang.code2Locale
@@ -376,9 +188,7 @@ interface Translator {
             }
 
             if (preferredLocales.isNotEmpty()) {
-                // Remove existing preferred languages to avoid duplicates
                 locales.removeAll(preferredLocales.toSet())
-                // Add preferred languages starting from position 1
                 locales.addAll(1, preferredLocales)
             }
 
@@ -387,7 +197,7 @@ interface Translator {
 
             for (i in locales.indices) {
                 localeNames[i] = if (i == 0) {
-                    getString(R.string.Default) + " ( " + locales[i].getDisplayName(currLocale) + " )"
+                    LocaleController.getString(R.string.Default) + " ( " + locales[i].getDisplayName(currLocale) + " )"
                 } else if (i <= preferredLocales.size) {
                     "⭐ " + locales[i].getDisplayName(currLocale)
                 } else {
@@ -396,13 +206,13 @@ interface Translator {
             }
 
             if (!full) {
-                localeNames[localeNames.size - 1] = getString(R.string.More)
+                localeNames[localeNames.size - 1] = LocaleController.getString(R.string.More)
             }
 
             builder.setItems(
                 localeNames.filterIsInstance<CharSequence>().toTypedArray()
             ) { index: Int, _ ->
-                if (index == locales.size) {
+                if (!full && index == locales.size) {
                     showTargetLangSelect(anchor, input, true, callback)
                 } else {
                     callback(locales[index])
@@ -412,42 +222,303 @@ interface Translator {
             builder.show()
         }
 
+        @JvmStatic
+        fun showProviderSelect(anchor: View, callback: (Int) -> Unit) {
+            val builder = PopupBuilder(anchor)
+            val providers = listOf(
+                Pair(providerGoogle, LocaleController.getString(R.string.ProviderGoogleTranslate)),
+                Pair(providerGoogleCN, LocaleController.getString(R.string.ProviderGoogleTranslateCN)),
+                Pair(providerGoogle2, LocaleController.getString(R.string.ProviderGoogleTranslate) + " 2"),
+                Pair(providerLingo, LocaleController.getString(R.string.ProviderLingocloud)),
+                Pair(providerMicrosoft, LocaleController.getString(R.string.ProviderMicrosoftTranslator)),
+                Pair(providerVolcengine, LocaleController.getString(R.string.ProviderVolcengineTranslate)),
+                Pair(providerDeepL, LocaleController.getString(R.string.ProviderDeepLxTranslate)),
+                Pair(providerTelegram, LocaleController.getString(R.string.ProviderTelegramAPI)),
+                Pair(providerTranSmart, LocaleController.getString(R.string.ProviderTranSmartTranslate)),
+                Pair(providerLLM, LocaleController.getString(R.string.ProviderLLMTranslate)),
+                Pair(providerDeepLOfficial, LocaleController.getString(R.string.ProviderDeepLTranslate)),
+                Pair(providerDeepLFree, LocaleController.getString(R.string.ProviderDeepLFreeTranslate))
+            )
+            val names: List<CharSequence?> = providers.map { it.second }
+            builder.setItems(names) { index, _ ->
+                callback(providers[index].first)
+            }
+            builder.show()
+        }
+
+        @JvmStatic
+        fun getInputTranslateLangForChat(chatId: Long): String {
+            val key = "translateInputLang_$chatId"
+            return NekoConfig.getPreferences().getString(key, null)
+                ?: NekoConfig.translateInputLang.String()
+        }
+
+        @JvmStatic
+        fun setInputTranslateLangForChat(chatId: Long, langCode: String) {
+            val key = "translateInputLang_$chatId"
+            NekoConfig.getPreferences().edit().putString(key, langCode).apply()
+        }
+
+        @JvmStatic
+        fun getInputTranslateLangLocaleForChat(chatId: Long): Locale {
+            return getInputTranslateLangForChat(chatId).code2Locale
+        }
+
+        @Throws(Exception::class)
+        suspend fun translate(to: Locale, query: String, provider: Int): String =
+            translate(to, provider, query)
+
+        @Throws(Exception::class)
+        @JvmOverloads
+        suspend fun translate(
+            to: Locale,
+            query: String,
+            entities: ArrayList<TLRPC.MessageEntity>?,
+            provider: Int = 0,
+            context: List<String> = emptyList()
+        ): TLRPC.TL_textWithEntities {
+            val source = TLRPC.TL_textWithEntities().also {
+                it.text = query
+                it.entities = entities ?: ArrayList()
+            }
+            val queryText = MessageTransText.queryTextOf(source)
+            val effectiveProvider = if (provider in 1..12) provider else NekoConfig.translationProvider.Int()
+            val translatedText = translateWithProvider(to, queryText, context, effectiveProvider)
+            return MessageTransText.merge(source, translatedText, "")
+        }
+
+        @JvmStatic
+        fun translate(
+            to: Locale,
+            query: String,
+            provider: Int,
+            translateCallBack: TranslateCallBack
+        ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching {
+                    val result = if (provider in 1..12) translate(to, provider, query) else translate(to, query)
+                    UIUtil.runOnUIThread {
+                        translateCallBack.onSuccess(result)
+                    }
+                }.onFailure {
+                    translateCallBack.onFailed(
+                        it is UnsupportedOperationException,
+                        it.message ?: it.javaClass.simpleName
+                    )
+                }
+            }
+        }
+
+        @JvmStatic
+        fun translate(
+            to: Locale,
+            query: String,
+            translateCallBack: TranslateCallBack
+        ) {
+            translate(to, query, 0, translateCallBack)
+        }
+
+        @JvmStatic
+        fun translate(
+            query: String,
+            translateCallBack: TranslateCallBack
+        ) {
+            translate(
+                to = NekoConfig.translateToLang.String()?.code2Locale
+                    ?: LocaleController.getInstance().currentLocale,
+                query = query,
+                provider = 0,
+                translateCallBack = translateCallBack
+            )
+        }
+
+        @JvmStatic
+        fun translate(
+            to: Locale,
+            query: String,
+            entities: ArrayList<TLRPC.MessageEntity>?,
+            provider: Int,
+            translateCallBack: TranslateCallBack2
+        ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching {
+                    val result = translate(to, query, entities, provider)
+                    UIUtil.runOnUIThread {
+                        translateCallBack.onSuccess(result)
+                    }
+                }.onFailure {
+                    UIUtil.runOnUIThread {
+                        translateCallBack.onFailed(
+                            it is UnsupportedOperationException,
+                            it.message ?: it.javaClass.simpleName
+                        )
+                    }
+                }
+            }
+        }
+
+        @JvmStatic
+        fun translate(
+            to: Locale,
+            query: String,
+            entities: ArrayList<TLRPC.MessageEntity>?,
+            translateCallBack: TranslateCallBack2
+        ) {
+            translate(to, query, entities, 0, translateCallBack)
+        }
+
+        @JvmStatic
+        fun translate(
+            query: String,
+            entities: ArrayList<TLRPC.MessageEntity>?,
+            translateCallBack: TranslateCallBack2
+        ) {
+            translate(
+                to = NekoConfig.translateToLang.String()?.code2Locale
+                    ?: LocaleController.getInstance().currentLocale,
+                query = query,
+                entities = entities,
+                provider = 0,
+                translateCallBack = translateCallBack
+            )
+        }
+
+        @JvmStatic
+        fun translateWithContext(
+            to: Locale,
+            query: String,
+            entities: ArrayList<TLRPC.MessageEntity>?,
+            context: String?,
+            translateCallBack: TranslateCallBack2
+        ) {
+            translateWithContext(to, query, entities, context, 0, translateCallBack)
+        }
+
+        @JvmStatic
+        fun translateWithContext(
+            to: Locale,
+            query: String,
+            entities: ArrayList<TLRPC.MessageEntity>?,
+            context: String?,
+            provider: Int,
+            translateCallBack: TranslateCallBack2
+        ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching {
+                    val source = TLRPC.TL_textWithEntities().also {
+                        it.text = query
+                        it.entities = entities ?: ArrayList()
+                    }
+                    val queryText = MessageTransText.queryTextOf(source)
+                    val effectiveProvider = if (provider in 1..12) provider else NekoConfig.translationProvider.Int()
+                    val contextList = if (!context.isNullOrBlank()) listOf(context) else emptyList()
+                    val translatedText = translateWithProvider(to, queryText, contextList, effectiveProvider)
+                    val result = MessageTransText.merge(source, translatedText, "")
+                    UIUtil.runOnUIThread {
+                        translateCallBack.onSuccess(result)
+                    }
+                }.onFailure {
+                    UIUtil.runOnUIThread {
+                        translateCallBack.onFailed(
+                            it is UnsupportedOperationException,
+                            it.message ?: it.javaClass.simpleName
+                        )
+                    }
+                }
+            }
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun translatePoll(
+            to: Locale = NekoConfig.translateToLang.String()?.code2Locale
+                ?: LocaleController.getInstance().currentLocale,
+            query: TranslateController.PollText,
+            translateCallBack: TranslateCallBack3
+        ) {
+            CoroutineScope(Dispatchers.IO).launch {
+                runCatching {
+                    val provider = NekoConfig.translationProvider.Int()
+                    val translatedPoll = TranslateController.PollText()
+                    if (query.question != null) {
+                        val questionSource = query.question
+                        val qText = MessageTransText.queryTextOf(questionSource)
+                        val qTrans = translateWithProvider(to, qText, emptyList(), provider)
+                        translatedPoll.question = MessageTransText.merge(questionSource, qTrans, "")
+                    }
+                    for (answer in query.answers) {
+                        val answerSource = answer.text
+                        val aText = MessageTransText.queryTextOf(answerSource)
+                        val aTrans = translateWithProvider(to, aText, emptyList(), provider)
+                        val translatedAnswer = TLRPC.TL_pollAnswer().apply {
+                            text = MessageTransText.merge(answerSource, aTrans, "")
+                            option = answer.option
+                        }
+                        translatedPoll.answers.add(translatedAnswer)
+                    }
+                    if (query.solution != null) {
+                        val solutionSource = query.solution
+                        val sText = MessageTransText.queryTextOf(solutionSource)
+                        val sTrans = translateWithProvider(to, sText, emptyList(), provider)
+                        translatedPoll.solution = MessageTransText.merge(solutionSource, sTrans, "")
+                    }
+
+                    UIUtil.runOnUIThread { translateCallBack.onSuccess(translatedPoll) }
+                }.onFailure {
+                    UIUtil.runOnUIThread {
+                        translateCallBack.onFailed(
+                            it is UnsupportedOperationException,
+                            it.message ?: it.javaClass.simpleName
+                        )
+                    }
+                }
+            }
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun translateShowAlert(
+            ctx: Context,
+            query: String,
+            to: Locale = NekoConfig.translateToLang.String()?.code2Locale
+                ?: LocaleController.getInstance().currentLocale
+        ) {
+            val db = currentTarget()
+            if (db.contains(query)) {
+                showCopyAlert(ctx, db.query(query)!!)
+            } else {
+                val pro = showProgress(ctx)
+                pro.show()
+                translate(to, query, object : TranslateCallBack {
+                    override fun onSuccess(translation: String) {
+                        pro.dismiss()
+                        showCopyAlert(ctx, translation)
+                    }
+
+                    override fun onFailed(unsupported: Boolean, message: String) {
+                        pro.dismiss()
+                        showTransFailedDialog(ctx, unsupported, message) {
+                            pro.show()
+                            translate(to, query, this)
+                        }
+                    }
+                })
+            }
+        }
+
         interface TranslateCallBack {
             fun onSuccess(translation: String)
             fun onFailed(unsupported: Boolean, message: String)
         }
 
         interface TranslateCallBack2 {
-            fun onSuccess(finalText: TLRPC.TL_textWithEntities)
+            fun onSuccess(finalText: org.telegram.tgnet.TLRPC.TL_textWithEntities)
             fun onFailed(unsupported: Boolean, message: String)
         }
 
         interface TranslateCallBack3 {
-            fun onSuccess(pollText: TranslateController.PollText)
+            fun onSuccess(pollText: org.telegram.messenger.TranslateController.PollText)
             fun onFailed(unsupported: Boolean, message: String)
-        }
-    }
-
-    suspend fun Call.await(): Response {
-        return suspendCancellableCoroutine { continuation ->
-            enqueue(object : Callback {
-                override fun onResponse(call: Call, response: Response) {
-                    continuation.resume(response)
-                }
-
-                override fun onFailure(call: Call, e: IOException) {
-                    if (continuation.isCancelled) return
-                    continuation.resumeWithException(e)
-                }
-            })
-
-            continuation.invokeOnCancellation {
-                try {
-                    cancel()
-                } catch (_: Throwable) {
-                    // ignore cancel exception
-                }
-            }
         }
     }
 }

@@ -1288,4 +1288,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">المجتمع الرسمي</string>
+    <string name="AlexgramWelcomeTitle">مرحبًا بك في Alexgram</string>
+    <string name="AlexgramWelcomeSubtitle">أكثر بكثير من مجرد مراسلة</string>
+    <string name="AlexgramWelcomeDescription">انضم إلى قناتنا الرسمية للحصول على ميزات حصرية، وآخر التحديثات، والوصول المبكر.</string>
+    <string name="AlexgramWelcomeFeature1Title">أداء فائق وسحابة سريعة</string>
+    <string name="AlexgramWelcomeFeature1Desc">تنزيل فائق السرعة، وبث محسّن، ومزامنة سحابية سلسة.</string>
+    <string name="AlexgramWelcomeFeature2Title">وضع الشبح</string>
+    <string name="AlexgramWelcomeFeature2Desc">قراءة الرسائل بخصوصية، وإخفاء حالة الاتصال وجاري الكتابة.</string>
+    <string name="AlexgramWelcomeFeature3Title">ميزات حصرية جديدة</string>
+    <string name="AlexgramWelcomeFeature3Desc">معاينات مبكرة، وتحديثات المطورين، وأدوات مخصصة.</string>
+    <string name="AlexgramWelcomeJoinButton">الانضمام إلى القناة الرسمية</string>
+    <string name="AlexgramWelcomeOpenButton">فتح القناة الرسمية</string>
+    <string name="AlexgramWelcomeContinueButton">استكشاف Alexgram</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

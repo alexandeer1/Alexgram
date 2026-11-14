@@ -9,6 +9,28 @@
     <string name="DeleteKeepLocally">本地保留</string>
     <string name="ClearMessageDatabase">清除消息数据库</string>
     <string name="ClearMessageDatabaseNotification">消息数据库已清除</string>
+    <string name="ExportMessagesHistory">导出消息历史</string>
+    <string name="ImportMessagesHistory">导入消息历史</string>
+    <string name="MessagesBackupCountsValue">%1$d 条删除 · %2$d 条编辑</string>
+    <string name="MessagesBackupExportText">所有已保存的删除和编辑消息将写入设备上的备份文件。媒体文件已在 Downloads 文件夹中，重新安装后仍会保留。重新安装后，使用“导入消息历史”恢复全部内容。</string>
+    <string name="MessagesBackupExport">导出</string>
+    <string name="MessagesBackupExportDone">已导出 %1$d 条删除消息和 %2$d 条编辑消息</string>
+    <string name="MessagesBackupExportSkipped">%1$d 条消息无法导出</string>
+    <string name="MessagesBackupExportFailed">导出失败</string>
+    <string name="MessagesBackupImportDone">已导入 %1$d 条删除消息和 %2$d 条编辑消息，跳过 %3$d 条已存在</string>
+    <string name="MessagesBackupImportFailed">导入失败</string>
+    <string name="MessagesBackupAlreadyRunning">已有备份操作正在进行</string>
+    <string name="MessagesBackupNotificationChannel">消息备份</string>
+    <string name="MessagesBackupExportingNotification">正在导出消息历史…</string>
+    <string name="MessagesBackupImportingNotification">正在导入消息历史…</string>
+    <string name="MessagesBackupExportCancelled">导出已取消，不完整的文件已删除</string>
+    <string name="MessagesBackupImportCancelled">导入已取消，未恢复任何内容</string>
+    <string name="MessagesBackupInvalidFile">此文件不是有效的消息备份</string>
+    <string name="MessagesBackupNewerVersion">此备份由更新版本的应用创建，请先更新应用</string>
+    <string name="MessagesBackupRemapTitle">账号不同</string>
+    <string name="MessagesBackupRemapText">此备份是在其他账号下保存的，仍要导入吗？</string>
+    <string name="MessagesBackupRemapToCurrent">映射到此账号</string>
+    <string name="MessagesBackupRemapKeep">原样导入</string>
     <string name="CustomDeletedMark">自定义已删除消息标记</string>
     <string name="HidePremiumSection">在设置中隐藏 Telegram Premium</string>
     <string name="HideHelpSection">在设置中隐藏帮助</string>
@@ -30,10 +52,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">模型提供商</string>
     <string name="LlmProviderCustom">自定义</string>
     <string name="LlmProviderOpenAIKey">OpenAI API 密钥</string>
     <string name="LlmProviderGeminiKey">Gemini API 密钥</string>
+    <string name="LlmProviderZhipuAIKey">智谱 AI API 密钥</string>
+    <string name="LlmProviderMistralKey">Mistral API 密钥</string>
+    <string name="LlmProviderQwenKey">通义千问 API 密钥</string>
+    <string name="LlmProviderMoonshotKey">月之暗面 API 密钥</string>
+    <string name="LlmProviderSiliconFlowKey">硅基流动 API 密钥</string>
+    <string name="DisableAiEditor">禁用 AI 编辑器</string>
     <string name="LlmSystemPrompt">系统提示词</string>
     <string name="LlmSystemPromptHint">您是一名专业的译者。</string>
     <string name="LlmSystemPromptNotice">定义 AI 的角色和行为。\n\n该提示词决定 AI 的语调、个性和限制。试着描述 AI 应该成为何种类型的助手。</string>
@@ -157,6 +190,14 @@
     <string name="GhostReadMessage">标记已读</string>
     <string name="GhostModeExcludeRead">排除已读</string>
     <string name="GhostModeExcludeTyping">排除输入</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">默认</string>
+    <string name="GhostModeExceptionForceBlockRead">强制阻断已读</string>
+    <string name="GhostModeExceptionForceAllowRead">强制放行已读</string>
+    <string name="GhostModeExceptionForceBlockTyping">强制阻断输入</string>
+    <string name="GhostModeExceptionForceAllowTyping">强制放行输入</string>
+    <string name="ShowFilteredMessagesMenuText">显示过滤消息</string>
+    <string name="HideFilteredMessagesMenuText">隐藏过滤消息</string>
     <string name="SendWithSound">有声发送</string>
     <string name="PerformanceClass">设备性能等级</string>
     <string name="PerformanceClassHigh">高</string>
@@ -246,6 +287,7 @@
     <string name="CreateCode">创建代码</string>
     <string name="CreateCodeLanguage">语言</string>
     <string name="NoCaptionForward">无说明转发</string>
+    <string name="NoCaptionForwardShort">无说明</string>
     <string name="PreferCommonGroupsTab">首选群组标签</string>
     <string name="PreferCommonGroupsTabNotice">在个人资料页面自动选择“群组”标签而不是“礼物”。</string>
     <string name="GroupedMessageMenu">分组消息菜单</string>
@@ -357,6 +399,13 @@
     <string name="UnifiedPushCurrentEndpoint">当前的 UnifiedPush 端点是：%1$s</string>
     <string name="PlayOnce">播放一次</string>
     <string name="StorageSettings">存储</string>
+    <string name="MainTabs">主标签栏</string>
+    <string name="MainTabsVisibility">显示方式</string>
+    <string name="MainTabsAlways">始终显示</string>
+    <string name="MainTabsHideOnScroll">滚动时隐藏</string>
+    <string name="HideMainTabsTitles">隐藏标题</string>
+    <string name="HideContactsTab">隐藏“联系人”标签</string>
+    <string name="Hidden">隐藏</string>
     <string name="MainTabsSettingsHeader">主标签页</string>
     <string name="MainTabsHideTitles">隐藏标题</string>
     <string name="DoubleTapOnChatsToFilterUnread">双击聊天列表以过滤未读聊天</string>
@@ -520,29 +569,27 @@
     <string name="ChatAutoDownloadFiles">文件与文档</string>
     <string name="ChatAutoDownloadVoice">语音与视频留言</string>
     <string name="ChatAutoDownloadAudio">音乐与音频</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">好友动态</string>
@@ -550,4 +597,79 @@
     <string name="FriendsActivitiesTab">动态</string>
     <string name="FriendsActivitiesEmpty">在共同聊天中暂无最新动态。</string>
     <string name="FriendsActivitiesHowItWorks">前往联系人个人资料 → 点击「动态」标签页，即可查看他们在你们共同所在的群组和频道中的最新消息。</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">自动更新</string>
+    <string name="NoSuchSetting">未找到该设置</string>
+    <string name="PluginDelete">删除插件？</string>
+    <string name="PluginDeleteInfo">要删除插件 &lt;b&gt;%1$s&lt;/b&gt; 吗？此操作无法撤销。</string>
+    <string name="PluginDependencyDownloadingProgress">正在下载 %1$s（%2$d%%）…</string>
+    <string name="PluginDependencyInstalling">正在安装 %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">依赖 %1$s 在当前版本范围内仅提供原生 wheel。当前客户端暂时只支持纯 Python wheel。</string>
+    <string name="PluginDependencyNoCompatibleWheel">未找到适用于 %1$s 的纯 Python wheel。</string>
+    <string name="PluginDependencyPreparing">正在准备插件依赖…</string>
+    <string name="PluginDependencyPythonUnsupported">依赖 %1$s 需要 Python %2$s，而当前客户端运行 Python 3.11。</string>
+    <string name="PluginDependencyResolving">正在解析 %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">依赖 %1$s 在当前版本范围内仅提供源码分发包。当前客户端暂时只支持纯 Python wheel。</string>
+    <string name="PluginDisableError">禁用 %1$s 失败。</string>
+    <string name="PluginEnableError">启用 %1$s 失败。</string>
+    <string name="PluginEngineNotEnabled">插件引擎已关闭。要打开 %1$s 的插件设置吗？</string>
+    <string name="PluginHasNoSettings">%1$s 没有可用设置。</string>
+    <string name="PluginInstallError">安装插件 %1$s 失败。</string>
+    <string name="PluginInstalled">已安装 %1$s</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s 已安装，但启用失败。</string>
+    <string name="PluginIsNotResponding">插件无响应。</string>
+    <string name="PluginIsNotRespondingAlert">%1$s 无响应</string>
+    <string name="PluginNoAuthor">未知作者</string>
+    <string name="PluginNoDescription">无描述</string>
+    <string name="PluginNotEnabled">插件支持已关闭。要前往设置启用 %1$s 吗？</string>
+    <string name="PluginNotFound">未找到插件 %1$s。</string>
+    <string name="PluginOpenExternalError">无法在外部应用中打开 %1$s。</string>
+    <string name="PluginSettingNotFound">未找到目标插件设置。</string>
+    <string name="PluginSourceTrusted">可信来源</string>
+    <string name="PluginSourceTrustedInfo">此插件来自可信来源。</string>
+    <string name="PluginSourceUnknown">未知来源</string>
+    <string name="PluginSourceUnknownInfo">此插件来自未知来源，安装前请仔细检查。</string>
+    <string name="PluginUpdated">已更新 %1$s</string>
+    <string name="PluginVersion">版本</string>
+    <string name="Plugins">插件</string>
+    <string name="PluginsCompactView">紧凑视图</string>
+    <string name="PluginsDevMode">开发者模式</string>
+    <string name="PluginsDevServerLaunched">插件开发服务器已启动</string>
+    <string name="PluginsDevServerStopped">插件开发服务器已停止</string>
+    <string name="PluginsDevTools">开发者工具</string>
+    <string name="PluginsDisableArt">兼容模式</string>
+    <string name="PluginsDisableArtInfo">通过禁用 ART Profile Saver 来避免插件 Hook 失效。</string>
+    <string name="PluginsDocumentation">文档</string>
+    <string name="PluginsEngine">插件引擎</string>
+    <string name="PluginsInfo">在这里安装和管理 .plugin 文件。</string>
+    <string name="PluginsInstallSmokeTest">安装冒烟测试插件</string>
+    <string name="PluginsInstallSmokeTestInfo">仅供开发者使用的辅助插件，用于验证应用事件、请求/更新 Hook、发送消息 Hook 以及插件菜单回调是否正常。</string>
+    <string name="PluginsInstallSmokeTestPrepareError">准备内置冒烟测试插件失败。</string>
+    <string name="PluginsNativeRuntimeUnavailable">插件原生 Hook 运行时不可用。在所有原生库正确加载并重启应用前，基于方法 Hook 的插件可能无法工作。</string>
+    <string name="PluginsNotFound">未找到插件</string>
+    <string name="PluginsPoweredBy">由 &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; 和 &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt; 驱动。</string>
+    <string name="PluginsPySdkAutoUpdate">自动更新</string>
+    <string name="PluginsPySdkCheckUpdates">检查更新</string>
+    <string name="PluginsPySdkCheckingForUpdates">正在检查更新…</string>
+    <string name="PluginsPySdkEnableBetaVersion">安装 Beta 版本</string>
+    <string name="PluginsPySdkLatestVersionInstalled">当前已是最新 SDK 版本</string>
+    <string name="PluginsPySdkLoadingUpdate">正在下载更新…</string>
+    <string name="PluginsPySdkUpdateFailed">SDK 更新失败</string>
+    <string name="PluginsPythonRuntimeUnavailable">插件 Python 运行时初始化失败。请重启应用，并确认内置插件依赖已正确打包。</string>
+    <string name="PluginsRestartEngine">重启插件引擎</string>
+    <string name="PluginsSafeMode">插件安全模式</string>
+    <string name="PluginsSafeModeInfo">插件在崩溃后已被禁用。你可以退出安全模式并重启插件引擎。</string>
+    <string name="PluginsSafeModeInfo2">安全模式会保持所有插件禁用，直到你手动关闭它。</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">插件在崩溃后已被禁用。请检查你的插件配置，准备好后再退出安全模式。</string>
+    <string name="PluginsSafeModeInfoManual">插件安全模式已手动开启。关闭安全模式后才能再次加载插件。</string>
+    <string name="PluginsSafeModeInfoNativeCrash">插件在一次原生崩溃后已被禁用。请先检查已安装插件，再退出安全模式。</string>
+    <string name="PluginsSafeModeInfoPluginCrash">插件 %1$s 在崩溃后已被禁用。准备好后可退出安全模式以恢复其余插件。</string>
+    <string name="PluginsSafeModeShortcut">以安全模式启动</string>
+    <string name="PluginsSettingsShowOriginal">显示原文</string>
+    <string name="PluginsSettingsTranslate">翻译设置</string>
+    <string name="PluginsTrusted">受信任插件</string>
+    <string name="UpdateAvailable">发现新版本</string>
+    <!-- untranslated (missing in NagramXF): PluginResetSettings -->
+    <string name="PluginResetSettings">重置设置</string>
 </resources>

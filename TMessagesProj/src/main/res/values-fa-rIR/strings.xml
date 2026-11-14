@@ -60,4 +60,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">جامعه رسمی</string>
+    <string name="AlexgramWelcomeTitle">به Alexgram خوش آمدید</string>
+    <string name="AlexgramWelcomeSubtitle">فراتر از یک پیام‌رسان ساده</string>
+    <string name="AlexgramWelcomeDescription">برای دسترسی به قابلیت‌های اختصاصی، جدیدترین به‌روزرسانی‌ها و دسترسی زودهنگام به کانال رسمی ما بپیوندید.</string>
+    <string name="AlexgramWelcomeFeature1Title">بالاترین عملکرد و فضای ابری</string>
+    <string name="AlexgramWelcomeFeature1Desc">دانلود فوق‌سریع، استریم ارتقایافته و همگام‌سازی ابری.</string>
+    <string name="AlexgramWelcomeFeature2Title">حالت روح</string>
+    <string name="AlexgramWelcomeFeature2Desc">خواندن پیام‌ها بدون تیک دوم، مخفی کردن آنلاین بودن و در حال تایپ.</string>
+    <string name="AlexgramWelcomeFeature3Title">قابلیت‌های اختصاصی</string>
+    <string name="AlexgramWelcomeFeature3Desc">پیش‌نمایش قابلیت‌های جدید، اخبار توسعه‌دهندگان و ابزارهای انحصاری.</string>
+    <string name="AlexgramWelcomeJoinButton">عضویت در کانال رسمی</string>
+    <string name="AlexgramWelcomeOpenButton">باز کردن کانال رسمی</string>
+    <string name="AlexgramWelcomeContinueButton">کاوش در Alexgram</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

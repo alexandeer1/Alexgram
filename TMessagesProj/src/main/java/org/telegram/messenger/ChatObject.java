@@ -12,12 +12,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import androidx.annotation.IntDef;
 import androidx.collection.LongSparseArray;
 
-import com.google.android.exoplayer2.util.Log;
+
 
 import org.telegram.messenger.utils.tlutils.TlUtils;
 import org.telegram.messenger.voip.Instance;
@@ -2638,5 +2639,10 @@ public class ChatObject {
             return DialogConfig.isCustomForumTabsEnable(-chat.id);
         }
         return SharedConfig.forceForumTabs || chat != null && chat.forum_tabs;
+    }
+
+    /** The topics in a panel that slides in from the right: a forum's own choice, apart from its tabs; always in direct messages. */
+    public static boolean isSidebarEnabled(TLRPC.Chat chat) {
+        return chat != null && (chat.forum && chat.forum_sidebar || chat.monoforum);
     }
 }

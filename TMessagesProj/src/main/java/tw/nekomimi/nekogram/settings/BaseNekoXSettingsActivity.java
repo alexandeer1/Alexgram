@@ -26,6 +26,7 @@ import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
+import org.telegram.utils.glass.BaseFragmentSimpleGlass;
 import org.telegram.ui.Cells.EmptyCell;
 import org.telegram.ui.Cells.NotificationsCheckCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
@@ -97,24 +98,16 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
     @Override
     public View createView(Context context) {
         setupBrandingColors();
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(getTitle());
+        // [Alexgram: Glass Header] Telegram glass header: back arrow in a glass circle,
+        // menu items in their own glass bubbles (SimpleActionBar, added on top by the framework)
+        simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+        simpleActionBar.setTitle(getTitle());
 
         if (AndroidUtilities.isTablet()) {
-            actionBar.setOccupyStatusBar(false);
+            simpleActionBar.setOccupyStatusBar(false);
         }
 
-        if (isAlexgramTheme()) {
-            actionBar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-            actionBar.setCastShadows(false);
-            actionBar.setAddToContainer(false);
-            int color = isDark ? android.graphics.Color.WHITE : 0xFF1A1A2E;
-            actionBar.setItemsColor(color, false);
-            actionBar.setTitleColor(color);
-            actionBar.setItemsBackgroundColor(isDark ? 0x0FFFFFFF : 0x0F000000, false);
-        }
-
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
@@ -162,7 +155,7 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
             }
         });
 
-        if (isAlexgramTheme()) {
+        if (isAlexgramTheme() && !useSimpleActionBar()) {
             listView.setPadding(0, AndroidUtilities.statusBarHeight + dp(64), 0, dp(40));
             listView.setClipToPadding(false);
         }
@@ -172,16 +165,40 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         frameLayout.addView(tooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
 
         listView.setSections(true);
-        actionBar.setAdaptiveBackground(listView);
-        if (isAlexgramTheme()) {
-            frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-        }
         return fragmentView;
     }
 
     protected boolean isAlexgramTheme() {
         return true;
     }
+
+    // [Alexgram: Glass Header] - Start
+    // All A-Settings pages use Telegram's simple glass header (back arrow in a glass circle)
+    @Override
+    protected boolean useSimpleActionBar() {
+        return true;
+    }
+
+    @Override
+    protected RecyclerListView getListViewForSimpleGlass() {
+        return listView;
+    }
+
+    @Override
+    protected void onViewCreated(View view) {
+        super.onViewCreated(view);
+        // the glass setup swaps in the bitmap sections decoration, which draws nothing
+        // on screen – restore the legacy decorator that paints the rounded cards
+        // (it is a valid IBlur3Capture, so the glass capture keeps working)
+        if (listView != null) {
+            listView.setLegacySections(true);
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            }
+        }
+    }
+    // [Alexgram: Glass Header] - End
 
     protected boolean isBreakType(int position) {
         CellGroup cellGroup = getCellGroup();
@@ -232,11 +249,19 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
-        listView.setClipToPadding(false);
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) tooltip.getLayoutParams();
-        layoutParams.setMargins(dp(8), 0, dp(8), dp(8) + bottom);
-        tooltip.setLayoutParams(layoutParams);
+        if (listView != null) {
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            } else {
+                listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
+            }
+            listView.setClipToPadding(false);
+        }
+        if (tooltip != null && tooltip.getLayoutParams() instanceof FrameLayout.LayoutParams layoutParams) {
+            layoutParams.setMargins(dp(8), 0, dp(8), dp(8) + bottom);
+            tooltip.setLayoutParams(layoutParams);
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -526,14 +551,10 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{EmptyCell.class, TextSettingsCell.class, TextCheckCell.class, HeaderCell.class, TextDetailSettingsCell.class, NotificationsCheckCell.class}, null, null, null, Theme.key_windowBackgroundWhite));
         themeDescriptions.add(new ThemeDescription(fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundGray));
 
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_avatar_backgroundActionBarBlue));
-        themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_avatar_backgroundActionBarBlue));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_avatar_actionBarIconBlue));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_actionBarDefaultTitle));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_SELECTORCOLOR, null, null, null, null, Theme.key_avatar_actionBarSelectorBlue));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_SUBMENUBACKGROUND, null, null, null, null, Theme.key_actionBarDefaultSubmenuBackground));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_SUBMENUITEM, null, null, null, null, Theme.key_actionBarDefaultSubmenuItem));
+        // [Alexgram: Glass Header] the SimpleActionBar themes itself; the legacy ActionBar
+        // color descriptions were dropped with the classic bar
 
+        themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_avatar_backgroundActionBarBlue));
         themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_SELECTOR, null, null, null, null, Theme.key_listSelector));
 
         themeDescriptions.add(new ThemeDescription(listView, 0, new Class[]{View.class}, Theme.dividerPaint, null, null, Theme.key_divider));
@@ -738,6 +759,9 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
                 case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON:
                     view = new TextCell(mContext);
                     break;
+                case CellGroup.ITEM_TYPE_TEXT_DETAIL_ICON:
+                    view = new TextDetailSettingsCell(mContext);
+                    break;
             }
             return view;
         }
@@ -809,56 +833,6 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         builder.setView(linearLayout);
         return builder.create();
     }
-
-    // [Alexgram: Customizable Message Menu] - Start
-    public static int getMessageMenuMode(String key, boolean defaultVal) {
-        if (key == null) return defaultVal ? 1 : 0;
-        android.content.SharedPreferences prefs = NekoConfig.getPreferences();
-        String modeKey = key + "_mode";
-        if (prefs.contains(modeKey)) {
-            return prefs.getInt(modeKey, defaultVal ? 1 : 0);
-        }
-        boolean boolVal = prefs.getBoolean(key, defaultVal);
-        return boolVal ? 1 : 0;
-    }
-
-    public static void setMessageMenuMode(String key, int mode) {
-        if (key == null) return;
-        android.content.SharedPreferences prefs = NekoConfig.getPreferences();
-        prefs.edit().putInt(key + "_mode", mode).apply();
-        prefs.edit().putBoolean(key, mode != 0).apply();
-        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
-    }
-
-    public static AlertDialog showMessageMenuConfigAlert(BaseFragment bf, int titleKeyRes, ArrayList<ConfigCellTextCheckIcon> configItems) {
-        Context context = bf.getContext();
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(getString(titleKeyRes));
-
-        android.widget.ScrollView scrollView = new android.widget.ScrollView(context);
-        LinearLayout container = new LinearLayout(context);
-        container.setOrientation(LinearLayout.VERTICAL);
-        scrollView.addView(container);
-
-        for (int a = 0; a < configItems.size(); a++) {
-            ConfigCellTextCheckIcon configItem = configItems.get(a);
-            tw.nekomimi.nekogram.ui.cells.MessageMenuConfigCell cell = new tw.nekomimi.nekogram.ui.cells.MessageMenuConfigCell(
-                context,
-                configItem.getKey(),
-                configItem.getTitle().toString(),
-                configItem.getResId(),
-                configItem.getBindConfig() != null ? (boolean) configItem.getBindConfig().defaultValue : true,
-                true,
-                () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface)
-            );
-            container.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-        }
-
-        builder.setPositiveButton(getString(R.string.OK), null);
-        builder.setView(scrollView);
-        return builder.create();
-    }
-    // [Alexgram: Customizable Message Menu] - End
 }
 
 

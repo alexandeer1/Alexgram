@@ -20,9 +20,11 @@ import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.UItem;
 import org.telegram.ui.Components.UniversalAdapter;
 import org.telegram.ui.Components.UniversalRecyclerView;
+import org.telegram.utils.glass.BaseFragmentSimpleGlass;
 import org.telegram.messenger.R;
 
 public abstract class BasePreferencesActivity extends BaseFragment {
@@ -42,6 +44,18 @@ public abstract class BasePreferencesActivity extends BaseFragment {
         return false;
     }
 
+    /** Screens with the simple glass header return true; the base keeps the classic action bar otherwise. */
+    @Override
+    protected boolean useSimpleActionBar() {
+        return false;
+    }
+
+    /** The list the glass header samples; null while the page keeps the classic action bar. */
+    @Override
+    protected RecyclerListView getListViewForSimpleGlass() {
+        return useSimpleActionBar() ? listView : null;
+    }
+
     @Override
     public boolean isSupportEdgeToEdge() {
         return true;
@@ -59,28 +73,46 @@ public abstract class BasePreferencesActivity extends BaseFragment {
 
     @Override
     public View createView(Context context) {
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setAllowOverlayTitle(false);
-        actionBar.setTitle(getTitle());
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
-            @Override
-            public void onItemClick(int id) {
-                if (id == -1) {
-                    finishFragment();
+        if (useSimpleActionBar()) {
+            // Telegram glass header: back arrow in a glass circle, added on top by the framework
+            simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+            simpleActionBar.setTitle(getTitle());
+            simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+                @Override
+                public void onItemClick(int id) {
+                    if (id == -1) {
+                        finishFragment();
+                    }
                 }
-            }
-        });
+            });
+            setHasOwnBackground(true);
+        } else {
+            actionBar.setBackButtonImage(R.drawable.ic_ab_back);
+            actionBar.setAllowOverlayTitle(false);
+            actionBar.setTitle(getTitle());
+            actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+                @Override
+                public void onItemClick(int id) {
+                    if (id == -1) {
+                        finishFragment();
+                    }
+                }
+            });
+        }
 
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
 
-        if (actionBar.menu == null) {
+        if (!useSimpleActionBar() && actionBar.menu == null) {
             actionBar.createMenu();
         }
 
         listView = new UniversalRecyclerView(this, this::fillItems, this::onClick, this::onLongClick);
         listView.setSections();
-        if (!hasHeaderCell()) {
+        if (useSimpleActionBar()) {
+            // like the Plugins page: the bitmap sections decoration draws the rounded cards
+            listView.setSectionsDrawBackground(true);
+        } else if (!hasHeaderCell()) {
             actionBar.setAdaptiveBackground(listView, needHideTitle());
         }
         listView.adapter.setApplyBackground(false);
@@ -137,9 +169,23 @@ public abstract class BasePreferencesActivity extends BaseFragment {
     }
 
     @Override
+    protected void onViewCreated(View view) {
+        super.onViewCreated(view);
+        if (useSimpleActionBar() && listView != null) {
+            BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                    ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+        }
+    }
+
+    @Override
     public void onInsets(int left, int top, int right, int bottom) {
         if (listView != null) {
-            listView.setPadding(0, 0, 0, bottom);
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            } else {
+                listView.setPadding(0, 0, 0, bottom);
+            }
             listView.setClipToPadding(false);
         }
     }

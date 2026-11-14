@@ -95,7 +95,7 @@ public class PillStackPreferencesActivity extends BaseNekoSettingsActivity {
         View view = super.createView(context);
         reorderIcon = ContextCompat.getDrawable(context, R.drawable.list_reorder);
 
-        resetItem = actionBar.createMenu().addItem(MENU_RESET, R.drawable.msg_reset);
+        resetItem = simpleActionBar.createMenu().addItem(MENU_RESET, R.drawable.msg_reset);
         resetItem.setContentDescription(getString(R.string.Reset));
         resetItem.setOnClickListener(v -> resetToDefault());
         updateResetButtonVisibility();

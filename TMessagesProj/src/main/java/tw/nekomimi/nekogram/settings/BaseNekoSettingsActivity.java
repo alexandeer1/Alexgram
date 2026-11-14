@@ -26,6 +26,7 @@ import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.utils.glass.BaseFragmentSimpleGlass;
 import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.NotificationsCheckCell;
@@ -170,6 +171,23 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
             actionBar.setDrawBlurBackground(frameLayout);
         }
 
+        if (useSimpleActionBar()) {
+            // Telegram glass header: floating back circle + title, menu items in glass bubbles
+            simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+            simpleActionBar.setTitle(getActionBarTitle());
+            simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+                @Override
+                public void onItemClick(int id) {
+                    if (id == -1) {
+                        finishFragment();
+                    }
+                }
+            });
+            if (AndroidUtilities.isTablet()) {
+                simpleActionBar.setOccupyStatusBar(false);
+            }
+        }
+
         listView = new BlurredRecyclerView(context);
         listView.disableBlurTopPadding = true;
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -187,7 +205,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         itemAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
         itemAnimator.setDelayAnimations(false);
         listView.setItemAnimator(itemAnimator);
-        if (isAlexgramTheme()) {
+        if (isAlexgramTheme() && !useSimpleActionBar()) {
             listView.setPadding(0, AndroidUtilities.statusBarHeight + dp(64), 0, dp(40));
             listView.setClipToPadding(false);
         }
@@ -278,9 +296,13 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         });
 
         listView.setSections(true);
-        actionBar.setAdaptiveBackground(listView);
-        if (isAlexgramTheme()) {
-            frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        if (useSimpleActionBar()) {
+            // the glass header (SimpleActionBar) is added on top by the framework
+        } else {
+            actionBar.setAdaptiveBackground(listView);
+            if (isAlexgramTheme()) {
+                frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+            }
         }
         return fragmentView;
     }
@@ -299,6 +321,34 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
     protected boolean isAlexgramTheme() {
         return true;
     }
+
+    // [Alexgram: Glass Header] - Start
+    // All A-Settings pages use Telegram's simple glass header (back arrow in a glass circle)
+    @Override
+    protected boolean useSimpleActionBar() {
+        return true;
+    }
+
+    @Override
+    protected RecyclerListView getListViewForSimpleGlass() {
+        return listView;
+    }
+
+    @Override
+    protected void onViewCreated(View view) {
+        super.onViewCreated(view);
+        // the glass setup swaps in the bitmap sections decoration, which draws nothing
+        // on screen – restore the legacy decorator that paints the rounded cards
+        // (it is a valid IBlur3Capture, so the glass capture keeps working)
+        if (listView != null) {
+            listView.setLegacySections(true);
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            }
+        }
+    }
+    // [Alexgram: Glass Header] - End
 
     private void setupBrandingColors() {
         isDark = Theme.getActiveTheme().isDark();
@@ -428,8 +478,15 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
-        listView.setClipToPadding(false);
+        if (listView != null) {
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            } else {
+                listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
+            }
+            listView.setClipToPadding(false);
+        }
     }
 
     private class BlurContentView extends SizeNotifierFrameLayout {

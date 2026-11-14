@@ -60,4 +60,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">KOMUNITAS RESMI</string>
+    <string name="AlexgramWelcomeTitle">Selamat Datang di Alexgram</string>
+    <string name="AlexgramWelcomeSubtitle">Lebih Dari Sekadar Berkirim Pesan</string>
+    <string name="AlexgramWelcomeDescription">Bergabunglah dengan saluran resmi kami untuk fitur eksklusif, pembaruan, dan akses awal.</string>
+    <string name="AlexgramWelcomeFeature1Title">Performa Puncak &amp; Cloud</string>
+    <string name="AlexgramWelcomeFeature1Desc">Unduhan super cepat, streaming lebih lancar &amp; sinkronisasi cloud.</string>
+    <string name="AlexgramWelcomeFeature2Title">Mode Hantu</string>
+    <string name="AlexgramWelcomeFeature2Desc">Baca pesan secara privat, sembunyikan status online &amp; sedang mengetik.</string>
+    <string name="AlexgramWelcomeFeature3Title">Rilis Fitur Eksklusif</string>
+    <string name="AlexgramWelcomeFeature3Desc">Pratinjau awal, kabar pengembang &amp; alat-alat eksklusif.</string>
+    <string name="AlexgramWelcomeJoinButton">Gabung Saluran Resmi</string>
+    <string name="AlexgramWelcomeOpenButton">Buka Saluran Resmi</string>
+    <string name="AlexgramWelcomeContinueButton">Jelajahi Alexgram</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

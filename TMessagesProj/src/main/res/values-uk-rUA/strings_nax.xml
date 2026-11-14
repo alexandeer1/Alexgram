@@ -9,6 +9,28 @@
     <string name="DeleteKeepLocally">Зберігати локально</string>
     <string name="ClearMessageDatabase">Очистити базу даних</string>
     <string name="ClearMessageDatabaseNotification">База повідомлень очищена</string>
+    <string name="ExportMessagesHistory">Експорт історії повідомлень</string>
+    <string name="ImportMessagesHistory">Імпорт історії повідомлень</string>
+    <string name="MessagesBackupCountsValue">%1$d видалених · %2$d змінених</string>
+    <string name="MessagesBackupExportText">Усі збережені видалені та змінені повідомлення буде записано у файл резервної копії на вашому пристрої. Медіафайли вже є в папці «Завантаження» та залишаться після перевстановлення. Після перевстановлення використайте «Імпорт історії повідомлень», щоб відновити все.</string>
+    <string name="MessagesBackupExport">Експорт</string>
+    <string name="MessagesBackupExportDone">Експортовано %1$d видалених та %2$d змінених повідомлень</string>
+    <string name="MessagesBackupExportSkipped">Не вдалося експортувати %1$d повідомлень</string>
+    <string name="MessagesBackupExportFailed">Помилка експорту</string>
+    <string name="MessagesBackupImportDone">Імпортовано %1$d видалених та %2$d змінених повідомлень, пропущено вже збережених: %3$d</string>
+    <string name="MessagesBackupImportFailed">Помилка імпорту</string>
+    <string name="MessagesBackupAlreadyRunning">Операція резервного копування вже виконується</string>
+    <string name="MessagesBackupNotificationChannel">Резервне копування повідомлень</string>
+    <string name="MessagesBackupExportingNotification">Експорт історії повідомлень…</string>
+    <string name="MessagesBackupImportingNotification">Імпорт історії повідомлень…</string>
+    <string name="MessagesBackupExportCancelled">Експорт скасовано, неповний файл видалено</string>
+    <string name="MessagesBackupImportCancelled">Імпорт скасовано, нічого не відновлено</string>
+    <string name="MessagesBackupInvalidFile">Цей файл не є дійсною резервною копією повідомлень</string>
+    <string name="MessagesBackupNewerVersion">Цю резервну копію створено новішою версією програми. Спочатку оновіть програму</string>
+    <string name="MessagesBackupRemapTitle">Інший акаунт</string>
+    <string name="MessagesBackupRemapText">Цю резервну копію збережено під іншим акаунтом. Все одно імпортувати?</string>
+    <string name="MessagesBackupRemapToCurrent">Прив\'язати до цього акаунту</string>
+    <string name="MessagesBackupRemapKeep">Імпортувати як є</string>
     <string name="CustomDeletedMark">Підпис для видалених повідомлень</string>
     <string name="HidePremiumSection">Приховати \"Преміум\" в налаштуваннях</string>
     <string name="HideHelpSection">Приховати \"Допомога\" в налаштуваннях</string>
@@ -30,10 +52,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Провайдер моделі</string>
     <string name="LlmProviderCustom">Користувацька</string>
     <string name="LlmProviderOpenAIKey">Ключ API OpenAI</string>
     <string name="LlmProviderGeminiKey">Ключ API Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Ключ API Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Ключ API Mistral</string>
+    <string name="LlmProviderQwenKey">Ключ API Qwen</string>
+    <string name="LlmProviderMoonshotKey">Ключ API Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Ключ API SiliconFlow</string>
+    <string name="DisableAiEditor">Вимкнути AI Редактор</string>
     <string name="LlmSystemPrompt">Системний Промпт</string>
     <string name="LlmSystemPromptHint">Ти професійний перекладач.</string>
     <string name="LlmSystemPromptNotice">Визначте роль і поведінку AI.\n\nЦей промпт задає тон, індивідуальність і обмеження для AI. Подумайте про те, яким типом помічника має бути AI.</string>
@@ -157,6 +190,14 @@
     <string name="GhostReadMessage">Прочитати повідомлення</string>
     <string name="GhostModeExcludeRead">Виключити читання</string>
     <string name="GhostModeExcludeTyping">Виключити введення тексту</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">За замовчуванням</string>
+    <string name="GhostModeExceptionForceBlockRead">Примусово блокувати читання</string>
+    <string name="GhostModeExceptionForceAllowRead">Примусово дозволяти читання</string>
+    <string name="GhostModeExceptionForceBlockTyping">Примусово блокувати введення тексту</string>
+    <string name="GhostModeExceptionForceAllowTyping">Примусово дозволяти введення тексту</string>
+    <string name="ShowFilteredMessagesMenuText">Показувати відфільтровані</string>
+    <string name="HideFilteredMessagesMenuText">Приховувати відфільтровані</string>
     <string name="SendWithSound">Надіслати зі звуком</string>
     <string name="PerformanceClass">Клас продуктивності пристрою</string>
     <string name="PerformanceClassHigh">Високий</string>
@@ -246,6 +287,7 @@
     <string name="CreateCode">Створити код</string>
     <string name="CreateCodeLanguage">Мова</string>
     <string name="NoCaptionForward">Переслати без підпису</string>
+    <string name="NoCaptionForwardShort">Без підпису</string>
     <string name="PreferCommonGroupsTab">Перевага вкладці \"Групи”</string>
     <string name="PreferCommonGroupsTabNotice">Автоматично вибирати вкладку «Групи» замість «Подарунки», коли це можливо.</string>
     <string name="GroupedMessageMenu">Згрупувати меню повідомлення</string>
@@ -357,6 +399,13 @@
     <string name="UnifiedPushCurrentEndpoint">Поточна кінцева точка UnifiedPush: %1$s</string>
     <string name="PlayOnce">Відтворити один раз</string>
     <string name="StorageSettings">Сховище</string>
+    <string name="MainTabs">Головні вкладки</string>
+    <string name="MainTabsVisibility">Відображення</string>
+    <string name="MainTabsAlways">Завжди</string>
+    <string name="MainTabsHideOnScroll">Ховати під час прокручування</string>
+    <string name="HideMainTabsTitles">Приховати підписи</string>
+    <string name="HideContactsTab">Приховати вкладку «Контакти»</string>
+    <string name="Hidden">Приховано</string>
     <string name="MainTabsSettingsHeader">Основні вкладки</string>
     <string name="MainTabsHideTitles">Приховати заголовки</string>
     <string name="DoubleTapOnChatsToFilterUnread">Подвійне натискання на чати для фільтрації непрочитаних</string>
@@ -520,29 +569,27 @@
     <string name="ChatAutoDownloadFiles">Files &amp; Documents</string>
     <string name="ChatAutoDownloadVoice">Voice &amp; Video Notes</string>
     <string name="ChatAutoDownloadAudio">Music &amp; Audio</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Friends Activities</string>
@@ -550,4 +597,79 @@
     <string name="FriendsActivitiesTab">Activities</string>
     <string name="FriendsActivitiesEmpty">No recent activities in shared chats.</string>
     <string name="FriendsActivitiesHowItWorks">Go to a contact\'s profile → tap the Activities tab to see their latest messages in groups and channels you both share.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Оновлювати автоматично</string>
+    <string name="NoSuchSetting">Налаштування не знайдено</string>
+    <string name="PluginDelete">Видалити плагін?</string>
+    <string name="PluginDeleteInfo">Видалити плагін &lt;b&gt;%1$s&lt;/b&gt;? Цю дію неможливо скасувати.</string>
+    <string name="PluginDependencyDownloadingProgress">Завантаження %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">Встановлення %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">Залежність %1$s надає лише нативні пакети (native wheels) у вибраному діапазоні версій. Цей клієнт наразі підтримує лише pure-Python wheels.</string>
+    <string name="PluginDependencyNoCompatibleWheel">Для %1$s не знайдено сумісного pure-Python wheel.</string>
+    <string name="PluginDependencyPreparing">Підготовка залежностей плагіна…</string>
+    <string name="PluginDependencyPythonUnsupported">Залежність %1$s потребує Python %2$s, але цей клієнт працює на Python 3.11.</string>
+    <string name="PluginDependencyResolving">Обробка %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">Залежність %1$s надає лише вихідні коди у вибраному діапазоні версій. Цей клієнт наразі підтримує лише pure-Python wheels.</string>
+    <string name="PluginDisableError">Не вдалося вимкнути %1$s.</string>
+    <string name="PluginEnableError">Не вдалося увімкнути %1$s.</string>
+    <string name="PluginEngineNotEnabled">Механізм плагінів вимкнено. Відкрити налаштування плагіна для %1$s?</string>
+    <string name="PluginHasNoSettings">У %1$s немає налаштувань.</string>
+    <string name="PluginInstallError">Не вдалося встановити плагін %1$s.</string>
+    <string name="PluginInstalled">%1$s встановлено</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s встановлено, але не вдалося увімкнути.</string>
+    <string name="PluginIsNotResponding">Плагін не відповідає.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s не відповідає</string>
+    <string name="PluginNoAuthor">Невідомий автор</string>
+    <string name="PluginNoDescription">Немає опису</string>
+    <string name="PluginNotEnabled">Підтримку плагінів вимкнено. Відкрити налаштування, щоб увімкнути %1$s?</string>
+    <string name="PluginNotFound">Плагін %1$s не знайдено.</string>
+    <string name="PluginOpenExternalError">Не вдалося відкрити %1$s у зовнішньому додатку.</string>
+    <string name="PluginSettingNotFound">Цільове налаштування плагіна не знайдено.</string>
+    <string name="PluginSourceTrusted">Надійне джерело</string>
+    <string name="PluginSourceTrustedInfo">Цей плагін походить із надійного джерела.</string>
+    <string name="PluginSourceUnknown">Невідоме джерело</string>
+    <string name="PluginSourceUnknownInfo">Цей плагін походить з невідомого джерела. Ретельно перевірте його перед встановленням.</string>
+    <string name="PluginUpdated">%1$s оновлено</string>
+    <string name="PluginVersion">Версія</string>
+    <string name="Plugins">Плагіни</string>
+    <string name="PluginsCompactView">Компактний вигляд</string>
+    <string name="PluginsDevMode">Режим розробника</string>
+    <string name="PluginsDevServerLaunched">Dev-сервер плагінів запущено</string>
+    <string name="PluginsDevServerStopped">Dev-сервер плагінів зупинено</string>
+    <string name="PluginsDevTools">Інструменти розробника</string>
+    <string name="PluginsDisableArt">Режим сумісності</string>
+    <string name="PluginsDisableArtInfo">Запобігає помилкам хуків плагіна, вимикаючи ART Profile Saver.</string>
+    <string name="PluginsDocumentation">Документація</string>
+    <string name="PluginsEngine">Механізм плагінів</string>
+    <string name="PluginsInfo">Тут можна встановлювати та керувати файлами .plugin.</string>
+    <string name="PluginsInstallSmokeTest">Встановити тестовий плагін</string>
+    <string name="PluginsInstallSmokeTestInfo">Допоміжний плагін (лише для розробників) для перевірки подій додатка, хуків запитів/оновлень, хуків надсилання повідомлень і колбеків меню плагіна.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Не вдалося підготувати вбудований тестовий плагін.</string>
+    <string name="PluginsNativeRuntimeUnavailable">Середовище native hook для плагінів недоступне. Плагіни на основі method-hook можуть не працювати, доки додаток не буде перезапущено з усіма завантаженими нативними бібліотеками.</string>
+    <string name="PluginsNotFound">Плагіни не знайдено</string>
+    <string name="PluginsPoweredBy">На базі &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; та &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Оновлювати автоматично</string>
+    <string name="PluginsPySdkCheckUpdates">Перевірити оновлення</string>
+    <string name="PluginsPySdkCheckingForUpdates">Перевірка оновлень…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Встановлювати бета-версії</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Встановлено останню версію SDK</string>
+    <string name="PluginsPySdkLoadingUpdate">Завантаження оновлення…</string>
+    <string name="PluginsPySdkUpdateFailed">Не вдалося оновити SDK</string>
+    <string name="PluginsPythonRuntimeUnavailable">Не вдалося ініціалізувати середовище Python для плагінів. Перезапустіть додаток і переконайтеся, що необхідні залежності плагінів присутні.</string>
+    <string name="PluginsRestartEngine">Перезапустити механізм плагінів</string>
+    <string name="PluginsSafeMode">Безпечний режим плагінів</string>
+    <string name="PluginsSafeModeInfo">Плагіни були вимкнені після збою. Ви можете вийти з безпечного режиму та перезапустити механізм.</string>
+    <string name="PluginsSafeModeInfo2">Безпечний режим тримає всі плагіни вимкненими, доки ви не вимкнете його вручну.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Плагіни були вимкнені після збою. Перевірте налаштування плагінів і вийдіть з безпечного режиму, коли будете готові.</string>
+    <string name="PluginsSafeModeInfoManual">Безпечний режим плагінів увімкнено вручну. Вимкніть безпечний режим, щоб знову завантажити плагіни.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Плагіни були вимкнені після системного збою. Виходьте з безпечного режиму лише після перевірки встановлених плагінів.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">Плагін %1$s був вимкнений після збою. Вийдіть із безпечного режиму, коли будете готові відновити решту плагінів.</string>
+    <string name="PluginsSafeModeShortcut">Запустити в безпечному режимі</string>
+    <string name="PluginsSettingsShowOriginal">Показати оригінал</string>
+    <string name="PluginsSettingsTranslate">Перекласти налаштування</string>
+    <string name="PluginsTrusted">Надійні плагіни</string>
+    <string name="UpdateAvailable">Доступне оновлення</string>
+    <!-- untranslated (missing in NagramXF): PluginResetSettings -->
+    <string name="PluginResetSettings">Скинути налаштування</string>
 </resources>

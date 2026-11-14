@@ -43,6 +43,9 @@ public class UItem extends AdapterWithDiffUtils.Item {
     public CharSequence animatedText;
     public String[] texts;
     public boolean accent, red, transparent, locked;
+    // --- Plugins (ported from NagramXF) ---
+    public boolean multiline;
+    // --- Plugins ---
     public int spanCount = MAX_SPAN_COUNT;
     public int parentSpanCount;
 
@@ -126,6 +129,16 @@ public class UItem extends AdapterWithDiffUtils.Item {
 
     public static UItem asFullyCustom(View view) {
         UItem i = new UItem(UniversalAdapter.VIEW_TYPE_FULLY_CUSTOM, false);
+        i.view = view;
+        return i;
+    }
+
+    /**
+     * Adds a custom item whose wrapper always has the full measured height of its RecyclerView.
+     * Unlike asFullscreenCustom(), this method never subtracts ActionBar, inset or padding values.
+     */
+    public static UItem asViewportCustom(View view) {
+        UItem i = new UItem(UniversalAdapter.VIEW_TYPE_VIEWPORT_CUSTOM, false);
         i.view = view;
         return i;
     }
@@ -231,6 +244,14 @@ public class UItem extends AdapterWithDiffUtils.Item {
         return i;
     }
 
+    public static UItem asButtonLoadingValue(int id, CharSequence text) {
+        UItem i = new UItem(UniversalAdapter.VIEW_TYPE_TEXT, false);
+        i.id = id;
+        i.text = text;
+        i.locked = true;
+        return i;
+    }
+
     public static UItem asButton(int id, int iconResId, CharSequence text) {
         UItem i = new UItem(UniversalAdapter.VIEW_TYPE_TEXT, false);
         i.id = id;
@@ -298,6 +319,30 @@ public class UItem extends AdapterWithDiffUtils.Item {
         i.text = text;
         return i;
     }
+
+    // --- Plugins (ported from NagramXF) ---
+    public static UItem asCheck(int id, CharSequence text, CharSequence value) {
+        UItem i = new UItem(UniversalAdapter.VIEW_TYPE_CHECK, false);
+        i.id = id;
+        i.text = text;
+        i.textValue = value;
+        return i;
+    }
+
+    public static UItem asCheck(int id, CharSequence text, CharSequence value, boolean multiline) {
+        UItem i = asCheck(id, text, value);
+        i.multiline = multiline;
+        return i;
+    }
+
+    public static UItem asCheck(int id, CharSequence text, int iconResId) {
+        UItem i = new UItem(UniversalAdapter.VIEW_TYPE_CHECK, false);
+        i.id = id;
+        i.text = text;
+        i.iconResId = iconResId;
+        return i;
+    }
+    // --- Plugins ---
 
     public static UItem asRadio(int id, CharSequence text) {
         UItem i = new UItem(UniversalAdapter.VIEW_TYPE_RADIO, false);
@@ -673,6 +718,18 @@ public class UItem extends AdapterWithDiffUtils.Item {
         this.enabled = enabled;
         return this;
     }
+
+    // --- Plugins (ported from NagramXF) ---
+    public UItem setTransparent(boolean transparent) {
+        this.transparent = transparent;
+        return this;
+    }
+
+    public UItem setIcon(int iconResId) {
+        this.iconResId = iconResId;
+        return this;
+    }
+    // --- Plugins ---
 
     public UItem setLocked(boolean locked) {
         this.locked = locked;

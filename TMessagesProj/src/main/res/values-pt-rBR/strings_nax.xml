@@ -9,6 +9,28 @@
     <string name="DeleteKeepLocally">Manter localmente</string>
     <string name="ClearMessageDatabase">Limpar BD de mensagens</string>
     <string name="ClearMessageDatabaseNotification">Dados de mensagens limpos.</string>
+    <string name="ExportMessagesHistory">Exportar histórico de mensagens</string>
+    <string name="ImportMessagesHistory">Importar histórico de mensagens</string>
+    <string name="MessagesBackupCountsValue">%1$d excluídas · %2$d editadas</string>
+    <string name="MessagesBackupExportText">Todas as mensagens excluídas e editadas salvas serão gravadas em um arquivo de backup no seu dispositivo. Os arquivos de mídia já estão na pasta Downloads e sobrevivem à reinstalação. Após reinstalar, use Importar histórico de mensagens para restaurar tudo.</string>
+    <string name="MessagesBackupExport">Exportar</string>
+    <string name="MessagesBackupExportDone">Exportadas %1$d mensagens excluídas e %2$d editadas</string>
+    <string name="MessagesBackupExportSkipped">Não foi possível exportar %1$d mensagens</string>
+    <string name="MessagesBackupExportFailed">Falha na exportação</string>
+    <string name="MessagesBackupImportDone">Importadas %1$d mensagens excluídas e %2$d editadas, %3$d já salvas foram ignoradas</string>
+    <string name="MessagesBackupImportFailed">Falha na importação</string>
+    <string name="MessagesBackupAlreadyRunning">Uma operação de backup já está em andamento</string>
+    <string name="MessagesBackupNotificationChannel">Backup de mensagens</string>
+    <string name="MessagesBackupExportingNotification">Exportando histórico de mensagens…</string>
+    <string name="MessagesBackupImportingNotification">Importando histórico de mensagens…</string>
+    <string name="MessagesBackupExportCancelled">Exportação cancelada, arquivo incompleto excluído</string>
+    <string name="MessagesBackupImportCancelled">Importação cancelada, nada foi restaurado</string>
+    <string name="MessagesBackupInvalidFile">Este arquivo não é um backup de mensagens válido</string>
+    <string name="MessagesBackupNewerVersion">Este backup foi criado com uma versão mais recente do app. Atualize o app primeiro</string>
+    <string name="MessagesBackupRemapTitle">Conta diferente</string>
+    <string name="MessagesBackupRemapText">Este backup foi salvo em uma conta diferente. Importar mesmo assim?</string>
+    <string name="MessagesBackupRemapToCurrent">Remapear para esta conta</string>
+    <string name="MessagesBackupRemapKeep">Importar como está</string>
     <string name="CustomDeletedMark">Marca de exclusão personalizada</string>
     <string name="HidePremiumSection">Ocultar Premium nas configurações</string>
     <string name="HideHelpSection">Ocultar Ajuda nas configurações</string>
@@ -30,10 +52,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Provedor do modelo</string>
     <string name="LlmProviderCustom">Personalizado</string>
     <string name="LlmProviderOpenAIKey">Chave da API da OpenAI</string>
     <string name="LlmProviderGeminiKey">Chave da API do Gemini</string>
+    <string name="LlmProviderZhipuAIKey">Chave de API Zhipu AI</string>
+    <string name="LlmProviderMistralKey">Chave de API Mistral</string>
+    <string name="LlmProviderQwenKey">Chave de API Qwen</string>
+    <string name="LlmProviderMoonshotKey">Chave de API Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">Chave de API SiliconFlow</string>
+    <string name="DisableAiEditor">Desativar editor de IA</string>
     <string name="LlmSystemPrompt">Prompt do sistema</string>
     <string name="LlmSystemPromptHint">Você é um tradutor profissional.</string>
     <string name="LlmSystemPromptNotice">Defina o papel e o comportamento da IA.\n\nEste comando estabelece o tom, a personalidade e as limitações da IA. Descreva que tipo de assistente a IA deve ser.</string>
@@ -157,6 +190,14 @@
     <string name="GhostReadMessage">Ler mensagem</string>
     <string name="GhostModeExcludeRead">Excluir leitura</string>
     <string name="GhostModeExcludeTyping">Excluir digitando</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Padrão</string>
+    <string name="GhostModeExceptionForceBlockRead">Forçar bloqueio de leitura</string>
+    <string name="GhostModeExceptionForceAllowRead">Forçar permissão de leitura</string>
+    <string name="GhostModeExceptionForceBlockTyping">Forçar bloqueio de digitação</string>
+    <string name="GhostModeExceptionForceAllowTyping">Forçar permissão de digitação</string>
+    <string name="ShowFilteredMessagesMenuText">Mostrar filtrados</string>
+    <string name="HideFilteredMessagesMenuText">Ocultar filtrados</string>
     <string name="SendWithSound">Enviar com Som</string>
     <string name="PerformanceClass">Classe de desempenho do dispositivo</string>
     <string name="PerformanceClassHigh">Alta</string>
@@ -246,6 +287,7 @@
     <string name="CreateCode">Criar Código</string>
     <string name="CreateCodeLanguage">Linguagem</string>
     <string name="NoCaptionForward">Encaminhar sem legenda</string>
+    <string name="NoCaptionForwardShort">Sem legenda</string>
     <string name="PreferCommonGroupsTab">Preferir aba Grupos</string>
     <string name="PreferCommonGroupsTabNotice">Seleciona automaticamente a aba \"Grupos\" em vez de \"Presentes\" sempre que possível.</string>
     <string name="GroupedMessageMenu">Menu de mensagens agrupado</string>
@@ -357,6 +399,13 @@
     <string name="UnifiedPushCurrentEndpoint">O endpoint atual do UnifiedPush é: %1$s</string>
     <string name="PlayOnce">Reproduzir uma vez</string>
     <string name="StorageSettings">Armazenamento</string>
+    <string name="MainTabs">Abas principais</string>
+    <string name="MainTabsVisibility">Visibilidade</string>
+    <string name="MainTabsAlways">Sempre</string>
+    <string name="MainTabsHideOnScroll">Ocultar ao rolar</string>
+    <string name="HideMainTabsTitles">Ocultar títulos</string>
+    <string name="HideContactsTab">Ocultar aba «Contatos»</string>
+    <string name="Hidden">Oculto</string>
     <string name="MainTabsSettingsHeader">Abas principais</string>
     <string name="MainTabsHideTitles">Ocultar títulos</string>
     <string name="DoubleTapOnChatsToFilterUnread">Toque duplo nos chats para filtrar não lidos</string>
@@ -520,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">Arquivos e documentos</string>
     <string name="ChatAutoDownloadVoice">Mensagens de voz e vídeo</string>
     <string name="ChatAutoDownloadAudio">Músicas e áudios</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Atividades de amigos</string>
@@ -550,4 +599,78 @@
     <string name="FriendsActivitiesTab">Atividades</string>
     <string name="FriendsActivitiesEmpty">Nenhuma atividade recente em chats compartilhados.</string>
     <string name="FriendsActivitiesHowItWorks">Acesse o perfil de um contato → toque na aba Atividades para ver as mensagens recentes em grupos e canais em comum.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Atualizar automaticamente</string>
+    <string name="NoSuchSetting">Configuração não encontrada</string>
+    <string name="PluginDelete">Excluir plugin?</string>
+    <string name="PluginDeleteInfo">Excluir o plugin &lt;b&gt;%1$s&lt;/b&gt;? Esta ação não pode ser desfeita.</string>
+    <string name="PluginDependencyDownloadingProgress">Baixando %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">Instalando %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">A dependência %1$s fornece apenas wheels nativos no intervalo de versões escolhido. Este cliente atualmente suporta apenas wheels pure-Python.</string>
+    <string name="PluginDependencyNoCompatibleWheel">Nenhum wheel pure-Python compatível encontrado para %1$s.</string>
+    <string name="PluginDependencyPreparing">Preparando dependências do plugin…</string>
+    <string name="PluginDependencyPythonUnsupported">A dependência %1$s requer Python %2$s, mas este cliente usa Python 3.11.</string>
+    <string name="PluginDependencyResolving">Resolvendo %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">A dependência %1$s fornece apenas distribuições de código no intervalo de versões escolhido. Este cliente atualmente suporta apenas wheels pure-Python.</string>
+    <string name="PluginDisableError">Falha ao desativar %1$s.</string>
+    <string name="PluginEnableError">Falha ao ativar %1$s.</string>
+    <string name="PluginEngineNotEnabled">O motor de plugins está desativado. Abrir as configurações do plugin %1$s?</string>
+    <string name="PluginHasNoSettings">%1$s não tem configurações.</string>
+    <string name="PluginInstallError">Falha ao instalar o plugin %1$s.</string>
+    <string name="PluginInstalled">%1$s instalado</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s foi instalado, mas a ativação falhou.</string>
+    <string name="PluginIsNotResponding">O plugin não está respondendo.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s não está respondendo</string>
+    <string name="PluginNoAuthor">Autor desconhecido</string>
+    <string name="PluginNoDescription">Sem descrição</string>
+    <string name="PluginNotEnabled">O suporte a plugins está desativado. Abrir as configurações para ativar %1$s?</string>
+    <string name="PluginNotFound">Plugin %1$s não foi encontrado.</string>
+    <string name="PluginOpenExternalError">Não foi possível abrir %1$s em um app externo.</string>
+    <string name="PluginResetSettings">Redefinir configurações</string>
+    <string name="PluginSettingNotFound">A configuração de plugin de destino não foi encontrada.</string>
+    <string name="PluginSourceTrusted">Fonte confiável</string>
+    <string name="PluginSourceTrustedInfo">Este plugin vem de uma fonte confiável.</string>
+    <string name="PluginSourceUnknown">Fonte desconhecida</string>
+    <string name="PluginSourceUnknownInfo">Este plugin vem de uma fonte desconhecida. Revise-o com cuidado antes de instalar.</string>
+    <string name="PluginUpdated">%1$s atualizado</string>
+    <string name="PluginVersion">Versão</string>
+    <string name="Plugins">Plugins</string>
+    <string name="PluginsCompactView">Visualização compacta</string>
+    <string name="PluginsDevMode">Modo desenvolvedor</string>
+    <string name="PluginsDevServerLaunched">Servidor de desenvolvimento de plugins iniciado</string>
+    <string name="PluginsDevServerStopped">Servidor de desenvolvimento de plugins parado</string>
+    <string name="PluginsDevTools">Ferramentas de desenvolvedor</string>
+    <string name="PluginsDisableArt">Modo de compatibilidade</string>
+    <string name="PluginsDisableArtInfo">Evita falhas de hooks de plugins desativando o ART Profile Saver.</string>
+    <string name="PluginsDocumentation">Documentação</string>
+    <string name="PluginsEngine">Motor de plugins</string>
+    <string name="PluginsInfo">Instale e gerencie arquivos .plugin aqui.</string>
+    <string name="PluginsInstallSmokeTest">Instalar plugin de teste</string>
+    <string name="PluginsInstallSmokeTestInfo">Plugin exclusivo para desenvolvedores para validar eventos do app, hooks de request/update, hooks de envio de mensagens e menus de plugins.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Falha ao preparar o plugin de teste incluído.</string>
+    <string name="PluginsNativeRuntimeUnavailable">O runtime nativo de hooks não está disponível. Plugins baseados em hooks de métodos podem não funcionar até que o app seja reiniciado com todas as bibliotecas nativas carregadas.</string>
+    <string name="PluginsNotFound">Nenhum plugin encontrado</string>
+    <string name="PluginsPoweredBy">Desenvolvido com &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; e &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Atualizar automaticamente</string>
+    <string name="PluginsPySdkCheckUpdates">Verificar atualizações</string>
+    <string name="PluginsPySdkCheckingForUpdates">Verificando atualizações…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Instalar versões beta</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Versão mais recente do SDK instalada</string>
+    <string name="PluginsPySdkLoadingUpdate">Baixando atualização…</string>
+    <string name="PluginsPySdkUpdateFailed">Falha na atualização do SDK</string>
+    <string name="PluginsPythonRuntimeUnavailable">O runtime Python não pôde ser inicializado. Reinicie o app e verifique as dependências de plugins incluídas.</string>
+    <string name="PluginsRestartEngine">Reiniciar motor de plugins</string>
+    <string name="PluginsSafeMode">Modo seguro de plugins</string>
+    <string name="PluginsSafeModeInfo">Os plugins foram desativados após uma falha. Você pode sair do modo seguro e reiniciar o motor.</string>
+    <string name="PluginsSafeModeInfo2">O modo seguro mantém todos os plugins desativados até você desativá-lo manualmente.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Os plugins foram desativados após uma falha. Revise seus plugins e saia do modo seguro quando estiver pronto.</string>
+    <string name="PluginsSafeModeInfoManual">O modo seguro foi ativado manualmente. Desative-o para carregar os plugins novamente.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Os plugins foram desativados após uma falha nativa. Saia do modo seguro somente após verificar seus plugins instalados.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">O plugin %1$s foi desativado após uma falha. Saia do modo seguro quando estiver pronto para restaurar os demais plugins.</string>
+    <string name="PluginsSafeModeShortcut">Iniciar em modo seguro</string>
+    <string name="PluginsSettingsShowOriginal">Mostrar texto original</string>
+    <string name="PluginsSettingsTranslate">Traduzir configurações</string>
+    <string name="PluginsTrusted">Plugins confiáveis</string>
+    <string name="UpdateAvailable">Atualização disponível</string>
 </resources>

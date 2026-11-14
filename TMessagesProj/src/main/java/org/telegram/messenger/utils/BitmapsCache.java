@@ -3,10 +3,6 @@ package org.telegram.messenger.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.os.SystemClock;
-
-import com.google.android.exoplayer2.util.Log;
-import com.google.common.util.concurrent.AtomicDouble;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -289,7 +285,13 @@ public class BitmapsCache {
                     return;
                 }
 
-                if (source.getNextFrame(bitmap[index]) != 1) {
+                int frameResult = source.getNextFrame(bitmap[index]);
+                if (frameResult == -1) {
+                    // render failed: abort without marking the cache as complete
+                    closed.set(true);
+                    continue;
+                }
+                if (frameResult != 1) {
                     break;
                 }
                 countDownLatch[index] = new CountDownLatch(1);

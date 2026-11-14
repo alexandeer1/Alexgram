@@ -105,6 +105,9 @@ public class HeaderCell extends LinearLayout {
         ViewCompat.setAccessibilityHeading(this, true);
     }
 
+    public void applySeparatedHeadersStyle() {
+    }
+
     // NekoX: BottomSheet BigTitle, move big title from constructor to here
     public HeaderCell setBigTitle(boolean enabled) {
         if (enabled) {

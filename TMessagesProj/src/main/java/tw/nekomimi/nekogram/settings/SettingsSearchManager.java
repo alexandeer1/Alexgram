@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
-import org.telegram.ui.AIAssistanceSettingsActivity;
+import com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity;
 import org.telegram.ui.ActionBar.BaseFragment;
 
 import tw.nekomimi.nekogram.config.CellGroup;
@@ -77,11 +77,9 @@ public class SettingsSearchManager {
         add(target, "Hide Contacts", "Remove the contacts tab from the main drawer", "hide_contacts", NekoSettingsActivity.class, "Privacy", R.drawable.msg_contacts);
         add(target, "Save Deleted Messages", "Automatically keep copies of deleted messages", "save_deleted", NekoSettingsActivity.class, "Privacy", R.drawable.msg_delete_solar);
         add(target, "Hidden Chats", "Secure your private conversations with a passcode", "hidden_chats", NekoSettingsActivity.class, "Privacy", R.drawable.msg_permissions);
-        add(target, "Enable AI Assistant", "Activate the floating Alexgram AI companion", "assistant_enabled", AIAssistanceSettingsActivity.class, "AI", R.drawable.settings_chat);
-        add(target, "AI Character Skin", "Change the visual appearance of the AI assistant", "character_skin", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_theme);
-        add(target, "Assistant Persona", "Choose between different AI personalities", "persona_preset", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_contacts);
-        add(target, "AI Background Animation", "Toggle the animated background in AI settings", "background_animation", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_sticker);
-        add(target, "Particle Effects", "Show dynamic particles on AI interaction", "particle_effects", AIAssistanceSettingsActivity.class, "AI", R.drawable.msg_info);
+        add(target, "AI Chat", "Setup Services, Roles, and History", "ai_chat", AiPreferencesActivity.class, "AI", R.drawable.ai_chat);
+        add(target, "AI Services", "Manage AI endpoints, models, and API keys", "ai_services", com.exteragram.messenger.ai.ui.activities.ServicesActivity.class, "AI", R.drawable.msg_language);
+        add(target, "AI Roles", "Custom and suggested system prompts", "ai_roles", com.exteragram.messenger.ai.ui.activities.RolesActivity.class, "AI", R.drawable.msg_openprofile);
         // [Alexgram: Friends Activities] - Start
         add(target, "Friends Activities", "Spy on Friends — see contacts' recent messages in shared groups and channels", "FriendsActivities", NekoCustomizationSettingsActivity.class, "Customization", R.drawable.msg_groups);
         // [Alexgram: Friends Activities] - End

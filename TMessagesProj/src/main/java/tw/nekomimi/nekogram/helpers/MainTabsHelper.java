@@ -74,6 +74,9 @@ public final class MainTabsHelper {
     }
 
     public static int getTabsViewWidth() {
+        if (isMainTabsHideTitleStyle()) {
+            return Math.max(56 * getFragmentsCount(), 240) + (getMainTabsMargin() + TAB_PADDING) * 2;
+        }
         return TAB_WIDTH * 4 + (getMainTabsMargin() + TAB_PADDING) * 2;
     }
 }

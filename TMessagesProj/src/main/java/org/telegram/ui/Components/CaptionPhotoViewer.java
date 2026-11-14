@@ -9,8 +9,6 @@ import static org.telegram.ui.ActionBar.Theme.RIPPLE_MASK_CIRCLE_20DP;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
@@ -36,6 +34,8 @@ import org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundPro
 import org.telegram.ui.Stories.DarkThemeResourceProvider;
 import org.telegram.ui.Stories.recorder.CaptionContainerView;
 import org.telegram.ui.Stories.recorder.HintView2;
+
+import xyz.nextalone.nagram.NaConfig;
 
 public class CaptionPhotoViewer extends CaptionContainerView {
 
@@ -402,7 +402,7 @@ public class CaptionPhotoViewer extends CaptionContainerView {
         hint.setTranslationY((-Math.min(dp(34), getEditTextHeight()) - dp(14)) * (isAtTop() ? -1.0f : 1.0f));
         hint.setText(text);
         final int iconResId = value > 0 ? R.raw.fire_on : R.raw.fire_off;
-        RLottieDrawable icon = new RLottieDrawable(iconResId, "" + iconResId, dp(34), dp(34));
+        RLottieDrawable icon = new RLottieDrawable(iconResId, dp(34), dp(34));
         icon.start();
         hint.setIcon(icon);
         hint.show();
@@ -531,7 +531,7 @@ public class CaptionPhotoViewer extends CaptionContainerView {
 
     private boolean shownAiButton;
     private void showAiButton(boolean show_) {
-        final boolean show = show_;
+        final boolean show = show_ && !NaConfig.INSTANCE.getDisableAiEditor().Bool();
 
         if (shownAiButton == show) return;
         if (show) {

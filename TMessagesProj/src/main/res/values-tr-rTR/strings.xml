@@ -60,4 +60,19 @@
     <string name="MessageMenuModeHide">Hide</string>
     <string name="MessageMenuModeText">Text</string>
     <string name="MessageMenuModeIcon">Icon</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - Start -->
+    <string name="AlexgramWelcomeBadge">RESMÎ TOPLULUK</string>
+    <string name="AlexgramWelcomeTitle">Alexgram\'a Hoş Geldiniz</string>
+    <string name="AlexgramWelcomeSubtitle">Mesajlaşmanın Çok Ötesinde</string>
+    <string name="AlexgramWelcomeDescription">Özel özellikler, güncellemeler ve erken erişim için resmî kanalımıza katılın.</string>
+    <string name="AlexgramWelcomeFeature1Title">Zirve Performans ve Bulut</string>
+    <string name="AlexgramWelcomeFeature1Desc">Ultra hızlı indirmeler, gelişmiş medya akışı ve bulut eşitleme.</string>
+    <string name="AlexgramWelcomeFeature2Title">Hayalet Modu</string>
+    <string name="AlexgramWelcomeFeature2Desc">Mesajları gizlice okuyun, çevrim içi ve yazıyor durumunu gizleyin.</string>
+    <string name="AlexgramWelcomeFeature3Title">Ayrıcalıklı Özellikler</string>
+    <string name="AlexgramWelcomeFeature3Desc">Erken önizlemeler, geliştirici duyuruları ve özel araçlar.</string>
+    <string name="AlexgramWelcomeJoinButton">Resmî Kanala Katıl</string>
+    <string name="AlexgramWelcomeOpenButton">Resmî Kanalı Aç</string>
+    <string name="AlexgramWelcomeContinueButton">Alexgram\'ı Keşfet</string>
+    <!-- [Alexgram: Official Channel Welcome Dialog] - End -->
 </resources>

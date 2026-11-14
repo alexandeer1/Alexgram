@@ -66,8 +66,12 @@ public enum FloatingActionButtonType {
         view.clearAnimation();
         switch (this) {
             case CREATE_CHAT:
-                view.setAnimation(R.raw.write_contacts_fab_icon, 52, 52);
-                view.playAnimation();
+                try {
+                    view.setAnimation(R.raw.write_contacts_fab_icon, 52, 52);
+                    view.playAnimation();
+                } catch (Throwable e) {
+                    view.setImageResource(R.drawable.filled_fab_compose_32);
+                }
                 break;
             case BOOKMARKS:
                 // [Alexgram: Tabs by Type] - use white star (fork_fab_star) to match FAB button style

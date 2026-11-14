@@ -10,6 +10,7 @@ package org.telegram.ui.Adapters;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -59,6 +60,9 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter imple
     public static int nkbtnRecentChats = 1009;
     public static int nkbtnSessions = 1010;
     public static int nkbtnFeed = 1011;
+
+    // --- Plugins (ported from NagramXF) ---
+    public static final int PLUGIN_ITEM_ID_BASE = 20000;
     public DrawerLayoutAdapter(Context context, SideMenultItemAnimator animator, DrawerLayoutContainer drawerLayoutContainer) {
         mContext = context;
         itemAnimator = animator;
@@ -363,6 +367,37 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter imple
         }
         if (NaConfig.INSTANCE.getDrawerItemSettings().Bool()) {
             items.add(new Item(8, LocaleController.getString(R.string.Settings), settingsIcon));
+        }
+
+        // --- Plugins (ported from NagramXF): MAIN_MENU / DRAWER_MENU items appended as a section ---
+        if (com.exteragram.messenger.plugins.PluginsController.isPluginEngineAvailable()) {
+            int account = UserConfig.selectedAccount;
+            TLRPC.User currentUser = UserConfig.getInstance(account).getCurrentUser();
+            com.exteragram.messenger.plugins.utils.MenuContextBuilder builder = com.exteragram.messenger.plugins.utils.MenuContextBuilder.create().withAccount(account);
+            if (currentUser != null) {
+                builder.withUser(currentUser);
+            }
+            java.util.Map<String, Object> pluginContext = builder.build();
+            java.util.List<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMenuItems = com.exteragram.messenger.plugins.PluginsController.getInstance().getMenuItemsForLocation(
+                    com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.MAIN_MENU, pluginContext);
+            boolean addedPluginDivider = false;
+            for (com.exteragram.messenger.plugins.hooks.MenuItemRecord record : pluginMenuItems) {
+                if (record == null || TextUtils.isEmpty(record.text)) {
+                    continue;
+                }
+                if (!addedPluginDivider) {
+                    items.add(null);
+                    addedPluginDivider = true;
+                }
+                int iconRes = record.iconResId != 0 ? record.iconResId : R.drawable.msg_plugins;
+                items.add(new Item(PLUGIN_ITEM_ID_BASE + items.size(), record.text, iconRes).onClick(v -> {
+                    try {
+                        record.executeClick(pluginContext);
+                    } catch (Throwable t) {
+                        org.telegram.messenger.FileLog.e("Failed to execute plugin drawer item " + record.itemId, t);
+                    }
+                }));
+            }
         }
 
         TLRPC.TL_attachMenuBots menuBots = MediaDataController.getInstance(UserConfig.selectedAccount).getAttachMenuBots();

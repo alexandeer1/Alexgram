@@ -9,6 +9,28 @@
     <string name="DeleteKeepLocally">Keep locally</string>
     <string name="ClearMessageDatabase">Clear Message Database</string>
     <string name="ClearMessageDatabaseNotification">Message database cleared.</string>
+    <string name="ExportMessagesHistory">تصدير سجل الرسائل</string>
+    <string name="ImportMessagesHistory">استيراد سجل الرسائل</string>
+    <string name="MessagesBackupCountsValue">%1$d محذوفة · %2$d معدلة</string>
+    <string name="MessagesBackupExportText">ستتم كتابة جميع الرسائل المحذوفة والمعدلة المحفوظة إلى ملف نسخة احتياطية على جهازك. ملفات الوسائط موجودة بالفعل في مجلد التنزيلات وتبقى بعد إعادة التثبيت. بعد إعادة تثبيت التطبيق، استخدم استيراد سجل الرسائل لاستعادة كل شيء.</string>
+    <string name="MessagesBackupExport">تصدير</string>
+    <string name="MessagesBackupExportDone">تم تصدير %1$d رسالة محذوفة و %2$d رسالة معدلة</string>
+    <string name="MessagesBackupExportSkipped">تعذر تصدير %1$d رسالة</string>
+    <string name="MessagesBackupExportFailed">فشل التصدير</string>
+    <string name="MessagesBackupImportDone">تم استيراد %1$d رسالة محذوفة و %2$d رسالة معدلة، تم تخطي %3$d محفوظة مسبقاً</string>
+    <string name="MessagesBackupImportFailed">فشل الاستيراد</string>
+    <string name="MessagesBackupAlreadyRunning">عملية نسخ احتياطي قيد التنفيذ بالفعل</string>
+    <string name="MessagesBackupNotificationChannel">النسخ الاحتياطي للرسائل</string>
+    <string name="MessagesBackupExportingNotification">جارٍ تصدير سجل الرسائل…</string>
+    <string name="MessagesBackupImportingNotification">جارٍ استيراد سجل الرسائل…</string>
+    <string name="MessagesBackupExportCancelled">تم إلغاء التصدير وحذف الملف الجزئي</string>
+    <string name="MessagesBackupImportCancelled">تم إلغاء الاستيراد، لم تتم استعادة أي شيء</string>
+    <string name="MessagesBackupInvalidFile">هذا الملف ليس نسخة احتياطية صالحة للرسائل</string>
+    <string name="MessagesBackupNewerVersion">تم إنشاء هذه النسخة الاحتياطية بإصدار أحدث من التطبيق. حدّث التطبيق أولاً</string>
+    <string name="MessagesBackupRemapTitle">حساب مختلف</string>
+    <string name="MessagesBackupRemapText">تم حفظ هذه النسخة الاحتياطية تحت حساب مختلف. استيرادها على أي حال؟</string>
+    <string name="MessagesBackupRemapToCurrent">تعيين إلى هذا الحساب</string>
+    <string name="MessagesBackupRemapKeep">استيراد كما هي</string>
     <string name="CustomDeletedMark">Custom Deleted Mark</string>
     <string name="HidePremiumSection">Hide Premium in Settings</string>
     <string name="HideHelpSection">Hide Help in Settings</string>
@@ -30,10 +52,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Model Provider</string>
     <string name="LlmProviderCustom">Custom</string>
     <string name="LlmProviderOpenAIKey">OpenAI API Key</string>
     <string name="LlmProviderGeminiKey">Gemini API Key</string>
+    <string name="LlmProviderZhipuAIKey">مفتاح API لـ Zhipu AI</string>
+    <string name="LlmProviderMistralKey">مفتاح API لـ Mistral</string>
+    <string name="LlmProviderQwenKey">مفتاح API لـ Qwen</string>
+    <string name="LlmProviderMoonshotKey">مفتاح API لـ Moonshot</string>
+    <string name="LlmProviderSiliconFlowKey">مفتاح API لـ SiliconFlow</string>
+    <string name="DisableAiEditor">تعطيل محرر الذكاء الاصطناعي</string>
     <string name="LlmSystemPrompt">System Prompt</string>
     <string name="LlmSystemPromptHint">You are a professional translator.</string>
     <string name="LlmSystemPromptNotice">Define the AI\'s role and behavior.\n\nThis prompt sets the tone, personality, and limitations for the AI. Consider describing what type of assistant the AI should be.</string>
@@ -157,6 +190,14 @@
     <string name="GhostReadMessage">Read Message</string>
     <string name="GhostModeExcludeRead">Exclude Read</string>
     <string name="GhostModeExcludeTyping">Exclude Typing</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">افتراضي</string>
+    <string name="GhostModeExceptionForceBlockRead">فرض حظر القراءة</string>
+    <string name="GhostModeExceptionForceAllowRead">فرض السماح بالقراءة</string>
+    <string name="GhostModeExceptionForceBlockTyping">فرض حظر الكتابة</string>
+    <string name="GhostModeExceptionForceAllowTyping">فرض السماح بالكتابة</string>
+    <string name="ShowFilteredMessagesMenuText">إظهار المفلترة</string>
+    <string name="HideFilteredMessagesMenuText">إخفاء المفلترة</string>
     <string name="SendWithSound">Send with Sound</string>
     <string name="PerformanceClass">Device Performance Class</string>
     <string name="PerformanceClassHigh">High</string>
@@ -246,6 +287,7 @@
     <string name="CreateCode">Create Code</string>
     <string name="CreateCodeLanguage">Language</string>
     <string name="NoCaptionForward">NoCaption forward</string>
+    <string name="NoCaptionForwardShort">بدون شرح</string>
     <string name="PreferCommonGroupsTab">Prefer Groups Tab</string>
     <string name="PreferCommonGroupsTabNotice">Auto-select \"Groups\" tab instead of \"Gifts\" when possible.</string>
     <string name="GroupedMessageMenu">Group Message Menu</string>
@@ -357,6 +399,13 @@
     <string name="UnifiedPushCurrentEndpoint">The current UnifiedPush endpoint is: %1$s</string>
     <string name="PlayOnce">Play once</string>
     <string name="StorageSettings">Storage</string>
+    <string name="MainTabs">التبويبات الرئيسية</string>
+    <string name="MainTabsVisibility">الظهور</string>
+    <string name="MainTabsAlways">دائمًا</string>
+    <string name="MainTabsHideOnScroll">إخفاء عند التمرير</string>
+    <string name="HideMainTabsTitles">إخفاء العناوين</string>
+    <string name="HideContactsTab">إخفاء تبويب «جهات الاتصال»</string>
+    <string name="Hidden">مخفي</string>
     <string name="MainTabsSettingsHeader">Main Tabs</string>
     <string name="MainTabsHideTitles">Hide Titles</string>
     <string name="DoubleTapOnChatsToFilterUnread">انقر نقرًا مزدوجًا على الدردشات لتصفية غير المقروءة</string>
@@ -520,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">الملفات والمستندات</string>
     <string name="ChatAutoDownloadVoice">الرسائل الصوتية والمرئية</string>
     <string name="ChatAutoDownloadAudio">الموسيقى والصوت</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">نشاط الأصدقاء</string>
@@ -550,4 +599,78 @@
     <string name="FriendsActivitiesTab">النشاط</string>
     <string name="FriendsActivitiesEmpty">لا يوجد نشاط حديث في المحادثات المشتركة.</string>
     <string name="FriendsActivitiesHowItWorks">انتقل إلى الملف الشخصي لجهة الاتصال ← انقر على تبويب النشاط لرؤية أحدث رسائلهم في المحادثات المشتركة.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">التحديث تلقائيًا</string>
+    <string name="NoSuchSetting">الإعداد غير موجود</string>
+    <string name="PluginDelete">حذف الإضافة؟</string>
+    <string name="PluginDeleteInfo">حذف الإضافة &lt;b&gt;%1$s&lt;/b&gt;؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="PluginDependencyDownloadingProgress">جارٍ تنزيل %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">جارٍ تثبيت %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">التبعية %1$s توفر حزم wheel أصلية فقط في نطاق الإصدارات المحدد. هذا العميل يدعم حاليًا حزم Python الخالصة فقط.</string>
+    <string name="PluginDependencyNoCompatibleWheel">لم يتم العثور على حزمة Python خالصة متوافقة لـ %1$s.</string>
+    <string name="PluginDependencyPreparing">جارٍ تحضير تبعيات الإضافة…</string>
+    <string name="PluginDependencyPythonUnsupported">التبعية %1$s تتطلب Python %2$s، لكن هذا العميل يستخدم Python 3.11.</string>
+    <string name="PluginDependencyResolving">جارٍ معالجة %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">التبعية %1$s توفر توزيعات مصدرية فقط في نطاق الإصدارات المحدد. هذا العميل يدعم حاليًا حزم Python الخالصة فقط.</string>
+    <string name="PluginDisableError">تعذر تعطيل %1$s.</string>
+    <string name="PluginEnableError">تعذر تفعيل %1$s.</string>
+    <string name="PluginEngineNotEnabled">محرك الإضافات معطل. فتح إعدادات الإضافة %1$s؟</string>
+    <string name="PluginHasNoSettings">%1$s ليس لديه إعدادات.</string>
+    <string name="PluginInstallError">فشل تثبيت الإضافة %1$s.</string>
+    <string name="PluginInstalled">تم تثبيت %1$s</string>
+    <string name="PluginInstalledButFailedToEnable">تم تثبيت %1$s، لكن فشل تفعيله.</string>
+    <string name="PluginIsNotResponding">الإضافة لا تستجيب.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s لا يستجيب</string>
+    <string name="PluginNoAuthor">مؤلف غير معروف</string>
+    <string name="PluginNoDescription">لا يوجد وصف</string>
+    <string name="PluginNotEnabled">دعم الإضافات معطل. فتح الإعدادات لتفعيل %1$s؟</string>
+    <string name="PluginNotFound">لم يتم العثور على الإضافة %1$s.</string>
+    <string name="PluginOpenExternalError">تعذر فتح %1$s في تطبيق خارجي.</string>
+    <string name="PluginResetSettings">إعادة تعيين الإعدادات</string>
+    <string name="PluginSettingNotFound">لم يتم العثور على إعداد الإضافة المستهدف.</string>
+    <string name="PluginSourceTrusted">مصدر موثوق</string>
+    <string name="PluginSourceTrustedInfo">هذه الإضافة تأتي من مصدر موثوق.</string>
+    <string name="PluginSourceUnknown">مصدر غير معروف</string>
+    <string name="PluginSourceUnknownInfo">هذه الإضافة تأتي من مصدر غير معروف. راجعها بعناية قبل التثبيت.</string>
+    <string name="PluginUpdated">تم تحديث %1$s</string>
+    <string name="PluginVersion">الإصدار</string>
+    <string name="Plugins">الإضافات</string>
+    <string name="PluginsCompactView">عرض مضغوط</string>
+    <string name="PluginsDevMode">وضع المطوّر</string>
+    <string name="PluginsDevServerLaunched">تم تشغيل خادم تطوير الإضافات</string>
+    <string name="PluginsDevServerStopped">تم إيقاف خادم تطوير الإضافات</string>
+    <string name="PluginsDevTools">أدوات المطوّر</string>
+    <string name="PluginsDisableArt">وضع التوافق</string>
+    <string name="PluginsDisableArtInfo">يمنع فشل خطافات الإضافات عبر تعطيل ART Profile Saver.</string>
+    <string name="PluginsDocumentation">الوثائق</string>
+    <string name="PluginsEngine">محرك الإضافات</string>
+    <string name="PluginsInfo">ثبّت وأدر ملفات .plugin من هنا.</string>
+    <string name="PluginsInstallSmokeTest">تثبيت إضافة الاختبار</string>
+    <string name="PluginsInstallSmokeTestInfo">إضافة للمطورين فقط للتحقق من أحداث التطبيق وخطافات الطلبات/التحديثات وخطافات الإرسال وقوائم الإضافات.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">تعذر تحضير إضافة الاختبار المدمجة.</string>
+    <string name="PluginsNativeRuntimeUnavailable">بيئة الخطافات الأصلية غير متوفرة. الإضافات المعتمدة على خطافات الأسلوب قد لا تعمل حتى إعادة تشغيل التطبيق مع تحميل جميع المكتبات الأصلية.</string>
+    <string name="PluginsNotFound">لا توجد إضافات</string>
+    <string name="PluginsPoweredBy">مدعوم بـ &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; و&lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">التحديث تلقائيًا</string>
+    <string name="PluginsPySdkCheckUpdates">التحقق من التحديثات</string>
+    <string name="PluginsPySdkCheckingForUpdates">جارٍ التحقق من التحديثات…</string>
+    <string name="PluginsPySdkEnableBetaVersion">تثبيت الإصدارات التجريبية</string>
+    <string name="PluginsPySdkLatestVersionInstalled">أحدث إصدار من SDK مثبت</string>
+    <string name="PluginsPySdkLoadingUpdate">جارٍ تنزيل التحديث…</string>
+    <string name="PluginsPySdkUpdateFailed">فشل تحديث SDK</string>
+    <string name="PluginsPythonRuntimeUnavailable">فشل تهيئة بيئة Python. أعد تشغيل التطبيق وتحقق من تبعيات الإضافات المدمجة.</string>
+    <string name="PluginsRestartEngine">إعادة تشغيل محرك الإضافات</string>
+    <string name="PluginsSafeMode">الوضع الآمن للإضافات</string>
+    <string name="PluginsSafeModeInfo">تم تعطيل الإضافات بعد خطأ. يمكنك الخروج من الوضع الآمن وإعادة تشغيل المحرك.</string>
+    <string name="PluginsSafeModeInfo2">يُبقي الوضع الآمن جميع الإضافات معطلة حتى تعطيله يدويًا.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">تم تعطيل الإضافات بعد خطأ. راجع إعدادات إضافاتك واخرج من الوضع الآمن عندما تكون جاهزًا.</string>
+    <string name="PluginsSafeModeInfoManual">تم تفعيل الوضع الآمن يدويًا. عطّله لإعادة تحميل الإضافات.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">تم تعطيل الإضافات بعد خطأ أصلي. اخرج من الوضع الآمن فقط بعد مراجعة إضافاتك المثبتة.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">تم تعطيل الإضافة %1$s بعد خطأ. اخرج من الوضع الآمن عندما تكون جاهزًا لاستعادة بقية الإضافات.</string>
+    <string name="PluginsSafeModeShortcut">البدء بالوضع الآمن</string>
+    <string name="PluginsSettingsShowOriginal">إظهار النص الأصلي</string>
+    <string name="PluginsSettingsTranslate">ترجمة الإعدادات</string>
+    <string name="PluginsTrusted">الإضافات الموثوقة</string>
+    <string name="UpdateAvailable">تحديث متوفر</string>
 </resources>

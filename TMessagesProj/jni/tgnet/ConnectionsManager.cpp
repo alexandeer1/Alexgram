@@ -20,6 +20,7 @@
 #include <string>
 #include <cinttypes>
 #include "ConnectionsManager.h"
+#include "DownloadRequestBudget.h"
 #include "FileLog.h"
 #include "EventObject.h"
 #include "MTProtoScheme.h"
@@ -43,6 +44,7 @@ jmethodID jclass_ByteBuffer_allocateDirect = nullptr;
 #endif
 
 static bool done = false;
+static constexpr int32_t MAX_CAPTCHA_CHECKS = 5;
 
 ConnectionsManager::ConnectionsManager(int32_t instance) {
     instanceNum = instance;
@@ -894,7 +896,8 @@ void ConnectionsManager::onConnectionConnected(Connection *connection) {
             if (networkPaused && lastPauseTime != 0) {
                 lastPauseTime = getCurrentTimeMonotonicMillis();
             }
-            processRequestQueue(connection->getConnectionType(), datacenter->getDatacenterId());
+            processRequestQueue(connectionType, datacenter->getDatacenterId(),
+                                connectionType == ConnectionTypeDownload ? connection : nullptr);
         }
     }
 }
@@ -1132,6 +1135,17 @@ TLObject *ConnectionsManager::getRequestWithMessageId(int64_t messageId) {
 }
 
 TLObject *ConnectionsManager::TLdeserialize(TLObject *request, uint32_t bytes, NativeByteBuffer *data) {
+    if (deserializeDepth >= MAX_DESERIALIZE_DEPTH) {
+        if (LOGS_ENABLED) DEBUG_E("too deep nesting in deserialize");
+        return nullptr;
+    }
+    deserializeDepth++;
+    TLObject *object = TLdeserializeInternal(request, bytes, data);
+    deserializeDepth--;
+    return object;
+}
+
+TLObject *ConnectionsManager::TLdeserializeInternal(TLObject *request, uint32_t bytes, NativeByteBuffer *data) {
     bool error = false;
     uint32_t position = data->position();
     uint32_t constructor = data->readUint32(&error);
@@ -1153,6 +1167,10 @@ TLObject *ConnectionsManager::TLdeserialize(TLObject *request, uint32_t bytes, N
             auto apiRequest = dynamic_cast<TL_api_request *>(request);
             if (apiRequest != nullptr) {
                 object = apiRequest->deserializeResponse(data, bytes, instanceNum, error);
+                if (object != nullptr && error) {
+                    delete object;
+                    object = nullptr;
+                }
                 if (LOGS_ENABLED) DEBUG_D("api request constructor 0x%x, don't parse", constructor);
             } else {
                 object = request->deserializeResponse(data, constructor, instanceNum, error);
@@ -1197,7 +1215,10 @@ void ConnectionsManager::processServerResponse(TLObject *message, int64_t messag
             for (auto & runningRequest : runningRequests) {
                 Request *request = runningRequest.get();
                 Datacenter *requestDatacenter = getDatacenterWithId(request->datacenterId);
-                if (request->messageId < response->first_msg_id && request->connectionType & connection->getConnectionType() && requestDatacenter != nullptr && requestDatacenter->getDatacenterId() == datacenter->getDatacenterId()) {
+                // A new download session says nothing about requests on sibling sockets.
+                bool sameDownloadConnection = connection->getConnectionType() != ConnectionTypeDownload ||
+                                              (request->connectionType >> 16) == connection->getConnectionNum();
+                if (sameDownloadConnection && request->messageId < response->first_msg_id && request->connectionType & connection->getConnectionType() && requestDatacenter != nullptr && requestDatacenter->getDatacenterId() == datacenter->getDatacenterId()) {
                     if (LOGS_ENABLED) DEBUG_D("clear request %p - %s", request->rawRequest, typeid(*request->rawRequest).name());
                     request->clear(true);
                 }
@@ -1420,7 +1441,7 @@ void ConnectionsManager::processServerResponse(TLObject *message, int64_t messag
                             if (delegate != nullptr) {
                                 delegate->onIntegrityCheckClassic(instanceNum, request->requestToken, project, nonce);
                             }
-                        } else if (error->error_code == 403 && error->error_message.find(captchaCheck) != std::string::npos) {
+                        } else if (error->error_code == 403 && error->error_message.find(captchaCheck) != std::string::npos && request->captchaCheckGeneration < MAX_CAPTCHA_CHECKS && delegate != nullptr) {
                             discardResponse = true;
                             std::string err = error->error_message;
                             int index = err.find('_', captchaCheck.size());
@@ -1428,10 +1449,11 @@ void ConnectionsManager::processServerResponse(TLObject *message, int64_t messag
                             std::string key_id = err.substr(captchaCheck.size() + action.size() + 2, err.size() - (captchaCheck.size() + action.size() + 1));
                             request->awaitingIntegrityCheck = false;
                             request->awaitingCaptchaCheck = true;
+                            request->captchaCheckGeneration++;
                             request->startTime = 0;
                             request->startTimeMillis = 0;
                             if (delegate != nullptr) {
-                                delegate->onCaptchaCheck(instanceNum, request->requestToken, action, key_id);
+                                delegate->onCaptchaCheck(instanceNum, request->requestToken, request->captchaCheckGeneration, action, key_id);
                             }
                         } else {
                             bool failServerErrors = (request->requestFlags & RequestFlagFailOnServerErrors) == 0 || processEvenFailed;
@@ -2320,34 +2342,57 @@ void ConnectionsManager::receivedIntegrityCheckClassic(int32_t requestToken, std
     });
 }
 
-void ConnectionsManager::receivedCaptchaResult(int32_t requestTokensCount, int32_t* requestTokens, std::string token) {
-    scheduleTask([&, requestTokensCount, requestTokens, token] {
-        for (int i = 0; i < requestTokensCount; ++i) {
-            auto requestToken = requestTokens[i];
-            for (auto iter = runningRequests.begin(); iter != runningRequests.end(); iter++) {
-                Request *request = iter->get();
-                if (requestToken != 0 && request->requestToken == requestToken) {
-                    auto invoke = new invokeWithReCaptcha();
-                    invoke->token = token;
-                    invoke->query = std::move(request->rpcRequest);
-                    request->rpcRequest = std::unique_ptr<invokeWithReCaptcha>(invoke);
-                    request->serializedLength = request->rpcRequest->getObjectSize();
+// Remove previous captcha tokens, including those inside other owned RPC wrappers.
+// Drop cached compression when inspecting its original request: its bytes contain old tokens.
+static void removeCaptchaWrappers(std::unique_ptr<TLObject> &rpcRequest) {
+    auto *query = &rpcRequest;
+    while (*query != nullptr) {
+        if (auto captcha = dynamic_cast<invokeWithReCaptcha *>(query->get())) {
+            auto inner = std::move(captcha->query);
+            *query = std::move(inner);
+        } else if (auto packed = dynamic_cast<TL_gzip_packed *>(query->get())) {
+            if (packed->originalRequest == nullptr) {
+                break;
+            }
+            auto inner = std::move(packed->originalRequest);
+            *query = std::move(inner);
+        } else if (auto integrity = dynamic_cast<invokeWithGooglePlayIntegrity *>(query->get())) {
+            query = &integrity->query;
+        } else if (auto layer = dynamic_cast<invokeWithLayer *>(query->get())) {
+            query = &layer->query;
+        } else if (auto init = dynamic_cast<initConnection *>(query->get())) {
+            query = &init->query;
+        } else {
+            break;
+        }
+    }
+}
 
-                    request->awaitingCaptchaCheck = false;
-                    request->requestFlags &=~ RequestFlagFailOnServerErrors;
-
-                    if (LOGS_ENABLED) DEBUG_D("account%d: received captcha result token, wrapping %s", instanceNum, token.c_str());
-
-                    processRequestQueue(request->connectionType, request->datacenterId);
-
-                    return;
-                }
+void ConnectionsManager::receivedCaptchaResult(int32_t requestToken, int32_t generation, std::string token) {
+    scheduleTask([this, requestToken, generation, token] {
+        for (auto &runningRequest : runningRequests) {
+            Request *request = runningRequest.get();
+            if (requestToken == 0 || request->requestToken != requestToken) {
+                continue;
+            }
+            if (request->cancelled || request->completed || !request->awaitingCaptchaCheck ||
+                    request->captchaCheckGeneration != generation) {
+                return;
             }
 
-            if (LOGS_ENABLED) DEBUG_E("account%d: received captcha result token but no request %d found", instanceNum, requestToken);
-        }
+            removeCaptchaWrappers(request->rpcRequest);
+            auto invoke = new invokeWithReCaptcha();
+            invoke->token = token;
+            invoke->query = std::move(request->rpcRequest);
+            request->rpcRequest = std::unique_ptr<invokeWithReCaptcha>(invoke);
+            request->serializedLength = request->rpcRequest->getObjectSize();
+            request->awaitingCaptchaCheck = false;
+            request->requestFlags &= ~RequestFlagFailOnServerErrors;
 
-        delete[] requestTokens;
+            if (LOGS_ENABLED) DEBUG_D("account%d: received captcha result for request %d, generation %d", instanceNum, requestToken, generation);
+            processRequestQueue(request->connectionType, request->datacenterId);
+            return;
+        }
     });
 }
 
@@ -2523,7 +2568,12 @@ inline void addMessageToDatacenter(uint32_t datacenterId, NetworkMessage *networ
 #define MAX_DOWNLOAD_REQUESTS 16 * 2
 #define MAX_UPLOAD_REQUESTS 10 * 3
 
-void ConnectionsManager::processRequestQueue(uint32_t connectionTypes, uint32_t dc) {
+static uint32_t getDownloadSize(Request *request) {
+    auto apiRequest = dynamic_cast<TL_api_request *>(request->rawRequest);
+    return apiRequest != nullptr ? apiRequest->downloadSize : 0;
+}
+
+void ConnectionsManager::processRequestQueue(uint32_t connectionTypes, uint32_t dc, Connection *connectedDownload) {
     genericMessagesToDatacenters.clear();
     genericMediaMessagesToDatacenters.clear();
     tempMessagesToDatacenters.clear();
@@ -2662,7 +2712,10 @@ void ConnectionsManager::processRequestQueue(uint32_t connectionTypes, uint32_t 
 
         uint32_t requestConnectionType = request->connectionType & 0x0000ffff;
 
-        bool forceThisRequest = (connectionTypes & requestConnectionType) && requestDatacenter->getDatacenterId() == dc;
+        // Opening one download socket must not resend requests on its siblings.
+        // Salt/session recovery calls without a socket still apply to the whole DC.
+        bool forceThisRequest = (connectionTypes & requestConnectionType) && requestDatacenter->getDatacenterId() == dc &&
+                                (connectedDownload == nullptr || connection == connectedDownload);
 
         if (typeInfo == typeid(TL_get_future_salts)) {
             if (request->messageId != 0) {
@@ -2778,6 +2831,16 @@ void ConnectionsManager::processRequestQueue(uint32_t connectionTypes, uint32_t 
             }
         }
         iter++;
+    }
+
+    // Snapshot after retries/migrations, which can remove or requeue requests.
+    // No persistent reservations to leak on cancellation or DC changes.
+    DownloadRequestBudget downloadBudget(currentUserPremium);
+    for (const auto &request : runningRequests) {
+        if (!request->cancelled && (request->connectionType & 0xffff) == ConnectionTypeDownload) {
+            uint32_t datacenterId = request->datacenterId == DEFAULT_DATACENTER_ID ? currentDatacenterId : request->datacenterId;
+            downloadBudget.account(datacenterId, (request->requestFlags & RequestFlagSmallDownload) != 0, getDownloadSize(request.get()));
+        }
     }
 
     Connection *genericConnection = nullptr;
@@ -2906,7 +2969,9 @@ void ConnectionsManager::processRequestQueue(uint32_t connectionTypes, uint32_t 
 
         Connection *connection = requestDatacenter->getConnectionByType(request->connectionType, true, canUseUnboundKey);
 
-        if (request->connectionType & ConnectionTypeGeneric && connection->getConnectionToken() == 0) {
+        // Keep budgeted chunks queued until the socket is ready. Otherwise they
+        // are buffered here and then sent again by onConnectionConnected.
+        if (((request->connectionType & ConnectionTypeGeneric) || getDownloadSize(request) != 0) && connection->getConnectionToken() == 0) {
             iter++;
             continue;
         }
@@ -2937,6 +3002,15 @@ void ConnectionsManager::processRequestQueue(uint32_t connectionTypes, uint32_t 
                         DEBUG_D("skip queue, token = %d: download type: network unavailable", request->requestToken);
                     continue;
                 }
+                uint32_t bytes = getDownloadSize(request);
+                if (bytes != 0) {
+                    if (!downloadBudget.acquire(datacenterId, (request->requestFlags & RequestFlagSmallDownload) != 0, bytes)) {
+                        iter++;
+                        continue;
+                    }
+                    break;
+                }
+                // Non-opted-in requests retain the original count-based scheduling.
                 int max;
                 if (request->isCancelRequest()) {
                     max = MAX_DOWNLOAD_REQUESTS_CANCELS;

@@ -9,6 +9,28 @@
     <string name="DeleteKeepLocally">Keep locally</string>
     <string name="ClearMessageDatabase">Clear Message Database</string>
     <string name="ClearMessageDatabaseNotification">Message database cleared.</string>
+    <string name="ExportMessagesHistory">Berichtgeschiedenis exporteren</string>
+    <string name="ImportMessagesHistory">Berichtgeschiedenis importeren</string>
+    <string name="MessagesBackupCountsValue">%1$d verwijderd · %2$d bewerkt</string>
+    <string name="MessagesBackupExportText">Alle opgeslagen verwijderde en bewerkte berichten worden naar een back-upbestand op je apparaat geschreven. Mediabestanden staan al in de map Downloads en overleven een herinstallatie. Gebruik na het opnieuw installeren Berichtgeschiedenis importeren om alles te herstellen.</string>
+    <string name="MessagesBackupExport">Exporteren</string>
+    <string name="MessagesBackupExportDone">%1$d verwijderde en %2$d bewerkte berichten geëxporteerd</string>
+    <string name="MessagesBackupExportSkipped">%1$d berichten konden niet worden geëxporteerd</string>
+    <string name="MessagesBackupExportFailed">Exporteren mislukt</string>
+    <string name="MessagesBackupImportDone">%1$d verwijderde en %2$d bewerkte berichten geïmporteerd, %3$d al opgeslagen overgeslagen</string>
+    <string name="MessagesBackupImportFailed">Importeren mislukt</string>
+    <string name="MessagesBackupAlreadyRunning">Er wordt al een back-upbewerking uitgevoerd</string>
+    <string name="MessagesBackupNotificationChannel">Berichtenback-up</string>
+    <string name="MessagesBackupExportingNotification">Berichtgeschiedenis wordt geëxporteerd…</string>
+    <string name="MessagesBackupImportingNotification">Berichtgeschiedenis wordt geïmporteerd…</string>
+    <string name="MessagesBackupExportCancelled">Exporteren geannuleerd, onvolledig bestand verwijderd</string>
+    <string name="MessagesBackupImportCancelled">Importeren geannuleerd, er is niets hersteld</string>
+    <string name="MessagesBackupInvalidFile">Dit bestand is geen geldig berichtenback-upbestand</string>
+    <string name="MessagesBackupNewerVersion">Deze back-up is gemaakt met een nieuwere app-versie. Werk eerst de app bij</string>
+    <string name="MessagesBackupRemapTitle">Ander account</string>
+    <string name="MessagesBackupRemapText">Deze back-up is opgeslagen onder een ander account. Toch importeren?</string>
+    <string name="MessagesBackupRemapToCurrent">Toewijzen aan dit account</string>
+    <string name="MessagesBackupRemapKeep">Onveranderd importeren</string>
     <string name="CustomDeletedMark">Custom Deleted Mark</string>
     <string name="HidePremiumSection">Hide Premium in Settings</string>
     <string name="HideHelpSection">Hide Help in Settings</string>
@@ -30,10 +52,21 @@
     <string name="LlmProviderOllamaCloudModel">gemma3:27b</string>
     <string name="LlmProviderOpenRouterModel">openrouter/free</string>
     <string name="LlmProviderVercelAIGatewayModel">xai/grok-4-1-fast-non-reasoning</string>
+    <string name="LlmProviderZhipuAIModel">GLM-4-Flash</string>
+    <string name="LlmProviderMistralModel">mistral-small-latest</string>
+    <string name="LlmProviderQwenModel">qwen-turbo-latest</string>
+    <string name="LlmProviderMoonshotModel">moonshot-v1-8k</string>
+    <string name="LlmProviderSiliconFlowModel">Qwen/Qwen2.5-7B-Instruct</string>
     <string name="LlmProviderPreset">Model Provider</string>
     <string name="LlmProviderCustom">Custom</string>
     <string name="LlmProviderOpenAIKey">OpenAI API Key</string>
     <string name="LlmProviderGeminiKey">Gemini API Key</string>
+    <string name="LlmProviderZhipuAIKey">Zhipu AI API-sleutel</string>
+    <string name="LlmProviderMistralKey">Mistral API-sleutel</string>
+    <string name="LlmProviderQwenKey">Qwen API-sleutel</string>
+    <string name="LlmProviderMoonshotKey">Moonshot API-sleutel</string>
+    <string name="LlmProviderSiliconFlowKey">SiliconFlow API-sleutel</string>
+    <string name="DisableAiEditor">AI-bewerker uitschakelen</string>
     <string name="LlmSystemPrompt">System Prompt</string>
     <string name="LlmSystemPromptHint">You are a professional translator.</string>
     <string name="LlmSystemPromptNotice">Define the AI\'s role and behavior.\n\nThis prompt sets the tone, personality, and limitations for the AI. Consider describing what type of assistant the AI should be.</string>
@@ -157,6 +190,14 @@
     <string name="GhostReadMessage">Read Message</string>
     <string name="GhostModeExcludeRead">Exclude Read</string>
     <string name="GhostModeExcludeTyping">Exclude Typing</string>
+    <string name="AyuGramMenu" translatable="false">AyuGram</string>
+    <string name="GhostModeExceptionDefault">Standaard</string>
+    <string name="GhostModeExceptionForceBlockRead">Lezen forceren te blokkeren</string>
+    <string name="GhostModeExceptionForceAllowRead">Lezen forceren toe te staan</string>
+    <string name="GhostModeExceptionForceBlockTyping">Typen forceren te blokkeren</string>
+    <string name="GhostModeExceptionForceAllowTyping">Typen forceren toe te staan</string>
+    <string name="ShowFilteredMessagesMenuText">Gefilterde weergeven</string>
+    <string name="HideFilteredMessagesMenuText">Gefilterde verbergen</string>
     <string name="SendWithSound">Send with Sound</string>
     <string name="PerformanceClass">Device Performance Class</string>
     <string name="PerformanceClassHigh">High</string>
@@ -246,6 +287,7 @@
     <string name="CreateCode">Create Code</string>
     <string name="CreateCodeLanguage">Language</string>
     <string name="NoCaptionForward">NoCaption forward</string>
+    <string name="NoCaptionForwardShort">Zonder bijschrift</string>
     <string name="PreferCommonGroupsTab">Prefer Groups Tab</string>
     <string name="PreferCommonGroupsTabNotice">Auto-select \"Groups\" tab instead of \"Gifts\" when possible.</string>
     <string name="GroupedMessageMenu">Group Message Menu</string>
@@ -357,6 +399,13 @@
     <string name="UnifiedPushCurrentEndpoint">The current UnifiedPush endpoint is: %1$s</string>
     <string name="PlayOnce">Play once</string>
     <string name="StorageSettings">Storage</string>
+    <string name="MainTabs">Hoofdtabbladen</string>
+    <string name="MainTabsVisibility">Zichtbaarheid</string>
+    <string name="MainTabsAlways">Altijd</string>
+    <string name="MainTabsHideOnScroll">Verbergen bij scrollen</string>
+    <string name="HideMainTabsTitles">Titels verbergen</string>
+    <string name="HideContactsTab">Tabblad «Contacten» verbergen</string>
+    <string name="Hidden">Verborgen</string>
     <string name="MainTabsSettingsHeader">Main Tabs</string>
     <string name="MainTabsHideTitles">Hide Titles</string>
     <string name="DoubleTapOnChatsToFilterUnread">Double-Tap On Chats To Filter Unread Chats</string>
@@ -520,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">Bestanden &amp; Documenten</string>
     <string name="ChatAutoDownloadVoice">Spraak- &amp; Videoberichten</string>
     <string name="ChatAutoDownloadAudio">Muziek &amp; Audio</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Activiteiten van vrienden</string>
@@ -550,4 +599,78 @@
     <string name="FriendsActivitiesTab">Activiteiten</string>
     <string name="FriendsActivitiesEmpty">Geen recente activiteiten in gedeelde chats.</string>
     <string name="FriendsActivitiesHowItWorks">Ga naar het profiel van een contactpersoon → tik op het tabblad Activiteiten om hun nieuwste berichten in gedeelde chats te zien.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Automatisch bijwerken</string>
+    <string name="NoSuchSetting">Instelling niet gevonden</string>
+    <string name="PluginDelete">Plugin verwijderen?</string>
+    <string name="PluginDeleteInfo">Plugin &lt;b&gt;%1$s&lt;/b&gt; verwijderen? Deze actie kan niet ongedaan worden gemaakt.</string>
+    <string name="PluginDependencyDownloadingProgress">%1$s wordt gedownload (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">%1$s %2$s wordt geïnstalleerd…</string>
+    <string name="PluginDependencyNativeUnsupported">Afhankelijkheid %1$s biedt alleen native wheels in het gekozen versiebereik. Deze client ondersteunt momenten alleen pure-Python-wheels.</string>
+    <string name="PluginDependencyNoCompatibleWheel">Geen compatibel pure-Python-wheel gevonden voor %1$s.</string>
+    <string name="PluginDependencyPreparing">Plugin-afhankelijkheden worden voorbereid…</string>
+    <string name="PluginDependencyPythonUnsupported">Afhankelijkheid %1$s vereist Python %2$s, maar deze client gebruikt Python 3.11.</string>
+    <string name="PluginDependencyResolving">%1$s wordt opgelost…</string>
+    <string name="PluginDependencySourceUnsupported">Afhankelijkheid %1$s biedt alleen brondistributies in het gekozen versiebereik. Deze client ondersteunt momenteel alleen pure-Python-wheels.</string>
+    <string name="PluginDisableError">Kon %1$s niet uitschakelen.</string>
+    <string name="PluginEnableError">Kon %1$s niet inschakelen.</string>
+    <string name="PluginEngineNotEnabled">Plugin-engine is uitgeschakeld. Plugin-instellingen voor %1$s openen?</string>
+    <string name="PluginHasNoSettings">%1$s heeft geen instellingen.</string>
+    <string name="PluginInstallError">Kon plugin %1$s niet installeren.</string>
+    <string name="PluginInstalled">%1$s geïnstalleerd</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s is geïnstalleerd, maar inschakelen mislukte.</string>
+    <string name="PluginIsNotResponding">Plugin reageert niet.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s reageert niet</string>
+    <string name="PluginNoAuthor">Onbekende auteur</string>
+    <string name="PluginNoDescription">Geen beschrijving</string>
+    <string name="PluginNotEnabled">Pluginondersteuning is uitgeschakeld. Instellingen openen om %1$s in te schakelen?</string>
+    <string name="PluginNotFound">Plugin %1$s is niet gevonden.</string>
+    <string name="PluginOpenExternalError">Kon %1$s niet in een externe app openen.</string>
+    <string name="PluginResetSettings">Instellingen herstellen</string>
+    <string name="PluginSettingNotFound">De doel-plugin-instelling is niet gevonden.</string>
+    <string name="PluginSourceTrusted">Vertrouwde bron</string>
+    <string name="PluginSourceTrustedInfo">Dit plugin komt van een vertrouwde bron.</string>
+    <string name="PluginSourceUnknown">Onbekende bron</string>
+    <string name="PluginSourceUnknownInfo">Dit plugin komt van een onbekende bron. Controleer het zorgvuldig vóór installatie.</string>
+    <string name="PluginUpdated">%1$s bijgewerkt</string>
+    <string name="PluginVersion">Versie</string>
+    <string name="Plugins">Plugins</string>
+    <string name="PluginsCompactView">Compacte weergave</string>
+    <string name="PluginsDevMode">Ontwikkelaarsmodus</string>
+    <string name="PluginsDevServerLaunched">Plugin-ontwikkelserver gestart</string>
+    <string name="PluginsDevServerStopped">Plugin-ontwikkelserver gestopt</string>
+    <string name="PluginsDevTools">Ontwikkelaarstools</string>
+    <string name="PluginsDisableArt">Compatibiliteitsmodus</string>
+    <string name="PluginsDisableArtInfo">Voorkomt plugin-hookfouten door ART Profile Saver uit te schakelen.</string>
+    <string name="PluginsDocumentation">Documentatie</string>
+    <string name="PluginsEngine">Plugin-engine</string>
+    <string name="PluginsInfo">Installeer en beheer hier .plugin-bestanden.</string>
+    <string name="PluginsInstallSmokeTest">Rooktest-plugin installeren</string>
+    <string name="PluginsInstallSmokeTestInfo">Alleen voor ontwikkelaars: hulppplugin om app-gebeurtenissen, request/update-hooks, verzend-hooks en plugin-menu\'s te valideren.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Kon het meegeleverde rooktest-plugin niet voorbereiden.</string>
+    <string name="PluginsNativeRuntimeUnavailable">Native hook-runtime is niet beschikbaar. Op methode-hooks gebaseerde plugins werken pas nadat de app is herstart met alle native bibliotheken geladen.</string>
+    <string name="PluginsNotFound">Geen plugins gevonden</string>
+    <string name="PluginsPoweredBy">Mogelijk gemaakt door &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; en &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Automatisch bijwerken</string>
+    <string name="PluginsPySdkCheckUpdates">Controleren op updates</string>
+    <string name="PluginsPySdkCheckingForUpdates">Controleren op updates…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Bètaversies installeren</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Nieuwste SDK-versie geïnstalleerd</string>
+    <string name="PluginsPySdkLoadingUpdate">Update wordt gedownload…</string>
+    <string name="PluginsPySdkUpdateFailed">SDK-update mislukt</string>
+    <string name="PluginsPythonRuntimeUnavailable">Python-runtime kon niet worden geïnitialiseerd. Herstart de app en controleer de meegeleverde plugin-afhankelijkheden.</string>
+    <string name="PluginsRestartEngine">Plugin-engine herstarten</string>
+    <string name="PluginsSafeMode">Veilige modus voor plugins</string>
+    <string name="PluginsSafeModeInfo">Plugins zijn uitgeschakeld na een crash. Je kunt de veilige modus verlaten en de engine herstarten.</string>
+    <string name="PluginsSafeModeInfo2">De veilige modus houdt alle plugins uitgeschakeld totdat je deze handmatig uitschakelt.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Plugins zijn uitgeschakeld na een crash. Controleer je plugin-instellingen en verlaat de veilige modus wanneer je klaar bent.</string>
+    <string name="PluginsSafeModeInfoManual">De veilige modus is handmatig ingeschakeld. Schakel deze uit om plugins weer te laden.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Plugins zijn uitgeschakeld na een native crash. Verlaat de veilige modus pas nadat je je geïnstalleerde plugins hebt gecontroleerd.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">Plugin %1$s is uitgeschakeld na een crash. Verlaat de veilige modus wanneer je klaar bent om de overige plugins te herstellen.</string>
+    <string name="PluginsSafeModeShortcut">Starten in veilige modus</string>
+    <string name="PluginsSettingsShowOriginal">Originele tekst tonen</string>
+    <string name="PluginsSettingsTranslate">Instellingen vertalen</string>
+    <string name="PluginsTrusted">Vertrouwde plugins</string>
+    <string name="UpdateAvailable">Update beschikbaar</string>
 </resources>

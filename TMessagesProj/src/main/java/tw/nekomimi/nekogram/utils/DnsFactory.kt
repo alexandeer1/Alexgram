@@ -57,18 +57,25 @@ object DnsFactory {
 
     private val cache = Cache()
 
-    private val DEFAULT_DOH_PROVIDERS = arrayOf(
+    private val DEFAULT_DOH_PROVIDERS_V4 = arrayOf(
         "https://1.1.1.1/dns-query",
         "https://1.0.0.1/dns-query",
         "https://8.8.8.8/dns-query",
         "https://8.8.4.4/dns-query",
+    )
+
+    private val DEFAULT_DOH_PROVIDERS_V6 = arrayOf(
         "https://[2606:4700:4700::1001]/dns-query", // Cloudflare IPv6
         "https://[2001:4860:4860::8844]/dns-query", // Google IPv6
     )
 
     private fun providers(): Array<String> {
         if (NekoConfig.dnsType.Int() != NekoConfig.DNS_TYPE_CUSTOM_DOH) {
-            return DEFAULT_DOH_PROVIDERS
+            return if (hasIPv6) {
+                DEFAULT_DOH_PROVIDERS_V4 + DEFAULT_DOH_PROVIDERS_V6
+            } else {
+                DEFAULT_DOH_PROVIDERS_V4
+            }
         }
 
         val validCustomProviders = NekoConfig.customDoH.String()
@@ -81,7 +88,11 @@ object DnsFactory {
         return if (validCustomProviders.isNotEmpty()) {
             validCustomProviders.toTypedArray()
         } else {
-            DEFAULT_DOH_PROVIDERS
+            if (hasIPv6) {
+                DEFAULT_DOH_PROVIDERS_V4 + DEFAULT_DOH_PROVIDERS_V6
+            } else {
+                DEFAULT_DOH_PROVIDERS_V4
+            }
         }
     }
 
@@ -110,7 +121,7 @@ object DnsFactory {
             FileLog.d("Querying ${usedProviders.size} DoH providers: ${usedProviders.joinToString()}")
 
             val ret: List<InetAddress>? = runBlocking {
-                val result = withTimeoutOrNull(5000L) {
+                val result = withTimeoutOrNull(2500L) {
                     suspendCancellableCoroutine { continuation ->
                         val callTag = "dns-lookup-$domain-${System.nanoTime()}"
                         val counterAll = AtomicInteger(0)
@@ -380,10 +391,10 @@ object DnsFactory {
 
             val determinedStrategy = when {
                 hasIPv6 -> when {
-                    !hasIPv4 -> USE_IPV6_ONLY
                     forceIPv6 -> USE_IPV6_ONLY
                     NekoConfig.useIPv6.Bool() -> USE_IPV6_ONLY
                     hasStrangeIPv4 -> USE_IPV4_IPV6_RANDOM
+                    !hasIPv4 -> USE_IPV6_ONLY
                     else -> USE_IPV4_ONLY
                 }
 
