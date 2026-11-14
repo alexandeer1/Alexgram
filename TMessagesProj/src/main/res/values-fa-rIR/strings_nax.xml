@@ -569,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">فایل‌ها و اسناد</string>
     <string name="ChatAutoDownloadVoice">پیام‌های صوتی و تصویری</string>
     <string name="ChatAutoDownloadAudio">موسیقی و صدا</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">فعالیت‌های دوستان</string>
@@ -599,4 +599,78 @@
     <string name="FriendsActivitiesTab">فعالیت‌ها</string>
     <string name="FriendsActivitiesEmpty">هیچ فعالیت اخیری در گفتگوهای مشترک وجود ندارد.</string>
     <string name="FriendsActivitiesHowItWorks">به نمایه مخاطب بروید ← روی برگه فعالیت‌ها ضربه بزنید تا آخرین پیام‌های آنها در گفتگوهای مشترک را ببینید.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">به‌روزرسانی خودکار</string>
+    <string name="NoSuchSetting">تنظیم پیدا نشد</string>
+    <string name="PluginDelete">حذف افزونه؟</string>
+    <string name="PluginDeleteInfo">افزونه &lt;b&gt;%1$s&lt;/b&gt; حذف شود؟ این عمل قابل بازگشت نیست.</string>
+    <string name="PluginDependencyDownloadingProgress">در حال دانلود %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">در حال نصب %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">وابستگی %1$s فقط ویل‌های نیتیو در بازه نسخه انتخابی ارائه می‌دهد. این کلاینت در حال حاضر فقط ویل‌های پایتون خالص را پشتیبانی می‌کند.</string>
+    <string name="PluginDependencyNoCompatibleWheel">هیچ ویل پایتون خالص سازگاری برای %1$s پیدا نشد.</string>
+    <string name="PluginDependencyPreparing">در حال آماده‌سازی وابستگی‌های افزونه…</string>
+    <string name="PluginDependencyPythonUnsupported">وابستگی %1$s به پایتون %2$s نیاز دارد، اما این کلاینت از پایتون 3.11 استفاده می‌کند.</string>
+    <string name="PluginDependencyResolving">در حال حل %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">وابستگی %1$s فقط توزیع‌های منبعی در بازه نسخه انتخابی ارائه می‌دهد. این کلاینت در حال حاضر فقط ویل‌های پایتون خالص را پشتیبانی می‌کند.</string>
+    <string name="PluginDisableError">غیرفعال‌سازی %1$s ناموفق بود.</string>
+    <string name="PluginEnableError">فعال‌سازی %1$s ناموفق بود.</string>
+    <string name="PluginEngineNotEnabled">موتور افزونه غیرفعال است. تنظیمات افزونه %1$s باز شود؟</string>
+    <string name="PluginHasNoSettings">%1$s تنظیماتی ندارد.</string>
+    <string name="PluginInstallError">نصب افزونه %1$s ناموفق بود.</string>
+    <string name="PluginInstalled">%1$s نصب شد</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s نصب شد، اما فعال‌سازی ناموفق بود.</string>
+    <string name="PluginIsNotResponding">افزونه پاسخ نمی‌دهد.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s پاسخ نمی‌دهد</string>
+    <string name="PluginNoAuthor">نویسنده ناشناس</string>
+    <string name="PluginNoDescription">بدون توضیحات</string>
+    <string name="PluginNotEnabled">پشتیبانی افزونه غیرفعال است. تنظیمات برای فعال‌سازی %1$s باز شود؟</string>
+    <string name="PluginNotFound">افزونه %1$s پیدا نشد.</string>
+    <string name="PluginOpenExternalError">باز کردن %1$s در برنامه خارجی ممکن نبود.</string>
+    <string name="PluginResetSettings">بازنشانی تنظیمات</string>
+    <string name="PluginSettingNotFound">تنظیمات هدف افزونه پیدا نشد.</string>
+    <string name="PluginSourceTrusted">منبع معتبر</string>
+    <string name="PluginSourceTrustedInfo">این افزونه از منبعی معتبر می‌آید.</string>
+    <string name="PluginSourceUnknown">منبع ناشناس</string>
+    <string name="PluginSourceUnknownInfo">این افزونه از منبعی ناشناس می‌آید. قبل از نصب آن را با دقت بررسی کنید.</string>
+    <string name="PluginUpdated">%1$s به‌روزرسانی شد</string>
+    <string name="PluginVersion">نسخه</string>
+    <string name="Plugins">افزونه‌ها</string>
+    <string name="PluginsCompactView">نمایش فشرده</string>
+    <string name="PluginsDevMode">حالت توسعه‌دهنده</string>
+    <string name="PluginsDevServerLaunched">سرور توسعه افزونه راه‌اندازی شد</string>
+    <string name="PluginsDevServerStopped">سرور توسعه افزونه متوقف شد</string>
+    <string name="PluginsDevTools">ابزارهای توسعه‌دهنده</string>
+    <string name="PluginsDisableArt">حالت سازگاری</string>
+    <string name="PluginsDisableArtInfo">با غیرفعال کردن ART Profile Saver از خطاهای هوک افزونه‌ها جلوگیری می‌کند.</string>
+    <string name="PluginsDocumentation">مستندات</string>
+    <string name="PluginsEngine">موتور افزونه</string>
+    <string name="PluginsInfo">نصب و مدیریت فایل‌های .plugin از اینجا.</string>
+    <string name="PluginsInstallSmokeTest">نصب افزونه آزمایشی</string>
+    <string name="PluginsInstallSmokeTestInfo">افزونه مخصوص توسعه‌دهندگان برای اعتبارسنجی رویدادهای برنامه، هوک‌های درخواست/به‌روزرسانی، هوک‌های ارسال پیام و منوهای افزونه.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">آماده‌سازی افزونه آزمایشی همراه برنامه ناموفق بود.</string>
+    <string name="PluginsNativeRuntimeUnavailable">محیط اجرای هوک نیتیو در دسترس نیست. افزونه‌های مبتنی بر هوک متد تا زمانی که برنامه با تمام کتابخانه‌های نیتیو بارگذاری‌شده دوباره اجرا شود ممکن است کار نکنند.</string>
+    <string name="PluginsNotFound">هیچ افزونه‌ای پیدا نشد</string>
+    <string name="PluginsPoweredBy">قدرت‌گرفته از &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; و &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">به‌روزرسانی خودکار</string>
+    <string name="PluginsPySdkCheckUpdates">بررسی به‌روزرسانی‌ها</string>
+    <string name="PluginsPySdkCheckingForUpdates">در حال بررسی به‌روزرسانی‌ها…</string>
+    <string name="PluginsPySdkEnableBetaVersion">نصب نسخه‌های بتا</string>
+    <string name="PluginsPySdkLatestVersionInstalled">آخرین نسخه SDK نصب شده است</string>
+    <string name="PluginsPySdkLoadingUpdate">در حال دانلود به‌روزرسانی…</string>
+    <string name="PluginsPySdkUpdateFailed">به‌روزرسانی SDK ناموفق بود</string>
+    <string name="PluginsPythonRuntimeUnavailable">راه‌اندازی محیط پایتون ناموفق بود. برنامه را دوباره اجرا کنید و وابستگی‌های افزونه همراه را بررسی کنید.</string>
+    <string name="PluginsRestartEngine">راه‌اندازی دوباره موتور افزونه</string>
+    <string name="PluginsSafeMode">حالت امن افزونه‌ها</string>
+    <string name="PluginsSafeModeInfo">افزونه‌ها پس از یک خرابی غیرفعال شدند. می‌توانید از حالت امن خارج شده و موتور را دوباره راه‌اندازی کنید.</string>
+    <string name="PluginsSafeModeInfo2">حالت امن همه افزونه‌ها را غیرفعال نگه می‌دارد تا خودتان آن را خاموش کنید.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">افزونه‌ها پس از یک خرابی غیرفعال شدند. تنظیمات افزونه‌های خود را بررسی کنید و هر وقت آماده بودید از حالت امن خارج شوید.</string>
+    <string name="PluginsSafeModeInfoManual">حالت امن به‌صورت دستی فعال شده است. برای بارگذاری دوباره افزونه‌ها آن را غیرفعال کنید.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">افزونه‌ها پس از یک خرابی نیتیو غیرفعال شدند. قبل از خروج از حالت امن، افزونه‌های نصب‌شده را بررسی کنید.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">افزونه %1$s پس از خرابی غیرفعال شد. هر وقت برای بازگرداندن بقیه افزونه‌ها آماده بودید از حالت امن خارج شوید.</string>
+    <string name="PluginsSafeModeShortcut">اجرای برنامه با حالت امن</string>
+    <string name="PluginsSettingsShowOriginal">نمایش متن اصلی</string>
+    <string name="PluginsSettingsTranslate">ترجمه تنظیمات</string>
+    <string name="PluginsTrusted">افزونه‌های معتبر</string>
+    <string name="UpdateAvailable">به‌روزرسانی موجود است</string>
 </resources>

@@ -101,6 +101,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
     private int cardBg;
     private int cardBorder;
     private int dividerColor;
+    private org.telegram.ui.Components.RecyclerListView searchListView;
 
     private int headerRow;
     private int quickSettingsHeaderRow;
@@ -181,10 +182,10 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         searchContainer.setVisibility(View.GONE);
         searchContainer.setAlpha(0.0f);
         
-        org.telegram.ui.Components.RecyclerListView searchListView = new org.telegram.ui.Components.RecyclerListView(context);
+        searchListView = new org.telegram.ui.Components.RecyclerListView(context);
         searchListView.setLayoutManager(new LinearLayoutManager(context));
-        searchListView.setPadding(0, AndroidUtilities.dp(64) + (AndroidUtilities.isTablet() ? 0 : AndroidUtilities.statusBarHeight), 0, AndroidUtilities.dp(16));
-        searchListView.setClipToPadding(true);
+        searchListView.setPadding(0, AndroidUtilities.dp(64) + (AndroidUtilities.isTablet() ? 0 : AndroidUtilities.statusBarHeight), 0, AndroidUtilities.dp(20));
+        searchListView.setClipToPadding(false);
         
         final SearchAdapter searchAdapter = new SearchAdapter(context);
         searchListView.setAdapter(searchAdapter);
@@ -254,6 +255,15 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         frameLayout.addView(searchContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));  // the glass header (SimpleActionBar) is added on top by the framework
 
         return fragmentView;
+    }
+
+    @Override
+    public void onInsets(int left, int top, int right, int bottom) {
+        super.onInsets(left, top, right, bottom);
+        if (searchListView != null) {
+            searchListView.setPadding(0, AndroidUtilities.dp(64) + (AndroidUtilities.isTablet() ? 0 : top), 0, bottom + AndroidUtilities.dp(20));
+            searchListView.setClipToPadding(false);
+        }
     }
 
     @Override

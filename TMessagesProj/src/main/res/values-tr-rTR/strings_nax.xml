@@ -569,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">Dosyalar ve Belgeler</string>
     <string name="ChatAutoDownloadVoice">Sesli ve Görüntülü Mesajlar</string>
     <string name="ChatAutoDownloadAudio">Müzik ve Ses</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Arkadaş Etkinlikleri</string>
@@ -599,4 +599,78 @@
     <string name="FriendsActivitiesTab">Etkinlikler</string>
     <string name="FriendsActivitiesEmpty">Ortak sohbetlerde yakın zamanda etkinlik yok.</string>
     <string name="FriendsActivitiesHowItWorks">Bir kişinin profiline gidin → ortak sohbetlerdeki en son mesajlarını görmek için Etkinlikler sekmesine dokunun.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Otomatik güncelle</string>
+    <string name="NoSuchSetting">Ayar bulunamadı</string>
+    <string name="PluginDelete">Eklenti silinsin mi?</string>
+    <string name="PluginDeleteInfo">&lt;b&gt;%1$s&lt;/b&gt; eklentisi silinsin mi? Bu işlem geri alınamaz.</string>
+    <string name="PluginDependencyDownloadingProgress">%1$s indiriliyor (%%%2$d)…</string>
+    <string name="PluginDependencyInstalling">%1$s %2$s kuruluyor…</string>
+    <string name="PluginDependencyNativeUnsupported">%1$s bağımlılığı seçilen sürüm aralığında yalnızca yerel (native) wheel sunuyor. Bu istemci şu anda yalnızca saf Python wheel\'lerini destekliyor.</string>
+    <string name="PluginDependencyNoCompatibleWheel">%1$s için uyumlu saf Python wheel\'i bulunamadı.</string>
+    <string name="PluginDependencyPreparing">Eklenti bağımlılıkları hazırlanıyor…</string>
+    <string name="PluginDependencyPythonUnsupported">%1$s bağımlılığı Python %2$s gerektiriyor, ancak bu istemci Python 3.11 kullanıyor.</string>
+    <string name="PluginDependencyResolving">%1$s çözümleniyor…</string>
+    <string name="PluginDependencySourceUnsupported">%1$s bağımlılığı seçilen sürüm aralığında yalnızca kaynak dağıtımları sunuyor. Bu istemci şu anda yalnızca saf Python wheel\'lerini destekliyor.</string>
+    <string name="PluginDisableError">%1$s devre dışı bırakılamadı.</string>
+    <string name="PluginEnableError">%1$s etkinleştirilemedi.</string>
+    <string name="PluginEngineNotEnabled">Eklenti motoru devre dışı. %1$s için eklenti ayarları açılsın mı?</string>
+    <string name="PluginHasNoSettings">%1$s\'in ayarı yok.</string>
+    <string name="PluginInstallError">%1$s eklentisi kurulamadı.</string>
+    <string name="PluginInstalled">%1$s kuruldu</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s kuruldu ancak etkinleştirilemedi.</string>
+    <string name="PluginIsNotResponding">Eklenti yanıt vermiyor.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s yanıt vermiyor</string>
+    <string name="PluginNoAuthor">Bilinmeyen yazar</string>
+    <string name="PluginNoDescription">Açıklama yok</string>
+    <string name="PluginNotEnabled">Eklenti desteği devre dışı. %1$s\'i etkinleştirmek için ayarlar açılsın mı?</string>
+    <string name="PluginNotFound">%1$s eklentisi bulunamadı.</string>
+    <string name="PluginOpenExternalError">%1$s harici bir uygulamada açılamadı.</string>
+    <string name="PluginResetSettings">Ayarları sıfırla</string>
+    <string name="PluginSettingNotFound">Hedef eklenti ayarı bulunamadı.</string>
+    <string name="PluginSourceTrusted">Güvenilir kaynak</string>
+    <string name="PluginSourceTrustedInfo">Bu eklenti güvenilir bir kaynaktan geliyor.</string>
+    <string name="PluginSourceUnknown">Bilinmeyen kaynak</string>
+    <string name="PluginSourceUnknownInfo">Bu eklenti bilinmeyen bir kaynaktan geliyor. Yüklemeden önce dikkatlice inceleyin.</string>
+    <string name="PluginUpdated">%1$s güncellendi</string>
+    <string name="PluginVersion">Sürüm</string>
+    <string name="Plugins">Eklentiler</string>
+    <string name="PluginsCompactView">Kompakt görünüm</string>
+    <string name="PluginsDevMode">Geliştirici modu</string>
+    <string name="PluginsDevServerLaunched">Eklenti geliştirme sunucusu başlatıldı</string>
+    <string name="PluginsDevServerStopped">Eklenti geliştirme sunucusu durduruldu</string>
+    <string name="PluginsDevTools">Geliştirici araçları</string>
+    <string name="PluginsDisableArt">Uyumluluk Modu</string>
+    <string name="PluginsDisableArtInfo">ART Profile Saver\'ı devre dışı bırakarak eklenti hook hatalarını önler.</string>
+    <string name="PluginsDocumentation">Belgelendirme</string>
+    <string name="PluginsEngine">Eklenti Motoru</string>
+    <string name="PluginsInfo">.plugin dosyalarını buradan kurun ve yönetin.</string>
+    <string name="PluginsInstallSmokeTest">Duman testi eklentisini kur</string>
+    <string name="PluginsInstallSmokeTestInfo">Yalnızca geliştiriciler için: uygulama olaylarını, istek/güncelleme hook\'larını, mesaj gönderme hook\'larını ve eklenti menülerini doğrulayan yardımcı eklenti.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Yerleşik duman testi eklentisi hazırlanamadı.</string>
+    <string name="PluginsNativeRuntimeUnavailable">Yerel hook çalışma zamanı kullanılamıyor. Yöntem hook\'u tabanlı eklentiler, uygulama tüm yerel kütüphanelerle yeniden başlatılana kadar çalışmayabilir.</string>
+    <string name="PluginsNotFound">Eklenti bulunamadı</string>
+    <string name="PluginsPoweredBy">&lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; ve &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt; ile geliştirildi.</string>
+    <string name="PluginsPySdkAutoUpdate">Otomatik güncelle</string>
+    <string name="PluginsPySdkCheckUpdates">Güncellemeleri denetle</string>
+    <string name="PluginsPySdkCheckingForUpdates">Güncellemeler denetleniyor…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Beta sürümlerini kur</string>
+    <string name="PluginsPySdkLatestVersionInstalled">En son SDK sürümü kurulu</string>
+    <string name="PluginsPySdkLoadingUpdate">Güncelleme indiriliyor…</string>
+    <string name="PluginsPySdkUpdateFailed">SDK güncellemesi başarısız oldu</string>
+    <string name="PluginsPythonRuntimeUnavailable">Python çalışma zamanı başlatılamadı. Uygulamayı yeniden başlatın ve yerleşik eklenti bağımlılıklarını doğrulayın.</string>
+    <string name="PluginsRestartEngine">Eklenti Motorunu Yeniden Başlat</string>
+    <string name="PluginsSafeMode">Eklenti güvenli modu</string>
+    <string name="PluginsSafeModeInfo">Bir çökme sonrası eklentiler devre dışı bırakıldı. Güvenli moddan çıkıp motoru yeniden başlatabilirsiniz.</string>
+    <string name="PluginsSafeModeInfo2">Güvenli mod, siz manuel olarak kapatana kadar tüm eklentileri devre dışı tutar.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Bir çökme sonrası eklentiler devre dışı bırakıldı. Eklenti kurulumunuzu gözden geçirin ve hazır olduğunuzda güvenli moddan çıkın.</string>
+    <string name="PluginsSafeModeInfoManual">Güvenli mod elle etkinleştirildi. Eklentileri yeniden yüklemek için devre dışı bırakın.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Yerel bir çökme sonrası eklentiler devre dışı bırakıldı. Güvenli moddan çıkmadan önce kurulu eklentilerinizi kontrol edin.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">%1$s eklentisi bir çökme sonrası devre dışı bırakıldı. Diğer eklentileri geri yüklemeye hazır olduğunuzda güvenli moddan çıkın.</string>
+    <string name="PluginsSafeModeShortcut">Güvenli modda başlat</string>
+    <string name="PluginsSettingsShowOriginal">Orijinal metni göster</string>
+    <string name="PluginsSettingsTranslate">Ayarları çevir</string>
+    <string name="PluginsTrusted">Güvenilir eklentiler</string>
+    <string name="UpdateAvailable">Güncelleme var</string>
 </resources>

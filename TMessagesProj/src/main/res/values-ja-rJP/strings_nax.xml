@@ -569,29 +569,27 @@
     <string name="ChatAutoDownloadFiles">ファイルとドキュメント</string>
     <string name="ChatAutoDownloadVoice">音声・ビデオメッセージ</string>
     <string name="ChatAutoDownloadAudio">音楽・オーディオ</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">友だちのアクティビティ</string>
@@ -599,4 +597,79 @@
     <string name="FriendsActivitiesTab">アクティビティ</string>
     <string name="FriendsActivitiesEmpty">共通チャットでの最近のアクティビティはありません。</string>
     <string name="FriendsActivitiesHowItWorks">連絡先のプロフィール →「アクティビティ」タブをタップして、共通のグループやチャンネルでの最新メッセージを確認します。</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">自動更新</string>
+    <string name="NoSuchSetting">設定が見つかりません</string>
+    <string name="PluginDelete">プラグインを削除しますか？</string>
+    <string name="PluginDeleteInfo">プラグイン &lt;b&gt;%1$s&lt;/b&gt; を削除しますか？この操作は取り消せません。</string>
+    <string name="PluginDependencyDownloadingProgress">%1$s をダウンロード中（%2$d%%）…</string>
+    <string name="PluginDependencyInstalling">%1$s %2$s をインストール中…</string>
+    <string name="PluginDependencyNativeUnsupported">依存関係 %1$s は選択されたバージョン範囲でネイティブ wheel のみ提供しています。このクライアントは純粋な Python wheel のみサポートします。</string>
+    <string name="PluginDependencyNoCompatibleWheel">%1$s に互換性のある純粋な Python wheel が見つかりません。</string>
+    <string name="PluginDependencyPreparing">プラグインの依存関係を準備中…</string>
+    <string name="PluginDependencyPythonUnsupported">依存関係 %1$s は Python %2$s を必要としますが、このクライアントは Python 3.11 で動作します。</string>
+    <string name="PluginDependencyResolving">%1$s を解決中…</string>
+    <string name="PluginDependencySourceUnsupported">依存関係 %1$s は選択されたバージョン範囲でソース配布のみ提供しています。このクライアントは純粋な Python wheel のみサポートします。</string>
+    <string name="PluginDisableError">%1$s を無効化できませんでした。</string>
+    <string name="PluginEnableError">%1$s を有効化できませんでした。</string>
+    <string name="PluginEngineNotEnabled">プラグインエンジンが無効です。%1$s のプラグイン設定を開きますか？</string>
+    <string name="PluginHasNoSettings">%1$s には設定がありません。</string>
+    <string name="PluginInstallError">プラグイン %1$s のインストールに失敗しました。</string>
+    <string name="PluginInstalled">%1$s をインストールしました</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s はインストールされましたが、有効化に失敗しました。</string>
+    <string name="PluginIsNotResponding">プラグインが応答していません。</string>
+    <string name="PluginIsNotRespondingAlert">%1$s が応答していません</string>
+    <string name="PluginNoAuthor">作者不明</string>
+    <string name="PluginNoDescription">説明なし</string>
+    <string name="PluginNotEnabled">プラグイン機能が無効です。設定を開いて %1$s を有効化しますか？</string>
+    <string name="PluginNotFound">プラグイン %1$s が見つかりません。</string>
+    <string name="PluginOpenExternalError">%1$s を外部アプリで開けませんでした。</string>
+    <string name="PluginSettingNotFound">対象のプラグイン設定が見つかりません。</string>
+    <string name="PluginSourceTrusted">信頼済みソース</string>
+    <string name="PluginSourceTrustedInfo">このプラグインは信頼済みのソースからのものです。</string>
+    <string name="PluginSourceUnknown">不明なソース</string>
+    <string name="PluginSourceUnknownInfo">このプラグインは不明なソースからのものです。インストール前に内容をよく確認してください。</string>
+    <string name="PluginUpdated">%1$s を更新しました</string>
+    <string name="PluginVersion">バージョン</string>
+    <string name="Plugins">プラグイン</string>
+    <string name="PluginsCompactView">コンパクト表示</string>
+    <string name="PluginsDevMode">開発者モード</string>
+    <string name="PluginsDevServerLaunched">プラグイン開発サーバーを起動しました</string>
+    <string name="PluginsDevServerStopped">プラグイン開発サーバーを停止しました</string>
+    <string name="PluginsDevTools">開発者ツール</string>
+    <string name="PluginsDisableArt">互換モード</string>
+    <string name="PluginsDisableArtInfo">ART Profile Saver を無効化してプラグインフックの失敗を防ぎます。</string>
+    <string name="PluginsDocumentation">ドキュメント</string>
+    <string name="PluginsEngine">プラグインエンジン</string>
+    <string name="PluginsInfo">.plugin ファイルのインストールと管理はこちらから行えます。</string>
+    <string name="PluginsInstallSmokeTest">スモークテストプラグインをインストール</string>
+    <string name="PluginsInstallSmokeTestInfo">アプリイベント、リクエスト/更新フック、送信メッセージフック、プラグインメニューコールバックを検証する開発者専用のヘルパープラグインです。</string>
+    <string name="PluginsInstallSmokeTestPrepareError">同梱のスモークテストプラグインの準備に失敗しました。</string>
+    <string name="PluginsNativeRuntimeUnavailable">プラグインのネイティブフックランタイムを利用できません。すべてのネイティブライブラリが読み込まれた状態でアプリを再起動するまで、メソッドフックベースのプラグインは動作しない可能性があります。</string>
+    <string name="PluginsNotFound">プラグインが見つかりません</string>
+    <string name="PluginsPoweredBy">&lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; と &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt; で動作しています。</string>
+    <string name="PluginsPySdkAutoUpdate">自動更新</string>
+    <string name="PluginsPySdkCheckUpdates">更新を確認</string>
+    <string name="PluginsPySdkCheckingForUpdates">更新を確認中…</string>
+    <string name="PluginsPySdkEnableBetaVersion">ベータ版をインストール</string>
+    <string name="PluginsPySdkLatestVersionInstalled">最新の SDK バージョンがインストール済みです</string>
+    <string name="PluginsPySdkLoadingUpdate">更新をダウンロード中…</string>
+    <string name="PluginsPySdkUpdateFailed">SDK の更新に失敗しました</string>
+    <string name="PluginsPythonRuntimeUnavailable">プラグインの Python ランタイムの初期化に失敗しました。アプリを再起動し、同梱のプラグイン依存関係が含まれていることを確認してください。</string>
+    <string name="PluginsRestartEngine">プラグインエンジンを再起動</string>
+    <string name="PluginsSafeMode">プラグインセーフモード</string>
+    <string name="PluginsSafeModeInfo">クラッシュ後、プラグインは無効化されました。セーフモードを解除してエンジンを再起動できます。</string>
+    <string name="PluginsSafeModeInfo2">セーフモードは手動で解除するまで、すべてのプラグインを無効のままにします。</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">クラッシュ後、プラグインは無効化されました。プラグインの設定を確認し、準備ができたらセーフモードを解除してください。</string>
+    <string name="PluginsSafeModeInfoManual">プラグインセーフモードが手動で有効化されています。プラグインを再度読み込むにはセーフモードを解除してください。</string>
+    <string name="PluginsSafeModeInfoNativeCrash">ネイティブクラッシュ後、プラグインは無効化されました。インストール済みのプラグインを確認してからセーフモードを解除してください。</string>
+    <string name="PluginsSafeModeInfoPluginCrash">プラグイン %1$s はクラッシュ後、無効化されました。準備ができたらセーフモードを解除して残りのプラグインを復元してください。</string>
+    <string name="PluginsSafeModeShortcut">セーフモードで起動</string>
+    <string name="PluginsSettingsShowOriginal">原文を表示</string>
+    <string name="PluginsSettingsTranslate">設定を翻訳</string>
+    <string name="PluginsTrusted">信頼済みプラグイン</string>
+    <string name="UpdateAvailable">更新があります</string>
+    <!-- untranslated (missing in NagramXF): PluginResetSettings -->
+    <string name="PluginResetSettings">設定をリセット</string>
 </resources>

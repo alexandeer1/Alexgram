@@ -569,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">File &amp; Dokumen</string>
     <string name="ChatAutoDownloadVoice">Pesan Suara &amp; Video</string>
     <string name="ChatAutoDownloadAudio">Musik &amp; Audio</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Aktivitas Teman</string>
@@ -599,4 +599,78 @@
     <string name="FriendsActivitiesTab">Aktivitas</string>
     <string name="FriendsActivitiesEmpty">Tidak ada aktivitas terbaru di obrolan bersama.</string>
     <string name="FriendsActivitiesHowItWorks">Buka profil kontak → ketuk tab Aktivitas untuk melihat pesan terbaru mereka di obrolan bersama.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Perbarui otomatis</string>
+    <string name="NoSuchSetting">Pengaturan tidak ditemukan</string>
+    <string name="PluginDelete">Hapus plugin?</string>
+    <string name="PluginDeleteInfo">Hapus plugin &lt;b&gt;%1$s&lt;/b&gt;? Tindakan ini tidak bisa dibatalkan.</string>
+    <string name="PluginDependencyDownloadingProgress">Mengunduh %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">Memasang %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">Dependensi %1$s hanya menyediakan wheel native pada rentang versi yang dipilih. Klien ini saat ini hanya mendukung wheel Python murni.</string>
+    <string name="PluginDependencyNoCompatibleWheel">Tidak ditemukan wheel Python murni yang kompatibel untuk %1$s.</string>
+    <string name="PluginDependencyPreparing">Menyiapkan dependensi plugin…</string>
+    <string name="PluginDependencyPythonUnsupported">Dependensi %1$s membutuhkan Python %2$s, tetapi klien ini memakai Python 3.11.</string>
+    <string name="PluginDependencyResolving">Menyelesaikan %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">Dependensi %1$s hanya menyediakan distribusi kode sumber pada rentang versi yang dipilih. Klien ini saat ini hanya mendukung wheel Python murni.</string>
+    <string name="PluginDisableError">Gagal menonaktifkan %1$s.</string>
+    <string name="PluginEnableError">Gagal mengaktifkan %1$s.</string>
+    <string name="PluginEngineNotEnabled">Mesin plugin dinonaktifkan. Buka pengaturan plugin untuk %1$s?</string>
+    <string name="PluginHasNoSettings">%1$s tidak memiliki pengaturan.</string>
+    <string name="PluginInstallError">Gagal memasang plugin %1$s.</string>
+    <string name="PluginInstalled">%1$s terpasang</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s terpasang, tetapi gagal diaktifkan.</string>
+    <string name="PluginIsNotResponding">Plugin tidak merespons.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s tidak merespons</string>
+    <string name="PluginNoAuthor">Penulis tidak diketahui</string>
+    <string name="PluginNoDescription">Tanpa deskripsi</string>
+    <string name="PluginNotEnabled">Dukungan plugin dinonaktifkan. Buka pengaturan untuk mengaktifkan %1$s?</string>
+    <string name="PluginNotFound">Plugin %1$s tidak ditemukan.</string>
+    <string name="PluginOpenExternalError">Tidak bisa membuka %1$s di aplikasi eksternal.</string>
+    <string name="PluginResetSettings">Atur ulang pengaturan</string>
+    <string name="PluginSettingNotFound">Pengaturan plugin tujuan tidak ditemukan.</string>
+    <string name="PluginSourceTrusted">Sumber terpercaya</string>
+    <string name="PluginSourceTrustedInfo">Plugin ini berasal dari sumber terpercaya.</string>
+    <string name="PluginSourceUnknown">Sumber tidak diketahui</string>
+    <string name="PluginSourceUnknownInfo">Plugin ini berasal dari sumber tidak diketahui. Periksa dengan cermat sebelum memasang.</string>
+    <string name="PluginUpdated">%1$s diperbarui</string>
+    <string name="PluginVersion">Versi</string>
+    <string name="Plugins">Plugin</string>
+    <string name="PluginsCompactView">Tampilan ringkas</string>
+    <string name="PluginsDevMode">Mode pengembang</string>
+    <string name="PluginsDevServerLaunched">Server pengembangan plugin dimulai</string>
+    <string name="PluginsDevServerStopped">Server pengembangan plugin dihentikan</string>
+    <string name="PluginsDevTools">Alat pengembang</string>
+    <string name="PluginsDisableArt">Mode kompatibilitas</string>
+    <string name="PluginsDisableArtInfo">Mencegah kegagalan hook plugin dengan menonaktifkan ART Profile Saver.</string>
+    <string name="PluginsDocumentation">Dokumentasi</string>
+    <string name="PluginsEngine">Mesin plugin</string>
+    <string name="PluginsInfo">Pasang dan kelola berkas .plugin di sini.</string>
+    <string name="PluginsInstallSmokeTest">Pasang plugin uji</string>
+    <string name="PluginsInstallSmokeTestInfo">Plugin khusus pengembang untuk memvalidasi event aplikasi, hook request/update, hook pengiriman pesan, dan menu plugin.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Gagal menyiapkan plugin uji bawaan.</string>
+    <string name="PluginsNativeRuntimeUnavailable">Runtime hook native tidak tersedia. Plugin berbasis hook metode mungkin tidak berfungsi sampai aplikasi dimulai ulang dengan semua pustaka native dimuat.</string>
+    <string name="PluginsNotFound">Tidak ada plugin</string>
+    <string name="PluginsPoweredBy">Ditenagai oleh &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; dan &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Perbarui otomatis</string>
+    <string name="PluginsPySdkCheckUpdates">Periksa pembaruan</string>
+    <string name="PluginsPySdkCheckingForUpdates">Memeriksa pembaruan…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Pasang versi beta</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Versi SDK terbaru sudah terpasang</string>
+    <string name="PluginsPySdkLoadingUpdate">Mengunduh pembaruan…</string>
+    <string name="PluginsPySdkUpdateFailed">Pembaruan SDK gagal</string>
+    <string name="PluginsPythonRuntimeUnavailable">Runtime Python gagal diinisialisasi. Mulai ulang aplikasi dan pastikan dependensi plugin bawaan tersedia.</string>
+    <string name="PluginsRestartEngine">Mulai ulang mesin plugin</string>
+    <string name="PluginsSafeMode">Mode aman plugin</string>
+    <string name="PluginsSafeModeInfo">Plugin dinonaktifkan setelah crash. Anda bisa keluar dari mode aman dan memulai ulang mesin.</string>
+    <string name="PluginsSafeModeInfo2">Mode aman menonaktifkan semua plugin sampai Anda mematikannya secara manual.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Plugin dinonaktifkan setelah crash. Tinjau pengaturan plugin Anda dan keluar dari mode aman saat sudah siap.</string>
+    <string name="PluginsSafeModeInfoManual">Mode aman diaktifkan secara manual. Matikan untuk memuat plugin kembali.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Plugin dinonaktifkan setelah crash native. Keluar dari mode aman hanya setelah memeriksa plugin yang terpasang.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">Plugin %1$s dinonaktifkan setelah crash. Keluar dari mode aman saat Anda siap memulihkan plugin lainnya.</string>
+    <string name="PluginsSafeModeShortcut">Mulai dengan mode aman</string>
+    <string name="PluginsSettingsShowOriginal">Tampilkan teks asli</string>
+    <string name="PluginsSettingsTranslate">Terjemahkan pengaturan</string>
+    <string name="PluginsTrusted">Plugin terpercaya</string>
+    <string name="UpdateAvailable">Pembaruan tersedia</string>
 </resources>

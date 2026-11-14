@@ -26,6 +26,7 @@ import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
+import org.telegram.utils.glass.BaseFragmentSimpleGlass;
 import org.telegram.ui.Cells.EmptyCell;
 import org.telegram.ui.Cells.NotificationsCheckCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
@@ -154,7 +155,7 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
             }
         });
 
-        if (isAlexgramTheme()) {
+        if (isAlexgramTheme() && !useSimpleActionBar()) {
             listView.setPadding(0, AndroidUtilities.statusBarHeight + dp(64), 0, dp(40));
             listView.setClipToPadding(false);
         }
@@ -191,6 +192,10 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         // (it is a valid IBlur3Capture, so the glass capture keeps working)
         if (listView != null) {
             listView.setLegacySections(true);
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            }
         }
     }
     // [Alexgram: Glass Header] - End
@@ -244,11 +249,19 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
-        listView.setClipToPadding(false);
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) tooltip.getLayoutParams();
-        layoutParams.setMargins(dp(8), 0, dp(8), dp(8) + bottom);
-        tooltip.setLayoutParams(layoutParams);
+        if (listView != null) {
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            } else {
+                listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
+            }
+            listView.setClipToPadding(false);
+        }
+        if (tooltip != null && tooltip.getLayoutParams() instanceof FrameLayout.LayoutParams layoutParams) {
+            layoutParams.setMargins(dp(8), 0, dp(8), dp(8) + bottom);
+            tooltip.setLayoutParams(layoutParams);
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

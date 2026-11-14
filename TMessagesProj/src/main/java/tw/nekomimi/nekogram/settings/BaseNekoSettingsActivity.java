@@ -26,6 +26,7 @@ import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.utils.glass.BaseFragmentSimpleGlass;
 import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.NotificationsCheckCell;
@@ -204,7 +205,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         itemAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
         itemAnimator.setDelayAnimations(false);
         listView.setItemAnimator(itemAnimator);
-        if (isAlexgramTheme()) {
+        if (isAlexgramTheme() && !useSimpleActionBar()) {
             listView.setPadding(0, AndroidUtilities.statusBarHeight + dp(64), 0, dp(40));
             listView.setClipToPadding(false);
         }
@@ -341,6 +342,10 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         // (it is a valid IBlur3Capture, so the glass capture keeps working)
         if (listView != null) {
             listView.setLegacySections(true);
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            }
         }
     }
     // [Alexgram: Glass Header] - End
@@ -473,8 +478,15 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
-        listView.setClipToPadding(false);
+        if (listView != null) {
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            } else {
+                listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
+            }
+            listView.setClipToPadding(false);
+        }
     }
 
     private class BlurContentView extends SizeNotifierFrameLayout {

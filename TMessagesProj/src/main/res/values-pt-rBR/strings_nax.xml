@@ -569,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">Arquivos e documentos</string>
     <string name="ChatAutoDownloadVoice">Mensagens de voz e vídeo</string>
     <string name="ChatAutoDownloadAudio">Músicas e áudios</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Atividades de amigos</string>
@@ -599,4 +599,78 @@
     <string name="FriendsActivitiesTab">Atividades</string>
     <string name="FriendsActivitiesEmpty">Nenhuma atividade recente em chats compartilhados.</string>
     <string name="FriendsActivitiesHowItWorks">Acesse o perfil de um contato → toque na aba Atividades para ver as mensagens recentes em grupos e canais em comum.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Atualizar automaticamente</string>
+    <string name="NoSuchSetting">Configuração não encontrada</string>
+    <string name="PluginDelete">Excluir plugin?</string>
+    <string name="PluginDeleteInfo">Excluir o plugin &lt;b&gt;%1$s&lt;/b&gt;? Esta ação não pode ser desfeita.</string>
+    <string name="PluginDependencyDownloadingProgress">Baixando %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">Instalando %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">A dependência %1$s fornece apenas wheels nativos no intervalo de versões escolhido. Este cliente atualmente suporta apenas wheels pure-Python.</string>
+    <string name="PluginDependencyNoCompatibleWheel">Nenhum wheel pure-Python compatível encontrado para %1$s.</string>
+    <string name="PluginDependencyPreparing">Preparando dependências do plugin…</string>
+    <string name="PluginDependencyPythonUnsupported">A dependência %1$s requer Python %2$s, mas este cliente usa Python 3.11.</string>
+    <string name="PluginDependencyResolving">Resolvendo %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">A dependência %1$s fornece apenas distribuições de código no intervalo de versões escolhido. Este cliente atualmente suporta apenas wheels pure-Python.</string>
+    <string name="PluginDisableError">Falha ao desativar %1$s.</string>
+    <string name="PluginEnableError">Falha ao ativar %1$s.</string>
+    <string name="PluginEngineNotEnabled">O motor de plugins está desativado. Abrir as configurações do plugin %1$s?</string>
+    <string name="PluginHasNoSettings">%1$s não tem configurações.</string>
+    <string name="PluginInstallError">Falha ao instalar o plugin %1$s.</string>
+    <string name="PluginInstalled">%1$s instalado</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s foi instalado, mas a ativação falhou.</string>
+    <string name="PluginIsNotResponding">O plugin não está respondendo.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s não está respondendo</string>
+    <string name="PluginNoAuthor">Autor desconhecido</string>
+    <string name="PluginNoDescription">Sem descrição</string>
+    <string name="PluginNotEnabled">O suporte a plugins está desativado. Abrir as configurações para ativar %1$s?</string>
+    <string name="PluginNotFound">Plugin %1$s não foi encontrado.</string>
+    <string name="PluginOpenExternalError">Não foi possível abrir %1$s em um app externo.</string>
+    <string name="PluginResetSettings">Redefinir configurações</string>
+    <string name="PluginSettingNotFound">A configuração de plugin de destino não foi encontrada.</string>
+    <string name="PluginSourceTrusted">Fonte confiável</string>
+    <string name="PluginSourceTrustedInfo">Este plugin vem de uma fonte confiável.</string>
+    <string name="PluginSourceUnknown">Fonte desconhecida</string>
+    <string name="PluginSourceUnknownInfo">Este plugin vem de uma fonte desconhecida. Revise-o com cuidado antes de instalar.</string>
+    <string name="PluginUpdated">%1$s atualizado</string>
+    <string name="PluginVersion">Versão</string>
+    <string name="Plugins">Plugins</string>
+    <string name="PluginsCompactView">Visualização compacta</string>
+    <string name="PluginsDevMode">Modo desenvolvedor</string>
+    <string name="PluginsDevServerLaunched">Servidor de desenvolvimento de plugins iniciado</string>
+    <string name="PluginsDevServerStopped">Servidor de desenvolvimento de plugins parado</string>
+    <string name="PluginsDevTools">Ferramentas de desenvolvedor</string>
+    <string name="PluginsDisableArt">Modo de compatibilidade</string>
+    <string name="PluginsDisableArtInfo">Evita falhas de hooks de plugins desativando o ART Profile Saver.</string>
+    <string name="PluginsDocumentation">Documentação</string>
+    <string name="PluginsEngine">Motor de plugins</string>
+    <string name="PluginsInfo">Instale e gerencie arquivos .plugin aqui.</string>
+    <string name="PluginsInstallSmokeTest">Instalar plugin de teste</string>
+    <string name="PluginsInstallSmokeTestInfo">Plugin exclusivo para desenvolvedores para validar eventos do app, hooks de request/update, hooks de envio de mensagens e menus de plugins.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Falha ao preparar o plugin de teste incluído.</string>
+    <string name="PluginsNativeRuntimeUnavailable">O runtime nativo de hooks não está disponível. Plugins baseados em hooks de métodos podem não funcionar até que o app seja reiniciado com todas as bibliotecas nativas carregadas.</string>
+    <string name="PluginsNotFound">Nenhum plugin encontrado</string>
+    <string name="PluginsPoweredBy">Desenvolvido com &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; e &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Atualizar automaticamente</string>
+    <string name="PluginsPySdkCheckUpdates">Verificar atualizações</string>
+    <string name="PluginsPySdkCheckingForUpdates">Verificando atualizações…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Instalar versões beta</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Versão mais recente do SDK instalada</string>
+    <string name="PluginsPySdkLoadingUpdate">Baixando atualização…</string>
+    <string name="PluginsPySdkUpdateFailed">Falha na atualização do SDK</string>
+    <string name="PluginsPythonRuntimeUnavailable">O runtime Python não pôde ser inicializado. Reinicie o app e verifique as dependências de plugins incluídas.</string>
+    <string name="PluginsRestartEngine">Reiniciar motor de plugins</string>
+    <string name="PluginsSafeMode">Modo seguro de plugins</string>
+    <string name="PluginsSafeModeInfo">Os plugins foram desativados após uma falha. Você pode sair do modo seguro e reiniciar o motor.</string>
+    <string name="PluginsSafeModeInfo2">O modo seguro mantém todos os plugins desativados até você desativá-lo manualmente.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Os plugins foram desativados após uma falha. Revise seus plugins e saia do modo seguro quando estiver pronto.</string>
+    <string name="PluginsSafeModeInfoManual">O modo seguro foi ativado manualmente. Desative-o para carregar os plugins novamente.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Os plugins foram desativados após uma falha nativa. Saia do modo seguro somente após verificar seus plugins instalados.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">O plugin %1$s foi desativado após uma falha. Saia do modo seguro quando estiver pronto para restaurar os demais plugins.</string>
+    <string name="PluginsSafeModeShortcut">Iniciar em modo seguro</string>
+    <string name="PluginsSettingsShowOriginal">Mostrar texto original</string>
+    <string name="PluginsSettingsTranslate">Traduzir configurações</string>
+    <string name="PluginsTrusted">Plugins confiáveis</string>
+    <string name="UpdateAvailable">Atualização disponível</string>
 </resources>

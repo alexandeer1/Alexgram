@@ -24,6 +24,7 @@ import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.UItem;
 import org.telegram.ui.Components.UniversalAdapter;
 import org.telegram.ui.Components.UniversalRecyclerView;
+import org.telegram.utils.glass.BaseFragmentSimpleGlass;
 import org.telegram.messenger.R;
 
 public abstract class BasePreferencesActivity extends BaseFragment {
@@ -168,10 +169,23 @@ public abstract class BasePreferencesActivity extends BaseFragment {
     }
 
     @Override
+    protected void onViewCreated(View view) {
+        super.onViewCreated(view);
+        if (useSimpleActionBar() && listView != null) {
+            BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                    ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+        }
+    }
+
+    @Override
     public void onInsets(int left, int top, int right, int bottom) {
         if (listView != null) {
-            // keep the top padding the glass header set up, only apply the bottom inset
-            listView.setPadding(0, listView.getPaddingTop(), 0, bottom);
+            if (useSimpleActionBar()) {
+                BaseFragmentSimpleGlass.setListViewParams(listView, mSystemInsets.top, mSystemInsets.bottom,
+                        ActionBar.getCurrentActionBarHeight() + AndroidUtilities.dp(6), AndroidUtilities.dp(20));
+            } else {
+                listView.setPadding(0, 0, 0, bottom);
+            }
             listView.setClipToPadding(false);
         }
     }

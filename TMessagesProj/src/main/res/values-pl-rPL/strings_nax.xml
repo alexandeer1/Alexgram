@@ -569,29 +569,29 @@
     <string name="ChatAutoDownloadFiles">Pliki i dokumenty</string>
     <string name="ChatAutoDownloadVoice">Wiadomości głosowe i wideo</string>
     <string name="ChatAutoDownloadAudio">Muzyka i dźwięk</string>
-    <string name="Plugins">Plugins</string>
-    <string name="ChoosePluginFile">Choose .plugin file</string>
+
+
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
-    <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
+
+
     <string name="UpdatePlugin">Update plugin?</string>
     <string name="InstallPlugin">Install plugin?</string>
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
-    <string name="FailedToInstallPlugin">Failed to install plugin</string>
-    <string name="InstalledPlugins">Installed Plugins</string>
-    <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
+
+
+
+
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
+
     <string name="EnabledToggle">Enabled</string>
-    <string name="DeletePlugin">Delete plugin</string>
-    <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
-    <string name="DeletePluginTitle">Delete plugin?</string>
-    <string name="DeletePluginAlert">«%s» and its settings will be deleted.</string>
+
+
+
+
     <string name="Author">Author: %s</string>
     <string name="Version">Version: %s</string>
     <string name="FriendsActivities">Aktywność znajomych</string>
@@ -599,4 +599,78 @@
     <string name="FriendsActivitiesTab">Aktywność</string>
     <string name="FriendsActivitiesEmpty">Brak ostatniej aktywności we wspólnych czatach.</string>
     <string name="FriendsActivitiesHowItWorks">Przejdź do profilu kontaktu → dotknij karty Aktywność, aby zobaczyć ich najnowsze wiadomości we wspólnych czatach.</string>
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="EnableAutoUpdate">Aktualizuj automatycznie</string>
+    <string name="NoSuchSetting">Nie znaleziono ustawienia</string>
+    <string name="PluginDelete">Usunąć wtyczkę?</string>
+    <string name="PluginDeleteInfo">Usunąć wtyczkę &lt;b&gt;%1$s&lt;/b&gt;? Tej operacji nie można cofnąć.</string>
+    <string name="PluginDependencyDownloadingProgress">Pobieranie %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">Instalowanie %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">Zależność %1$s udostępnia tylko natywne pakiety wheel w wybranym zakresie wersji. Ten klient obsługuje obecnie tylko pakiety wheel czystego Pythona.</string>
+    <string name="PluginDependencyNoCompatibleWheel">Nie znaleziono zgodnego pakietu wheel czystego Pythona dla %1$s.</string>
+    <string name="PluginDependencyPreparing">Przygotowywanie zależności wtyczki…</string>
+    <string name="PluginDependencyPythonUnsupported">Zależność %1$s wymaga Pythona %2$s, ale ten klient używa Pythona 3.11.</string>
+    <string name="PluginDependencyResolving">Rozwiązywanie %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">Zależność %1$s udostępnia tylko dystrybucje źródłowe w wybranym zakresie wersji. Ten klient obsługuje obecnie tylko pakiety wheel czystego Pythona.</string>
+    <string name="PluginDisableError">Nie udało się wyłączyć %1$s.</string>
+    <string name="PluginEnableError">Nie udało się włączyć %1$s.</string>
+    <string name="PluginEngineNotEnabled">Silnik wtyczek jest wyłączony. Otworzyć ustawienia wtyczki %1$s?</string>
+    <string name="PluginHasNoSettings">%1$s nie ma ustawień.</string>
+    <string name="PluginInstallError">Nie udało się zainstalować wtyczki %1$s.</string>
+    <string name="PluginInstalled">Zainstalowano %1$s</string>
+    <string name="PluginInstalledButFailedToEnable">Zainstalowano %1$s, ale włączenie nie powiodło się.</string>
+    <string name="PluginIsNotResponding">Wtyczka nie odpowiada.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s nie odpowiada</string>
+    <string name="PluginNoAuthor">Nieznany autor</string>
+    <string name="PluginNoDescription">Brak opisu</string>
+    <string name="PluginNotEnabled">Obsługa wtyczek jest wyłączona. Otworzyć ustawienia, aby włączyć %1$s?</string>
+    <string name="PluginNotFound">Nie znaleziono wtyczki %1$s.</string>
+    <string name="PluginOpenExternalError">Nie można otworzyć %1$s w aplikacji zewnętrznej.</string>
+    <string name="PluginResetSettings">Przywróć ustawienia</string>
+    <string name="PluginSettingNotFound">Nie znaleziono docelowego ustawienia wtyczki.</string>
+    <string name="PluginSourceTrusted">Zaufane źródło</string>
+    <string name="PluginSourceTrustedInfo">Ta wtyczka pochodzi z zaufanego źródła.</string>
+    <string name="PluginSourceUnknown">Nieznane źródło</string>
+    <string name="PluginSourceUnknownInfo">Ta wtyczka pochodzi z nieznaneog źródła. Sprawdź ją dokładnie przed instalacją.</string>
+    <string name="PluginUpdated">Zaktualizowano %1$s</string>
+    <string name="PluginVersion">Wersja</string>
+    <string name="Plugins">Wtyczki</string>
+    <string name="PluginsCompactView">Widok kompaktowy</string>
+    <string name="PluginsDevMode">Tryb dewelopera</string>
+    <string name="PluginsDevServerLaunched">Uruchomiono serwer deweloperski wtyczek</string>
+    <string name="PluginsDevServerStopped">Zatrzymano serwer deweloperski wtyczek</string>
+    <string name="PluginsDevTools">Narzędzia deweloperskie</string>
+    <string name="PluginsDisableArt">Tryb zgodności</string>
+    <string name="PluginsDisableArtInfo">Zapobiega błędom hooków wtyczek poprzez wyłączenie ART Profile Saver.</string>
+    <string name="PluginsDocumentation">Dokumentacja</string>
+    <string name="PluginsEngine">Silnik wtyczek</string>
+    <string name="PluginsInfo">Tutaj instaluj i zarządzaj plikami .plugin.</string>
+    <string name="PluginsInstallSmokeTest">Zainstaluj wtyczkę testową</string>
+    <string name="PluginsInstallSmokeTestInfo">Wtyczka tylko dla deweloperów: sprawdza zdarzenia aplikacji, hooki żądań/aktualizacji, hooki wysyłania wiadomości i menu wtyczek.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Nie udało się przygotować wbudowanej wtyczki testowej.</string>
+    <string name="PluginsNativeRuntimeUnavailable">Natywne środowisko hooków jest niedostępne. Wtyczki oparte na hookach metod mogą nie działać do ponownego uruchomienia aplikacji z załadowanymi wszystkimi bibliotekami natywnymi.</string>
+    <string name="PluginsNotFound">Nie znaleziono wtyczek</string>
+    <string name="PluginsPoweredBy">Napędzane przez &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; i &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Aktualizuj automatycznie</string>
+    <string name="PluginsPySdkCheckUpdates">Sprawdź aktualizacje</string>
+    <string name="PluginsPySdkCheckingForUpdates">Sprawdzanie aktualizacji…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Instaluj wersje beta</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Zainstalowano najnowszą wersję SDK</string>
+    <string name="PluginsPySdkLoadingUpdate">Pobieranie aktualizacji…</string>
+    <string name="PluginsPySdkUpdateFailed">Aktualizacja SDK nie powiodła się</string>
+    <string name="PluginsPythonRuntimeUnavailable">Nie udało się zainicjować środowiska Pythona. Uruchom aplikację ponownie i sprawdź wbudowane zależności wtyczek.</string>
+    <string name="PluginsRestartEngine">Uruchom ponownie silnik wtyczek</string>
+    <string name="PluginsSafeMode">Tryb awaryjny wtyczek</string>
+    <string name="PluginsSafeModeInfo">Wtyczki zostały wyłączone po awarii. Możesz opuścić tryb awaryjny i ponownie uruchomić silnik.</string>
+    <string name="PluginsSafeModeInfo2">Tryb awaryjny utrzymuje wszystkie wtyczki wyłączone, dopóki nie wyłączysz go ręcznie.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Wtyczki zostały wyłączone po awarii. Sprawdź konfigurację wtyczek i opuść tryb awaryjny, gdy będziesz gotowy.</string>
+    <string name="PluginsSafeModeInfoManual">Tryb awaryjny został włączony ręcznie. Wyłącz go, aby ponownie załadować wtyczki.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Wtyczki zostały wyłączone po natywnej awarii. Opuść tryb awaryjny dopiero po sprawdzeniu zainstalowanych wtyczek.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">Wtyczka %1$s została wyłączona po awarii. Opuść tryb awaryjny, gdy będziesz gotowy przywrócić pozostałe wtyczki.</string>
+    <string name="PluginsSafeModeShortcut">Uruchom w trybie awaryjnym</string>
+    <string name="PluginsSettingsShowOriginal">Pokaż oryginalny tekst</string>
+    <string name="PluginsSettingsTranslate">Przetłumacz ustawienia</string>
+    <string name="PluginsTrusted">Zaufane wtyczki</string>
+    <string name="UpdateAvailable">Dostępna aktualizacja</string>
 </resources>

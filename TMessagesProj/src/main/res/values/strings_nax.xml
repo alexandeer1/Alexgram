@@ -582,11 +582,9 @@
     <string name="FailedToInstallPlugin">Failed to install plugin</string>
     <string name="InstalledPlugins">Installed Plugins</string>
     <string name="NoPluginsHint">No plugins yet. Tap + and choose a .plugin file (Python, exteraGram-compatible).</string>
-    <string name="PluginTapHint">Tap on a plugin to enable/disable it, open settings, or delete it.</string>
     <string name="Error">error</string>
     <string name="Disabled">off</string>
     <string name="Enabled">on</string>
-    <string name="Plugin">Plugin</string>
     <string name="EnabledToggle">Enabled</string>
     <string name="DeletePlugin">Delete plugin</string>
     <string name="DeletePluginInfo">Deleting removes the plugin and erases its saved settings.</string>
