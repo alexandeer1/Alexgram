@@ -37,6 +37,28 @@ public class MediaActionDrawable extends Drawable {
     public static final int ICON_CANCEL_PERCENT = 13;
     public static final int ICON_CANCEL_FILL = 14;
     public static final int ICON_UPDATE = 15;
+    // --- Plugins (ported from NagramXF) ---
+    public static final int ICON_PLUGIN = 16;
+    public static final int ICON_SETTINGS = 17;
+    public static final int ICON_STICKERS = 18;
+
+    public static boolean isCustomFileIcon(int icon) {
+        return icon == ICON_PLUGIN || icon == ICON_SETTINGS || icon == ICON_STICKERS || com.exteragram.messenger.plugins.PluginsController.isPluginFileIcon(icon);
+    }
+
+    private Drawable getCustomIconDrawable(int icon) {
+        if (icon == ICON_PLUGIN) {
+            return Theme.chat_pluginIcon;
+        }
+        if (icon == ICON_SETTINGS) {
+            return Theme.chat_settingsIcon;
+        }
+        if (icon == ICON_STICKERS) {
+            return Theme.chat_stickersIcon;
+        }
+        return com.exteragram.messenger.plugins.PluginsController.getPluginFileIconDrawable(icon);
+    }
+    // --- Plugins ---
 
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -627,6 +649,13 @@ public class MediaActionDrawable extends Drawable {
         } else if (currentIcon == ICON_GIF) {
             previousDrawable = Theme.chat_gifIcon;
         }
+        // --- Plugins (ported from NagramXF) ---
+        if (isCustomFileIcon(nextIcon)) {
+            nextDrawable = getCustomIconDrawable(nextIcon);
+        } else if (isCustomFileIcon(currentIcon)) {
+            previousDrawable = getCustomIconDrawable(currentIcon);
+        }
+        // --- Plugins ---
 
 
         if (currentIcon == ICON_SECRETCHECK || nextIcon == ICON_SECRETCHECK) {

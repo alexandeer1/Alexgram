@@ -18296,7 +18296,13 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     // must be run from Utilities.stageQueue
-    public void processUpdates(final TLRPC.Updates updates, boolean fromQueue) {
+    public void processUpdates(final TLRPC.Updates updatesOrig, boolean fromQueue) {
+        // --- Plugins (ported from NagramXF) ---
+        TLRPC.Updates updates = com.exteragram.messenger.plugins.PluginsController.getInstance().executeUpdatesHook(updatesOrig == null ? null : updatesOrig.getClass().getSimpleName(), currentAccount, updatesOrig);
+        if (updates == null) {
+            return;
+        }
+        // --- Plugins ---
         if (updates instanceof TLRPC.TL_updates || updates instanceof TLRPC.TL_updatesCombined) {
             boolean hasMessageIdUpdates = false;
             for (int i = 0; i < updates.updates.size(); i++) {
@@ -18855,6 +18861,21 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean processUpdateArray(ArrayList<TLRPC.Update> updates, ArrayList<TLRPC.User> usersArr, ArrayList<TLRPC.Chat> chatsArr, boolean fromGetDifference, int date) {
+        // --- Plugins (ported from NagramXF) ---
+        if (updates != null && !updates.isEmpty()) {
+            ArrayList<TLRPC.Update> hookedUpdates = new ArrayList<>(updates.size());
+            for (TLRPC.Update update : updates) {
+                if (update == null) {
+                    continue;
+                }
+                TLRPC.Update hookedUpdate = com.exteragram.messenger.plugins.PluginsController.getInstance().executeUpdateHook(update.getClass().getSimpleName(), currentAccount, update);
+                if (hookedUpdate != null) {
+                    hookedUpdates.add(hookedUpdate);
+                }
+            }
+            updates = hookedUpdates;
+        }
+        // --- Plugins ---
         if (updates.isEmpty()) {
             if (usersArr != null || chatsArr != null) {
                 AndroidUtilities.runOnUIThread(() -> {

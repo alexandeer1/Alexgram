@@ -80,6 +80,17 @@ public class SettingsHelper {
                 case "a":
                     fragment = nekox_fragment = new com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity();
                     break;
+                // --- Plugins (ported from NagramXF) ---
+                case "plugins":
+                case "plugin":
+                case "p":
+                    if (!com.exteragram.messenger.plugins.PluginsController.isPluginEngineSupported()) {
+                        unknown.run();
+                        return;
+                    }
+                    fragment = new com.exteragram.messenger.plugins.ui.PluginsActivity();
+                    break;
+                // --- Plugins ---
                 case "send_logs":
                     sendLogs(activity, false);
                     return;
@@ -120,6 +131,18 @@ public class SettingsHelper {
 
     public static ArrayList<SettingsSearchResult> onCreateSearchArray(Callback callback) {
         ArrayList<SettingsSearchResult> items = new ArrayList<>();
+        // --- Plugins (ported from NagramXF) ---
+        if (com.exteragram.messenger.plugins.PluginsController.isPluginEngineSupported()) {
+            items.add(new SettingsSearchResult(
+                    900000,
+                    getString(R.string.Plugins),
+                    getString(R.string.NekoSettings),
+                    null,
+                    R.drawable.msg_plugins,
+                    () -> callback.presentFragment(new com.exteragram.messenger.plugins.ui.PluginsActivity())
+            ));
+        }
+        // --- Plugins ---
         ArrayList<BaseNekoXSettingsActivity> fragments = new ArrayList<>();
         fragments.add(new NekoGeneralSettingsActivity());
         fragments.add(new NekoCustomizationSettingsActivity());

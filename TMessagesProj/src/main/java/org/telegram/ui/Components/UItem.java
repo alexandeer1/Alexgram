@@ -43,6 +43,9 @@ public class UItem extends AdapterWithDiffUtils.Item {
     public CharSequence animatedText;
     public String[] texts;
     public boolean accent, red, transparent, locked;
+    // --- Plugins (ported from NagramXF) ---
+    public boolean multiline;
+    // --- Plugins ---
     public int spanCount = MAX_SPAN_COUNT;
     public int parentSpanCount;
 
@@ -316,6 +319,30 @@ public class UItem extends AdapterWithDiffUtils.Item {
         i.text = text;
         return i;
     }
+
+    // --- Plugins (ported from NagramXF) ---
+    public static UItem asCheck(int id, CharSequence text, CharSequence value) {
+        UItem i = new UItem(UniversalAdapter.VIEW_TYPE_CHECK, false);
+        i.id = id;
+        i.text = text;
+        i.textValue = value;
+        return i;
+    }
+
+    public static UItem asCheck(int id, CharSequence text, CharSequence value, boolean multiline) {
+        UItem i = asCheck(id, text, value);
+        i.multiline = multiline;
+        return i;
+    }
+
+    public static UItem asCheck(int id, CharSequence text, int iconResId) {
+        UItem i = new UItem(UniversalAdapter.VIEW_TYPE_CHECK, false);
+        i.id = id;
+        i.text = text;
+        i.iconResId = iconResId;
+        return i;
+    }
+    // --- Plugins ---
 
     public static UItem asRadio(int id, CharSequence text) {
         UItem i = new UItem(UniversalAdapter.VIEW_TYPE_RADIO, false);
@@ -691,6 +718,18 @@ public class UItem extends AdapterWithDiffUtils.Item {
         this.enabled = enabled;
         return this;
     }
+
+    // --- Plugins (ported from NagramXF) ---
+    public UItem setTransparent(boolean transparent) {
+        this.transparent = transparent;
+        return this;
+    }
+
+    public UItem setIcon(int iconResId) {
+        this.iconResId = iconResId;
+        return this;
+    }
+    // --- Plugins ---
 
     public UItem setLocked(boolean locked) {
         this.locked = locked;

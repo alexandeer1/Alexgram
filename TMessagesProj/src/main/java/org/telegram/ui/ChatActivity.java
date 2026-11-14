@@ -518,6 +518,13 @@ public class ChatActivity extends BaseFragment implements
     // [Alexgram: Templates Message Share Action] - End
 
     // chat click menu buttons
+    // --- Plugins (ported from NagramXF) ---
+    private static final int PLUGIN_MESSAGE_MENU_OPTION_BASE = 0x70000000;
+    private static final int PLUGIN_CHAT_ACTION_MENU_OPTION_BASE = 0x71000000;
+    private final SparseArray<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMessageMenuItemsByOption = new SparseArray<>();
+    private final SparseArray<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginChatActionMenuItemsByOption = new SparseArray<>();
+    private int nextPluginChatActionMenuOptionId = PLUGIN_CHAT_ACTION_MENU_OPTION_BASE;
+    // --- Plugins ---
     public final static int nkbtn_detail = 2012;
     public final static int nkbtn_deldlcache = 2013;
     public final static int nkbtn_view_history = 2014;
@@ -610,6 +617,11 @@ public class ChatActivity extends BaseFragment implements
     private ActionBarMenuItem.Item timeItem2;
     private ComposeDrawable otherIcon;
     private ActionBarMenu.LazyItem attachItem;
+    // --- Plugins (ported from NagramXF) ---
+    private ActionBarMenuItem.Item pluginChatActionMenuGapItem;
+    private ActionBarMenuItem.Item pluginChatActionMenuItem;
+    private com.exteragram.messenger.plugins.ui.components.PluginsMenuWrapper pluginChatActionMenuWrapper;
+    // --- Plugins ---
     private ActionBarMenuItem.Item savedChatsItem, savedChatsGap;
     private ActionBarMenuItem headerItem;
     protected ActionBarMenuItem searchItem;
@@ -3301,6 +3313,9 @@ public class ChatActivity extends BaseFragment implements
         if (chatMode == 0) {
             observersGroup.add(NotificationCenter.didLoadSponsoredMessages);
         }
+        // --- Plugins (ported from NagramXF) ---
+        getNotificationCenter().addObserver(this, NotificationCenter.pluginMenuItemsUpdated);
+        // --- Plugins ---
         observersGroup
             .add(NotificationCenter.updatedChatRanks)
             .add(NotificationCenter.premiumFloodWaitReceived)
@@ -3804,6 +3819,9 @@ public class ChatActivity extends BaseFragment implements
 
         // na: unread count
         getNotificationCenter().removeObserver(this, NotificationCenter.dialogsUnreadCounterChanged);
+        // --- Plugins (ported from NagramXF) ---
+        getNotificationCenter().removeObserver(this, NotificationCenter.pluginMenuItemsUpdated);
+        // --- Plugins ---
 
         getNotificationCenter().removePostponeNotificationsCallback(postponeNotificationsWhileLoadingCallback);
         getMessagesController().setLastCreatedDialogId(dialog_id, chatMode == MODE_SCHEDULED, false);
@@ -4808,6 +4826,10 @@ public class ChatActivity extends BaseFragment implements
         }
 
         ActionBarMenu menu = actionBar.createMenu();
+        // --- Plugins (ported from NagramXF) ---
+        detachPluginChatActionMenuWrapper();
+        pluginChatActionMenuItemsByOption.clear();
+        // --- Plugins ---
         menu.setCenteredTitle(isTitleCentered() && chatMode != MODE_QUICK_REPLIES);
 
         if (isThreadChat() && threadMessageId != 0 && !isTopic) {
@@ -5252,6 +5274,9 @@ public class ChatActivity extends BaseFragment implements
             closeTopicItem = headerItem.lazilyAddSubItem(topic_close, R.drawable.msg_topic_close, LocaleController.getString(R.string.CloseTopic));
             closeTopicItem.setVisibility(currentChat != null && ChatObject.canManageTopic(currentAccount, currentChat, forumTopic) && forumTopic != null && !forumTopic.closed ? View.VISIBLE : View.GONE);
         }
+        // --- Plugins (ported from NagramXF) ---
+        appendPluginChatActionMenuItems();
+        // --- Plugins ---
         menu.setVisibility(inMenuMode ? View.GONE : View.VISIBLE);
 
         updateTitle(false);
@@ -22802,6 +22827,12 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void didReceivedNotification(int id, int account, final Object... args) {
 
+        // --- Plugins (ported from NagramXF) ---
+        if (id == NotificationCenter.pluginMenuItemsUpdated) {
+            refreshPluginChatActionMenuItems();
+            return;
+        }
+        // --- Plugins ---
         if (id == NotificationCenter.messagesDidLoad) {
             int guid = (Integer) args[10];
             if (guid != classGuid) {
@@ -37949,15 +37980,145 @@ public class ChatActivity extends BaseFragment implements
                 break;
             }
             default: {
+                // --- Plugins (ported from NagramXF) ---
+                if (handlePluginMessageMenuOption(option)) {
+                    break;
+                }
+                if (handlePluginChatActionMenuOption(option)) {
+                    break;
+                }
+                // --- Plugins ---
                 nkbtn_onclick(option);
                 break;
             }
         }
+        pluginMessageMenuItemsByOption.clear();
+        pluginChatActionMenuItemsByOption.clear();
         selectedObject = null;
         selectedObjectGroup = null;
         selectedObjectToEditCaption = null;
         closeMenu(!preserveDim);
     }
+
+    // ------------------------------------------------------------------ plugins (ported from NagramXF)
+
+    private boolean handlePluginMessageMenuOption(int option) {
+        com.exteragram.messenger.plugins.hooks.MenuItemRecord pluginItem = pluginMessageMenuItemsByOption.get(option);
+        if (pluginItem == null) {
+            return false;
+        }
+        try {
+            pluginItem.executeClick(buildMessageMenuPluginContext(selectedObject, selectedObjectGroup));
+        } catch (Throwable t) {
+            FileLog.e("Failed to execute plugin menu item " + pluginItem.itemId + " from plugin " + pluginItem.pluginId, t);
+        }
+        return true;
+    }
+
+    private boolean handlePluginChatActionMenuOption(int option) {
+        com.exteragram.messenger.plugins.hooks.MenuItemRecord pluginItem = pluginChatActionMenuItemsByOption.get(option);
+        if (pluginItem == null) {
+            return false;
+        }
+        try {
+            pluginItem.executeClick(buildChatActionMenuPluginContext());
+        } catch (Throwable t) {
+            FileLog.e("Failed to execute chat action plugin menu item " + pluginItem.itemId + " from plugin " + pluginItem.pluginId, t);
+        }
+        return true;
+    }
+
+    private void appendPluginChatActionMenuItems() {
+        if (headerItem == null) {
+            return;
+        }
+        pluginChatActionMenuItemsByOption.clear();
+        java.util.Map<String, Object> contextData = buildChatActionMenuPluginContext();
+        java.util.List<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMenuItems = com.exteragram.messenger.plugins.PluginsController.getInstance().getMenuItemsForLocation(
+                com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.CHAT_ACTION_MENU,
+                contextData);
+
+        pluginChatActionMenuWrapper = new com.exteragram.messenger.plugins.ui.components.PluginsMenuWrapper(this, headerItem.getPopupLayout().getSwipeBack(), pluginMenuItems, com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.CHAT_ACTION_MENU, contextData, getResourceProvider()) {
+            @Override
+            protected void closeMenu() {
+                if (headerItem != null && headerItem.isSubMenuShowing()) {
+                    headerItem.toggleSubMenu();
+                }
+            }
+        };
+        pluginChatActionMenuGapItem = headerItem.lazilyAddColoredGap();
+        pluginChatActionMenuItem = headerItem.lazilyAddSwipeBackItem(R.drawable.msg_plugins, null, LocaleController.getString(R.string.Plugins), pluginChatActionMenuWrapper.getSwipeBackView());
+
+        boolean visible = !pluginMenuItems.isEmpty();
+        pluginChatActionMenuGapItem.setVisibility(visible);
+        pluginChatActionMenuItem.setVisibility(visible);
+    }
+
+    private void refreshPluginChatActionMenuItems() {
+        if (headerItem == null) {
+            return;
+        }
+        if (headerItem.isSubMenuShowing()) {
+            headerItem.closeSubMenu();
+        }
+        pluginChatActionMenuItemsByOption.clear();
+        java.util.Map<String, Object> contextData = buildChatActionMenuPluginContext();
+        java.util.List<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMenuItems = com.exteragram.messenger.plugins.PluginsController.getInstance().getMenuItemsForLocation(
+                com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.CHAT_ACTION_MENU,
+                contextData);
+        if (pluginChatActionMenuWrapper == null || pluginChatActionMenuItem == null || pluginChatActionMenuGapItem == null) {
+            appendPluginChatActionMenuItems();
+        } else {
+            pluginChatActionMenuWrapper.setContextData(contextData);
+            pluginChatActionMenuWrapper.rebuildMenu(pluginMenuItems);
+
+            boolean visible = !pluginMenuItems.isEmpty();
+            pluginChatActionMenuGapItem.setVisibility(visible);
+            pluginChatActionMenuItem.setVisibility(visible);
+        }
+        headerItem.checkHideMenuItem();
+    }
+
+    private void detachPluginChatActionMenuWrapper() {
+        if (pluginChatActionMenuWrapper != null) {
+            View swipeBackView = pluginChatActionMenuWrapper.getSwipeBackView();
+            if (swipeBackView.getParent() instanceof ViewGroup) {
+                ((ViewGroup) swipeBackView.getParent()).removeView(swipeBackView);
+            }
+        }
+        pluginChatActionMenuGapItem = null;
+        pluginChatActionMenuItem = null;
+        pluginChatActionMenuWrapper = null;
+    }
+
+    private java.util.Map<String, Object> buildChatActionMenuPluginContext() {
+        return com.exteragram.messenger.plugins.utils.MenuContextBuilder.from(this)
+                .withDialogId(dialog_id)
+                .withChat(currentChat)
+                .withChatFull(chatInfo)
+                .withUser(currentUser)
+                .withUserFull(userInfo)
+                .withEncryptedChat(currentEncryptedChat)
+                .withCustom("chatMode", chatMode)
+                .withCustom("threadMessageId", threadMessageId)
+                .withCustom("topicId", getTopicId())
+                .withCustom("isTopic", isTopic)
+                .withCustom("threadMessageObject", threadMessageObject)
+                .build();
+    }
+
+    private java.util.Map<String, Object> buildMessageMenuPluginContext(MessageObject message, MessageObject.GroupedMessages groupedMessages) {
+        return com.exteragram.messenger.plugins.utils.MenuContextBuilder.from(this)
+                .withDialogId(dialog_id)
+                .withMessage(message)
+                .withGroupedMessage(groupedMessages)
+                .withChat(currentChat)
+                .withUser(currentUser)
+                .withEncryptedChat(currentEncryptedChat)
+                .build();
+    }
+
+    // ------------------------------------------------------------------ end plugins
 
     public void showSuggestionOfferForEditMessage(MessageSuggestionParams oldParams) {
         if (editingMessageObject == null) {
@@ -45532,6 +45693,12 @@ public class ChatActivity extends BaseFragment implements
                     com.exteragram.messenger.icons.IconManager.INSTANCE.handleIconPack(ChatActivity.this, message);
                     return;
                 }
+                // --- Plugins (ported from NagramXF): .plugin files open the install dialog ---
+                if (com.exteragram.messenger.plugins.PluginsController.isPlugin(message)) {
+                    com.exteragram.messenger.plugins.PluginsController.getInstance().showInstallDialog(ChatActivity.this, message);
+                    return;
+                }
+                // --- Plugins ---
                 if (message.getDocumentName().toLowerCase().endsWith("attheme")) {
                     Theme.ThemeInfo themeInfo = Theme.applyThemeFile(locFile, message.getDocumentName(), null, true);
                     if (themeInfo != null) {
@@ -50976,6 +51143,21 @@ public class ChatActivity extends BaseFragment implements
             icons.add(R.drawable.ic_local_editor);
         }
         // [Alexgram: Extended Message Menu Options] - End
+
+        // --- Plugins (ported from NagramXF): MESSAGE_CONTEXT_MENU items ---
+        pluginMessageMenuItemsByOption.clear();
+        java.util.List<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMenuItems = com.exteragram.messenger.plugins.PluginsController.getInstance().getMenuItemsForLocation(
+                com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.MESSAGE_CONTEXT_MENU,
+                buildMessageMenuPluginContext(message, groupedMessages));
+        for (int i = 0; i < pluginMenuItems.size(); i++) {
+            com.exteragram.messenger.plugins.hooks.MenuItemRecord pluginItem = pluginMenuItems.get(i);
+            int optionId = PLUGIN_MESSAGE_MENU_OPTION_BASE + i;
+            pluginMessageMenuItemsByOption.put(optionId, pluginItem);
+            items.add(pluginItem.text);
+            options.add(optionId);
+            icons.add(pluginItem.iconResId != 0 ? pluginItem.iconResId : R.drawable.msg_plugins);
+        }
+        // --- Plugins ---
 
         if (getMessagesController().config.walletAvailable.get() &&
                 selectedObject.messageOwner.action instanceof TLRPC.TL_messageActionGramTransfer

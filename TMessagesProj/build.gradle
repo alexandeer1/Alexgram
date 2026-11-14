@@ -409,15 +409,24 @@ dependencies {
 
     compileOnly fileTree('libs')
 
-    // ZaStoGram plugin engine: Pine — dynamic ART method hooking (Xposed-compatible API).
+    // Plugin engine (ported from NagramXF): Pine — dynamic ART method hooking (Xposed-compatible API).
     implementation 'top.canyie.pine:core:0.3.0'
     implementation 'top.canyie.pine:xposed:0.2.0'
+
+    // Plugin engine (ported from NagramXF): python DexMaker shim + MVEL hook-filter expressions.
+    implementation 'com.linkedin.dexmaker:dexmaker:2.28.3'
+    implementation 'org.mvel:mvel2:2.5.2.Final'
 }
 
 def getPythonPath() {
     def envPath = System.getenv("PYTHON_PATH")
     if (envPath != null && !envPath.isEmpty()) {
         return envPath
+    }
+    // buildPython must match the Chaquopy target version (3.11 — see the chaquopy block).
+    def local311Path = "${System.getProperty('user.home')}/AppData/Local/Programs/Python/Python311/python.exe"
+    if (new File(local311Path).exists()) {
+        return local311Path
     }
     def localWinPath = "${System.getProperty('user.home')}/AppData/Local/Programs/Python/Python313/python.exe"
     if (new File(localWinPath).exists()) {
@@ -428,17 +437,17 @@ def getPythonPath() {
 
 chaquopy {
     defaultConfig {
-        if (nativeTarget.contains("armeabi-v7a")) {
-            version "3.11"
-        } else {
-            version "3.13"
-        }
+        // Plugin engine (ported from NagramXF): the runtime MUST stay 3.11 — the
+        // plugins_pysdk archives (and NagramXF's remote SDK update channel) ship
+        // CPython 3.11 bytecode, exactly like NagramXF's own runtime.
+        version "3.11"
         buildPython getPythonPath()
         pyc {
             src false
         }
         pip {
             install "requests"
+            install "pyyaml"
         }
     }
 }

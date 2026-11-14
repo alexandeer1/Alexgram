@@ -666,7 +666,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 .add(NotificationCenter.requestPermissions)
                 .add(NotificationCenter.billingConfirmPurchaseError)
                 .add(NotificationCenter.tlSchemeParseException)
-                .add(NotificationCenter.memoryLeakFoundException);
+                .add(NotificationCenter.memoryLeakFoundException)
+                .add(NotificationCenter.pluginMenuItemsUpdated);
         NotificationCenter.getGlobalInstance().addObserver(drawerLayoutAdapter,
                 NotificationCenter.proxySettingsChanged);
         LiteMode.addOnPowerSaverAppliedListener(onPowerSaverCallback = this::onPowerSaver);
@@ -1470,6 +1471,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (drawerLayoutContainer != null) {
             drawerLayoutContainer.closeDrawer(false);
         }
+
+        com.exteragram.messenger.plugins.PluginsController.getInstance().loadPluginSettings();
 
         switchingAccount = false;
     }
@@ -2483,6 +2486,21 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @SuppressLint("Range")
     private boolean handleIntent(Intent intent, boolean isNew, boolean restore, boolean fromPassword,
+            Browser.Progress progress, boolean rebuildFragments, boolean openedTelegram) {
+        // --- Plugins (ported from NagramXF): let plugins intercept/dispatch intents ---
+        boolean stopped = com.exteragram.messenger.plugins.IntentsController.dispatchBeforeIntent(intent);
+        try {
+            if (stopped) {
+                return true;
+            }
+            return handleIntentInternal(intent, isNew, restore, fromPassword, progress, rebuildFragments, openedTelegram);
+        } finally {
+            com.exteragram.messenger.plugins.IntentsController.dispatchAfterIntent(intent);
+        }
+    }
+
+    @SuppressLint("Range")
+    private boolean handleIntentInternal(Intent intent, boolean isNew, boolean restore, boolean fromPassword,
             Browser.Progress progress, boolean rebuildFragments, boolean openedTelegram) {
         if (GiftInfoBottomSheet.handleIntent(intent, progress)) {
             return true;
@@ -9336,6 +9354,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         } else if (id == NotificationCenter.mainUserInfoChanged) {
             refreshDrawer(true);
         } else if (id == NotificationCenter.attachMenuBotsDidLoad) {
+            refreshDrawer(true);
+        } else if (id == NotificationCenter.pluginMenuItemsUpdated) {
             refreshDrawer(true);
         } else if (id == NotificationCenter.needShowAlert) {
             final Integer reason = (Integer) args[0];

@@ -14286,9 +14286,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             });
         }
         io.addGapIf(hideBottomNavigationBar);
-        if (ApplicationLoader.applicationLoaderInstance != null) {
-            ApplicationLoader.applicationLoaderInstance.addItemOptions(io);
-        }
         if (getMessagesController().config.walletAvailable.get()) {
             io.add(R.drawable.ic_gram, LocaleController.getString(R.string.WalletAttachMoney), () -> {
                 presentFragment(new WalletActivity());

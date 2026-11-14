@@ -32,7 +32,8 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import com.exteragram.messenger.ai.ui.activities.AiPreferencesActivity;
-import org.telegram.ui.Plugins.PluginsActivity;
+import com.exteragram.messenger.plugins.PluginsController;
+import com.exteragram.messenger.plugins.ui.PluginsActivity;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -516,7 +517,9 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                     items.add(new CoreItem(LocaleController.getString("TranslatorSettings", R.string.TranslatorSettings), LocaleController.getString("TranslatorDesc", R.string.TranslatorDesc), R.drawable.ic_translate, 0xFF9C27B0, v -> presentFragment(new NekoTranslatorSettingsActivity())));
                     items.add(new CoreItem(LocaleController.getString(R.string.AIChat), LocaleController.getString(R.string.AIChatInfo), R.drawable.ai_chat, 0xFF8E44AD, v -> presentFragment(new AiPreferencesActivity())));
                     items.add(new CoreItem(LocaleController.getString("Chats", R.string.Chats), LocaleController.getString("ChatsDesc", R.string.ChatsDesc), R.drawable.msg_discussion, 0xFF4CAF50, v -> presentFragment(new NekoChatSettingsActivity())));
-                    items.add(new CoreItem(LocaleController.getString("Plugins", R.string.Plugins), LocaleController.getString("PluginsDesc", R.string.PluginsDesc), R.drawable.msg_fave, 0xFF009688, v -> presentFragment(new PluginsActivity())));
+                    if (PluginsController.isPluginEngineSupported()) {
+                        items.add(new CoreItem(LocaleController.getString("Plugins", R.string.Plugins), LocaleController.getString("PluginsDesc", R.string.PluginsDesc), R.drawable.msg_plugins, 0xFF009688, v -> presentFragment(new PluginsActivity())));
+                    }
                     if (!PasscodeHelper.isSettingsHidden()) {
                         items.add(new CoreItem(LocaleController.getString("Passcode", R.string.Passcode), LocaleController.getString("PasscodeDesc", R.string.PasscodeDesc), R.drawable.msg_permissions, 0xFFF44336, v -> presentFragment(new NekoPasscodeSettingsActivity())));
                     }

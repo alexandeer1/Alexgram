@@ -92,9 +92,15 @@ public class ApplicationLoader extends Application {
 
     private static ConnectivityManager connectivityManager;
     private static volatile boolean applicationInited = false;
+    private static volatile boolean pluginLifecycleCallbacksRegistered = false;
     private static volatile  ConnectivityManager.NetworkCallback networkCallback;
     private static long lastNetworkCheckTypeTime;
     private static int lastKnownNetworkType = -1;
+    private static int pluginStartedActivities;
+    private static int pluginResumedActivities;
+    private static final long PLUGIN_LIFECYCLE_DISPATCH_DELAY_MS = 200L;
+    private static final Runnable pluginPauseEventRunnable = () -> com.exteragram.messenger.plugins.PluginsController.getInstance().executeOnAppEvent(com.exteragram.messenger.plugins.PluginsConstants.APP_PAUSE);
+    private static final Runnable pluginStopEventRunnable = () -> com.exteragram.messenger.plugins.PluginsController.getInstance().executeOnAppEvent(com.exteragram.messenger.plugins.PluginsConstants.APP_STOP);
 
     public static long startTime;
 
@@ -240,6 +246,11 @@ public class ApplicationLoader extends Application {
         }
         applicationInited = true;
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
+        try {
+            com.exteragram.messenger.plugins.utils.NativeCrashHandler.init(com.exteragram.messenger.plugins.utils.NativeCrashHandler.getCrashFlagPath());
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
 
         try {
             LocaleController.getInstance(); //TODO improve
@@ -295,6 +306,9 @@ public class ApplicationLoader extends Application {
         SharedConfig.loadConfig();
         NekoConfig.init();
         NaConfig.init();
+        com.exteragram.messenger.ExteraConfig.init();
+        installPluginCrashHandler();
+        registerPluginLifecycleCallbacks();
         tw.nekomimi.nekogram.helpers.HiddenAccountsController.getInstance().restoreHiddenState();
         SharedPrefsHelper.init(applicationContext);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!NaConfig.INSTANCE.getDisableCrashlyticsCollection().Bool());
@@ -353,6 +367,112 @@ public class ApplicationLoader extends Application {
                 () -> org.telegram.utils.twidget.WidgetSandboxSession.prewarmEngine(applicationContext)), 3000);
     }
 
+    // ------------------------------------------------------------------ plugins (ported from NagramXF)
+
+    private static void installPluginCrashHandler() {
+        if (!com.exteragram.messenger.ExteraConfig.pluginsEngine) {
+            return;
+        }
+        final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+            try {
+                String stackTrace = Log.getStackTraceString(error);
+                String crashedPluginId = null;
+                for (String pluginId : com.exteragram.messenger.plugins.PluginsController.getInstance().plugins.keySet()) {
+                    if (stackTrace.contains(pluginId)) {
+                        crashedPluginId = pluginId;
+                    }
+                }
+                if (crashedPluginId != null) {
+                    com.exteragram.messenger.plugins.PluginsController.markPendingSafeModeCrash(
+                            com.exteragram.messenger.plugins.PluginsController.SafeModeReason.PLUGIN_CRASH, crashedPluginId);
+                }
+            } catch (Throwable ignore) {
+            }
+            if (previous != null) {
+                previous.uncaughtException(thread, error);
+            }
+        });
+    }
+
+    private static void registerPluginLifecycleCallbacks() {
+        if (pluginLifecycleCallbacksRegistered || applicationLoaderInstance == null) {
+            return;
+        }
+        pluginLifecycleCallbacksRegistered = true;
+        applicationLoaderInstance.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(@NonNull Activity activity, @Nullable android.os.Bundle savedInstanceState) {
+            }
+
+            @Override
+            public void onActivityStarted(@NonNull Activity activity) {
+                cancelPluginStopEvent();
+                pluginStartedActivities++;
+            }
+
+            @Override
+            public void onActivityResumed(@NonNull Activity activity) {
+                cancelPluginPauseEvent();
+                if (++pluginResumedActivities == 1) {
+                    com.exteragram.messenger.plugins.PluginsController.getInstance().executeOnAppEvent(com.exteragram.messenger.plugins.PluginsConstants.APP_RESUME);
+                }
+            }
+
+            @Override
+            public void onActivityPaused(@NonNull Activity activity) {
+                if (pluginResumedActivities > 0 && --pluginResumedActivities == 0) {
+                    schedulePluginPauseEvent();
+                }
+            }
+
+            @Override
+            public void onActivityStopped(@NonNull Activity activity) {
+                if (pluginStartedActivities > 0 && --pluginStartedActivities == 0) {
+                    schedulePluginStopEvent();
+                }
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull android.os.Bundle outState) {
+            }
+
+            @Override
+            public void onActivityDestroyed(@NonNull Activity activity) {
+            }
+        });
+    }
+
+    private static void cancelPluginPauseEvent() {
+        if (applicationHandler != null) {
+            applicationHandler.removeCallbacks(pluginPauseEventRunnable);
+        }
+    }
+
+    private static void cancelPluginStopEvent() {
+        if (applicationHandler != null) {
+            applicationHandler.removeCallbacks(pluginStopEventRunnable);
+        }
+    }
+
+    private static void schedulePluginPauseEvent() {
+        if (applicationHandler != null) {
+            applicationHandler.removeCallbacks(pluginPauseEventRunnable);
+            applicationHandler.postDelayed(pluginPauseEventRunnable, PLUGIN_LIFECYCLE_DISPATCH_DELAY_MS);
+        } else {
+            pluginPauseEventRunnable.run();
+        }
+    }
+
+    private static void schedulePluginStopEvent() {
+        if (applicationHandler != null) {
+            applicationHandler.removeCallbacks(pluginStopEventRunnable);
+            applicationHandler.postDelayed(pluginStopEventRunnable, PLUGIN_LIFECYCLE_DISPATCH_DELAY_MS);
+        } else {
+            pluginStopEventRunnable.run();
+        }
+    }
+
     public ApplicationLoader() {
         super();
     }
@@ -375,13 +495,6 @@ public class ApplicationLoader extends Application {
 
         // AndroidUtilities must be initialized before FileLog
         final String helloWorld = AndroidUtilities.getHelloWorld();
-
-        // ZaStoGram plugin engine: start CPython + load enabled .plugin files (off the main thread).
-        try {
-            org.telegram.plugins.PluginsController.getInstance().init(applicationContext);
-        } catch (Throwable t) {
-            FileLog.e(t);
-        }
 
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d(helloWorld);
@@ -882,13 +995,6 @@ public class ApplicationLoader extends Application {
 
     public boolean onSuggestionClick(String suggestion) {
         return false;
-    }
-
-    public void addItemOptions(ItemOptions itemOptions) {
-        try {
-            org.telegram.plugins.PluginsController.getInstance().addDrawerMenuItems(itemOptions);
-        } catch (Throwable ignore) {
-        }
     }
 
     public boolean checkRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) {

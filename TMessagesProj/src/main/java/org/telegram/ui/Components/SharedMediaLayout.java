@@ -7895,6 +7895,12 @@ public class SharedMediaLayout extends FrameLayout implements Theme.Colorable, N
                     SharedDocumentCell cell = (SharedDocumentCell) view;
                     TLRPC.Document document = message.getDocument();
                     if (cell.isLoaded()) {
+                        // --- Plugins (ported from NagramXF) ---
+                        if (com.exteragram.messenger.plugins.PluginsController.isPlugin(message)) {
+                            com.exteragram.messenger.plugins.PluginsController.getInstance().showInstallDialog(profileActivity, message);
+                            return;
+                        }
+                        // --- Plugins ---
                         if (message.canPreviewDocument()) {
                             PhotoViewer.getInstance().setParentActivity(profileActivity);
                             index = sharedMediaData[selectedMode].messages.indexOf(message);
@@ -7907,7 +7913,7 @@ public class SharedMediaLayout extends FrameLayout implements Theme.Colorable, N
                             }
                             return;
                         }
-                        AndroidUtilities.openDocument(message, profileActivity.getParentActivity(), profileActivity);
+                        AndroidUtilities.openDocument(message, profileActivity.getParentActivity(), profileActivity, com.exteragram.messenger.plugins.IntentsController.PLACE_SHARED_MEDIA_LAYOUT);
                     } else if (!cell.isLoading()) {
                         MessageObject messageObject = cell.getMessage();
                         messageObject.putInDownloadsStore = true;

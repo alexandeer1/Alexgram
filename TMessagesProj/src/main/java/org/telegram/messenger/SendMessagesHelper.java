@@ -4929,6 +4929,12 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     }
 
     public void sendMessage(SendMessageParams sendMessageParams) {
+        // --- Plugins (ported from NagramXF) ---
+        sendMessageParams = com.exteragram.messenger.plugins.PluginsController.getInstance().executeSendMessageHook(currentAccount, sendMessageParams);
+        if (sendMessageParams == null) {
+            return;
+        }
+        // --- Plugins ---
         final SendMessageChatArguments sendMessageChatArguments = sendMessageParams.sendMessageChatArguments != null ?
                 sendMessageParams.sendMessageChatArguments : SendMessageChatArguments.EMPTY;
         String message = sendMessageParams.message;
@@ -5025,10 +5031,12 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         }
 
         final long payStars = ephemeralReceiverBotId != 0 ? 0 : _payStars;
-        if (payStars != sendMessageParams.payStars && !isGroup && ephemeralReceiverBotId == 0) {
+        // final copy so the plugin-hook-reassigned params stay capturable in the lambda below
+        final SendMessageParams hookedSendMessageParams = sendMessageParams;
+        if (payStars != hookedSendMessageParams.payStars && !isGroup && ephemeralReceiverBotId == 0) {
             AlertsCreator.ensurePaidMessageConfirmation(currentAccount, peer, 1, newPayStars -> {
-                sendMessageParams.payStars = newPayStars;
-                sendMessage(sendMessageParams);
+                hookedSendMessageParams.payStars = newPayStars;
+                sendMessage(hookedSendMessageParams);
             });
             return;
         }

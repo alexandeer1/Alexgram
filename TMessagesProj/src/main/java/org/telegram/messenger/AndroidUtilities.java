@@ -4528,6 +4528,10 @@ public class AndroidUtilities {
     }
 
     public static void openDocument(MessageObject message, Activity activity, BaseFragment parentFragment) {
+        openDocument(message, activity, parentFragment, com.exteragram.messenger.plugins.IntentsController.resolvePlace(parentFragment));
+    }
+
+    public static void openDocument(MessageObject message, Activity activity, BaseFragment parentFragment, int place) {
         if (message == null) {
             return;
         }
@@ -4544,6 +4548,12 @@ public class AndroidUtilities {
             f = FileLoader.getInstance(UserConfig.selectedAccount).getPathToMessage(message.messageOwner);
         }
         if (f != null && f.exists()) {
+            // --- Plugins (ported from NagramXF): plugins can intercept file opens ---
+            if (com.exteragram.messenger.plugins.IntentsController.dispatchFileOpen(
+                    place,
+                    f, fileName, message, activity, parentFragment)) {
+                return;
+            }
             if (parentFragment != null && f.getName().toLowerCase().endsWith("attheme")) {
                 Theme.ThemeInfo themeInfo = Theme.applyThemeFile(f, message.getDocumentName(), null, true);
                 if (themeInfo != null) {
@@ -4619,13 +4629,6 @@ public class AndroidUtilities {
 
     public static boolean openForView(File f, String fileName, String mimeType, final Activity activity, Theme.ResourcesProvider resourcesProvider, boolean restrict) {
         if (f != null && f.exists()) {
-            // ZaStoGram: a .plugin opened in-app (e.g. tapped in a chat) -> review-and-install dialog,
-            // not an external viewer/browser.
-            if (fileName != null && fileName.length() >= 7
-                    && fileName.regionMatches(true, fileName.length() - 7, ".plugin", 0, 7)
-                    && org.telegram.ui.Plugins.PluginsActivity.offerInstall(activity, f)) {
-                return true;
-            }
             String realMimeType = null;
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

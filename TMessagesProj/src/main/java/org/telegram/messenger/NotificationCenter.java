@@ -410,7 +410,14 @@ public class NotificationCenter {
     public static final int updateLoginToken = totalEvents++;
     public static final int accountLogin = totalEvents++;
     public static final int voiceChangerUpdated = totalEvents++;
-    public static final int pluginsDidLoad = totalEvents++;
+
+    // plugin engine (ported from NagramXF)
+    public static final int pluginsUpdated = totalEvents++;
+    public static final int pluginMenuItemsUpdated = totalEvents++;
+    public static final int pluginSettingsRegistered = totalEvents++;
+    public static final int pluginSettingsUnregistered = totalEvents++;
+    public static final int pluginIsNotResponding = totalEvents++;
+    public static final int pluginsPySdkInfoChanged = totalEvents++;
 
     private final SparseArray<ArrayList<NotificationCenterDelegate>> observers = new SparseArray<>();
     private final SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();

@@ -499,6 +499,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private boolean videoCallItemVisible;
     private boolean editItemVisible;
     private ImageView callToActionItem;
+    // --- Plugins (ported from NagramXF) ---
+    private static final int PLUGIN_PROFILE_ACTION_MENU_OPTION_BASE = 0x72000000;
+    private final SparseArray<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginProfileMenuItemsByOption = new SparseArray<>();
+    // --- Plugins ---
 
     private ActionBarMenuItem animatingItem;
     private ActionBarMenuItem callItem;
@@ -506,6 +510,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private ActionBarMenuItem editItem;
     private ActionBarMenuItem otherItem;
     private ActionBarMenuItem searchItem;
+    // --- Plugins (ported from NagramXF) ---
+    private ActionBarMenuItem.Item pluginProfileMenuGapItem;
+    private ActionBarMenuItem.Item pluginProfileMenuItem;
+    private com.exteragram.messenger.plugins.ui.components.PluginsMenuWrapper pluginProfileMenuWrapper;
+    // --- Plugins ---
     private ActionBarMenuSubItem editColorItem;
     private ActionBarMenuSubItem linkItem;
     private ActionBarMenuSubItem setUsernameItem;
@@ -2316,6 +2325,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().addWeakObserver(this, NotificationCenter.profileMusicUpdated);
         getNotificationCenter().addWeakObserver(this, NotificationCenter.updatedChatRanks);
         NotificationCenter.getGlobalInstance().addWeakObserver(this, NotificationCenter.emojiLoaded);
+        // --- Plugins (ported from NagramXF) ---
+        NotificationCenter.getGlobalInstance().addWeakObserver(this, NotificationCenter.pluginMenuItemsUpdated);
+        // --- Plugins ---
         updateRowsIds();
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
@@ -2473,6 +2485,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().removeObserver(this, NotificationCenter.profileMusicUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.updatedChatRanks);
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
+        // --- Plugins (ported from NagramXF) ---
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.pluginMenuItemsUpdated);
+        // --- Plugins ---
         if (avatarsViewPager != null) {
             avatarsViewPager.onDestroy();
         }
@@ -9609,6 +9624,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, final Object... args) {
+        // --- Plugins (ported from NagramXF) ---
+        if (id == NotificationCenter.pluginMenuItemsUpdated) {
+            refreshPluginProfileActionMenuItems();
+            return;
+        }
+        // --- Plugins ---
         if (id == NotificationCenter.uploadStoryEnd || id == NotificationCenter.chatWasBoostedByUser) {
             checkCanSendStoryForPosting();
         } else if (id == NotificationCenter.updateInterfaces) {
@@ -12716,12 +12737,113 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         return color;
     }
 
+    // ------------------------------------------------------------------ plugins (ported from NagramXF)
+
+    private boolean handlePluginProfileMenuOption(int option) {
+        com.exteragram.messenger.plugins.hooks.MenuItemRecord pluginItem = pluginProfileMenuItemsByOption.get(option);
+        if (pluginItem == null) {
+            return false;
+        }
+        try {
+            pluginItem.onClickCallback.call(buildProfileActionMenuPluginContext());
+        } catch (Throwable t) {
+            FileLog.e("Failed to execute profile action plugin menu item " + pluginItem.itemId + " from plugin " + pluginItem.pluginId, t);
+        }
+        return true;
+    }
+
+    private void appendPluginProfileActionMenuItems() {
+        if (otherItem == null) {
+            return;
+        }
+        java.util.Map<String, Object> contextData = buildProfileActionMenuPluginContext();
+        java.util.List<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMenuItems = com.exteragram.messenger.plugins.PluginsController.getInstance().getMenuItemsForLocation(
+                com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.PROFILE_ACTION_MENU,
+                contextData);
+
+        pluginProfileMenuWrapper = new com.exteragram.messenger.plugins.ui.components.PluginsMenuWrapper(this, otherItem.getPopupLayout().getSwipeBack(), pluginMenuItems, com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.PROFILE_ACTION_MENU, contextData, getResourceProvider()) {
+            @Override
+            protected void closeMenu() {
+                if (otherItem != null && otherItem.isSubMenuShowing()) {
+                    otherItem.toggleSubMenu();
+                }
+            }
+        };
+        pluginProfileMenuGapItem = otherItem.lazilyAddColoredGap();
+        pluginProfileMenuItem = otherItem.lazilyAddSwipeBackItem(R.drawable.msg_plugins, null, LocaleController.getString(R.string.Plugins), pluginProfileMenuWrapper.getSwipeBackView());
+
+        boolean visible = !pluginMenuItems.isEmpty();
+        pluginProfileMenuGapItem.setVisibility(visible);
+        pluginProfileMenuItem.setVisibility(visible);
+    }
+
+    private void refreshPluginProfileActionMenuItems() {
+        if (otherItem == null) {
+            return;
+        }
+        if (otherItem.isSubMenuShowing()) {
+            otherItem.closeSubMenu();
+        }
+
+        java.util.Map<String, Object> contextData = buildProfileActionMenuPluginContext();
+        java.util.List<com.exteragram.messenger.plugins.hooks.MenuItemRecord> pluginMenuItems = com.exteragram.messenger.plugins.PluginsController.getInstance().getMenuItemsForLocation(
+                com.exteragram.messenger.plugins.PluginsConstants.MenuItemTypes.PROFILE_ACTION_MENU,
+                contextData);
+
+        if (pluginProfileMenuWrapper == null || pluginProfileMenuItem == null || pluginProfileMenuGapItem == null) {
+            appendPluginProfileActionMenuItems();
+            return;
+        }
+
+        pluginProfileMenuWrapper.setContextData(contextData);
+        pluginProfileMenuWrapper.rebuildMenu(pluginMenuItems);
+
+        boolean visible = !pluginMenuItems.isEmpty();
+        pluginProfileMenuGapItem.setVisibility(visible);
+        pluginProfileMenuItem.setVisibility(visible);
+    }
+
+    private void detachPluginProfileMenuWrapper() {
+        if (pluginProfileMenuWrapper != null) {
+            View swipeBackView = pluginProfileMenuWrapper.getSwipeBackView();
+            if (swipeBackView.getParent() instanceof ViewGroup) {
+                ((ViewGroup) swipeBackView.getParent()).removeView(swipeBackView);
+            }
+        }
+        pluginProfileMenuGapItem = null;
+        pluginProfileMenuItem = null;
+        pluginProfileMenuWrapper = null;
+    }
+
+    private java.util.Map<String, Object> buildProfileActionMenuPluginContext() {
+        return com.exteragram.messenger.plugins.utils.MenuContextBuilder.from(this)
+                .withDialogId(getDialogId())
+                .withChat(currentChat)
+                .withChatFull(chatInfo)
+                .withUser(userId != 0 ? getMessagesController().getUser(userId) : null)
+                .withUserFull(userInfo)
+                .withBotInfo(botInfo)
+                .withEncryptedChat(currentEncryptedChat)
+                .withCustom("chatId", chatId)
+                .withCustom("userId", userId)
+                .withCustom("topicId", topicId)
+                .withCustom("isTopic", isTopic)
+                .withCustom("myProfile", myProfile)
+                .build();
+    }
+
+    // ------------------------------------------------------------------ end plugins
+
     private void createActionBarMenu(boolean animated) {
         if (actionBar == null || otherItem == null) {
             return;
         }
         Context context = actionBar.getContext();
+        // --- Plugins (ported from NagramXF) ---
+        detachPluginProfileMenuWrapper();
         otherItem.removeAllSubItems();
+        pluginProfileMenuItemsByOption.clear();
+        // --- Plugins ---
         animatingItem = null;
 
         editItemVisible = false;
@@ -13025,6 +13147,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         if (selfUser && !myProfile) {
             otherItem.addSubItem(logout, R.drawable.msg_leave, LocaleController.getString(R.string.LogOut));
         }
+        // --- Plugins (ported from NagramXF) ---
+        appendPluginProfileActionMenuItems();
+        // --- Plugins ---
         if (!isPulledDown) {
             otherItem.hideSubItem(gallery_menu_save);
             otherItem.hideSubItem(set_as_main);

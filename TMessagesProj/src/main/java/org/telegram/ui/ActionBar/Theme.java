@@ -2598,6 +2598,11 @@ public class Theme {
     public static Path[] chat_updatePath = new Path[3];
     public static Drawable chat_flameIcon;
     public static Drawable chat_gifIcon;
+    // --- Plugins (ported from NagramXF) ---
+    public static Drawable chat_pluginIcon;
+    public static Drawable chat_settingsIcon;
+    public static Drawable chat_stickersIcon;
+    // --- Plugins ---
 
     private static AudioVisualizerDrawable chat_msgAudioVisualizeDrawable;
     private static HashMap<MessageObject, AudioVisualizerDrawable> animatedOutVisualizerDrawables;
@@ -8515,6 +8520,11 @@ public class Theme {
 
             chat_flameIcon = resources.getDrawable(R.drawable.filled_fire).mutate();
             chat_gifIcon = resources.getDrawable(R.drawable.msg_round_gif_m).mutate();
+            // --- Plugins (ported from NagramXF) ---
+            chat_pluginIcon = resources.getDrawable(R.drawable.plugins_filled).mutate();
+            chat_settingsIcon = resources.getDrawable(R.drawable.filled_profile_settings).mutate();
+            chat_stickersIcon = resources.getDrawable(R.drawable.deproko_baseline_stickers_filled_24).mutate();
+            // --- Plugins ---
 
             chat_fileStatesDrawable[0][0] = createCircleDrawableWithIcon(dp(44), R.drawable.msg_round_play_m);
             chat_fileStatesDrawable[0][1] = createCircleDrawableWithIcon(dp(44), R.drawable.msg_round_play_m);

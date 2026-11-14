@@ -229,7 +229,7 @@
     <string name="DeletePack">Delete Pack</string>
     <string name="DeletePackInfo">Are you sure you want to delete **%1$s**?</string>
     <string name="EditIconPackInfo">Edit Info</string>
-    <string name="EnableAfterInstallation">Enable After Installation</string>
+
     <string name="EnabledPacks">Enabled Packs</string>
     <string name="IconPack">Icon Pack</string>
     <string name="IconPackErrorArchiveTooLarge">Icon pack is too large.</string>
@@ -569,13 +569,13 @@
     <string name="ChatAutoDownloadFiles">Files &amp; Documents</string>
     <string name="ChatAutoDownloadVoice">Voice &amp; Video Notes</string>
     <string name="ChatAutoDownloadAudio">Music &amp; Audio</string>
-    <string name="Plugins">Plugins</string>
+
     <string name="ChoosePluginFile">Choose .plugin file</string>
     <string name="CouldNotOpenFileSelector">Could not open file selector</string>
     <string name="NotValidPluginFile">This does not appear to be a valid .plugin file</string>
-    <string name="PluginInstalled">Plugin «%s» installed</string>
-    <string name="UpdatePlugin">Update plugin?</string>
-    <string name="InstallPlugin">Install plugin?</string>
+
+
+
     <string name="AlreadyInstalledVersion">Already installed: v%1$s  →  v%2$s</string>
     <string name="RequiresVersion">Requires version %s+</string>
     <string name="Install">Install</string>
@@ -599,4 +599,92 @@
     <string name="FriendsActivitiesTab">Activities</string>
     <string name="FriendsActivitiesEmpty">No recent activities in shared chats.</string>
     <string name="FriendsActivitiesHowItWorks">Go to a contact\'s profile → tap the Activities tab to see their latest messages in groups and channels you both share.</string>
+
+
+    <!-- plugin engine (ported from NagramXF) -->
+    <string name="CheckingForUpdates">Checking for updates…</string>
+    <string name="EnableAfterInstallation">Enable after installation</string>
+    <string name="EnablePluginsEngine">Enable plugins engine</string>
+    <string name="EnterValue">Enter value</string>
+    <string name="InstallPlugin">Install plugin</string>
+    <string name="LatestVersionInstalled">Latest version installed</string>
+    <string name="Links">Links</string>
+    <string name="LoadingUpdate">Downloading update…</string>
+    <string name="PluginDelete">Delete plugin?</string>
+    <string name="PluginDeleteInfo">Delete plugin &lt;b&gt;%1$s&lt;/b&gt;? This action can\'t be undone.</string>
+    <string name="PluginDependencyDownloadingProgress">Downloading %1$s (%2$d%%)…</string>
+    <string name="PluginDependencyInstalling">Installing %1$s %2$s…</string>
+    <string name="PluginDependencyNativeUnsupported">Dependency %1$s only provides native wheels in the selected version range. This client currently supports pure-Python wheels only.</string>
+    <string name="PluginDependencyNoCompatibleWheel">No compatible pure-Python wheel was found for %1$s.</string>
+    <string name="PluginDependencyPreparing">Preparing plugin dependencies…</string>
+    <string name="PluginDependencyPythonUnsupported">Dependency %1$s requires Python %2$s, but this client runs Python 3.11.</string>
+    <string name="PluginDependencyResolving">Resolving %1$s…</string>
+    <string name="PluginDependencySourceUnsupported">Dependency %1$s only provides source distributions in the selected version range. This client currently supports pure-Python wheels only.</string>
+    <string name="PluginDisableError">Failed to disable %1$s.</string>
+    <string name="PluginEnableError">Failed to enable %1$s.</string>
+    <string name="PluginEngineNotEnabled">Plugin engine is disabled. Open plugin settings for %1$s?</string>
+    <string name="PluginHasNoSettings">%1$s has no settings.</string>
+    <string name="PluginInstallError">Failed to install plugin %1$s.</string>
+    <string name="PluginInstalled">%1$s installed</string>
+    <string name="PluginInstalledButFailedToEnable">%1$s was installed, but enabling failed.</string>
+    <string name="PluginIsNotResponding">Plugin isn\'t responding.</string>
+    <string name="PluginIsNotRespondingAlert">%1$s isn\'t responding</string>
+    <string name="PluginNoAuthor">Unknown author</string>
+    <string name="PluginNoDescription">No description</string>
+    <string name="PluginNotEnabled">Plugin support is disabled. Open settings to enable %1$s?</string>
+    <string name="PluginNotFound">Plugin %1$s was not found.</string>
+    <string name="PluginOpenExternalError">Couldn\'t open %1$s in an external app.</string>
+    <string name="PluginSettingNotFound">The target plugin setting was not found.</string>
+    <string name="PluginSourceTrusted">Trusted source</string>
+    <string name="PluginSourceTrustedInfo">This plugin comes from a trusted source.</string>
+    <string name="PluginSourceUnknown">Unknown source</string>
+    <string name="PluginSourceUnknownInfo">This plugin comes from an unknown source. Review it carefully before installing.</string>
+    <string name="PluginUpdated">%1$s updated</string>
+    <string name="PluginVersion">Version</string>
+    <string name="Plugins">Plugins</string>
+    <string name="PluginsCompactView">Compact view</string>
+    <string name="PluginsDevMode">Developer mode</string>
+    <string name="PluginsDevServerLaunched">Plugin dev server started</string>
+    <string name="PluginsDevServerStopped">Plugin dev server stopped</string>
+    <string name="PluginsDevTools">Developer tools</string>
+    <string name="PluginsDisableArt">Compatibility Mode</string>
+    <string name="PluginsDisableArtInfo">Prevents plugin hook failures by disabling ART Profile Saver.</string>
+    <string name="PluginsDocumentation">Documentation</string>
+    <string name="PluginsEngine">Plugins Engine</string>
+    <string name="PluginsInfo">Install and manage .plugin files here.</string>
+    <string name="PluginsInstallSmokeTest">Install smoke test plugin</string>
+    <string name="PluginsInstallSmokeTestInfo">Developer-only helper plugin for validating app events, request/update hooks, send-message hooks, and plugin menu callbacks.</string>
+    <string name="PluginsInstallSmokeTestPrepareError">Failed to prepare the bundled smoke test plugin.</string>
+    <string name="PluginsNativeRuntimeUnavailable">Plugin native hook runtime is unavailable. Method-hook based plugins may not work until the app is restarted with all native libraries loaded.</string>
+    <string name="PluginsNotFound">No plugins found</string>
+    <string name="PluginsPoweredBy">Powered by &lt;a href="https://chaquo.com/chaquopy/"&gt;Chaquopy&lt;/a&gt; and &lt;a href="https://github.com/Aliucord/hook"&gt;AliuHook&lt;/a&gt;.</string>
+    <string name="PluginsPySdkAutoUpdate">Update Automatically</string>
+    <string name="PluginsPySdkCheckUpdates">Check for Updates</string>
+    <string name="PluginsPySdkCheckingForUpdates">Checking for updates…</string>
+    <string name="PluginsPySdkEnableBetaVersion">Install Beta Versions</string>
+    <string name="PluginsPySdkLatestVersionInstalled">Latest SDK version installed</string>
+    <string name="PluginsPySdkLoadingUpdate">Downloading update…</string>
+    <string name="PluginsPySdkUpdateFailed">SDK update failed</string>
+    <string name="PluginsPythonRuntimeUnavailable">Plugin Python runtime failed to initialize. Restart the app and verify the bundled plugin dependencies are present.</string>
+    <string name="PluginsRestartEngine">Restart Plugin Engine</string>
+    <string name="PluginsSafeMode">Plugins safe mode</string>
+    <string name="PluginsSafeModeInfo">Plugins were disabled after a crash. You can leave safe mode and restart the engine.</string>
+    <string name="PluginsSafeModeInfo2">Safe mode keeps all plugins disabled until you turn it off manually.</string>
+    <string name="PluginsSafeModeInfoCrashGeneric">Plugins were disabled after a crash. Review your plugin setup and leave safe mode when ready.</string>
+    <string name="PluginsSafeModeInfoManual">Plugins safe mode is enabled manually. Disable safe mode to load plugins again.</string>
+    <string name="PluginsSafeModeInfoNativeCrash">Plugins were disabled after a native crash. Leave safe mode only after checking your installed plugins.</string>
+    <string name="PluginsSafeModeInfoPluginCrash">Plugin %1$s was disabled after a crash. Leave safe mode when you are ready to restore the remaining plugins.</string>
+    <string name="PluginsSafeModeShortcut">Start with safe mode</string>
+    <string name="PluginsSettingsShowOriginal">Show original text</string>
+    <string name="PluginsSettingsTranslate">Translate settings</string>
+    <string name="PluginsTrusted">Trusted plugins</string>
+    <string name="ResetPluginSettings">%1$s settings reset</string>
+    <string name="ResetPluginSettingsInfo">Reset all saved settings for &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="PluginResetSettings">Reset Settings</string>
+    <string name="RestartPluginSystemToApplyUpdate">Update loaded, restart Plugin Engine to apply</string>
+    <string name="RestoreSdkFromApk">Restore SDK from APK</string>
+    <string name="UpdatePlugin">Update plugin</string>
+    <string name="NoSuchSetting">Setting not found</string>
+    <string name="EnableAutoUpdate">Update automatically</string>
+    <string name="UpdateAvailable">Update available</string>
 </resources>
