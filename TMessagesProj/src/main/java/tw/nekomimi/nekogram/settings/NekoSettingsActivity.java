@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -174,15 +173,9 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         AlexgramSettingsHeaderView backgroundView = new AlexgramSettingsHeaderView(context);
         frameLayout.addView(backgroundView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(LocaleController.getString("NekoSettings", R.string.NekoSettings));
-        actionBar.setBackgroundColor(Color.TRANSPARENT);
-        actionBar.setCastShadows(false);
-        actionBar.setAddToContainer(false);
-        
-        int color = isDark ? Color.WHITE : 0xFF1A1A2E;
-        actionBar.setItemsColor(color, false);
-        actionBar.setTitleColor(color);
+        // [Alexgram: Glass Header] Telegram glass header: back arrow in a glass circle
+        simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+        simpleActionBar.setTitle(LocaleController.getString("NekoSettings", R.string.NekoSettings));
         
         final FrameLayout searchContainer = new FrameLayout(context);
         searchContainer.setVisibility(View.GONE);
@@ -199,7 +192,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         
         final int search_id = 1;
         final int cloud_id = 2;
-        org.telegram.ui.ActionBar.ActionBarMenu menu = actionBar.createMenu();
+        org.telegram.ui.ActionBar.SimpleActionBarMenu menu = simpleActionBar.createMenu();
         org.telegram.ui.ActionBar.ActionBarMenuItem searchItem = menu.addItem(search_id, R.drawable.ic_ab_search_solar);
         searchItem.setIsSearchField(true).setActionBarMenuItemSearchListener(new org.telegram.ui.ActionBar.ActionBarMenuItem.ActionBarMenuItemSearchListener() {
             @Override
@@ -225,10 +218,8 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
         searchItem.setSearchFieldHint("Search anything...");
         
         org.telegram.ui.ActionBar.ActionBarMenuItem cloudItem = menu.addItem(cloud_id, R.drawable.cloud_sync);
-        if (searchItem != null) searchItem.setIconColor(color);
-        if (cloudItem != null) cloudItem.setIconColor(color);
         
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
@@ -239,7 +230,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
             }
         });
 
-        actionBar.getTitleTextView().setAlpha(0.0f);
+        simpleActionBar.setTitlesAlpha(0.0f);
         
         listView = new org.telegram.ui.Components.BlurredRecyclerView(context);
         listView.disableBlurTopPadding = true;
@@ -255,13 +246,12 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 int scrollY = recyclerView.computeVerticalScrollOffset();
                 float alpha = Math.max(0, Math.min(1.0f, (scrollY - AndroidUtilities.dp(100)) / (float) AndroidUtilities.dp(60)));
-                actionBar.getTitleTextView().setAlpha(alpha);
-                actionBar.setBackgroundColor(ColorUtils.setAlphaComponent(isDark ? 0xFF1E2732 : Color.WHITE, (int) (alpha * 255)));
+                simpleActionBar.setTitlesAlpha(alpha);
             }
         });
         
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        frameLayout.addView(searchContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));  frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        frameLayout.addView(searchContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));  // the glass header (SimpleActionBar) is added on top by the framework
 
         return fragmentView;
     }
@@ -983,7 +973,7 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                     addToRecentSearches(item.key);
                     try {
                         if (item.fragmentClass == NekoSettingsActivity.class) {
-                            actionBar.closeSearchField();
+                            simpleActionBar.closeSearchField();
                             scrollToRow(item.key, null);
                         } else {
                             BaseFragment fragment = item.fragmentClass.getConstructor().newInstance();
@@ -1013,5 +1003,4 @@ public class NekoSettingsActivity extends BaseNekoSettingsActivity {
                     AppRestartHelper.triggerRebirth(getParentActivity(), new Intent(getParentActivity(), LaunchActivity.class));
                 });
     }
-}
-// [Alexgram: A-Settings UI] - End
+}// [Alexgram: A-Settings UI] - End

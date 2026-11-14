@@ -19,8 +19,8 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
-import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
+import org.telegram.ui.ActionBar.SimpleActionBarMenu;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.ItemOptions;
 import org.telegram.ui.Components.UItem;
@@ -38,6 +38,12 @@ public class FeedChannelsActivity extends BasePreferencesActivity implements Not
     @Override
     public String getTitle() {
         return LocaleController.getString("FeedSettings", R.string.FeedSettings);
+    }
+
+    // [Alexgram: Glass Header] Telegram glass header like the Plugins page
+    @Override
+    protected boolean useSimpleActionBar() {
+        return true;
     }
 
     @Override
@@ -66,7 +72,7 @@ public class FeedChannelsActivity extends BasePreferencesActivity implements Not
     @Override
     public View createView(Context context) {
         View view = super.createView(context);
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
@@ -79,7 +85,7 @@ public class FeedChannelsActivity extends BasePreferencesActivity implements Not
             }
         });
 
-        ActionBarMenu menu = actionBar.createMenu();
+        SimpleActionBarMenu menu = simpleActionBar.createMenu();
         menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
             @Override
             public void onSearchExpand() {
@@ -126,7 +132,7 @@ public class FeedChannelsActivity extends BasePreferencesActivity implements Not
         if (!check) {
             return false;
         }
-        actionBar.closeSearchField();
+        simpleActionBar.closeSearchField();
         return false;
     }
 

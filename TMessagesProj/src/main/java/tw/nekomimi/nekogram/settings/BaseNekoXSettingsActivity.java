@@ -97,24 +97,16 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
     @Override
     public View createView(Context context) {
         setupBrandingColors();
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(getTitle());
+        // [Alexgram: Glass Header] Telegram glass header: back arrow in a glass circle,
+        // menu items in their own glass bubbles (SimpleActionBar, added on top by the framework)
+        simpleActionBar.setBackButtonImage(R.drawable.ic_ab_back);
+        simpleActionBar.setTitle(getTitle());
 
         if (AndroidUtilities.isTablet()) {
-            actionBar.setOccupyStatusBar(false);
+            simpleActionBar.setOccupyStatusBar(false);
         }
 
-        if (isAlexgramTheme()) {
-            actionBar.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-            actionBar.setCastShadows(false);
-            actionBar.setAddToContainer(false);
-            int color = isDark ? android.graphics.Color.WHITE : 0xFF1A1A2E;
-            actionBar.setItemsColor(color, false);
-            actionBar.setTitleColor(color);
-            actionBar.setItemsBackgroundColor(isDark ? 0x0FFFFFFF : 0x0F000000, false);
-        }
-
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+        simpleActionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
@@ -172,16 +164,36 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         frameLayout.addView(tooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
 
         listView.setSections(true);
-        actionBar.setAdaptiveBackground(listView);
-        if (isAlexgramTheme()) {
-            frameLayout.addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-        }
         return fragmentView;
     }
 
     protected boolean isAlexgramTheme() {
         return true;
     }
+
+    // [Alexgram: Glass Header] - Start
+    // All A-Settings pages use Telegram's simple glass header (back arrow in a glass circle)
+    @Override
+    protected boolean useSimpleActionBar() {
+        return true;
+    }
+
+    @Override
+    protected RecyclerListView getListViewForSimpleGlass() {
+        return listView;
+    }
+
+    @Override
+    protected void onViewCreated(View view) {
+        super.onViewCreated(view);
+        // the glass setup swaps in the bitmap sections decoration, which draws nothing
+        // on screen – restore the legacy decorator that paints the rounded cards
+        // (it is a valid IBlur3Capture, so the glass capture keeps working)
+        if (listView != null) {
+            listView.setLegacySections(true);
+        }
+    }
+    // [Alexgram: Glass Header] - End
 
     protected boolean isBreakType(int position) {
         CellGroup cellGroup = getCellGroup();
@@ -526,14 +538,10 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_CELLBACKGROUNDCOLOR, new Class[]{EmptyCell.class, TextSettingsCell.class, TextCheckCell.class, HeaderCell.class, TextDetailSettingsCell.class, NotificationsCheckCell.class}, null, null, null, Theme.key_windowBackgroundWhite));
         themeDescriptions.add(new ThemeDescription(fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundGray));
 
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_avatar_backgroundActionBarBlue));
-        themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_avatar_backgroundActionBarBlue));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_avatar_actionBarIconBlue));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_actionBarDefaultTitle));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_SELECTORCOLOR, null, null, null, null, Theme.key_avatar_actionBarSelectorBlue));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_SUBMENUBACKGROUND, null, null, null, null, Theme.key_actionBarDefaultSubmenuBackground));
-        themeDescriptions.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_SUBMENUITEM, null, null, null, null, Theme.key_actionBarDefaultSubmenuItem));
+        // [Alexgram: Glass Header] the SimpleActionBar themes itself; the legacy ActionBar
+        // color descriptions were dropped with the classic bar
 
+        themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_LISTGLOWCOLOR, null, null, null, null, Theme.key_avatar_backgroundActionBarBlue));
         themeDescriptions.add(new ThemeDescription(listView, ThemeDescription.FLAG_SELECTOR, null, null, null, null, Theme.key_listSelector));
 
         themeDescriptions.add(new ThemeDescription(listView, 0, new Class[]{View.class}, Theme.dividerPaint, null, null, Theme.key_divider));
