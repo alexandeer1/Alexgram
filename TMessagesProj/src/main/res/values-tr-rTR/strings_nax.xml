@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Kaydedilen tüm silinmiş ve düzenlenmiş mesajlar cihazınızdaki bir yedek dosyasına yazılacak. Medya dosyaları zaten İndirilenler klasöründedir ve yeniden yüklemeden sonra da kalır. Yeniden yükledikten sonra her şeyi geri yüklemek için Mesaj geçmişini içe aktar seçeneğini kullanın.</string>
     <string name="MessagesBackupExport">Dışa aktar</string>
     <string name="MessagesBackupExportDone">%1$d silinmiş ve %2$d düzenlenmiş mesaj dışa aktarıldı</string>
+    <string name="MessagesBackupExportSkipped">%1$d mesaj dışa aktarılamadı</string>
     <string name="MessagesBackupExportFailed">Dışa aktarma başarısız</string>
     <string name="MessagesBackupImportDone">%1$d silinmiş ve %2$d düzenlenmiş mesaj içe aktarıldı, %3$d zaten kayıtlı olan atlandı</string>
     <string name="MessagesBackupImportFailed">İçe aktarma başarısız</string>
+    <string name="MessagesBackupAlreadyRunning">Bir yedekleme işlemi zaten çalışıyor</string>
+    <string name="MessagesBackupNotificationChannel">Mesaj yedeği</string>
+    <string name="MessagesBackupExportingNotification">Mesaj geçmişi dışa aktarılıyor…</string>
+    <string name="MessagesBackupImportingNotification">Mesaj geçmişi içe aktarılıyor…</string>
+    <string name="MessagesBackupExportCancelled">Dışa aktarma iptal edildi, eksik dosya silindi</string>
+    <string name="MessagesBackupImportCancelled">İçe aktarma iptal edildi, hiçbir şey geri yüklenmedi</string>
     <string name="MessagesBackupInvalidFile">Bu dosya geçerli bir mesaj yedeği değil</string>
     <string name="MessagesBackupNewerVersion">Bu yedek daha yeni bir uygulama sürümüyle oluşturuldu. Önce uygulamayı güncelleyin</string>
     <string name="MessagesBackupRemapTitle">Farklı hesap</string>

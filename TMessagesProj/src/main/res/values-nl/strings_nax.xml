@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Alle opgeslagen verwijderde en bewerkte berichten worden naar een back-upbestand op je apparaat geschreven. Mediabestanden staan al in de map Downloads en overleven een herinstallatie. Gebruik na het opnieuw installeren Berichtgeschiedenis importeren om alles te herstellen.</string>
     <string name="MessagesBackupExport">Exporteren</string>
     <string name="MessagesBackupExportDone">%1$d verwijderde en %2$d bewerkte berichten geëxporteerd</string>
+    <string name="MessagesBackupExportSkipped">%1$d berichten konden niet worden geëxporteerd</string>
     <string name="MessagesBackupExportFailed">Exporteren mislukt</string>
     <string name="MessagesBackupImportDone">%1$d verwijderde en %2$d bewerkte berichten geïmporteerd, %3$d al opgeslagen overgeslagen</string>
     <string name="MessagesBackupImportFailed">Importeren mislukt</string>
+    <string name="MessagesBackupAlreadyRunning">Er wordt al een back-upbewerking uitgevoerd</string>
+    <string name="MessagesBackupNotificationChannel">Berichtenback-up</string>
+    <string name="MessagesBackupExportingNotification">Berichtgeschiedenis wordt geëxporteerd…</string>
+    <string name="MessagesBackupImportingNotification">Berichtgeschiedenis wordt geïmporteerd…</string>
+    <string name="MessagesBackupExportCancelled">Exporteren geannuleerd, onvolledig bestand verwijderd</string>
+    <string name="MessagesBackupImportCancelled">Importeren geannuleerd, er is niets hersteld</string>
     <string name="MessagesBackupInvalidFile">Dit bestand is geen geldig berichtenback-upbestand</string>
     <string name="MessagesBackupNewerVersion">Deze back-up is gemaakt met een nieuwere app-versie. Werk eerst de app bij</string>
     <string name="MessagesBackupRemapTitle">Ander account</string>

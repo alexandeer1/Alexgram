@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Усі збережені видалені та змінені повідомлення буде записано у файл резервної копії на вашому пристрої. Медіафайли вже є в папці «Завантаження» та залишаться після перевстановлення. Після перевстановлення використайте «Імпорт історії повідомлень», щоб відновити все.</string>
     <string name="MessagesBackupExport">Експорт</string>
     <string name="MessagesBackupExportDone">Експортовано %1$d видалених та %2$d змінених повідомлень</string>
+    <string name="MessagesBackupExportSkipped">Не вдалося експортувати %1$d повідомлень</string>
     <string name="MessagesBackupExportFailed">Помилка експорту</string>
     <string name="MessagesBackupImportDone">Імпортовано %1$d видалених та %2$d змінених повідомлень, пропущено вже збережених: %3$d</string>
     <string name="MessagesBackupImportFailed">Помилка імпорту</string>
+    <string name="MessagesBackupAlreadyRunning">Операція резервного копування вже виконується</string>
+    <string name="MessagesBackupNotificationChannel">Резервне копування повідомлень</string>
+    <string name="MessagesBackupExportingNotification">Експорт історії повідомлень…</string>
+    <string name="MessagesBackupImportingNotification">Імпорт історії повідомлень…</string>
+    <string name="MessagesBackupExportCancelled">Експорт скасовано, неповний файл видалено</string>
+    <string name="MessagesBackupImportCancelled">Імпорт скасовано, нічого не відновлено</string>
     <string name="MessagesBackupInvalidFile">Цей файл не є дійсною резервною копією повідомлень</string>
     <string name="MessagesBackupNewerVersion">Цю резервну копію створено новішою версією програми. Спочатку оновіть програму</string>
     <string name="MessagesBackupRemapTitle">Інший акаунт</string>

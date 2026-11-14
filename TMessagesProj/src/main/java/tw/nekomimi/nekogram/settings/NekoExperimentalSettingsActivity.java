@@ -93,7 +93,7 @@ import xyz.nextalone.nagram.NaConfig;
 
 @SuppressLint("RtlHardcoded")
 @SuppressWarnings("unused")
-public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity {
+public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity implements AyuMessagesBackup.UiListener {
 
     private ListAdapter listAdapter;
 
@@ -186,7 +186,12 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     private final AbstractConfigCell exportMessagesHistoryRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ExportMessagesHistory", null, null, R.drawable.ic_export_chat_na, false, () -> AyuMessagesBackup.showExportDialog(this)));
     private final AbstractConfigCell importMessagesHistoryRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ImportMessagesHistory", null, null, R.drawable.ic_import_chat_na, false, () -> AyuMessagesBackup.showImportDialog(this)));
     // [Alexgram: Messages Backup Rows] - End
-    private final AbstractConfigCell clearMessageDatabaseRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ClearMessageDatabase", null, AyuData.totalSize > 0 ? AndroidUtilities.formatFileSize(AyuData.totalSize) : "...", R.drawable.msg_clear_solar, false, () -> new AlertDialog.Builder(getContext(), getResourceProvider())
+    private final AbstractConfigCell clearMessageDatabaseRow = cellGroup.appendCell(new ConfigCellTextCheckIcon(null, "ClearMessageDatabase", null, AyuData.totalSize > 0 ? AndroidUtilities.formatFileSize(AyuData.totalSize) : "...", R.drawable.msg_clear_solar, false, () -> {
+        if (AyuMessagesBackup.isBusy()) {
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.MessagesBackupAlreadyRunning)).show();
+            return;
+        }
+        new AlertDialog.Builder(getContext(), getResourceProvider())
             .setTitle(getString(R.string.ClearMessageDatabase))
             .setMessage(getString(R.string.AreYouSure))
             .setPositiveButton(getString(R.string.Clear), (dialog, which) -> {
@@ -204,7 +209,8 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
             })
             .setNegativeButton(getString(R.string.Cancel), (d, w) -> d.dismiss())
             .makeRed(AlertDialog.BUTTON_POSITIVE)
-            .show()));
+            .show();
+    }));
     // [Alexgram: Home Drawer] - Start
     private final AbstractConfigCell navigationDrawerRow = cellGroup.appendCell(
             new ConfigCellTextCheck(NekoConfig.navigationDrawerEnabled, null, getString(R.string.HomeDrawer))
@@ -296,8 +302,44 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
         super.onFragmentCreate();
         AyuData.loadSizes(this);
         AyuData.loadBackupCounts(this);
+        AyuMessagesBackup.setUiListener(this);
         return true;
     }
+
+    @Override
+    public void onFragmentDestroy() {
+        super.onFragmentDestroy();
+        AyuMessagesBackup.setUiListener(null);
+    }
+
+    // [Alexgram: Messages Backup Rows] - Start
+    private int lastBackupState = AyuMessagesBackup.STATE_IDLE;
+
+    @Override
+    public void onBackupStateChanged() {
+        int state = AyuMessagesBackup.getState();
+        boolean wasBusy = lastBackupState != AyuMessagesBackup.STATE_IDLE;
+        lastBackupState = state;
+        boolean exporting = state == AyuMessagesBackup.STATE_EXPORTING;
+        boolean importing = state == AyuMessagesBackup.STATE_IMPORTING;
+        ((ConfigCellTextCheckIcon) exportMessagesHistoryRow).setValue(exporting ? AyuMessagesBackup.getProgressPercent() + "%" : null);
+        ((ConfigCellTextCheckIcon) importMessagesHistoryRow).setValue(importing ? AyuMessagesBackup.getProgressPercent() + "%" : null);
+        if (listAdapter != null) {
+            int exportIndex = cellGroup.rows.indexOf(exportMessagesHistoryRow);
+            int importIndex = cellGroup.rows.indexOf(importMessagesHistoryRow);
+            if (exportIndex >= 0) {
+                listAdapter.notifyItemChanged(exportIndex);
+            }
+            if (importIndex >= 0) {
+                listAdapter.notifyItemChanged(importIndex);
+            }
+        }
+        if (state == AyuMessagesBackup.STATE_IDLE && wasBusy) {
+            // re-query the real counts, they changed after an import
+            AyuData.loadBackupCounts(this);
+        }
+    }
+    // [Alexgram: Messages Backup Rows] - End
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, android.content.Intent data) {

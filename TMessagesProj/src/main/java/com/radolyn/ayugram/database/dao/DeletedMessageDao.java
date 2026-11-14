@@ -53,6 +53,13 @@ public interface DeletedMessageDao {
     @Query("SELECT * FROM deletedmessage WHERE fakeId > :afterId ORDER BY fakeId LIMIT :limit")
     List<DeletedMessageFull> getFullMessagesAfter(long afterId, int limit);
 
+    @Query("SELECT fakeId FROM deletedmessage WHERE fakeId > :afterId ORDER BY fakeId LIMIT :limit")
+    List<Long> getIdsAfter(long afterId, int limit);
+
+    @Transaction
+    @Query("SELECT * FROM deletedmessage WHERE fakeId = :fakeId")
+    DeletedMessageFull getMessageFullById(long fakeId);
+
     @Query("SELECT COUNT(*) FROM deletedmessage")
     int countAll();
 

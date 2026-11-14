@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">ستتم كتابة جميع الرسائل المحذوفة والمعدلة المحفوظة إلى ملف نسخة احتياطية على جهازك. ملفات الوسائط موجودة بالفعل في مجلد التنزيلات وتبقى بعد إعادة التثبيت. بعد إعادة تثبيت التطبيق، استخدم استيراد سجل الرسائل لاستعادة كل شيء.</string>
     <string name="MessagesBackupExport">تصدير</string>
     <string name="MessagesBackupExportDone">تم تصدير %1$d رسالة محذوفة و %2$d رسالة معدلة</string>
+    <string name="MessagesBackupExportSkipped">تعذر تصدير %1$d رسالة</string>
     <string name="MessagesBackupExportFailed">فشل التصدير</string>
     <string name="MessagesBackupImportDone">تم استيراد %1$d رسالة محذوفة و %2$d رسالة معدلة، تم تخطي %3$d محفوظة مسبقاً</string>
     <string name="MessagesBackupImportFailed">فشل الاستيراد</string>
+    <string name="MessagesBackupAlreadyRunning">عملية نسخ احتياطي قيد التنفيذ بالفعل</string>
+    <string name="MessagesBackupNotificationChannel">النسخ الاحتياطي للرسائل</string>
+    <string name="MessagesBackupExportingNotification">جارٍ تصدير سجل الرسائل…</string>
+    <string name="MessagesBackupImportingNotification">جارٍ استيراد سجل الرسائل…</string>
+    <string name="MessagesBackupExportCancelled">تم إلغاء التصدير وحذف الملف الجزئي</string>
+    <string name="MessagesBackupImportCancelled">تم إلغاء الاستيراد، لم تتم استعادة أي شيء</string>
     <string name="MessagesBackupInvalidFile">هذا الملف ليس نسخة احتياطية صالحة للرسائل</string>
     <string name="MessagesBackupNewerVersion">تم إنشاء هذه النسخة الاحتياطية بإصدار أحدث من التطبيق. حدّث التطبيق أولاً</string>
     <string name="MessagesBackupRemapTitle">حساب مختلف</string>

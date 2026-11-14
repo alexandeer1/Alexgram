@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Tutti i messaggi eliminati e modificati salvati verranno scritti in un file di backup sul dispositivo. I file multimediali sono già nella cartella Download e sopravvivono alla reinstallazione. Dopo la reinstallazione, usa Importa cronologia messaggi per ripristinare tutto.</string>
     <string name="MessagesBackupExport">Esporta</string>
     <string name="MessagesBackupExportDone">Esportati %1$d messaggi eliminati e %2$d modificati</string>
+    <string name="MessagesBackupExportSkipped">%1$d messaggi non sono stati esportati</string>
     <string name="MessagesBackupExportFailed">Esportazione non riuscita</string>
     <string name="MessagesBackupImportDone">Importati %1$d messaggi eliminati e %2$d modificati, %3$d già salvati ignorati</string>
     <string name="MessagesBackupImportFailed">Importazione non riuscita</string>
+    <string name="MessagesBackupAlreadyRunning">Un\'operazione di backup è già in corso</string>
+    <string name="MessagesBackupNotificationChannel">Backup dei messaggi</string>
+    <string name="MessagesBackupExportingNotification">Esportazione cronologia messaggi…</string>
+    <string name="MessagesBackupImportingNotification">Importazione cronologia messaggi…</string>
+    <string name="MessagesBackupExportCancelled">Esportazione annullata, file parziale eliminato</string>
+    <string name="MessagesBackupImportCancelled">Importazione annullata, nulla è stato ripristinato</string>
     <string name="MessagesBackupInvalidFile">Questo file non è un backup dei messaggi valido</string>
     <string name="MessagesBackupNewerVersion">Questo backup è stato creato con una versione più recente dell\'app. Aggiorna prima l\'app</string>
     <string name="MessagesBackupRemapTitle">Account diverso</string>

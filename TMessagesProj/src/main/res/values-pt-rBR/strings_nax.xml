@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Todas as mensagens excluídas e editadas salvas serão gravadas em um arquivo de backup no seu dispositivo. Os arquivos de mídia já estão na pasta Downloads e sobrevivem à reinstalação. Após reinstalar, use Importar histórico de mensagens para restaurar tudo.</string>
     <string name="MessagesBackupExport">Exportar</string>
     <string name="MessagesBackupExportDone">Exportadas %1$d mensagens excluídas e %2$d editadas</string>
+    <string name="MessagesBackupExportSkipped">Não foi possível exportar %1$d mensagens</string>
     <string name="MessagesBackupExportFailed">Falha na exportação</string>
     <string name="MessagesBackupImportDone">Importadas %1$d mensagens excluídas e %2$d editadas, %3$d já salvas foram ignoradas</string>
     <string name="MessagesBackupImportFailed">Falha na importação</string>
+    <string name="MessagesBackupAlreadyRunning">Uma operação de backup já está em andamento</string>
+    <string name="MessagesBackupNotificationChannel">Backup de mensagens</string>
+    <string name="MessagesBackupExportingNotification">Exportando histórico de mensagens…</string>
+    <string name="MessagesBackupImportingNotification">Importando histórico de mensagens…</string>
+    <string name="MessagesBackupExportCancelled">Exportação cancelada, arquivo incompleto excluído</string>
+    <string name="MessagesBackupImportCancelled">Importação cancelada, nada foi restaurado</string>
     <string name="MessagesBackupInvalidFile">Este arquivo não é um backup de mensagens válido</string>
     <string name="MessagesBackupNewerVersion">Este backup foi criado com uma versão mais recente do app. Atualize o app primeiro</string>
     <string name="MessagesBackupRemapTitle">Conta diferente</string>

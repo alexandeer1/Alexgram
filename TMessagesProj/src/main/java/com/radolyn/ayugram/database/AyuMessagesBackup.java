@@ -9,14 +9,25 @@
 
 package com.radolyn.ayugram.database;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
+import android.provider.DocumentsContract;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.JsonWriter;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.radolyn.ayugram.database.dao.DeletedMessageDao;
 import com.radolyn.ayugram.database.dao.EditedMessageDao;
@@ -62,10 +73,19 @@ import java.util.Map;
  * a reinstall on their own, so only the records need to be backed up. On import,
  * media paths that no longer exist are re-resolved against the current
  * attachments folder by file name, so backups also survive a changed save path.
+ *
+ * Both operations run on a dedicated background thread: the UI is never blocked,
+ * progress is mirrored on the settings rows and on a status-bar notification
+ * (with a cancel action), and the result is delivered as a bulletin when the
+ * app is in the foreground or as a notification otherwise.
  */
 public class AyuMessagesBackup {
     public static final int REQUEST_EXPORT_MESSAGES = 4021;
     public static final int REQUEST_IMPORT_MESSAGES = 4022;
+
+    public static final int STATE_IDLE = 0;
+    public static final int STATE_EXPORTING = 1;
+    public static final int STATE_IMPORTING = 2;
 
     private static final String BACKUP_TYPE = "alexgram_messages_backup";
     private static final int BACKUP_VERSION = 1;
@@ -73,10 +93,48 @@ public class AyuMessagesBackup {
     private static final int SCHEMA_VERSION = 26;
     private static final int EXPORT_CHUNK_SIZE = 200;
 
+    private static final String NOTIFICATION_CHANNEL_ID = "ayu_messages_backup";
+    private static final int NOTIFICATION_ID_PROGRESS = 7301;
+    private static final int NOTIFICATION_ID_RESULT = 7302;
+    private static final int UI_UPDATE_EVERY = 250;
+
     private static final Map<String, Field> messageFieldMap = buildFieldMap(AyuMessageBase.class);
     private static final Map<String, Field> reactionFieldMap = buildFieldMap(DeletedMessageReaction.class, "fakeReactionId", "deletedMessageId");
 
+    private static volatile int state = STATE_IDLE;
+    private static volatile int progressProcessed;
+    private static volatile int progressTotal;
+    private static volatile boolean cancelRequested;
+    private static volatile UiListener uiListener;
+
+    public interface UiListener {
+        void onBackupStateChanged();
+    }
+
+    private static class CancelledException extends Exception {
+    }
+
+    static {
+        try {
+            IntentFilter filter = new IntentFilter(getCancelAction());
+            ContextCompat.registerReceiver(ApplicationLoader.applicationContext, new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    cancelRequested = true;
+                }
+            }, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+        // a killed process leaves its progress notification behind
+        cancelNotifications();
+    }
+
     private AyuMessagesBackup() {
+    }
+
+    private static String getCancelAction() {
+        return ApplicationLoader.applicationContext.getPackageName() + ".MESSAGES_BACKUP_CANCEL";
     }
 
     private static DeletedMessageDao deletedMessageDao() {
@@ -87,9 +145,43 @@ public class AyuMessagesBackup {
         return AyuData.getEditedMessageDao();
     }
 
+    // region background state
+
+    public static boolean isBusy() {
+        return state != STATE_IDLE;
+    }
+
+    public static int getState() {
+        return state;
+    }
+
+    public static int getProgressPercent() {
+        return progressTotal <= 0 ? 0 : Math.min(99, (int) (progressProcessed * 100L / progressTotal));
+    }
+
+    public static void setUiListener(UiListener listener) {
+        uiListener = listener;
+        if (listener != null && isBusy()) {
+            AndroidUtilities.runOnUIThread(listener::onBackupStateChanged);
+        }
+    }
+
+    private static void notifyUiChanged() {
+        UiListener listener = uiListener;
+        if (listener != null) {
+            AndroidUtilities.runOnUIThread(listener::onBackupStateChanged);
+        }
+    }
+
+    // endregion
+
     // region UI entry points
 
     public static void showExportDialog(BaseFragment fragment) {
+        if (isBusy()) {
+            bulletinAlreadyRunning(fragment);
+            return;
+        }
         if (fragment.getParentActivity() == null) {
             return;
         }
@@ -113,6 +205,10 @@ public class AyuMessagesBackup {
     }
 
     public static void showImportDialog(BaseFragment fragment) {
+        if (isBusy()) {
+            bulletinAlreadyRunning(fragment);
+            return;
+        }
         if (fragment.getParentActivity() == null) {
             return;
         }
@@ -141,7 +237,7 @@ public class AyuMessagesBackup {
         }
 
         if (requestCode == REQUEST_EXPORT_MESSAGES) {
-            export(fragment, uri);
+            startExport(uri);
         } else {
             importBackup(fragment, uri);
         }
@@ -155,8 +251,8 @@ public class AyuMessagesBackup {
         return progressDialog;
     }
 
-    private static void showDone(BaseFragment fragment, String message) {
-        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.done, message).show();
+    private static void bulletinAlreadyRunning(BaseFragment fragment) {
+        BulletinFactory.of(fragment).createSimpleBulletin(R.raw.error, LocaleController.getString(R.string.MessagesBackupAlreadyRunning)).show();
     }
 
     private static void showError(BaseFragment fragment, String message) {
@@ -167,31 +263,47 @@ public class AyuMessagesBackup {
 
     // region export
 
-    private static void export(BaseFragment fragment, Uri uri) {
-        AlertDialog progressDialog = showProgress(fragment);
-        Utilities.globalQueue.postRunnable(() -> {
+    private static void startExport(Uri uri) {
+        state = STATE_EXPORTING;
+        cancelRequested = false;
+        progressProcessed = 0;
+        progressTotal = 0;
+        notifyUiChanged();
+        showProgressNotification(R.string.MessagesBackupExportingNotification);
+        Thread thread = new Thread(() -> {
             int[] counts;
             try {
+                progressTotal = deletedMessageDao().countAll() + editedMessageDao().countAll();
                 counts = exportTo(uri);
+            } catch (CancelledException e) {
+                deleteDocument(uri);
+                finishOperation(LocaleController.getString(R.string.MessagesBackupExportCancelled), true);
+                return;
             } catch (Exception e) {
                 FileLog.e("messages backup export failed", e);
-                AndroidUtilities.runOnUIThread(() -> {
-                    progressDialog.dismiss();
-                    showError(fragment, LocaleController.getString(R.string.MessagesBackupExportFailed));
-                });
+                finishOperation(TextUtils.isEmpty(e.getMessage()) ? LocaleController.getString(R.string.MessagesBackupExportFailed) : e.getMessage(), true);
                 return;
             }
-            AndroidUtilities.runOnUIThread(() -> {
-                progressDialog.dismiss();
-                showDone(fragment, LocaleController.formatString(R.string.MessagesBackupExportDone, counts[0], counts[1]));
-            });
-        });
+            String text = LocaleController.formatString(R.string.MessagesBackupExportDone, counts[0], counts[1]);
+            if (counts[2] > 0) {
+                text += "\n" + LocaleController.formatString(R.string.MessagesBackupExportSkipped, counts[2]);
+            }
+            finishOperation(text, counts[2] > 0);
+        }, "AyuMessagesBackupExport");
+        thread.start();
     }
 
+    /**
+     * Returns {deleted, edited, skipped}. Rows are fetched one by one via id
+     * chunks: a single oversized row (bigger than the SQLite cursor window)
+     * would otherwise fail the entire batch query, so unreadable rows are
+     * skipped and reported instead of failing the whole export.
+     */
     public static int[] exportTo(Uri uri) throws Exception {
         Context context = ApplicationLoader.applicationContext;
         int deleted = 0;
         int edited = 0;
+        int skipped = 0;
         try (JsonWriter writer = new JsonWriter(new OutputStreamWriter(new BufferedOutputStream(context.getContentResolver().openOutputStream(uri)), StandardCharsets.UTF_8))) {
             writer.beginObject();
             writer.name("type").value(BACKUP_TYPE);
@@ -203,18 +315,36 @@ public class AyuMessagesBackup {
             writer.beginArray();
             long afterId = 0;
             while (true) {
-                List<DeletedMessageFull> batch = deletedMessageDao().getFullMessagesAfter(afterId, EXPORT_CHUNK_SIZE);
-                if (batch == null || batch.isEmpty()) {
+                if (cancelRequested) {
+                    throw new CancelledException();
+                }
+                List<Long> ids = deletedMessageDao().getIdsAfter(afterId, EXPORT_CHUNK_SIZE);
+                if (ids == null || ids.isEmpty()) {
                     break;
                 }
-                for (DeletedMessageFull full : batch) {
-                    // re-point stale paths (old cache refs) at the durable attachments copy before writing
-                    resolveMediaPaths(full.message);
-                    writeDeletedMessage(writer, full);
-                    deleted++;
+                for (long id : ids) {
+                    try {
+                        DeletedMessageFull full = deletedMessageDao().getMessageFullById(id);
+                        if (full == null || full.message == null) {
+                            continue;
+                        }
+                        // re-point stale paths (old cache refs) at the durable attachments copy before writing
+                        resolveMediaPaths(full.message);
+                        writeDeletedMessage(writer, full);
+                        deleted++;
+                    } catch (IOException e) {
+                        throw e; // the output stream itself is broken: the whole export must abort
+                    } catch (Exception e) {
+                        recoverWriter(writer);
+                        FileLog.e("messages backup: skipping unreadable deleted row " + id, e);
+                        skipped++;
+                    }
+                    progressProcessed++;
                 }
-                afterId = batch.get(batch.size() - 1).message.fakeId;
-                if (batch.size() < EXPORT_CHUNK_SIZE) {
+                afterId = ids.get(ids.size() - 1);
+                notifyUiChanged();
+                updateProgressNotification();
+                if (ids.size() < EXPORT_CHUNK_SIZE) {
                     break;
                 }
             }
@@ -224,17 +354,37 @@ public class AyuMessagesBackup {
             writer.beginArray();
             afterId = 0;
             while (true) {
-                List<EditedMessage> batch = editedMessageDao().getMessagesAfter(afterId, EXPORT_CHUNK_SIZE);
-                if (batch == null || batch.isEmpty()) {
+                if (cancelRequested) {
+                    throw new CancelledException();
+                }
+                List<Long> ids = editedMessageDao().getIdsAfter(afterId, EXPORT_CHUNK_SIZE);
+                if (ids == null || ids.isEmpty()) {
                     break;
                 }
-                for (EditedMessage revision : batch) {
-                    resolveMediaPaths(revision);
-                    writeFields(writer, revision, messageFieldMap);
-                    edited++;
+                for (long id : ids) {
+                    try {
+                        EditedMessage revision = editedMessageDao().getMessageById(id);
+                        if (revision == null) {
+                            continue;
+                        }
+                        resolveMediaPaths(revision);
+                        writer.beginObject();
+                        writeFields(writer, revision, messageFieldMap);
+                        writer.endObject();
+                        edited++;
+                    } catch (IOException e) {
+                        throw e; // the output stream itself is broken: the whole export must abort
+                    } catch (Exception e) {
+                        recoverWriter(writer);
+                        FileLog.e("messages backup: skipping unreadable edited row " + id, e);
+                        skipped++;
+                    }
+                    progressProcessed++;
                 }
-                afterId = batch.get(batch.size() - 1).fakeId;
-                if (batch.size() < EXPORT_CHUNK_SIZE) {
+                afterId = ids.get(ids.size() - 1);
+                notifyUiChanged();
+                updateProgressNotification();
+                if (ids.size() < EXPORT_CHUNK_SIZE) {
                     break;
                 }
             }
@@ -242,7 +392,7 @@ public class AyuMessagesBackup {
 
             writer.endObject();
         }
-        return new int[]{deleted, edited};
+        return new int[]{deleted, edited, skipped};
     }
 
     private static void writeDeletedMessage(JsonWriter writer, DeletedMessageFull full) throws Exception {
@@ -289,64 +439,66 @@ public class AyuMessagesBackup {
     private static void importBackup(BaseFragment fragment, Uri uri) {
         AlertDialog progressDialog = showProgress(fragment);
         Utilities.globalQueue.postRunnable(() -> {
-            long firstUserId;
+            ScanResult result;
             try {
-                firstUserId = scanForAccount(uri);
+                result = scanForAccount(uri);
             } catch (Exception e) {
                 FileLog.e("messages backup scan failed", e);
                 AndroidUtilities.runOnUIThread(() -> {
                     progressDialog.dismiss();
-                    showError(fragment, e.getMessage());
+                    showError(fragment, TextUtils.isEmpty(e.getMessage()) ? LocaleController.getString(R.string.MessagesBackupImportFailed) : e.getMessage());
                 });
                 return;
             }
 
             long currentUserId = UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId();
-            if (firstUserId != 0 && firstUserId != currentUserId) {
+            if (result.firstUserId != 0 && result.firstUserId != currentUserId) {
                 AndroidUtilities.runOnUIThread(() -> {
                     progressDialog.dismiss();
-                    showRemapDialog(fragment, uri);
+                    showRemapDialog(fragment, uri, result.totalRecords);
                 });
                 return;
             }
-            // scan dialog must go away before runImport shows its own progress
-            AndroidUtilities.runOnUIThread(progressDialog::dismiss);
-            runImport(fragment, uri, false);
+            AndroidUtilities.runOnUIThread(() -> {
+                progressDialog.dismiss();
+                startImport(uri, result.totalRecords, false);
+            });
         });
     }
 
-    private static void showRemapDialog(BaseFragment fragment, Uri uri) {
+    private static void showRemapDialog(BaseFragment fragment, Uri uri, int totalRecords) {
         new AlertDialog.Builder(fragment.getContext(), fragment.getResourceProvider())
                 .setTitle(LocaleController.getString(R.string.MessagesBackupRemapTitle))
                 .setMessage(LocaleController.getString(R.string.MessagesBackupRemapText))
-                .setPositiveButton(LocaleController.getString(R.string.MessagesBackupRemapToCurrent), (dialog, which) -> runImport(fragment, uri, true))
-                .setNeutralButton(LocaleController.getString(R.string.MessagesBackupRemapKeep), (dialog, which) -> runImport(fragment, uri, false))
+                .setPositiveButton(LocaleController.getString(R.string.MessagesBackupRemapToCurrent), (dialog, which) -> startImport(uri, totalRecords, true))
+                .setNeutralButton(LocaleController.getString(R.string.MessagesBackupRemapKeep), (dialog, which) -> startImport(uri, totalRecords, false))
                 .setNegativeButton(LocaleController.getString(R.string.Cancel), (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
-    private static void runImport(BaseFragment fragment, Uri uri, boolean remapToCurrentAccount) {
-        // may be entered from the scan worker on globalQueue: dialogs must be shown from the main thread
-        AndroidUtilities.runOnUIThread(() -> {
-            AlertDialog progressDialog = showProgress(fragment);
-            Utilities.globalQueue.postRunnable(() -> {
-                int[] counts;
-                try {
-                    counts = importFrom(uri, remapToCurrentAccount);
-                } catch (Exception e) {
-                    FileLog.e("messages backup import failed", e);
-                    AndroidUtilities.runOnUIThread(() -> {
-                        progressDialog.dismiss();
-                        showError(fragment, TextUtils.isEmpty(e.getMessage()) ? LocaleController.getString(R.string.MessagesBackupImportFailed) : e.getMessage());
-                    });
-                    return;
-                }
-                AndroidUtilities.runOnUIThread(() -> {
-                    progressDialog.dismiss();
-                    showDone(fragment, LocaleController.formatString(R.string.MessagesBackupImportDone, counts[0], counts[1], counts[2] + counts[3]));
-                });
-            });
-        });
+    private static void startImport(Uri uri, int totalRecords, boolean remapToCurrentAccount) {
+        state = STATE_IMPORTING;
+        cancelRequested = false;
+        progressProcessed = 0;
+        progressTotal = totalRecords;
+        notifyUiChanged();
+        showProgressNotification(R.string.MessagesBackupImportingNotification);
+        Thread thread = new Thread(() -> {
+            int[] counts;
+            try {
+                counts = importFrom(uri, remapToCurrentAccount);
+            } catch (CancelledException e) {
+                // the transaction rolled back, so nothing was restored
+                finishOperation(LocaleController.getString(R.string.MessagesBackupImportCancelled), true);
+                return;
+            } catch (Exception e) {
+                FileLog.e("messages backup import failed", e);
+                finishOperation(TextUtils.isEmpty(e.getMessage()) ? LocaleController.getString(R.string.MessagesBackupImportFailed) : e.getMessage(), true);
+                return;
+            }
+            finishOperation(LocaleController.formatString(R.string.MessagesBackupImportDone, counts[0], counts[2], counts[1] + counts[3]), false);
+        }, "AyuMessagesBackupImport");
+        thread.start();
     }
 
     public static int[] importFrom(Uri uri, boolean remapToCurrentAccount) throws Exception {
@@ -380,6 +532,9 @@ public class AyuMessagesBackup {
             if ("deletedMessages".equals(name)) {
                 reader.beginArray();
                 while (reader.hasNext()) {
+                    if (cancelRequested) {
+                        throw new CancelledException();
+                    }
                     DeletedMessageFull full = readDeletedMessage(reader);
                     if (remapToCurrentAccount) {
                         full.message.userId = currentUserId;
@@ -389,21 +544,25 @@ public class AyuMessagesBackup {
                     // message can never be imported twice
                     if (deletedMessageDao().existsByMessageId(full.message.userId, full.message.dialogId, full.message.messageId)) {
                         counters[1]++;
-                        continue;
-                    }
-                    long fakeId = deletedMessageDao().insert(full.message);
-                    if (fakeId != 0 && full.reactions != null) {
-                        for (DeletedMessageReaction reaction : full.reactions) {
-                            reaction.deletedMessageId = fakeId;
-                            deletedMessageDao().insertReaction(reaction);
+                    } else {
+                        long fakeId = deletedMessageDao().insert(full.message);
+                        if (fakeId != 0 && full.reactions != null) {
+                            for (DeletedMessageReaction reaction : full.reactions) {
+                                reaction.deletedMessageId = fakeId;
+                                deletedMessageDao().insertReaction(reaction);
+                            }
                         }
+                        counters[0]++;
                     }
-                    counters[0]++;
+                    onRecordProcessed();
                 }
                 reader.endArray();
             } else if ("editedMessages".equals(name)) {
                 reader.beginArray();
                 while (reader.hasNext()) {
+                    if (cancelRequested) {
+                        throw new CancelledException();
+                    }
                     EditedMessage revision = new EditedMessage();
                     reader.beginObject();
                     while (reader.hasNext()) {
@@ -416,10 +575,11 @@ public class AyuMessagesBackup {
                     resolveMediaPaths(revision);
                     if (editedMessageDao().existsRevision(revision.userId, revision.dialogId, revision.messageId, revision.entityCreateDate, revision.text)) {
                         counters[3]++;
-                        continue;
+                    } else {
+                        editedMessageDao().insert(revision);
+                        counters[2]++;
                     }
-                    editedMessageDao().insert(revision);
-                    counters[2]++;
+                    onRecordProcessed();
                 }
                 reader.endArray();
             } else {
@@ -427,6 +587,14 @@ public class AyuMessagesBackup {
             }
         }
         reader.endObject();
+    }
+
+    private static void onRecordProcessed() {
+        progressProcessed++;
+        if (progressProcessed % UI_UPDATE_EVERY == 0) {
+            notifyUiChanged();
+            updateProgressNotification();
+        }
     }
 
     private static DeletedMessageFull readDeletedMessage(JsonReader reader) throws Exception {
@@ -490,13 +658,14 @@ public class AyuMessagesBackup {
     }
 
     /**
-     * First pass over the file: validates the header and grabs the userId of the
-     * first record of either array to detect a cross-account restore. Everything
-     * else is skipped by streaming, so it is fast even on huge backups.
+     * First pass over the file: validates the header, counts the records (used
+     * as the progress total) and grabs the userId of the first record of either
+     * array to detect a cross-account restore. Everything else is skipped by
+     * streaming, so it is fast even on huge backups.
      */
-    private static long scanForAccount(Uri uri) throws Exception {
+    private static ScanResult scanForAccount(Uri uri) throws Exception {
         Context context = ApplicationLoader.applicationContext;
-        long firstUserId = 0;
+        ScanResult result = new ScanResult();
         String type = null;
         int schemaVersion = 0;
         try (JsonReader reader = new JsonReader(new InputStreamReader(new BufferedInputStream(context.getContentResolver().openInputStream(uri)), StandardCharsets.UTF_8))) {
@@ -508,54 +677,197 @@ public class AyuMessagesBackup {
                 } else if ("schemaVersion".equals(name)) {
                     schemaVersion = reader.nextInt();
                 } else if ("deletedMessages".equals(name) || "editedMessages".equals(name)) {
-                    if (firstUserId == 0) {
-                        firstUserId = peekFirstUserId(reader);
-                    } else {
-                        reader.skipValue();
+                    long[] userIdAndCount = readFirstUserIdAndCount(reader);
+                    if (result.firstUserId == 0 && userIdAndCount[0] != 0) {
+                        result.firstUserId = userIdAndCount[0];
                     }
+                    result.totalRecords += (int) userIdAndCount[1];
                 } else {
                     reader.skipValue();
                 }
             }
             reader.endObject();
         }
-        validate(type, schemaVersion, firstUserId);
-        return firstUserId;
+        validate(type, schemaVersion, result.firstUserId);
+        return result;
     }
 
-    private static long peekFirstUserId(JsonReader reader) throws Exception {
+    private static long[] readFirstUserIdAndCount(JsonReader reader) throws Exception {
         long userId = 0;
+        int count = 0;
         reader.beginArray();
-        if (reader.hasNext()) {
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String key = reader.nextName();
-                if ("userId".equals(key)) {
-                    userId = reader.nextLong();
-                    break;
-                }
-                reader.skipValue();
-            }
-            while (reader.hasNext()) {
-                reader.skipValue();
-            }
-            reader.endObject();
-        }
         while (reader.hasNext()) {
-            reader.skipValue();
+            if (count == 0) {
+                reader.beginObject();
+                while (reader.hasNext()) {
+                    String key = reader.nextName();
+                    if ("userId".equals(key)) {
+                        userId = reader.nextLong();
+                        break;
+                    }
+                    reader.skipValue();
+                }
+                while (reader.hasNext()) {
+                    reader.skipValue();
+                }
+                reader.endObject();
+            } else {
+                reader.skipValue();
+            }
+            count++;
         }
         reader.endArray();
-        return userId;
+        return new long[]{userId, count};
     }
 
-    private static long validate(String type, int schemaVersion, long firstUserId) throws IOException {
+    private static void validate(String type, int schemaVersion, long firstUserId) throws IOException {
         if (!BACKUP_TYPE.equals(type)) {
             throw new IOException(LocaleController.getString(R.string.MessagesBackupInvalidFile));
         }
         if (schemaVersion > SCHEMA_VERSION) {
             throw new IOException(LocaleController.getString(R.string.MessagesBackupNewerVersion));
         }
-        return firstUserId;
+    }
+
+    private static class ScanResult {
+        long firstUserId;
+        int totalRecords;
+    }
+
+    // endregion
+
+    // region finish + result delivery
+
+    private static void finishOperation(String text, boolean isError) {
+        state = STATE_IDLE;
+        notifyUiChanged();
+        cancelProgressNotification();
+        deliverResult(text, isError);
+    }
+
+    private static void deliverResult(String text, boolean isError) {
+        boolean notified = false;
+        // while the app is in the background, or for failures, the status bar is
+        // the only place the user is guaranteed to see the outcome
+        if (ApplicationLoader.mainInterfacePaused || isError) {
+            notified = postResultNotification(text, isError);
+        }
+        if (!notified) {
+            AndroidUtilities.runOnUIThread(() -> {
+                try {
+                    BulletinFactory.global().createSimpleBulletin(isError ? R.raw.error : R.raw.done, text).show();
+                } catch (Throwable ignored) {
+                }
+            });
+        }
+    }
+
+    // endregion
+
+    // region notifications
+
+    private static void ensureChannel() {
+        try {
+            NotificationManager manager = (NotificationManager) ApplicationLoader.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager == null) {
+                return;
+            }
+            NotificationChannel channel = manager.getNotificationChannel(NOTIFICATION_CHANNEL_ID);
+            if (channel == null) {
+                channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, LocaleController.getString(R.string.MessagesBackupNotificationChannel), NotificationManager.IMPORTANCE_LOW);
+                manager.createNotificationChannel(channel);
+            }
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    private static void showProgressNotification(int titleRes) {
+        try {
+            ensureChannel();
+            NotificationCompat.Builder builder = progressNotificationBuilder(LocaleController.getString(titleRes));
+            builder.setProgress(100, 0, true);
+            NotificationManagerCompat.from(ApplicationLoader.applicationContext).notify(NOTIFICATION_ID_PROGRESS, builder.build());
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    private static void updateProgressNotification() {
+        try {
+            ensureChannel();
+            NotificationCompat.Builder builder = progressNotificationBuilder(LocaleController.getString(state == STATE_IMPORTING ? R.string.MessagesBackupImportingNotification : R.string.MessagesBackupExportingNotification));
+            builder.setProgress(100, getProgressPercent(), false);
+            NotificationManagerCompat.from(ApplicationLoader.applicationContext).notify(NOTIFICATION_ID_PROGRESS, builder.build());
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    private static NotificationCompat.Builder progressNotificationBuilder(String title) {
+        return new NotificationCompat.Builder(ApplicationLoader.applicationContext, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification)
+                .setContentTitle(title)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setContentIntent(contentPendingIntent())
+                .addAction(0, LocaleController.getString(R.string.Cancel), cancelPendingIntent());
+    }
+
+    private static boolean postResultNotification(String text, boolean isError) {
+        try {
+            ensureChannel();
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(ApplicationLoader.applicationContext, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.notification)
+                    .setContentTitle(LocaleController.getString(R.string.MessagesBackupNotificationChannel))
+                    .setContentText(text)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                    .setAutoCancel(true)
+                    .setContentIntent(contentPendingIntent());
+            NotificationManagerCompat.from(ApplicationLoader.applicationContext).notify(NOTIFICATION_ID_RESULT, builder.build());
+            return true;
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return false;
+        }
+    }
+
+    private static void cancelProgressNotification() {
+        try {
+            NotificationManagerCompat.from(ApplicationLoader.applicationContext).cancel(NOTIFICATION_ID_PROGRESS);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    private static void cancelNotifications() {
+        try {
+            NotificationManagerCompat.from(ApplicationLoader.applicationContext).cancel(NOTIFICATION_ID_PROGRESS);
+            NotificationManagerCompat.from(ApplicationLoader.applicationContext).cancel(NOTIFICATION_ID_RESULT);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    private static PendingIntent contentPendingIntent() {
+        Intent launch = ApplicationLoader.applicationContext.getPackageManager().getLaunchIntentForPackage(ApplicationLoader.applicationContext.getPackageName());
+        if (launch == null) {
+            launch = new Intent();
+        }
+        return PendingIntent.getActivity(ApplicationLoader.applicationContext, 0, launch, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    private static PendingIntent cancelPendingIntent() {
+        Intent intent = new Intent(getCancelAction());
+        return PendingIntent.getBroadcast(ApplicationLoader.applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    private static void deleteDocument(Uri uri) {
+        try {
+            DocumentsContract.deleteDocument(ApplicationLoader.applicationContext.getContentResolver(), uri);
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
     }
 
     // endregion
@@ -584,6 +896,21 @@ public class AyuMessagesBackup {
             return candidate.getAbsolutePath();
         }
         return path;
+    }
+
+    /**
+     * If a row failed mid-write the JsonWriter is left with unclosed nesting;
+     * close whatever level we are stuck at so the remaining rows stay valid.
+     */
+    private static void recoverWriter(JsonWriter writer) {
+        try {
+            writer.endArray();
+        } catch (Throwable ignored) {
+        }
+        try {
+            writer.endObject();
+        } catch (Throwable ignored) {
+        }
     }
 
     private static Map<String, Field> buildFieldMap(Class<?> clazz, String... excluded) {

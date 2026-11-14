@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">所有已保存的删除和编辑消息将写入设备上的备份文件。媒体文件已在 Downloads 文件夹中，重新安装后仍会保留。重新安装后，使用“导入消息历史”恢复全部内容。</string>
     <string name="MessagesBackupExport">导出</string>
     <string name="MessagesBackupExportDone">已导出 %1$d 条删除消息和 %2$d 条编辑消息</string>
+    <string name="MessagesBackupExportSkipped">%1$d 条消息无法导出</string>
     <string name="MessagesBackupExportFailed">导出失败</string>
     <string name="MessagesBackupImportDone">已导入 %1$d 条删除消息和 %2$d 条编辑消息，跳过 %3$d 条已存在</string>
     <string name="MessagesBackupImportFailed">导入失败</string>
+    <string name="MessagesBackupAlreadyRunning">已有备份操作正在进行</string>
+    <string name="MessagesBackupNotificationChannel">消息备份</string>
+    <string name="MessagesBackupExportingNotification">正在导出消息历史…</string>
+    <string name="MessagesBackupImportingNotification">正在导入消息历史…</string>
+    <string name="MessagesBackupExportCancelled">导出已取消，不完整的文件已删除</string>
+    <string name="MessagesBackupImportCancelled">导入已取消，未恢复任何内容</string>
     <string name="MessagesBackupInvalidFile">此文件不是有效的消息备份</string>
     <string name="MessagesBackupNewerVersion">此备份由更新版本的应用创建，请先更新应用</string>
     <string name="MessagesBackupRemapTitle">账号不同</string>

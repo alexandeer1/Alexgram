@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Todos los mensajes eliminados y editados guardados se escribirán en un archivo de copia de seguridad en tu dispositivo. Los archivos multimedia ya están en la carpeta de Descargas y sobreviven a la reinstalación. Tras reinstalar, usa Importar historial de mensajes para restaurar todo.</string>
     <string name="MessagesBackupExport">Exportar</string>
     <string name="MessagesBackupExportDone">Se exportaron %1$d mensajes eliminados y %2$d editados</string>
+    <string name="MessagesBackupExportSkipped">No se pudieron exportar %1$d mensajes</string>
     <string name="MessagesBackupExportFailed">Error al exportar</string>
     <string name="MessagesBackupImportDone">Se importaron %1$d mensajes eliminados y %2$d editados, se omitieron %3$d ya guardados</string>
     <string name="MessagesBackupImportFailed">Error al importar</string>
+    <string name="MessagesBackupAlreadyRunning">Ya se está ejecutando una operación de copia de seguridad</string>
+    <string name="MessagesBackupNotificationChannel">Copia de seguridad de mensajes</string>
+    <string name="MessagesBackupExportingNotification">Exportando historial de mensajes…</string>
+    <string name="MessagesBackupImportingNotification">Importando historial de mensajes…</string>
+    <string name="MessagesBackupExportCancelled">Exportación cancelada, archivo incompleto eliminado</string>
+    <string name="MessagesBackupImportCancelled">Importación cancelada, no se restauró nada</string>
     <string name="MessagesBackupInvalidFile">Este archivo no es una copia de seguridad de mensajes válida</string>
     <string name="MessagesBackupNewerVersion">Esta copia de seguridad se creó con una versión más reciente de la app. Actualiza la app primero</string>
     <string name="MessagesBackupRemapTitle">Cuenta diferente</string>

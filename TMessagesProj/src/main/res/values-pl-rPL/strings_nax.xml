@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Wszystkie zapisane usunięte i edytowane wiadomości zostaną zapisane w pliku kopii zapasowej na urządzeniu. Pliki multimedialne są już w folderze Pobrane i przetrwają ponowną instalację. Po ponownej instalacji użyj opcji Importuj historię wiadomości, aby przywrócić wszystko.</string>
     <string name="MessagesBackupExport">Eksportuj</string>
     <string name="MessagesBackupExportDone">Wyeksportowano %1$d usuniętych i %2$d edytowanych wiadomości</string>
+    <string name="MessagesBackupExportSkipped">Nie można wyeksportować %1$d wiadomości</string>
     <string name="MessagesBackupExportFailed">Eksport nie powiódł się</string>
     <string name="MessagesBackupImportDone">Zaimportowano %1$d usuniętych i %2$d edytowanych wiadomości, pominięto %3$d już zapisanych</string>
     <string name="MessagesBackupImportFailed">Import nie powiódł się</string>
+    <string name="MessagesBackupAlreadyRunning">Operacja tworzenia kopii zapasowej jest już uruchomiona</string>
+    <string name="MessagesBackupNotificationChannel">Kopia zapasowa wiadomości</string>
+    <string name="MessagesBackupExportingNotification">Eksportowanie historii wiadomości…</string>
+    <string name="MessagesBackupImportingNotification">Importowanie historii wiadomości…</string>
+    <string name="MessagesBackupExportCancelled">Eksport anulowano, usunięto niekompletny plik</string>
+    <string name="MessagesBackupImportCancelled">Import anulowano, nic nie przywrócono</string>
     <string name="MessagesBackupInvalidFile">Ten plik nie jest prawidłową kopią zapasową wiadomości</string>
     <string name="MessagesBackupNewerVersion">Ta kopia zapasowa została utworzona w nowszej wersji aplikacji. Najpierw zaktualizuj aplikację</string>
     <string name="MessagesBackupRemapTitle">Inne konto</string>

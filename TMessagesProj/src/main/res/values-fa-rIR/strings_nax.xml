@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">همه پیام‌های حذف‌شده و ویرایش‌شده ذخیره‌شده در یک فایل پشتیبان روی دستگاه شما نوشته می‌شوند. فایل‌های رسانه از قبل در پوشه Downloads هستند و پس از نصب مجدد باقی می‌مانند. بعد از نصب مجدد، برای بازگرداندن همه‌چیز از «ورود تاریخچه پیام‌ها» استفاده کنید.</string>
     <string name="MessagesBackupExport">خروجی</string>
     <string name="MessagesBackupExportDone">%1$d پیام حذف‌شده و %2$d پیام ویرایش‌شده خروجی گرفته شد</string>
+    <string name="MessagesBackupExportSkipped">%1$d پیام قابل خروجی گرفتن نبود</string>
     <string name="MessagesBackupExportFailed">خروجی گرفتن ناموفق بود</string>
     <string name="MessagesBackupImportDone">%1$d پیام حذف‌شده و %2$d پیام ویرایش‌شده وارد شد، %3$d مورد تکراری نادیده گرفته شد</string>
     <string name="MessagesBackupImportFailed">ورود اطلاعات ناموفق بود</string>
+    <string name="MessagesBackupAlreadyRunning">یک عملیات پشتیبان‌گیری در حال اجرا است</string>
+    <string name="MessagesBackupNotificationChannel">پشتیبان‌گیری پیام‌ها</string>
+    <string name="MessagesBackupExportingNotification">در حال خروجی گرفتن از تاریخچه پیام‌ها…</string>
+    <string name="MessagesBackupImportingNotification">در حال ورود تاریخچه پیام‌ها…</string>
+    <string name="MessagesBackupExportCancelled">خروجی گرفتن لغو شد، فایل ناقص حذف شد</string>
+    <string name="MessagesBackupImportCancelled">ورود اطلاعات لغو شد، هیچ چیز بازیابی نشد</string>
     <string name="MessagesBackupInvalidFile">این فایل یک نسخه پشتیبان معتبر پیام‌ها نیست</string>
     <string name="MessagesBackupNewerVersion">این نسخه پشتیبان با نسخه جدیدتر برنامه ساخته شده است. ابتدا برنامه را به‌روزرسانی کنید</string>
     <string name="MessagesBackupRemapTitle">حساب متفاوت</string>

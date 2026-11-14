@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">所有已儲存的刪除與編輯訊息將寫入裝置上的備份檔案。媒體檔案已在 Downloads 資料夾中，重新安裝後仍會保留。重新安裝後，使用「匯入訊息歷史」還原全部內容。</string>
     <string name="MessagesBackupExport">匯出</string>
     <string name="MessagesBackupExportDone">已匯出 %1$d 則刪除訊息和 %2$d 則編輯訊息</string>
+    <string name="MessagesBackupExportSkipped">%1$d 則訊息無法匯出</string>
     <string name="MessagesBackupExportFailed">匯出失敗</string>
     <string name="MessagesBackupImportDone">已匯入 %1$d 則刪除訊息和 %2$d 則編輯訊息，略過 %3$d 則已存在</string>
     <string name="MessagesBackupImportFailed">匯入失敗</string>
+    <string name="MessagesBackupAlreadyRunning">已有備份作業正在進行</string>
+    <string name="MessagesBackupNotificationChannel">訊息備份</string>
+    <string name="MessagesBackupExportingNotification">正在匯出訊息歷史…</string>
+    <string name="MessagesBackupImportingNotification">正在匯入訊息歷史…</string>
+    <string name="MessagesBackupExportCancelled">匯出已取消，不完整的檔案已刪除</string>
+    <string name="MessagesBackupImportCancelled">匯入已取消，未還原任何內容</string>
     <string name="MessagesBackupInvalidFile">此檔案不是有效的訊息備份</string>
     <string name="MessagesBackupNewerVersion">此備份由較新版本的應用程式建立，請先更新應用程式</string>
     <string name="MessagesBackupRemapTitle">帳號不同</string>

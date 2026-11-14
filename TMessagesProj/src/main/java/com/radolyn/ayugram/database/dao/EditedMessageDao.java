@@ -30,6 +30,12 @@ public interface EditedMessageDao {
     @Query("SELECT * FROM editedmessage WHERE fakeId > :afterId ORDER BY fakeId LIMIT :limit")
     List<EditedMessage> getMessagesAfter(long afterId, int limit);
 
+    @Query("SELECT fakeId FROM editedmessage WHERE fakeId > :afterId ORDER BY fakeId LIMIT :limit")
+    List<Long> getIdsAfter(long afterId, int limit);
+
+    @Query("SELECT * FROM editedmessage WHERE fakeId = :fakeId")
+    EditedMessage getMessageById(long fakeId);
+
     @Query("SELECT COUNT(*) FROM editedmessage")
     int countAll();
 

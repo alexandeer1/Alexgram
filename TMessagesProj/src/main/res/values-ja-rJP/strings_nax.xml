@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">保存された削除済み・編集済みメッセージすべてを、端末上のバックアップファイルに書き出します。メディアファイルはすでにダウンロードフォルダにあり、再インストール後も残ります。再インストール後は「メッセージ履歴をインポート」ですべて復元できます。</string>
     <string name="MessagesBackupExport">エクスポート</string>
     <string name="MessagesBackupExportDone">削除済み %1$d 件・編集済み %2$d 件のメッセージをエクスポートしました</string>
+    <string name="MessagesBackupExportSkipped">%1$d 件のメッセージをエクスポートできませんでした</string>
     <string name="MessagesBackupExportFailed">エクスポートに失敗しました</string>
     <string name="MessagesBackupImportDone">削除済み %1$d 件・編集済み %2$d 件のメッセージをインポートしました（既存 %3$d 件はスキップ）</string>
     <string name="MessagesBackupImportFailed">インポートに失敗しました</string>
+    <string name="MessagesBackupAlreadyRunning">バックアップ操作がすでに実行中です</string>
+    <string name="MessagesBackupNotificationChannel">メッセージのバックアップ</string>
+    <string name="MessagesBackupExportingNotification">メッセージ履歴をエクスポート中…</string>
+    <string name="MessagesBackupImportingNotification">メッセージ履歴をインポート中…</string>
+    <string name="MessagesBackupExportCancelled">エクスポートをキャンセルしました。不完全なファイルは削除されました</string>
+    <string name="MessagesBackupImportCancelled">インポートをキャンセルしました。何も復元されていません</string>
     <string name="MessagesBackupInvalidFile">このファイルは有効なメッセージバックアップではありません</string>
     <string name="MessagesBackupNewerVersion">このバックアップは新しいバージョンのアプリで作成されました。先にアプリを更新してください</string>
     <string name="MessagesBackupRemapTitle">別のアカウント</string>

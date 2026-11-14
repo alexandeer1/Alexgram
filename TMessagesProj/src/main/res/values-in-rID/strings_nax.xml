@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Semua pesan yang dihapus dan diedit yang tersimpan akan ditulis ke file cadangan di perangkatmu. File media sudah berada di folder Download dan tetap ada setelah instalasi ulang. Setelah instalasi ulang, gunakan Impor Riwayat Pesan untuk memulihkan semuanya.</string>
     <string name="MessagesBackupExport">Ekspor</string>
     <string name="MessagesBackupExportDone">%1$d pesan dihapus dan %2$d pesan diedit berhasil diekspor</string>
+    <string name="MessagesBackupExportSkipped">%1$d pesan tidak dapat diekspor</string>
     <string name="MessagesBackupExportFailed">Ekspor gagal</string>
     <string name="MessagesBackupImportDone">%1$d pesan dihapus dan %2$d pesan diedit berhasil diimpor, %3$d duplikat dilewati</string>
     <string name="MessagesBackupImportFailed">Impor gagal</string>
+    <string name="MessagesBackupAlreadyRunning">Operasi pencadangan sedang berjalan</string>
+    <string name="MessagesBackupNotificationChannel">Cadangan pesan</string>
+    <string name="MessagesBackupExportingNotification">Mengekspor riwayat pesan…</string>
+    <string name="MessagesBackupImportingNotification">Mengimpor riwayat pesan…</string>
+    <string name="MessagesBackupExportCancelled">Ekspor dibatalkan, file tidak lengkap dihapus</string>
+    <string name="MessagesBackupImportCancelled">Impor dibatalkan, tidak ada yang dipulihkan</string>
     <string name="MessagesBackupInvalidFile">File ini bukan cadangan pesan yang valid</string>
     <string name="MessagesBackupNewerVersion">Cadangan ini dibuat dengan versi aplikasi yang lebih baru. Perbarui aplikasi dulu</string>
     <string name="MessagesBackupRemapTitle">Akun Berbeda</string>

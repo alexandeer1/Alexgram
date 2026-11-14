@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">Alle gespeicherten gelöschten und bearbeiteten Nachrichten werden in eine Sicherungsdatei auf deinem Gerät geschrieben. Mediendateien liegen bereits im Downloads-Ordner und überstehen eine Neuinstallation. Nach der Neuinstallation kannst du mit „Nachrichtenverlauf importieren“ alles wiederherstellen.</string>
     <string name="MessagesBackupExport">Exportieren</string>
     <string name="MessagesBackupExportDone">%1$d gelöschte und %2$d bearbeitete Nachrichten exportiert</string>
+    <string name="MessagesBackupExportSkipped">%1$d Nachrichten konnten nicht exportiert werden</string>
     <string name="MessagesBackupExportFailed">Export fehlgeschlagen</string>
     <string name="MessagesBackupImportDone">%1$d gelöschte und %2$d bearbeitete Nachrichten importiert, %3$d bereits gespeicherte übersprungen</string>
     <string name="MessagesBackupImportFailed">Import fehlgeschlagen</string>
+    <string name="MessagesBackupAlreadyRunning">Ein Sicherungsvorgang läuft bereits</string>
+    <string name="MessagesBackupNotificationChannel">Nachrichtensicherung</string>
+    <string name="MessagesBackupExportingNotification">Nachrichtenverlauf wird exportiert…</string>
+    <string name="MessagesBackupImportingNotification">Nachrichtenverlauf wird importiert…</string>
+    <string name="MessagesBackupExportCancelled">Export abgebrochen, unvollständige Datei gelöscht</string>
+    <string name="MessagesBackupImportCancelled">Import abgebrochen, es wurde nichts wiederhergestellt</string>
     <string name="MessagesBackupInvalidFile">Diese Datei ist keine gültige Nachrichtensicherung</string>
     <string name="MessagesBackupNewerVersion">Diese Sicherung wurde mit einer neueren App-Version erstellt. Aktualisiere zuerst die App</string>
     <string name="MessagesBackupRemapTitle">Anderes Konto</string>

@@ -15,9 +15,16 @@
     <string name="MessagesBackupExportText">All saved deleted and edited messages will be written to a backup file on your device. Media files already live in the Downloads folder and survive reinstall. After reinstalling, use Import Messages History to restore everything.</string>
     <string name="MessagesBackupExport">Export</string>
     <string name="MessagesBackupExportDone">Exported %1$d deleted and %2$d edited messages</string>
+    <string name="MessagesBackupExportSkipped">%1$d messages could not be exported</string>
     <string name="MessagesBackupExportFailed">Export failed</string>
     <string name="MessagesBackupImportDone">Imported %1$d deleted and %2$d edited messages, skipped %3$d already saved</string>
     <string name="MessagesBackupImportFailed">Import failed</string>
+    <string name="MessagesBackupAlreadyRunning">A backup operation is already running</string>
+    <string name="MessagesBackupNotificationChannel">Messages backup</string>
+    <string name="MessagesBackupExportingNotification">Exporting messages history…</string>
+    <string name="MessagesBackupImportingNotification">Importing messages history…</string>
+    <string name="MessagesBackupExportCancelled">Export cancelled, partial file deleted</string>
+    <string name="MessagesBackupImportCancelled">Import cancelled, nothing was restored</string>
     <string name="MessagesBackupInvalidFile">This file is not a valid messages backup</string>
     <string name="MessagesBackupNewerVersion">This backup was created with a newer app version. Update the app first</string>
     <string name="MessagesBackupRemapTitle">Different Account</string>
